@@ -1,0 +1,7 @@
+#!/usr/bin/perl
+
+use strict;
+
+open FILE, "cacaprout.txt" or die $!;
+print FILE "GLAPAGOUGOU\n";
+close FILE;

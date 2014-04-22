@@ -1,0 +1,10 @@
+#!/usr/bin/perl
+
+use strict;
+
+my $nbRuns = 11;
+
+
+open FILE, ">cacaprout.txt" or die $!;
+print FILE "GLAPAGOUGOU\n";
+close FILE;

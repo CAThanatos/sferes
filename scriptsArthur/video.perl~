@@ -1,0 +1,55 @@
+#!/usr/bin/perl
+
+use strict;
+use Getopt::Std;
+
+my %conf = ();
+
+my $width = 800;
+my $height = 600;
+my $morph = 5;
+my $delay = 5;
+my $output = "output.mp4";
+my $rate = 25;
+my $quality = 2;
+
+getopts( 'o:m:d:s:r:q:', \%conf ) or die $!;
+
+if($conf{s})
+{
+	($width, $height) = split ':', $conf{s}, 2;
+}
+
+if($conf{m})
+{
+	$morph = $conf{m};
+}
+
+if($conf{o})
+{
+	$output = $conf{o};
+}
+
+if($conf{d})
+{
+	$delay = $conf{d};
+}
+
+if($conf{q})
+{
+	$quality = $conf{q};
+}
+
+if($conf{r})
+{
+	$rate = $conf{r};
+}
+
+print "mogrify -resize ${width}x${height} *.bmp\n";
+#system "mogrify -resize ${width}x${height} *.bmp";
+
+print "convert *.bmp -delay $delay -morph $morph %05d.morph.jpg\n";
+system "convert *.bmp -delay $delay -morph $morph %05d.morph.jpg";
+
+print "ffmpeg -r $rate -qscale $quality -i %05d.morph.jpg $output\n";
+system "ffmpeg -r $rate -qscale $quality -i %05d.morph.jpg $output";
