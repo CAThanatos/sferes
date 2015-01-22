@@ -246,14 +246,10 @@ namespace sferes
 							
 				dbg::out(dbg::info, "ea")<<"best fitness: " << this->_pop[0]->fit().value() << std::endl;
       }
-
-      const pop_t& pop_co() const { return _pop_co; };
-      pop_t& pop_co() { return _pop_co; };
       
     protected:
     	float _step_size;
     	float _step_size_co;
-    	pop_t _pop_co;
     	pop_t _mixed_pop;
 
       void _merge(const pop_t& pop1, const pop_t& pop2, pop_t& pop3)

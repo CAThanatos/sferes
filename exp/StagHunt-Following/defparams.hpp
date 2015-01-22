@@ -37,7 +37,11 @@ struct Params
 		
 		static const float waypoint_radius = 30.0f;
 
-#ifdef WAYPOINTS7
+#ifdef WAYPOINTS18
+		static const int nb_waypoints = 18;
+#elif defined(WAYPOINTS12)
+		static const int nb_waypoints = 12;
+#elif defined(WAYPOINTS7)
 		static const int nb_waypoints = 7;
 #elif defined(WAYPOINTS5)
 		static const int nb_waypoints = 5;

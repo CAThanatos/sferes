@@ -246,14 +246,10 @@ namespace sferes
 							
 				dbg::out(dbg::info, "ea")<<"best fitness: " << this->_pop[0]->fit().value() << std::endl;
       }
-
-      const pop_t& pop_co() const { return _pop_co; };
-      pop_t& pop_co() { return _pop_co; };
       
     protected:
     	float _step_size;
     	float _step_size_co;
-    	pop_t _pop_co;
     	pop_t _mixed_pop;
 
       void _merge(const pop_t& pop1, const pop_t& pop2, pop_t& pop3)
@@ -265,58 +261,6 @@ namespace sferes
 				pop3.insert(pop3.end(), pop2.begin(), pop2.end());
 				assert(pop3.size() == pop1.size() + pop2.size());
       }
-
-//       void _write_gen(int gen)
-//       {
-//         dbg::trace trace("ea", DBG_HERE);
-//         if (Params::pop::dump_period == -1)
-//           return;
-          
-//         std::string fname = _res_dir + std::string("/popGen_")
-//                             + boost::lexical_cast<std::string>(gen);
-//         std::ofstream ofs(fname.c_str());
-//         typedef boost::archive::binary_oarchive oa_t;
-//         oa_t oa(ofs);
-//         oa << BOOST_SERIALIZATION_NVP(_seed);
-//         oa << BOOST_SERIALIZATION_NVP(_pop);
-//         oa << BOOST_SERIALIZATION_NVP(_pop_co);
-//         std::cout << fname << " written" << std::endl;
-
-        
-//         // We use a new seed
-// 				time_t t = time(0) + ::getpid();
-// 				srand(t);
-// 				set_seed(t);
-//       }
-
-//       void _load_gen(const std::string& fname)
-//       {
-//         dbg::trace trace("ea", DBG_HERE);
-//         std::cout << "loading " << fname << std::endl;
-//         std::ifstream ifs(fname.c_str());
-//         if (ifs.fail())
-//         {
-//           std::cerr << "Cannot open :" << fname
-//                     << "(does file exist ?)" << std::endl;
-//           exit(1);
-//         }
-        
-// 				_gen = atof(fname.substr(fname.find_last_of("_") + 1, fname.length() - 1).c_str()) + 1;
-        
-//         typedef boost::archive::binary_iarchive ia_t;
-//         ia_t ia(ifs);
-//         ia >> BOOST_SERIALIZATION_NVP(_seed);
-//         ia >> BOOST_SERIALIZATION_NVP(_pop);
-//         ia >> BOOST_SERIALIZATION_NVP(_pop_co);
-
-        
-// //	        srand(_seed);
-
-//         // We use a new seed
-// 				time_t t = time(0) + ::getpid();
-// 				srand(t);
-// 				set_seed(t);
-//       }
     };
   }
 }

@@ -33,6 +33,8 @@ def build(bld):
                                         'COEVO WAYPOINTS3',
                                         'COEVO WAYPOINTS5',
                                         'COEVO WAYPOINTS7',
+                                        'COEVO WAYPOINTS12',
+                                        'COEVO WAYPOINTS18',
                                       ])
 
                                        

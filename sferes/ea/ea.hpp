@@ -218,6 +218,10 @@ namespace sferes
         }
         const pop_t& pop() const { return _pop; };
         pop_t& pop() { return _pop; };
+#ifdef COEVO
+        const pop_t& pop_co() const { return _pop_co; };
+        pop_t& pop_co() { return _pop_co; };
+#endif
         const eval_t& eval() const { return _eval; }
         eval_t& eval() { return _eval; }
         const stat_t& stat() const { return _stat; }
@@ -256,6 +260,9 @@ namespace sferes
         void set_seed(time_t seed) { _seed = seed; }
       protected:
         pop_t _pop;
+#ifdef COEVO
+        pop_t _pop_co;
+#endif
         eval_t _eval;
         stat_t _stat;
         modifier_t _fit_modifier;
@@ -303,9 +310,6 @@ namespace sferes
         }
         void _write_gen(int gen)
         {
-// #ifdef COEVO
-//           stc::exact(this)->_write_gen(gen);
-// #else
           dbg::trace trace("ea", DBG_HERE);
           if (Params::pop::dump_period == -1)
             return;
@@ -317,6 +321,9 @@ namespace sferes
           oa_t oa(ofs);
           oa << BOOST_SERIALIZATION_NVP(_seed);
 	        oa << BOOST_SERIALIZATION_NVP(_pop);
+#ifdef COEVO
+          oa << BOOST_SERIALIZATION_NVP(_pop_co);
+#endif
           std::cout << fname << " written" << std::endl;
 
           
@@ -324,13 +331,9 @@ namespace sferes
 					time_t t = time(0) + ::getpid();
 					srand(t);
 					set_seed(t);
-// #endif
         }
         void _load_gen(const std::string& fname)
         {
-// #ifdef COEVO
-//           stc::exact(this)->_load_gen(fname);
-// #else
           dbg::trace trace("ea", DBG_HERE);
           std::cout << "loading " << fname << std::endl;
           std::ifstream ifs(fname.c_str());
@@ -347,6 +350,9 @@ namespace sferes
           ia_t ia(ifs);
           ia >> BOOST_SERIALIZATION_NVP(_seed);
 	        ia >> BOOST_SERIALIZATION_NVP(_pop);
+#ifdef COEVO
+          ia >> BOOST_SERIALIZATION_NVP(_pop_co);
+#endif
 
 	        
 //	        srand(_seed);
@@ -355,7 +361,6 @@ namespace sferes
 					time_t t = time(0) + ::getpid();
 					srand(t);
 					set_seed(t);
-// #endif
         }
     };
   }
