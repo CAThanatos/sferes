@@ -1,5 +1,0 @@
-#include "Hare.hpp"
-
-void Hare::step_action()
-{
-}

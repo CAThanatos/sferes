@@ -1,6 +1,0 @@
-#include "StagHuntRobot.hpp"
-
-void StagHuntRobot::step_action()
-{
-	
-}
