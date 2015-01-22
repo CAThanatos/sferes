@@ -303,6 +303,9 @@ namespace sferes
         }
         void _write_gen(int gen)
         {
+// #ifdef COEVO
+//           stc::exact(this)->_write_gen(gen);
+// #else
           dbg::trace trace("ea", DBG_HERE);
           if (Params::pop::dump_period == -1)
             return;
@@ -321,9 +324,13 @@ namespace sferes
 					time_t t = time(0) + ::getpid();
 					srand(t);
 					set_seed(t);
+// #endif
         }
         void _load_gen(const std::string& fname)
         {
+// #ifdef COEVO
+//           stc::exact(this)->_load_gen(fname);
+// #else
           dbg::trace trace("ea", DBG_HERE);
           std::cout << "loading " << fname << std::endl;
           std::ifstream ifs(fname.c_str());
@@ -348,6 +355,7 @@ namespace sferes
 					time_t t = time(0) + ::getpid();
 					srand(t);
 					set_seed(t);
+// #endif
         }
     };
   }

@@ -18,7 +18,7 @@ namespace sferes
       {
 				_best = *ea.pop().begin();
 
-				this->_create_log_file(ea, "bestleadership.dat");
+				this->_create_log_file_leadership(ea, "bestleadership.dat");
 
 				if (ea.dump_enabled())
 				{
