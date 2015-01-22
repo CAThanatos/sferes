@@ -63,8 +63,8 @@ chdir "$dossier";
 print "convert *.bmp -delay $delay -morph $morph %05d.morph.jpg\n";
 system "convert *.bmp -delay $delay -morph $morph %05d.morph.jpg";
 
-print "ffmpeg -r $rate -qscale $quality -i %05d.morph.jpg $output\n";
-system "ffmpeg -r $rate -qscale $quality -i %05d.morph.jpg $output";
+print "avconv -r $rate -qscale $quality -i %05d.morph.jpg $output\n";
+system "avconv -r $rate -qscale $quality -i %05d.morph.jpg $output";
 
 print "rm *.morph.jpg\n";
 system "rm *.morph.jpg";

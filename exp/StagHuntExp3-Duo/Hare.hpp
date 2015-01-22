@@ -17,6 +17,22 @@ namespace sferes
 			{ 
 				_stamina = STAMINA; 
 				_type_prey = Prey::HARE; 
+
+#ifdef TRIGO
+#ifdef ONEVALUE
+				float angle_color = M_PI/4.0f;
+#elif defined(QUARTERVALUE)
+				float angle_color = misc::rand(0.0, M_PI/2);
+#else
+				float angle_color = misc::rand(0.0, 2.0f*M_PI/3.0f);
+
+				while(!(angle_color*10 < ceil(2.0f*M_PI/3.0f)*10))
+					angle_color = misc::rand(0.0, 2.0f*M_PI/3.0f);
+#endif
+
+				this->set_angle_color(angle_color);
+				this->set_color(color + angle_color*10);
+#endif
 			}
 			
 			~Hare()	{	}

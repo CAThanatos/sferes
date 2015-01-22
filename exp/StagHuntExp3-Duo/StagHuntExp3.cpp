@@ -94,10 +94,35 @@ namespace sferes
 				simu_t simu(map, (this->mode() == fit::mode::view));
 				init_simu(simu, nn1, nn2);
 
+#ifdef BEHAVIOUR_LOG
+				_file_behaviour = "behaviourTrace";
+				cpt_files = 0;
+#endif
+
+#ifdef COMPAS_LANDMARK
+		    width=simu.map()->get_real_w();
+		    height=simu.map()->get_real_h();
+		    Posture pos_landmark;
+
+#ifdef LANDMARK_CENTER
+				pos_landmark.set_x(width/2);
+				pos_landmark.set_y(height/2);
+#else
+				pos_landmark.set_x(misc::rand(0.0f, width));
+				pos_landmark.set_y(misc::rand(0.0f, height));
+#endif
+
+				simu.map()->set_landmark(pos_landmark);
+#endif
+
 #ifdef MLP_PERSO
 				StagHuntRobot* robotTmp = (StagHuntRobot*)(simu.robots()[0]);
 				Hunter* hunterTmp = (Hunter*)robotTmp;
-				hunterTmp->set_weights(ind.data());
+				hunterTmp->set_weights(ind1.data());
+
+				robotTmp = (StagHuntRobot*)(simu.robots()[1]);
+				hunterTmp = (Hunter*)robotTmp;
+				hunterTmp->set_weights(ind2.data());
 #endif
 	
 				float food_trial = 0;
@@ -111,7 +136,6 @@ namespace sferes
 					std::vector<size_t> ord_vect;
 					misc::rand_ind(ord_vect, simu.robots().size());
 					
-#ifdef COMPAS_PRED
 					// We update the compas information of each hunter
 					StagHuntRobot* robot1 = (StagHuntRobot*)(simu.robots()[0]);
 					Hunter* hunter1 = (Hunter*)robot1;
@@ -129,6 +153,33 @@ namespace sferes
 					float angle_toPred1 = normalize_angle(atan2(robot1->get_pos().y() - robot2->get_pos().y(), robot1->get_pos().x() - robot2->get_pos().x()));
 					angle_toPred1 = normalize_angle(angle_toPred1 - robot2->get_pos().theta());
 					hunter2->set_angle_hunter(angle_toPred1);
+
+					float direction_toPred2 = normalize_angle(robot2->get_pos().theta() - robot1->get_pos().theta());
+					hunter1->set_direction_hunter(direction_toPred2);
+
+					float direction_toPred1 = normalize_angle(robot1->get_pos().theta() - robot2->get_pos().theta());
+					hunter2->set_direction_hunter(direction_toPred1);
+
+#ifdef COMPAS_LANDMARK
+					// We update the compas information of each hunter
+					StagHuntRobot* robot1 = (StagHuntRobot*)(simu.robots()[0]);
+					Hunter* hunter1 = (Hunter*)robot1;
+					StagHuntRobot* robot2 = (StagHuntRobot*)(simu.robots()[1]);
+					Hunter* hunter2 = (Hunter*)robot2;
+	
+					float distance_toLandmark1 = robot1->get_pos().dist_to(pos_landmark.x(), pos_landmark.y());
+					hunter1->set_distance_landmark(distance_toLandmark1);
+	
+					float distance_toLandmark2 = robot2->get_pos().dist_to(pos_landmark.x(), pos_landmark.y());
+					hunter2->set_distance_landmark(distance_toLandmark2);
+					
+					float angle_toLandmark1 = normalize_angle(atan2(pos_landmark.y() - robot1->get_pos().y(), pos_landmark.x() - robot1->get_pos().x()));
+					angle_toLandmark1 = normalize_angle(angle_toLandmark1 - robot1->get_pos().theta());
+					hunter1->set_angle_landmark(angle_toLandmark1);
+					
+					float angle_toLandmark2 = normalize_angle(atan2(pos_landmark.y() - robot2->get_pos().y(), pos_landmark.x() - robot2->get_pos().x()));
+					angle_toLandmark2 = normalize_angle(angle_toLandmark2 - robot2->get_pos().theta());
+					hunter2->set_angle_landmark(angle_toLandmark2);
 #endif
 
 					for(int k = 0; k < ord_vect.size(); ++k)
@@ -236,8 +287,17 @@ namespace sferes
 						Prey::type_prey type = ((Prey*)simu.robots()[index])->get_type();
 						Posture pos;
 
+						int nb_blocked = ((Prey*)simu.robots()[index])->get_nb_blocked();
+						bool alone = (nb_blocked > 1) ? false : true;
+
+#ifdef BEHAVIOUR_LOG
 						if(this->mode() == fit::mode::view)
-							simu.add_dead_prey(index);
+						{
+							std::string fileDump = _file_behaviour + boost::lexical_cast<std::string>(cpt_files + 1) + ".bmp";
+       				simu.add_dead_prey(index, fileDump, alone);
+       				cpt_files++;
+						}
+#endif
 
 						bool pred_on_it = ((Prey*)simu.robots()[index])->is_pred_on_it();
 
@@ -267,6 +327,44 @@ namespace sferes
 								simu.add_robot(r);
 							}
 						}
+#ifdef CONFUSION
+						else
+						{
+							int nb_iter = 0;
+							int max_iter = 1000;
+							int fur_color = 0;		
+							Prey::type_prey type_stag = Prey::BIG_STAG;
+
+							while(((type_stag != type) && (nb_iter < max_iter)) || (nb_iter == 0))
+							{
+								nb_iter++;
+
+								fur_color = misc::rand(0, 100);
+							  	float proba_bstag = 1/(1 + exp(-Params::simu::k_confusion * (fur_color - 50)));
+
+							  	float rand_bstag = misc::rand(0.0f, 1.0f);
+							  	if(rand_bstag > proba_bstag)
+							  			type_stag = Prey::SMALL_STAG;
+								else
+										type_stag = Prey::BIG_STAG;
+							}
+
+
+							if(nb_iter == max_iter)
+								fur_color = (int)(((Stag*)simu.robots()[index])->fur_color());
+
+							Stag::type_stag type_tmp = Stag::big;
+							if(type == Prey::SMALL_STAG)
+								type_tmp = Stag::small;
+
+							if(simu.get_random_initial_position(Params::simu::big_stag_radius, pos))
+							{
+								Stag* r = new Stag(Params::simu::big_stag_radius, pos, BIG_STAG_COLOR, type_tmp, fur_color);
+									
+								simu.add_robot(r);
+							}
+						}
+#else
 						else if(type == Prey::SMALL_STAG)
 						{
 							if(simu.get_random_initial_position(Params::simu::big_stag_radius, pos))
@@ -315,8 +413,10 @@ namespace sferes
 								simu.add_robot(r);
 							}
 						}
+#endif
 					}
 				}
+
        	Hunter* h1 = (Hunter*)(simu.robots()[0]);
        	food1 += h1->get_food_gathered();
 		   	food_trial += h1->get_food_gathered();
@@ -350,13 +450,6 @@ namespace sferes
 				fit << "," << food_trial;
 #endif
        	
-#ifdef BEHAVIOUR_LOG
-       	if(this->mode() == fit::mode::view)
-       	{
-       		simu.dump_behaviour_log(_file_behaviour.c_str());
-       		return;
-       	}
-#endif
 #ifdef BEHAVIOUR_VIDEO
 				if(this->mode() == fit::mode::view)
 					return;
@@ -388,9 +481,11 @@ namespace sferes
 
 			food2 /= Params::simu::nb_trials;
 #endif
-			
-#ifdef NOT_AGAINST_ALL
+		
+#ifdef NOT_AGAINST_ALL	
 			int nb_encounters = Params::pop::nb_opponents*Params::pop::nb_eval;
+#elif defined(ALTRUISM)
+			int nb_encounters = 1;
 #else
 			int nb_encounters = Params::pop::size - 1;
 #endif
@@ -414,7 +509,7 @@ namespace sferes
      	moy_sstags2_solo /= nb_encounters;
      	moy_bstags2_solo /= nb_encounters;
      	
-#ifndef NOT_AGAINST_ALL     	
+#if !defined(NOT_AGAINST_ALL) && !defined(ALTRUISM)
 			ind2.add_nb_hares(moy_hares2, moy_hares1_solo);
 			ind2.add_nb_sstag(moy_sstags2, moy_sstags1_solo);
 			ind2.add_nb_bstag(moy_bstags2, moy_bstags1_solo);
@@ -446,7 +541,7 @@ namespace sferes
 
 			ind1.fit().add_fitness(food1);
 			
-#ifndef NOT_AGAINST_ALL
+#if !defined(NOT_AGAINST_ALL) && !defined(ALTRUISM)
 			ind2.fit().add_fitness(food2);
 #endif
 
@@ -546,11 +641,21 @@ namespace sferes
 			pos_init.push_back(Posture(width/3 + 0.05*width, height - 0.1*height, M_PI/2));
 			pos_init.push_back(Posture(2.0f * width/3 - 0.05*width, height - 0.1*height, M_PI/2));
 #else
+#ifdef MAP1600
+			pos_init.push_back(Posture(width/2, 160, M_PI/2));
+			pos_init.push_back(Posture(width/2, height - 160, -M_PI/2));
+#else
 			pos_init.push_back(Posture(width/2, 80, M_PI/2));
 			pos_init.push_back(Posture(width/2, height - 80, -M_PI/2));
+#endif
 #endif			
 
 			invers_pos = false;
+			
+#ifdef LEADERSHIP
+			bool leadership_hunter1 = misc::flip_coin();
+#endif
+			
 #ifdef SOLO
 			for(int i = 0; i < 1; ++i)
 #else
@@ -561,9 +666,17 @@ namespace sferes
 				Posture pos = (invers_pos) ? pos_init[(i + 1)%2] : pos_init[i];
 		
 				if(0 == i)
+#ifdef LEADERSHIP
+					r = new Hunter(Params::simu::hunter_radius, pos, HUNTER_COLOR, nn1, false, leadership_hunter1);
+#else
 					r = new Hunter(Params::simu::hunter_radius, pos, HUNTER_COLOR, nn1);
+#endif
 				else
+#ifdef LEADERSHIP
+					r = new Hunter(Params::simu::hunter_radius, pos, HUNTER_COLOR, nn2, false, !leadership_hunter1);
+#else
 					r = new Hunter(Params::simu::hunter_radius, pos, HUNTER_COLOR, nn2);
+#endif
 
 #ifdef PRED_IMMOBILE
 				if(i > 0)	
@@ -671,6 +784,60 @@ namespace sferes
 			}
 	
 			// And finally the big stags
+#ifdef CONFUSION
+			int nb_cur_small_stags = 0;
+			int nb_cur_big_stags = 0;
+			int nb_iter = 0;
+			int max_iter = 1000;
+
+			while(((nb_cur_small_stags < nb_small_stags) || (nb_cur_big_stags < nb_big_stags)) && (nb_iter < max_iter))
+			{
+				nb_iter++;
+
+				int fur_color = misc::rand(0, 100);
+		  	float proba_bstag = 1/(1 + exp(-Params::simu::k_confusion * (fur_color - 50)));
+
+		  	float rand_bstag = misc::rand(0.0f, 1.0f);
+		  	Stag::type_stag type = Stag::big;
+		  	if(rand_bstag <= proba_bstag)
+		  	{
+		  		if(nb_cur_big_stags < nb_big_stags)
+		  		{
+		  			nb_cur_big_stags++;
+		  		}
+		  		else
+		  			continue;
+		  	}
+		  	else
+		  	{
+		  		if(nb_cur_small_stags < nb_small_stags)
+		  		{
+		  			type = Stag::small;
+		  			nb_cur_small_stags++;
+		  		}
+		  		else
+		  			continue;
+		  	}
+			
+				Posture pos;
+
+				if(map2.get_random_initial_position(Params::simu::big_stag_radius + 5, pos))
+				{
+					Stag* r = new Stag(Params::simu::big_stag_radius, pos, BIG_STAG_COLOR, type, fur_color);
+
+					simu.add_robot(r);
+
+					float x = pos.x();
+					float y = pos.y();
+					float radius = Params::simu::big_stag_radius;
+					float _bbx = x - radius - 4;
+					float _bby = y - radius - 4;
+					float _bbw = radius * 2 + 8;
+					float _bbh = radius * 2 + 8;				
+					map2.add_robot_obstacle(x, y, radius, _bbx, _bby, _bbw, _bbh);
+				}
+			}
+#else
 			for(int i = 0; i < Params::simu::nb_big_stags; ++i)
 			{
 				int fur_color = 0;
@@ -712,6 +879,7 @@ namespace sferes
 					map2.add_robot_obstacle(x, y, radius, _bbx, _bby, _bbw, _bbh);
 				}
 			}
+#endif
 		}
     
     // *** Refresh infos about the robots
@@ -844,15 +1012,6 @@ namespace sferes
 		}
 #endif
 
-#ifdef BEHAVIOUR_LOG
-		std::string _file_behaviour;
-		
-		void set_file_behaviour(const std::string& file_behaviour)
-		{
-			_file_behaviour = file_behaviour;
-		}
-#endif
-
 #ifdef BEHAVIOUR_VIDEO
 		std::string _file_video;
 		
@@ -860,6 +1019,11 @@ namespace sferes
 		{
 			_file_video = file_video;
 		}
+#endif
+
+#ifdef BEHAVIOUR_LOG
+		std::string _file_behaviour;
+		int cpt_files;
 #endif
 
 		std::vector<float> vec_fitness;
@@ -922,9 +1086,9 @@ int main(int argc, char **argv)
 		  sferes::stat::MeanFitEval<phen_t, Params>,
 		  sferes::stat::BestEverFitEval<phen_t, Params>,
 		  sferes::stat::AllFitEvalStat<phen_t, Params>,
-#ifdef BEHAVIOUR_LOG
+/*#ifdef BEHAVIOUR_LOG
 		  sferes::stat::BestFitBehaviour<phen_t, Params>,
-#endif
+#endif*/
 #ifdef BEHAVIOUR_VIDEO
 		  sferes::stat::BestFitBehaviourVideo<phen_t, Params>,
 #endif

@@ -66,8 +66,8 @@ namespace fastsim
     void dump_display(const char * file);
     void dump_behaviour_log(const char * file);
     
-    void add_dead_prey(float x, float y, float radius, int color) { struct Position pos; pos.x = x; pos.y = y; pos.radius = radius; pos.color = color; _dead_preys_list.push_back(pos); }
-    void display_dead_prey(float x, float y, float radius, int color);
+    void add_dead_prey(float x, float y, float radius, int color, bool alone = true) { struct Position pos; pos.x = x; pos.y = y; pos.radius = radius; pos.color = color; pos.solo = alone; _dead_preys_list.push_back(pos); }
+    void display_dead_prey(float x, float y, float radius, int color, bool alone = true);
 #else
     Display(const boost::shared_ptr<Map>& m, const std::vector<Robot*>& r) : _map(m), _robots(r), _selected(0) {}
     ~Display() {}
@@ -184,6 +184,7 @@ namespace fastsim
     	float y;
     	float radius;
     	int color;
+    	bool solo;
     };
     std::vector<struct Position> _dead_preys_list;
     std::vector<struct Position> _start_positions;

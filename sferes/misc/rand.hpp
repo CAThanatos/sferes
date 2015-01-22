@@ -71,13 +71,15 @@ namespace sferes
 
 
     template<typename T>
-    inline T rand(T min, T max)
+    inline T rand(T min, T max, bool debug = false)
     {
       assert(max != min);
       assert(max > min);
       T res;
+
       do
-      	res = T(rand<double>() * ((long int) max - (long int) min) + min);
+        res = T(rand<double>() * ((long double) max - (long double) min) + min);
+//      	res = T(rand<double>() * ((long int) max - (long int) min) + min);
       while(res >= max || res < min); // Strange case happening too
       assert(res >= min);
       assert(res < max);

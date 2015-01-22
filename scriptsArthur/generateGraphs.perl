@@ -138,6 +138,7 @@ else
 	else
 	{
 		system "$dir/drawGraphs.perl -d $dossier/$typeData -m $iterMax";
+		#system "$dir/drawGraphs.perl -d $dossier/BestEverFit -m $iterMax";
 	}
 }
 

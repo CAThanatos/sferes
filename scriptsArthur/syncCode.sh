@@ -12,7 +12,7 @@ OPTIONS:
 	-s 	The site where to copy"
 }
 
-exp=
+exp=StagHuntExp3-Duo
 site=
 while getopts "he:s:" OPTION
 do
@@ -34,15 +34,9 @@ do
 	esac
 done
 
-if [[ -z $exp ]]
-then
-	Usage
-	exit 1
-fi
-
 if [[ -z $site ]]
 then
-	for i in rennes grenoble lille luxembourg lyon nancy reims sophia toulouse; do
+	for i in rennes grenoble lille luxembourg lyon nancy reims sophia toulouse nantes; do
 	#for i in rennes grenoble lille luxembourg lyon nancy reims sophia; do
 		echo "rsync on $i..."
 	

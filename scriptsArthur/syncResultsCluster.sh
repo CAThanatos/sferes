@@ -11,7 +11,7 @@ OPTIONS:
 	-d	The directory to copy"
 }
 
-dossier=
+dossier=ResultatsCluster
 while getopts "hd:" OPTION
 do
 	case $OPTION in
@@ -35,4 +35,4 @@ then
 	exit 1
 fi
 
-rsync -avz abernard@cluster.isir.upmc.fr:./Sferes/sferes/sferes2-0.99/$dossier /home/abernard/sferes2-0.99
+rsync -avz abernard@cluster.isir.upmc.fr:./sferes2-0.99/$dossier /home/abernard/sferes2-0.99

@@ -36,7 +36,8 @@ namespace fastsim
       _gap_dist(gap_dist), _gap_angle(gap_angle),
       _x(0), _y(0), 
       _x_pixel(0), _y_pixel(0),
-      _dist(-1) {}
+      _dist(-1) 
+      {}
     float update(const Posture& pos,
 		 const boost::shared_ptr<Map>& map);
     float get_dist() const { return _dist; }

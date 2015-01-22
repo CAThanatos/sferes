@@ -113,9 +113,10 @@ namespace sferes
         {
         	_display->dump_behaviour_log(file);
         }
-        void add_dead_prey(int index)
+        void add_dead_prey(int index, bool alone = true)
         {
-        	_display->add_dead_prey(_robots[index]->get_pos().x(), _robots[index]->get_pos().y(), _robots[index]->get_radius(), _robots[index]->display_color());
+					std::cout << "simu::add_dead_prey : " << alone << std::endl;
+        	_display->add_dead_prey(_robots[index]->get_pos().x(), _robots[index]->get_pos().y(), _robots[index]->get_radius(), _robots[index]->display_color(), alone);
         }
         void switch_map()
         {
@@ -206,82 +207,7 @@ namespace sferes
 			
 					return found;
         }
-        
-        // Used to get a random initial position in the map for a robot in a centered and defined circle.
-        // Not a very smart function so it's encouraged
-        // to use your own list of initial positions in a map with a lot of obstacles and/or robots as is
-        // could take a pretty long time for this function to get a valid position
-        bool get_random_initial_position_circle(float radius, fastsim::Posture &pos, float circle_radius, int max_tries = 1000)
-        {
-					// We don't want robots to appear outside the map
-					float x_min = (_map->get_real_w()/2) - circle_radius;
-					float x_max = (_map->get_real_w()/2) + circle_radius;
-			
-					bool found = false;
-					float rand_x = 0;
-					float rand_y = 0;
-					for(int k = 0; k < max_tries && !found; ++k)
-					{
-						rand_x = misc::rand(x_min, x_max);
 
-						// y_min and y_max depend on x
-						float yabs = sqrtf(pow(circle_radius, 2) - pow((_map->get_real_w()/2) - rand_x, 2));
-						float y_min = (_map->get_real_h()/2) - yabs;
-						float y_max = (_map->get_real_h()/2) + yabs;
-
-						rand_y = misc::rand(y_min, y_max);
-				
-						// We don't want this robot to collide with anything
-						// We use the same code as for Robot :: _check_collision
-						// pixel wise
-						int rp = _map->real_to_pixel(radius);
-						int r = rp * rp;
-						int x = _map->real_to_pixel(rand_x);
-						int y = _map->real_to_pixel(rand_y);
-						
-						// Bounding Box
-						float _bbx = rand_x - radius - 4;
-						float _bby = rand_y - radius - 4;
-						float _bbw = radius * 2 + 8;
-						float _bbh = radius * 2 + 8;
-						int bbx = _map->real_to_pixel(_bbx);
-						int bby = _map->real_to_pixel(_bby);
-						int bbw = _map->real_to_pixel(_bbx + _bbw);
-						int bbh = _map->real_to_pixel(_bby + _bbh);
-				
-						found = true;
-						for (int i = bbx; i < bbw; ++i)
-						{
-							for (int j = bby; j < bbh; ++j)
-							{
-								if (_map->get_pixel(i, j) == fastsim::Map::obstacle)
-								{
-									float d1 = (i - x);
-									float d2 = (j - y);
-									if (d1 * d1 + d2 * d2 <= r)
-									{
-										found = false;
-										break;
-									}
-								}
-							}
-							
-							if(!found)
-								break;
-						}
-					}
-			
-					if(found)
-					{
-						float rand_theta = misc::rand(-M_PI, M_PI);
-				
-						pos.set_x(rand_x);
-						pos.set_y(rand_y);
-						pos.set_theta(rand_theta);
-					}
-			
-					return found;
-        }
         				
 				void add_robot(fastsim::Robot *robot)
 				{

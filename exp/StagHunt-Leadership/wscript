@@ -1,0 +1,48 @@
+#! /usr/bin/env python
+
+import sferes;
+
+def build(bld):
+    cxxflags_kdtree = \
+        bld.get_env()['CXXFLAGS']\
+        + ['-I.'] \
+        + ['-DLIBSSRCKDTREE_HAVE_BOOST'] \
+        + ['-std=c++0x'] \
+        + ['-m32']
+
+#    lz = bld.new_task_gen('cxx', 'staticlib')
+#    lz.source = 'fastlz.cpp'
+#    lz.target = 'lz'
+
+#    bld.get_env()['LIB_BZIP2'] = 'bzip2'
+#    bld.get_env()['CPPPATH_BZIP2'] = 'bzlib2/include/'
+#    bld.get_env()['LIBPATH_BZIP2'] = 'bzlib2/lib/'
+
+#bz = bld.new_task_gen('cxx', 'staticlib')
+    #bz.source = 'bzlib2/bzlib.cpp'
+    #bz.target = 'bz'
+
+    sferes.create_variants(bld,
+                           source='StagHunt.cpp',
+                           uselib_local = 'sferes2 fastsim_multi',
+#                           uselib = 'EIGEN2 TBB',
+                           uselib = 'EIGEN2 SDL FF BOOST_GRAPH TBB',
+                           target = 'StagHunt',
+#                           json = 'StagHuntExp3.json',
+                           variants = [
+                                        'CONTROL1 COEVO BSTAG500',
+                                        'CONTROL1 COEVO BSTAG250',
+                                        'CONTROL1 COEVO BSTAG100',
+                                        'SETTING15',
+                                        'SETTING15 COEVO',
+                                        'SETTING15 ID_LEADER',
+                                      ])
+
+                                       
+#def build(bld):
+#    obj.source = 'StagHuntExp1.cpp'
+#    obj.includes = '. ../../'
+#    obj.uselib_local = 'sferes2'
+#    obj.uselib = ''
+#    obj.target = 'StagHuntExp1'
+#    obj.uselib_local = 'sferes2'

@@ -108,7 +108,7 @@ foreach my $file (@files)
 		my $nbFiles = 0;
 		foreach my $fileDir (@filesDir)
 		{
-			if($fileDir !~ /BestFit/ && $fileDir !~ /MeanFit/ && $fileDir !~ /BestEver/ && $fileDir !~ /Refactor/)
+			if($fileDir !~ /BestFit/ && $fileDir !~ /MeanFit/ && $fileDir !~ /BestEverFit/ && $fileDir !~ /Refactor/)
 			{
 				if($refactDir == 1 && $fileDir !~ /Dir/)
 				{

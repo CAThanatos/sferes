@@ -66,19 +66,21 @@ namespace sferes
 
       void random_pop()
       {
-	parallel::init();
+				parallel::init();
 
-	_parent_pop.resize(Params::pop::size);
-	assert(Params::pop::size % 4 == 0);
+				_parent_pop.resize(Params::pop::size);
+				assert(Params::pop::size % 4 == 0);
 
-	pop_t init_pop((size_t)(Params::pop::size * Params::pop::initial_aleat));
-	parallel::p_for(parallel::range_t(0, init_pop.size()),
-			random<crowd::Indiv<Phen> >(init_pop));
-	_eval_pop(init_pop);
-	_apply_modifier(init_pop);
-	front_t fronts;
-	_rank_crowd(init_pop, fronts);
-	_fill_nondominated_sort(init_pop, _parent_pop);
+				pop_t init_pop((size_t)(Params::pop::size * Params::pop::initial_aleat));
+				parallel::p_for(parallel::range_t(0, init_pop.size()),
+						random<crowd::Indiv<Phen> >(init_pop));
+
+				_eval_pop(init_pop);
+
+				_apply_modifier(init_pop);
+				front_t fronts;
+				_rank_crowd(init_pop, fronts);
+				_fill_nondominated_sort(init_pop, _parent_pop);
       }
 
       void epoch()
@@ -112,6 +114,8 @@ namespace sferes
 	assert(_mixed_pop.size() == 0);
 	//	assert(_child_pop.size() == 0);
 	assert(this->_pop.size() == Params::pop::size);
+
+				
       }
       const std::vector<boost::shared_ptr<Phen> >& pareto_front() const { return _pareto_front; }
       const pop_t& mixed_pop() { return _mixed_pop; }
@@ -196,21 +200,22 @@ namespace sferes
       // --- tournament selection ---
       void _selection(pop_t& old_pop, pop_t& new_pop)
       {
-	new_pop.resize(old_pop.size());
-	std::vector<size_t> a1, a2;
-	misc::rand_ind(a1, old_pop.size());
-	misc::rand_ind(a2, old_pop.size());
-	// todo : this loop could be parallelized
-	for (size_t i = 0; i < old_pop.size(); i += 4)
-	  {
-	    const indiv_t& p1 = _tournament(old_pop[a1[i]], old_pop[a1[i + 1]]);
-	    const indiv_t& p2 = _tournament(old_pop[a1[i + 2]], old_pop[a1[i + 3]]);
-	    const indiv_t& p3 = _tournament(old_pop[a2[i]], old_pop[a2[i + 1]]);
-	    const indiv_t& p4 = _tournament(old_pop[a2[i + 2]], old_pop[a2[i + 3]]);
-	    assert(i + 3 < new_pop.size());
-	    p1->cross(p2, new_pop[i], new_pop[i + 1]);
-	    p3->cross(p4, new_pop[i + 2], new_pop[i + 3]);
-	  }
+				new_pop.resize(old_pop.size());
+				std::vector<size_t> a1, a2;
+				misc::rand_ind(a1, old_pop.size());
+				misc::rand_ind(a2, old_pop.size());
+
+				// todo : this loop could be parallelized
+				for (size_t i = 0; i < old_pop.size(); i += 4)
+			  {
+			    const indiv_t& p1 = _tournament(old_pop[a1[i]], old_pop[a1[i + 1]]);
+			    const indiv_t& p2 = _tournament(old_pop[a1[i + 2]], old_pop[a1[i + 3]]);
+			    const indiv_t& p3 = _tournament(old_pop[a2[i]], old_pop[a2[i + 1]]);
+			    const indiv_t& p4 = _tournament(old_pop[a2[i + 2]], old_pop[a2[i + 3]]);
+			    assert(i + 3 < new_pop.size());
+			    p1->cross(p2, new_pop[i], new_pop[i + 1]);
+			    p3->cross(p4, new_pop[i + 2], new_pop[i + 3]);
+			  }
       }
 
       const indiv_t& _tournament(const indiv_t& i1, const indiv_t& i2)

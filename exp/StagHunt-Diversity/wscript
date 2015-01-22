@@ -1,0 +1,52 @@
+#! /usr/bin/env python
+
+import sferes;
+
+def build(bld):
+    cxxflags_kdtree = \
+        bld.get_env()['CXXFLAGS']\
+        + ['-I.'] \
+        + ['-DLIBSSRCKDTREE_HAVE_BOOST'] \
+        + ['-std=c++0x'] \
+        + ['-m32']
+
+#    lz = bld.new_task_gen('cxx', 'staticlib')
+#    lz.source = 'fastlz.cpp'
+#    lz.target = 'lz'
+
+#    bld.get_env()['LIB_BZIP2'] = 'bzip2'
+#    bld.get_env()['CPPPATH_BZIP2'] = 'bzlib2/include/'
+#    bld.get_env()['LIBPATH_BZIP2'] = 'bzlib2/li/'
+
+#bz = bld.new_task_gen('cxx', 'staticlib')
+    #bz.source = 'bzlib2/bzlib.cpp'
+    #bz.target = 'bz'
+
+    sferes.create_variants(bld,
+                           source='StagHunt.cpp',
+                           uselib_local = 'sferes2 fastsim_multi',
+#                           uselib = 'EIGEN2 TBB',
+                           uselib = 'EIGEN2 SDL FF BOOST_GRAPH TBB',
+                           target = 'StagHunt',
+#                           json = 'StagHuntExp3.json',
+                           variants = [
+                                        # 'MONO_OBJ ALTRUISM POS_CLOSE SIZE100 BSTAG100',
+                                        # 'DIVERSITY MONO_DIV DIVSM ALTRUISM POS_CLOSE SIZE100 BSTAG100',
+                                        # 'DIVERSITY DIVSM ALTRUISM POS_CLOSE SIZE100 BSTAG100',
+                                        # 'MULTI_ACTIVITY ALTRUISM POS_CLOSE SIZE100 BSTAG100',
+                                        # 'MULTI_SIM SIM_WINDOW ALTRUISM POS_CLOSE SIZE100 BSTAG100',
+                                        # 'MULTI_ACTIVITY DIVERSITY DIVSM ALTRUISM POS_CLOSE SIZE100 BSTAG100',
+
+                                        'MULTI_SIM SIM_MEAN RATIO_SIM01 ALTRUISM POS_CLOSE SIZE100 BSTAG100',
+                                        'MULTI_SIM SIM_MEAN RATIO_SIM05 ALTRUISM POS_CLOSE SIZE100 BSTAG100',
+                                        # 'MULTI_SIM SIM_MEAN ALTRUISM POS_CLOSE SIZE100 BSTAG100',
+                                        'MULTI_SIM SIM_MEAN LIMITED_SENSORS ALTRUISM POS_CLOSE SIZE100 BSTAG100',
+                                      ])
+                                       
+#def build(bld):
+#    obj.source = 'StagHuntExp1.cpp'
+#    obj.includes = '. ../../'
+#    obj.uselib_local = 'sferes2'
+#    obj.uselib = ''
+#    obj.target = 'StagHuntExp1'
+#    obj.uselib_local = 'sferes2'

@@ -18,7 +18,8 @@ namespace sferes
 			{ 
 #ifdef MOVING_PREYS
 				// Front laser
-				SENSORS_INF.push_back(std::make_pair(MAX_SENSOR_INFLUENCE/2.0f, MIN_SENSOR_INFLUENCE));
+//				SENSORS_INF.push_back(std::make_pair(MAX_SENSOR_INFLUENCE/2.0f, MIN_SENSOR_INFLUENCE));
+				SENSORS_INF.push_back(std::make_pair(NEUTRAL_SENSOR_INFLUENCE, NEUTRAL_SENSOR_INFLUENCE));
 				
 				// Front right laser
 				SENSORS_INF.push_back(std::make_pair(MAX_SENSOR_INFLUENCE, MIN_SENSOR_INFLUENCE));
@@ -33,7 +34,8 @@ namespace sferes
 				SENSORS_INF.push_back(std::make_pair(MIN_SENSOR_INFLUENCE, MAX_SENSOR_INFLUENCE));
 				
 				// Back laser
-				SENSORS_INF.push_back(std::make_pair(MAX_SENSOR_INFLUENCE/2.0f, MAX_SENSOR_INFLUENCE/2.0f));
+//				SENSORS_INF.push_back(std::make_pair(MAX_SENSOR_INFLUENCE/2.0f, MAX_SENSOR_INFLUENCE/2.0f));
+				SENSORS_INF.push_back(std::make_pair(NEUTRAL_SENSOR_INFLUENCE, NEUTRAL_SENSOR_INFLUENCE));
 #endif
 			}
 
@@ -90,6 +92,11 @@ namespace sferes
 			type_prey get_type() { return _type_prey; }
 
 			int get_nb_blocked() { return _nb_blocked; }
+
+#ifdef TRIGO
+			float get_angle_color() { return _angle_color; }
+			void set_angle_color(float angle_color) { _angle_color = angle_color; }
+#endif
 			
 		protected :
 			bool _blocked;
@@ -99,12 +106,17 @@ namespace sferes
 			type_prey _type_prey;
 			
 			bool _pred_on_it;
+
+#ifdef TRIGO
+			float _angle_color;
+#endif
 			
 #ifdef MOVING_PREYS
 			static const float V_DEFAULT = 1.4f;
 			static const float SPEED_RATIO = 1.0f;
 			static const float SENSOR_STRENGTH = 64.0f;
 			static const float MAX_SENSOR_INFLUENCE = 2.0f;
+			static const float NEUTRAL_SENSOR_INFLUENCE = 1.0f;
 			static const float MIN_SENSOR_INFLUENCE = 0.0f;
 			
 			std::vector<std::pair<float, float> > SENSORS_INF;

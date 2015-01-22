@@ -136,6 +136,8 @@ namespace fastsim
 				    
 		_behaviour_log = SDL_CreateRGBSurface(SDL_SWSURFACE, _w, _h, 32, rmask, gmask, bmask, amask);
     _blit_map();
+
+    _trajectory_log.resize(2);
     
     for(int i = 0; i < _robots.size(); ++i)
     {
@@ -719,6 +721,13 @@ namespace fastsim
 
     // goals
     _disp_goals();
+
+#ifdef COMPAS_LANDMARK
+    unsigned x_landmark = _map->real_to_pixel(_map->get_landmark().x());
+    unsigned y_landmark = _map->real_to_pixel(_map->get_landmark().y());
+    unsigned r_landmark = _map->real_to_pixel(20.0f);
+    _disc(_screen, x_landmark, y_landmark, r_landmark, 0xFFFF000);
+#endif
     
     // illuminated switches
     _disp_switches();
@@ -736,7 +745,7 @@ namespace fastsim
     _disp_lasers();
 
 		//for(std::vector<fastsim::Robot>::const_iterator it = _robots.begin(); it != _robots.end(); ++it) 
-  	_end_positions.clear();
+  	bool first_hunter = true;
 		for(int i = 0; i < _robots.size(); ++i)
 		{
 		  // convert to pixel
@@ -771,13 +780,26 @@ namespace fastsim
 		  
 		  if((col * 100) == 100)
 		  {
-		  	// Ending positions
-		  	struct Position pos;
-				pos.x = _robots[i]->get_pos().x();
-				pos.y = _robots[i]->get_pos().y();
-		  	_end_positions.push_back(pos);
-		  	
-			  _disc(_behaviour_log, x, y, 1, _color_from_id(_behaviour_log,col));
+		  	// To differenciate the two hunters
+		  	struct Position pos_traj;
+		  	pos_traj.x = x;
+		  	pos_traj.y = y;
+		  	pos_traj.radius = 1;
+
+		  	if(first_hunter)
+		  	{
+	  			pos_traj.color = _color_from_id(_behaviour_log,col);
+	  			_trajectory_log[0].push_back(pos_traj);
+		  	}
+				else
+				{
+			  	Uint32 color_hunter2 = SDL_MapRGB(_behaviour_log->format, 0, 0, 255);
+			  	pos_traj.color = color_hunter2;
+		  		_trajectory_log[1].push_back(pos_traj);
+				}
+
+			  if(first_hunter)
+			  	first_hunter = false;
 			}
 			else
 			{
@@ -800,12 +822,6 @@ namespace fastsim
 					_start_positions.push_back(pos);
 				}
     	}
-    }
-    
-    // We display the dead preys on the _behaviour_log
-    for(int i = 0; i < _dead_preys_list.size(); ++i)
-    {
-    	display_dead_prey(_dead_preys_list[i].x, _dead_preys_list[i].y, _dead_preys_list[i].radius, _dead_preys_list[i].color);
     }
 
     // bumpers
@@ -874,8 +890,19 @@ namespace fastsim
   
   void Display :: dump_behaviour_log(const char * file)
   {
-	  // Starting and ending positions drawing
-	  assert(_start_positions.size() == _end_positions.size());
+	  // Trajectories drawing
+	  for(size_t i = 0; i < _trajectory_log.size(); ++i)
+	  {
+	  	for(size_t j = 0; j < _trajectory_log[i].size(); ++j)
+	  	{
+	  		_disc(_behaviour_log, _trajectory_log[i][j].x, _trajectory_log[i][j].y, _trajectory_log[i][j].radius, _trajectory_log[i][j].color);
+	  	}
+	  }
+
+	  _trajectory_log.clear();
+	  _trajectory_log.resize(2);
+
+	  // Starting positions drawing
 	  for(size_t i = 0; i < _start_positions.size(); ++i)
 	  {
 	  	// Starting position
@@ -888,24 +915,16 @@ namespace fastsim
 
 			Uint32 _color = SDL_MapRGB(_behaviour_log->format, 0, 0, 0);
 		  _disc(_behaviour_log, _x, _y, _r, _color);
-			
-			// Ending position
-	  	x = _end_positions[i].x;
-	  	y = _end_positions[i].y;
-	  	
-	  	_x = _map->real_to_pixel(x);
-	  	_y = _map->real_to_pixel(y);
-	  	_r = _map->real_to_pixel(15);
-
-			_color = SDL_MapRGB(_behaviour_log->format, 0, 0, 0);
-			_line(_behaviour_log, _x - _r, _y, _x + _r, _y, _color);
-			_line(_behaviour_log, _x, _y - _r, _x, _y + _r, _color);	  
 	  }
-	  
+	  _start_positions.clear();
+
   	SDL_SaveBMP(_behaviour_log, file);
+
+  	// We reinitialize the _behaviour_log screen
+		_behaviour_log = SDL_ConvertSurface(_map_bmp, _map_bmp->format, SDL_SWSURFACE);
   }
 
-  void Display :: display_dead_prey(float x, float y, float radius, int color)
+  void Display :: display_dead_prey(float x, float y, float radius, int color, bool alone)
   {
 	  unsigned _x = _map->real_to_pixel(x);
 	  unsigned _y = _map->real_to_pixel(y);
@@ -913,8 +932,25 @@ namespace fastsim
 
 	  //Uint32 _color = _color_from_id(_behaviour_log, color);
 	  Uint32 _color = SDL_MapRGB(_behaviour_log->format, 255, 0, 0);
+	  
 	  _line(_behaviour_log, _x - _r, _y, _x + _r, _y, _color);
 	  _line(_behaviour_log, _x, _y - _r, _x, _y + _r, _color);
+
+	  if(!alone)
+	  {
+	  	float x1 = x - (cosf(M_PI/4)*radius);
+	  	float x2 = x + (cosf(M_PI/4)*radius);
+	  	float y1 = y - (sinf(M_PI/4)*radius);
+	  	float y2 = y + (sinf(M_PI/4)*radius);
+	  	
+	  	unsigned _x1 = _map->real_to_pixel(x1);
+	  	unsigned _y1 = _map->real_to_pixel(y1);
+	  	unsigned _x2 = _map->real_to_pixel(x2);
+	  	unsigned _y2 = _map->real_to_pixel(y2);
+	  	
+			_line(_behaviour_log, _x1 , _y1, _x2, _y2, _color);
+			_line(_behaviour_log, _x1, _y2, _x2, _y1, _color);
+	  }
   }
 }
 

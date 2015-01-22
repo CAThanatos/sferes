@@ -174,10 +174,12 @@ namespace sferes
           dbg::trace trace("ea", DBG_HERE);
           random_pop();
           update_stats();
+
           for (_gen = 0; _gen < Params::pop::nb_gen; ++_gen)
           {
             epoch();
             update_stats();
+
             if (_gen % Params::pop::dump_period == 0)
             {
               _write(_gen);

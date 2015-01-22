@@ -1,0 +1,23 @@
+import os
+
+def set_options(blah) : pass
+
+def configure(blah): pass
+
+def build(bld):
+    print ("Entering directory `" + os.getcwd() + "/modules/'")
+    test_evo_neuro = bld.new_task_gen('cxx', 'program')
+    test_evo_neuro.source = 'test_evo_neuro.cpp'
+    test_evo_neuro.includes = '. ../../'
+    test_evo_neuro.uselib_local = 'sferes2'
+    test_evo_neuro.uselib = 'BOOST BOOST_GRAPH BOOST_UNIT_TEST_FRAMEWORK EIGEN2'
+    test_evo_neuro.target = 'test_evo_neuro'
+    test_evo_neuro.unit_test = 1
+
+#    test_evo_neuro_2 = bld.new_task_gen('cxx', 'program')
+#    test_evo_neuro_2.source = 'test_evo_neuro_2.cpp'
+#    test_evo_neuro_2.includes = '. ../../'
+#    test_evo_neuro_2.uselib_local = 'sferes2'
+#    test_evo_neuro_2.uselib = 'BOOST BOOST_GRAPH BOOST_UNIT_TEST_FRAMEWORK'
+#    test_evo_neuro_2.target = 'test_evo_neuro_2'
+#    test_evo_neuro_2.unit_test = 1

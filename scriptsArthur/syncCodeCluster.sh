@@ -35,7 +35,7 @@ then
 	exit 1
 fi
 
-scp -r /home/abernard/sferes2-0.99/sferes abernard@cluster.isir.upmc.fr:./Sferes/sferes/sferes2-0.99/
-scp -r /home/abernard/sferes2-0.99/modules abernard@cluster.isir.upmc.fr:./Sferes/sferes/sferes2-0.99/
-scp -r /home/abernard/sferes2-0.99/exp/$exp abernard@cluster.isir.upmc.fr:./Sferes/sferes/sferes2-0.99/exp
-scp -r /home/abernard/sferes2-0.99/modules.conf abernard@cluster.isir.upmc.fr:./Sferes/sferes/sferes2-0.99/
+scp -r /home/abernard/sferes2-0.99/sferes abernard@cluster.isir.upmc.fr:./sferes2-0.99/
+scp -r /home/abernard/sferes2-0.99/modules abernard@cluster.isir.upmc.fr:./sferes2-0.99/
+scp -r /home/abernard/sferes2-0.99/exp/$exp abernard@cluster.isir.upmc.fr:./sferes2-0.99/exp
+scp -r /home/abernard/sferes2-0.99/modules.conf abernard@cluster.isir.upmc.fr:./sferes2-0.99/

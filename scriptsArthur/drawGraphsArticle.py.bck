@@ -1,0 +1,492 @@
+#!/usr/bin/env python
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+from matplotlib.ticker import MaxNLocator
+import numpy as np
+import argparse
+import re
+import os
+import math
+
+import makeData
+
+colorHares = 'lime'
+colorHaresSolo = 'green'
+colorErrorHares = 'black'
+alphaHares = 1
+colorBStags = 'magenta'
+colorBStagsSolo = 'purple'
+colorErrorBStags = 'black'
+alphaBStags = 1
+colorSStags = 'cyan'
+colorSStagsSolo = 'steelblue'
+colorErrorSStags = 'black'
+alphaSStags = 1
+colorTotal = 'grey'
+colorErrorTotal = 'black'
+alphaTotal = 1
+maxValue = None
+maxEval = None
+nbEvalByGen = 20
+nbPopFirstGen = 10
+selection = None
+exclusion = None
+precision = 10
+drawSStags = False
+drawCoop = False
+
+
+def drawBestFit(dossier) :
+	fileData = "refactDataArticle.dat"
+	if os.path.isdir(dossier) :
+		makeData.make_dataBest(dossier, precision, fileData)
+	 	
+		dtypes = np.dtype({ 'names' : ('evaluation', 'run', 'fitness', 'nbHaresDuo', 'nbHaresSolo', 'nbHares', 'nbSStagsDuo', 'nbSStagsSolo', 'nbSStags', 'nbBStagsDuo', 'nbBStagsSolo', 'nbBStags'), 'formats' : [np.int, np.int, np.float, np.float, np.float, np.float, np.float, np.float, np.float, np.float, np.float, np.float] })
+		data = np.loadtxt(dossier + "/" + fileData, delimiter=',', skiprows = 1, usecols = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11), dtype = dtypes)
+
+		diffEvals = 0
+		lastEval = 0;
+
+		testLine = None
+		if selection != None :
+			testLine = lambda line, evaluation : (line['evaluation'] == evaluation) and (line['run'] in selection)
+		elif exclusion != None :
+			testLine = lambda line, evaluation : (line['evaluation'] == evaluation) and (line['run'] not in exclusion)
+		else :
+			testLine = lambda line, evaluation : line['evaluation'] == evaluation
+
+		hashFitness = {}
+		hashNbHaresDuo = {}
+		hashNbHaresSolo = {}
+		hashNbHares = {}
+		hashNbSStagsDuo = {}
+		hashNbSStagsSolo = {}
+		hashNbSStags = {}
+		hashNbBStagsDuo = {}
+		hashNbBStagsSolo = {}
+		hashNbBStags = {}
+		hashRatio = {}
+		for evaluation in data['evaluation'] :
+			if evaluation < maxEval :
+				hashFitness[evaluation] = [line['fitness'] for line in data if testLine(line, evaluation)]
+
+				hashNbHares[evaluation] = [line['nbHares'] for line in data if testLine(line, evaluation)]
+				hashNbHaresDuo[evaluation] = [line['nbHaresDuo'] for line in data if testLine(line, evaluation)]
+				hashNbHaresSolo[evaluation] = [line['nbHaresSolo'] for line in data if testLine(line, evaluation)]
+
+				hashNbBStags[evaluation] = [line['nbBStags'] for line in data if testLine(line, evaluation)]
+				hashNbBStagsDuo[evaluation] = [line['nbBStagsDuo'] for line in data if testLine(line, evaluation)]
+				hashNbBStagsSolo[evaluation] = [line['nbBStagsSolo'] for line in data if testLine(line, evaluation)]
+
+				hashNbSStags[evaluation] = [line['nbSStags'] for line in data if testLine(line, evaluation)]
+				hashNbSStagsDuo[evaluation] = [line['nbSStagsDuo'] for line in data if testLine(line, evaluation)]
+				hashNbSStagsSolo[evaluation] = [line['nbSStagsSolo'] for line in data if testLine(line, evaluation)]
+
+				hashRatio[evaluation] = [(line['nbHares']/(line['nbHares'] + line['nbBStags'])) for line in data if testLine(line, evaluation)]
+
+
+		tabEvaluation = sorted(hashFitness.keys())
+		lastEval = tabEvaluation[-1]
+		diffEvals = lastEval - tabEvaluation[-2]
+
+		while lastEval < maxEval :
+			lastEval += diffEvals
+			tabEvaluation.append(lastEval)
+
+		# tabEvaluation = sorted(hashFitness.keys())
+		tabGeneration = [int(math.floor((evaluation-nbPopFirstGen)/nbEvalByGen)) for evaluation in tabEvaluation]
+
+		tabPlotEvaluation = sorted(hashFitness.keys())
+		with open('debutOutput.txt', 'w') as output :
+			cpt = 0;
+			while cpt < len(tabPlotEvaluation) :
+				evaluation = tabPlotEvaluation[cpt]
+				output.write(str(evaluation) + "/" + str(tabGeneration[cpt]) + "\n")
+
+				for item in hashNbHares[evaluation] :
+					output.write(str(item) + ",")
+				output.write("\n")
+
+				for item in hashNbHaresDuo[evaluation] :
+					output.write(str(item) + ",")
+				output.write("\n")
+
+				for item in hashNbHaresSolo[evaluation] :
+					output.write(str(item) + ",")
+				output.write("\n")
+
+				for item in hashNbBStags[evaluation] :
+					output.write(str(item) + ",")
+				output.write("\n")
+
+				for item in hashNbBStagsDuo[evaluation] :
+					output.write(str(item) + ",")
+				output.write("\n")
+
+				for item in hashNbBStagsSolo[evaluation] :
+					output.write(str(item) + ",")
+				output.write("\n")
+
+				for item in hashRatio[evaluation] :
+					output.write(str(item) + ",")
+				output.write("\n")
+
+				cpt += 1
+
+
+		# SEABORN
+		sns.set()
+		sns.set_style('white')
+		sns.set_context('paper')
+
+		dpi = 96
+
+		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = (800/dpi, 600/dpi))
+
+		# fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize = (800/dpi, 800/dpi))
+		# axe0, axe1 = axes.flat
+
+		# # --- RATIO ---
+		# dataToPlot = [hashRatio[evaluation] for evaluation in tabPlotEvaluation]
+		# axe0.boxplot(dataToPlot)
+		# axe0.set_title('Proportion of Stags hunted', fontsize=10)
+
+		# axe0.set_xticks(range(0, len(tabGeneration), 20))
+		# axe0.set_xticklabels([tabGeneration[x] for x in range(0, len(tabGeneration), 20)])
+		# axe0.set_xlabel("Generation")
+
+		# axe0.set_ylabel("Proportion of Stags")
+
+
+		# --- BAR GRAPHS ---
+		tabPlotEvaluation = [evaluation for evaluation in sorted(hashFitness.keys()) if (math.floor((evaluation-nbPopFirstGen)/nbEvalByGen)%100 == 0)]
+
+		tabMeanNbHares = [np.mean(hashNbHares[evaluation]) for evaluation in tabPlotEvaluation if len(hashNbHares[evaluation]) > 0]
+		tabMinNbHares = [np.amin(hashNbHares[evaluation]) for evaluation in tabPlotEvaluation if len(hashNbHares[evaluation]) > 0]
+		tabMaxNbHares = [np.amax(hashNbHares[evaluation]) for evaluation in tabPlotEvaluation if len(hashNbHares[evaluation]) > 0]
+
+		tabMeanNbHaresSolo = [np.mean(hashNbHaresSolo[evaluation]) for evaluation in tabPlotEvaluation if len(hashNbHaresSolo[evaluation]) > 0]
+		tabMinNbHaresSolo = [np.amin(hashNbHaresSolo[evaluation]) for evaluation in tabPlotEvaluation if len(hashNbHaresSolo[evaluation]) > 0]
+		tabMaxNbHaresSolo = [np.amax(hashNbHaresSolo[evaluation]) for evaluation in tabPlotEvaluation if len(hashNbHaresSolo[evaluation]) > 0]
+
+		tabMeanNbBStags = [np.mean(hashNbBStags[evaluation]) for evaluation in tabPlotEvaluation if len(hashNbBStags[evaluation]) > 0]
+		tabMinNbBStags = [np.amin(hashNbBStags[evaluation]) for evaluation in tabPlotEvaluation if len(hashNbBStags[evaluation]) > 0]
+		tabMaxNbBStags = [np.amax(hashNbBStags[evaluation]) for evaluation in tabPlotEvaluation if len(hashNbBStags[evaluation]) > 0]
+
+		tabMeanNbBStagsSolo = [np.mean(hashNbBStagsSolo[evaluation]) for evaluation in tabPlotEvaluation if len(hashNbBStagsSolo[evaluation]) > 0]
+		tabMinNbBStagsSolo = [np.amin(hashNbBStagsSolo[evaluation]) for evaluation in tabPlotEvaluation if len(hashNbBStagsSolo[evaluation]) > 0]
+		tabMaxNbBStagsSolo = [np.amax(hashNbBStagsSolo[evaluation]) for evaluation in tabPlotEvaluation if len(hashNbBStagsSolo[evaluation]) > 0]
+
+		tabMeanNbSStags = [np.mean(hashNbSStags[evaluation]) for evaluation in tabPlotEvaluation]
+		tabMinNbSStags = [np.amin(hashNbSStags[evaluation]) for evaluation in tabPlotEvaluation]
+		tabMaxNbSStags = [np.amax(hashNbSStags[evaluation]) for evaluation in tabPlotEvaluation]
+
+		tabMeanNbSStagsSolo = [np.mean(hashNbSStagsSolo[evaluation]) for evaluation in tabPlotEvaluation]
+		tabMinNbSStagsSolo = [np.amin(hashNbSStagsSolo[evaluation]) for evaluation in tabPlotEvaluation]
+		tabMaxNbSStagsSolo = [np.amax(hashNbSStagsSolo[evaluation]) for evaluation in tabPlotEvaluation]
+
+		if drawSStags == True :
+			tabMeanTotal = [np.mean(np.add(np.add(hashNbHares[evaluation], hashNbBStags[evaluation]), hashNbSStags[evaluation])) for evaluation in tabPlotEvaluation if len(np.add(np.add(hashNbHares[evaluation], hashNbBStags[evaluation]), hashNbSStags[evaluation])) > 0]
+			tabMinTotal = [np.amin(np.add(np.add(hashNbHares[evaluation], hashNbBStags[evaluation]), hashNbSStags[evaluation])) for evaluation in tabPlotEvaluation if len(np.add(np.add(hashNbHares[evaluation], hashNbBStags[evaluation]), hashNbSStags[evaluation])) > 0]
+			tabMaxTotal = [np.amax(np.add(np.add(hashNbHares[evaluation], hashNbBStags[evaluation]), hashNbSStags[evaluation])) for evaluation in tabPlotEvaluation if len(np.add(np.add(hashNbHares[evaluation], hashNbBStags[evaluation]), hashNbSStags[evaluation])) > 0]
+		else :
+			tabMeanTotal = [np.mean(np.add(hashNbHares[evaluation], hashNbBStags[evaluation])) for evaluation in tabPlotEvaluation if len(np.add(hashNbHares[evaluation], hashNbBStags[evaluation])) > 0]
+			tabMinTotal = [np.amin(np.add(hashNbHares[evaluation], hashNbBStags[evaluation])) for evaluation in tabPlotEvaluation if len(np.add(hashNbHares[evaluation], hashNbBStags[evaluation])) > 0]
+			tabMaxTotal = [np.amax(np.add(hashNbHares[evaluation], hashNbBStags[evaluation])) for evaluation in tabPlotEvaluation if len(np.add(hashNbHares[evaluation], hashNbBStags[evaluation])) > 0]
+
+		width = 0.1
+		errors = [np.subtract(tabMeanNbHares, tabMinNbHares), np.subtract(tabMaxNbHares, tabMeanNbHares)]
+
+		if noErrorBars == True :
+			errors = None;
+
+		barNbHares = axe1.bar(range(len(tabMeanNbHares)), tabMeanNbHares, width=width, yerr=errors, ecolor=colorErrorHares, color=colorHares, alpha=alphaHares)
+
+		deplacement = 1
+		offset = 10
+
+		if drawCoop == True :
+			errors = [np.subtract(tabMeanNbHaresSolo, tabMinNbHaresSolo), np.subtract(tabMaxNbHaresSolo, tabMeanNbHaresSolo)]
+
+			if noErrorBars == True :
+				errors = None;
+
+			barNbHaresSolo = axe1.bar(np.add(range(len(tabMeanNbHaresSolo)), width*deplacement), tabMeanNbHaresSolo, width=width, yerr=errors, ecolor=colorErrorHares, color=colorHaresSolo, alpha=alphaHares)
+			deplacement += 1
+
+		if drawSStags == True :
+			errors = [np.subtract(tabMeanNbSStags, tabMinNbSStags), np.subtract(tabMaxNbSStags, tabMeanNbSStags)]
+
+			if noErrorBars == True :
+				errors = None;
+
+			barNbSStags = axe1.bar(np.add(range(len(tabMeanNbSStags)), width*deplacement), tabMeanNbSStags, width=width, yerr=errors, ecolor=colorErrorSStags, color=colorSStags, alpha=alphaSStags)
+			deplacement += 1
+
+			if drawCoop == True :
+				errors = [np.subtract(tabMeanNbSStagsSolo, tabMinNbSStagsSolo), np.subtract(tabMaxNbSStagsSolo, tabMeanNbSStagsSolo)]
+
+				if noErrorBars == True :
+					errors = None;
+
+				barNbSStagsSolo = axe1.bar(np.add(range(len(tabMeanNbSStagsSolo)), width*deplacement), tabMeanNbSStagsSolo, width=width, yerr=errors, ecolor=colorErrorSStags, color=colorSStagsSolo, alpha=alphaSStags)
+				deplacement += 1
+
+		errors = [np.subtract(tabMeanNbBStags, tabMinNbBStags), np.subtract(tabMaxNbBStags, tabMeanNbBStags)]
+
+		if noErrorBars == True :
+			errors = None;
+
+		barNbBStags = axe1.bar(np.add(range(len(tabMeanNbBStags)), width*deplacement), tabMeanNbBStags, width=width, yerr=errors, ecolor=colorErrorBStags, color=colorBStags, alpha=alphaBStags)
+		deplacement += 1
+
+		if drawCoop == True :
+			errors = [np.subtract(tabMeanNbBStagsSolo, tabMinNbBStagsSolo), np.subtract(tabMaxNbBStagsSolo, tabMeanNbBStagsSolo)]
+
+			if noErrorBars == True :
+				errors = None;
+
+			barNbBStagsSolo = axe1.bar(np.add(range(len(tabMeanNbBStagsSolo)), width*deplacement), tabMeanNbBStagsSolo, width=width, yerr=errors, ecolor=colorErrorBStags, color=colorBStagsSolo, alpha=alphaBStags)
+			deplacement += 1
+
+		errors = [np.subtract(tabMeanTotal, tabMinTotal), np.subtract(tabMaxTotal, tabMeanTotal)]
+
+		if noErrorBars == True :
+			errors = None;
+
+		barTotal = axe1.bar(np.add(range(len(tabMeanTotal)), width*deplacement), tabMeanTotal, width=width, yerr=errors, ecolor=colorErrorTotal, color=colorTotal, alpha=alphaTotal)
+		deplacement += 1
+
+		axe1.set_title('Repartition of preys hunted', fontsize=10)
+
+		if drawCoop == True :
+			if drawSStags == True :
+				plt.legend([barNbHares, barNbHaresSolo, barNbSStags, barNbSStagsSolo, barNbBStags,  barNbBStagsSolo, barTotal], ['Hares', 'Hares solo', 'Small Stags', 'Small Stags solo', 'Big Stags', 'Big Stags solo', 'Total'], bbox_to_anchor=(0., 1.05, 1., .102), loc=3, ncol=4, mode="expand", borderaxespad=0.)
+			else :		
+				plt.legend([barNbHares, barNbHaresSolo, barNbBStags,  barNbBStagsSolo, barTotal], ['Hares', 'Hares solo', 'Stags', 'Stags solo', 'Total'], bbox_to_anchor=(0., 1.05, 1., .102), loc=3, ncol=3, mode="expand", borderaxespad=0.)
+		else :
+			plt.legend([barNbHares, barNbBStags, barTotal], ['Hares', 'Stags', 'Total'], bbox_to_anchor=(0., 1.05, 1., .102), loc=3, ncol=3, mode="expand", borderaxespad=0.)
+
+		axe1.set_xlabel('Generation')
+
+		tick_place = deplacement*width/2
+
+
+		tabGenerationTicks = [int(math.floor((evaluation-nbPopFirstGen)/nbEvalByGen)) for evaluation in tabEvaluation if (math.floor((evaluation-nbPopFirstGen)/nbEvalByGen)%100 == 0)]
+		axe1.set_xticks(np.add(np.arange(len(tabGenerationTicks)), tick_place))
+		axe1.set_xticklabels([generation for generation in tabGenerationTicks])
+
+		axe1.set_ylabel('Number of preys hunted')
+
+#		fig.set_size_inches(800/dpi,800/dpi)
+#		fig.savefig('test2png.png',dpi=100)
+		plt.savefig(dossier + "/figureArticle.png", bbox_inches = 'tight')
+#		plt.show()
+
+
+def drawDir(dossier) :
+	fileData = "refactDataArticle.dat"
+	if os.path.isdir(dossier) :
+		makeData.make_dataAll(dossier, precision, fileData)
+
+		dtypes = np.dtype({ 'names' : ('evaluation', 'fitness', 'nbHaresDuo', 'nbHaresSolo', 'nbHares', 'nbBStagsDuo', 'nbBStagsSolo', 'nbBStags'), 'formats' : [np.int, np.float, np.float, np.float, np.float, np.float, np.float, np.float] })
+		data = np.loadtxt(dossier + "/" + fileData, delimiter=',', skiprows = 1, usecols = (0, 1, 2, 3, 4, 8, 9, 10), dtype = dtypes)
+
+		diffEvals = 0
+		lastEval = 0;
+
+		testLine = lambda line, evaluation : line['evaluation'] == evaluation
+
+		hashFitness = {}
+		hashNbHaresDuo = {}
+		hashNbHaresSolo = {}
+		hashNbHares = {}
+		hashNbBStagsDuo = {}
+		hashNbBStagsSolo = {}
+		hashNbBStags = {}
+		hashRatio = {}
+		for evaluation in data['evaluation'] :
+			if evaluation < maxEval :
+				hashFitness[evaluation] = [line['fitness'] for line in data if testLine(line, evaluation)]
+
+				hashNbHares[evaluation] = [line['nbHares'] for line in data if testLine(line, evaluation)]
+				hashNbHaresDuo[evaluation] = [line['nbHaresDuo'] for line in data if testLine(line, evaluation)]
+				hashNbHaresSolo[evaluation] = [line['nbHaresSolo'] for line in data if testLine(line, evaluation)]
+
+				hashNbBStags[evaluation] = [line['nbBStags'] for line in data if testLine(line, evaluation)]
+				hashNbBStagsDuo[evaluation] = [line['nbBStagsDuo'] for line in data if testLine(line, evaluation)]
+				hashNbBStagsSolo[evaluation] = [line['nbBStagsSolo'] for line in data if testLine(line, evaluation)]
+
+				hashRatio[evaluation] = [(line['nbHares']/(line['nbHares'] + line['nbBStags'])) for line in data if testLine(line, evaluation)]
+
+
+		tabEvaluation = sorted(hashFitness.keys())
+		lastEval = tabEvaluation[-1]
+		diffEvals = lastEval - tabEvaluation[-2]
+
+		while lastEval < maxEval :
+			lastEval += diffEvals
+			tabEvaluation.append(lastEval)
+
+		# tabEvaluation = sorted(hashFitness.keys())
+		tabGeneration = [int(math.floor((evaluation-nbPopFirstGen)/nbEvalByGen)) for evaluation in tabEvaluation]
+
+		tabPlotEvaluation = sorted(hashFitness.keys())
+		with open('debutOutput.txt', 'w') as output :
+			cpt = 0;
+			while cpt < len(tabPlotEvaluation) :
+				evaluation = tabPlotEvaluation[cpt]
+				output.write(str(evaluation) + "/" + str(tabGeneration[cpt]) + "\n")
+
+				for item in hashNbHares[evaluation] :
+					output.write(str(item) + ",")
+				output.write("\n")
+
+				for item in hashNbHaresDuo[evaluation] :
+					output.write(str(item) + ",")
+				output.write("\n")
+
+				for item in hashNbHaresSolo[evaluation] :
+					output.write(str(item) + ",")
+				output.write("\n")
+
+				for item in hashNbBStags[evaluation] :
+					output.write(str(item) + ",")
+				output.write("\n")
+
+				for item in hashNbBStagsDuo[evaluation] :
+					output.write(str(item) + ",")
+				output.write("\n")
+
+				for item in hashNbBStagsSolo[evaluation] :
+					output.write(str(item) + ",")
+				output.write("\n")
+
+				for item in hashRatio[evaluation] :
+					output.write(str(item) + ",")
+				output.write("\n")
+
+				cpt += 1
+
+
+		# SEABORN
+		sns.set()
+		sns.set_style('white')
+		sns.set_context('paper')
+
+
+		dpi = 96
+
+		fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize = (800/dpi, 800/dpi))
+		axe0, axe1 = axes.flat
+
+
+		# --- RATIO ---
+		dataToPlot = [hashRatio[evaluation] for evaluation in tabPlotEvaluation]
+		axe0.boxplot(dataToPlot)
+		axe0.set_title('Proportion of Stags hunted', fontsize=10)
+
+		axe0.set_xticks(range(0, len(tabGeneration), 20))
+		axe0.set_xticklabels([tabGeneration[x] for x in range(0, len(tabGeneration), 20)])
+		axe0.set_xlabel("Generation")
+
+		axe0.set_ylabel("Proportion of Stags")
+
+
+		# --- BAR GRAPHS ---
+		tabPlotEvaluation = [evaluation for evaluation in sorted(hashFitness.keys()) if (math.floor((evaluation-nbPopFirstGen)/nbEvalByGen)%100 == 0)]
+
+		tabMeanNbHares = [np.mean(hashNbHares[evaluation]) for evaluation in tabPlotEvaluation]
+		tabMinNbHares = [np.amin(hashNbHares[evaluation]) for evaluation in tabPlotEvaluation]
+		tabMaxNbHares = [np.amax(hashNbHares[evaluation]) for evaluation in tabPlotEvaluation]
+
+		tabMeanNbBStags = [np.mean(hashNbBStags[evaluation]) for evaluation in tabPlotEvaluation]
+		tabMinNbBStags = [np.amin(hashNbBStags[evaluation]) for evaluation in tabPlotEvaluation]
+		tabMaxNbBStags = [np.amax(hashNbBStags[evaluation]) for evaluation in tabPlotEvaluation]
+
+		tabMeanTotal = [np.mean(np.add(hashNbHares[evaluation], hashNbBStags[evaluation])) for evaluation in tabPlotEvaluation]
+		tabMinTotal = [np.amin(np.add(hashNbHares[evaluation], hashNbBStags[evaluation])) for evaluation in tabPlotEvaluation]
+		tabMaxTotal = [np.amax(np.add(hashNbHares[evaluation], hashNbBStags[evaluation])) for evaluation in tabPlotEvaluation]
+
+		width = 0.2
+		errors = [np.subtract(tabMeanNbHares, tabMinNbHares), np.subtract(tabMaxNbHares, tabMeanNbHares)]
+
+		barNbHares = axe1.bar(range(len(tabMeanNbHares)), tabMeanNbHares, width=width, yerr=errors, ecolor=colorHares, color=colorHares, alpha=alphaHares)
+
+		errors = [np.subtract(tabMeanNbBStags, tabMinNbBStags), np.subtract(tabMaxNbBStags, tabMeanNbBStags)]
+		barNbBStags = axe1.bar(np.add(range(len(tabMeanNbBStags)), width), tabMeanNbBStags, width=width, yerr=errors, ecolor=colorBStags, color=colorBStags, alpha=alphaBStags)
+
+		errors = [np.subtract(tabMeanTotal, tabMinTotal), np.subtract(tabMaxTotal, tabMeanTotal)]
+		barTotal = axe1.bar(np.add(range(len(tabMeanTotal)), width*2), tabMeanTotal, width=width, yerr=errors, ecolor=colorTotal, color=colorTotal, alpha=alphaTotal)
+
+		axe1.set_title('Repartition of preys hunted', fontsize=10)
+#		plt.legend([barNbHares, barNbBStags, barTotal], ['Hares', 'Stags', 'Total'])
+
+		axe1.set_xlabel('Generation')
+
+		tabGenerationTicks = [int(math.floor((evaluation-nbPopFirstGen)/nbEvalByGen)) for evaluation in tabEvaluation if (math.floor((evaluation-nbPopFirstGen)/nbEvalByGen)%100 == 0)]
+		axe1.set_xticks(np.add(np.arange(len(tabGenerationTicks)), 3*width/2))
+		axe1.set_xticklabels([generation for generation in tabGenerationTicks])
+
+		axe1.set_ylabel('Number of preys hunted')
+
+		plt.savefig(dossier + "/figureArticle.png", bbox_inches = 'tight')
+#		plt.show()
+
+
+def main(args) :
+	global maxValue
+	maxValue = int(args.max)
+
+	global maxEval
+	maxEval = int(args.last)
+
+	global precision 
+	precision = int(args.precision)
+
+	global selection
+	selection = args.selection
+
+	global exclusion
+	exclusion = args.exclusion
+
+	global drawCoop
+	drawCoop = args.drawCoop
+
+	global drawSStags
+	drawSStags = args.drawSStags
+
+	global noErrorBars
+	noErrorBars = args.noErrorBars
+
+	dossier = args.directory
+
+	if os.path.isdir(dossier) :
+		listSubDirs = [d for d in os.listdir(dossier) if os.path.isdir(dossier + '/' + d)]
+
+		for curDir in listSubDirs :
+			if re.match(r'^Dir(\d*)$', curDir) and (args.bestfit != True) :
+				print('Drawing directory : ' + curDir)
+				drawDir(dossier + '/' + curDir)
+			elif re.match(r'^BestFit$', curDir) :
+				print('Drawing bestfit directory : ' + curDir)
+				drawBestFit(dossier + '/' + curDir)
+
+
+
+if __name__ == '__main__' :
+	parser = argparse.ArgumentParser()
+	parser.add_argument('directory', help = "Results directory")
+	parser.add_argument('-m', '--max', help = "Max value", default='20000')
+	parser.add_argument('-l', '--last', help = "Last evaluation", default='20000')
+	parser.add_argument('-p', '--precision', help = "Precision", default='10')
+	parser.add_argument('-s', '--selection', help = "Selected runs", default=None, type=int, nargs='+')
+	parser.add_argument('-e', '--exclusion', help = "Excluded runs", default=None, type=int, nargs='+')
+	parser.add_argument('-b', '--bestfit', help = "Bestfit only", default=False, action="store_true")
+	parser.add_argument('-d', '--drawSStags', help = "Draws the proportion of small stags", default=False, action="store_true")
+	parser.add_argument('-c', '--drawCoop', help = "Draws the proportion of cooperation", default=False, action="store_true")
+	parser.add_argument('-n', '--noErrorBars', help = "No error bars", default=False, action="store_true")
+	args = parser.parse_args()
+
+	main(args)

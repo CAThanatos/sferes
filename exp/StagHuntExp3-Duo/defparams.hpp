@@ -28,15 +28,42 @@
 #elif defined(CONTROL4)
 #define HARE_PRES
 #define SSTAG_PRES
+#elif defined(EXP)
+#define HARE_PRES
+#define SSTAG_PRES
+#define BSTAG_PRES
+#endif
+
+/*#ifdef FITPROP
+#define LARGE_POP
+#endif*/
+
+#ifdef LARGE_POP
+#define OPPONENTS10
+#define TRIALS1
+#define NESTED
 #endif
 
 #ifdef CAMERA_TYPE
 #define ZERO_INPUT
 #endif
 
-#define NOT_AGAINST_ALL
+#ifdef NEW_CAMERA
+#define NEW_TYPES
+#define RANGE_COR
+#endif
 
+#ifdef CONFUSION
+#undef NEW_TYPES
+#endif
+
+#ifndef ALTRUISM
+#define NOT_AGAINST_ALL
+#endif
+
+#ifndef BOOLEAN
 #define NO_BOOLEAN
+#endif
 
 #ifdef NOT_AGAINST_ALL
 #if !defined(OPPONENTS1) && !defined(OPPONENTS2) && !defined(OPPONENTS10) && !defined(OPPONENTS20)
@@ -52,6 +79,14 @@
 #define NO_BUMPERS
 #define MORE_SENSORS
 
+#ifdef SIMSENSORS
+#define SIMULARITY_SM
+#endif
+
+#if defined(SIMULARITY_SM) || defined(SIMULARITY_HUNT)
+#define SIMULARITY
+#endif
+
 struct Params
 {
 	struct simu
@@ -65,6 +100,9 @@ struct Params
 #elif defined(MAP800)
 		SFERES_STRING(map_name, SFERES_ROOT "/exp/StagHuntExp3-Duo/map800x800.pbm");
 		static const float real_w = 2400.0f;
+#elif defined(MAP1600)
+		SFERES_STRING(map_name, SFERES_ROOT "/exp/StagHuntExp3-Duo/map1600x1600.pbm");
+		static const float real_w = 4800.0f;
 #else
 		SFERES_STRING(map_name, SFERES_ROOT "/exp/StagHuntExp3-Duo/map200x200.pbm");
 		static const float real_w = 600.0f;
@@ -105,8 +143,13 @@ struct Params
 #endif
 #else
 #if defined(BSTAG_PRES)
+#if defined(RATIO_BSTAGS95)
+	static const int nb_hares = total_preys - 1;
+	static const int nb_big_stags = 1;
+#else
 	static const int nb_hares = total_preys/2;
 	static const int nb_big_stags = total_preys/2;
+#endif
 	static const float ratio_big_stags = 1;
 #else
 	static const int nb_hares = total_preys;
@@ -118,7 +161,7 @@ struct Params
 #if defined(SSTAG_PRES)
 #if defined(BSTAG_PRES)
 	static const int nb_hares = 0;
-	static const int nb_big_stags = total_preys/2;
+	static const int nb_big_stags = total_preys;
 	static const float ratio_big_stags = 0.5;
 #else
 	static const int nb_hares = 0;
@@ -154,6 +197,8 @@ struct Params
 		static const float nb_steps = 15000;
 #elif defined(STEPS20000)
 		static const float nb_steps = 20000;
+#elif defined(STEPS25000)
+		static const float nb_steps = 25000;
 #elif defined(STEPS40000)
 		static const float nb_steps = 40000;
 #else
@@ -194,14 +239,73 @@ struct Params
 		
 #ifdef SCREAM
 		static const float scream_threshold = 0.5;
-		static const int scream_decay = 200;
+		static const int scream_decay = 50;
+#endif
+
+#ifdef CONFUSIONPREY
+#ifdef CONFP1
+		static const float confusion_prey = 0.01;
+#elif defined(CONFP10)
+		static const float confusion_prey = 0.1;
+#elif defined(CONFP25)
+		static const float confusion_prey = 0.25;
+#elif defined(CONFP50)
+		static const float confusion_prey = 0.5;
+#endif
+#endif
+
+#ifdef CONFUSION
+#ifdef KCONF01
+		static const float k_confusion = 0.1;
+#elif defined(KCONF015)
+		static const float k_confusion = 0.15;
+#elif defined(KCONF025)
+		static const float k_confusion = 0.25;
+#elif defined(KCONF05)
+		static const float k_confusion = 0.5;
+#elif defined(KCONF1)
+		static const float k_confusion = 1;
+#elif defined(KCONF10)
+		static const float k_confusion = 10;
+#else
+		static const float k_confusion = 0.5;
+#endif
 #endif
 	};
 	
 	struct nn
 	{
+#ifdef DIR_CLOSE
+		static const size_t nb_info_by_pixel = 6;
+#elif defined(TYPEB)
+		static const size_t nb_info_by_pixel = 6;
+#else
+		static const size_t nb_info_by_pixel = 5;
+#endif
+
+#ifdef LEADERSHIP
+		static const size_t nb_inputs_leadership = 1;
+#else
+		static const size_t nb_inputs_leadership = 0;
+#endif
+
+#ifdef SCREAM
+		static const size_t nb_inputs_scream = 1;
+#else
+		static const size_t nb_inputs_scream = 0;
+#endif
+
+#if defined(COMPAS_SCR) || defined(COMPAS_PRED) || defined(COMPAS_LANDMARK)
+		static const size_t nb_inputs_compas = 2;
+#elif defined(COMPAS_LF) || defined(COMPAS_DIR)
+		static const size_t nb_inputs_compas = 1;
+#else
+		static const size_t nb_inputs_compas = 0;
+#endif
+
 #ifdef CAMERA_TYPE
-		static const size_t nb_inputs = Params::simu::nb_lasers + Params::simu::nb_camera_pixels*5 + Params::simu::nb_bumpers;
+		static const size_t nb_inputs = Params::simu::nb_lasers + Params::simu::nb_camera_pixels*nb_info_by_pixel + Params::simu::nb_bumpers 
+													+ Params::nn::nb_inputs_leadership + Params::nn::nb_inputs_scream + Params::nn::nb_inputs_compas;
 #else
 #ifdef CAMERA_DIST
 		static const size_t nb_inputs = Params::simu::nb_lasers + Params::simu::nb_camera_pixels*3 + Params::simu::nb_bumpers;
@@ -214,6 +318,8 @@ struct Params
 		static const size_t nb_hidden = 12;
 #elif defined(HIDDEN16)
 		static const size_t nb_hidden = 16;
+#elif defined(HIDDEN24)
+		static const size_t nb_hidden = 24;
 #elif defined(HIDDEN32)
 		static const size_t nb_hidden = 32;
 #else
@@ -243,28 +349,38 @@ struct Params
   struct evo_float
   {
     // the mutation rate of the real-valued vector
-#ifdef HIGH_RATE
+#ifdef MUT30
     static const float mutation_rate = 0.3f;
-#elif defined(LOW_RATE)
+#elif defined(MUT10)
+    static const float mutation_rate = 0.1f;
+#elif defined(MUT1)
     static const float mutation_rate = 0.01f;
-#elif defined(VLOW_RATE)
+#elif defined(MUT03)
     static const float mutation_rate = 0.003f;
+#elif defined(MUT01)
+    static const float mutation_rate = 0.001f;
 #else
-    static const float mutation_rate = 0.03f;
+    static const float mutation_rate = 0.003f;
 #endif
 
 #ifdef GAUSSIAN_MUTATION
     // we choose the gaussian mutation type
     static const sferes::gen::evo_float::mutation_t mutation_type = sferes::gen::evo_float::gaussian;
     
-#ifdef STD_01
+#ifdef STD1
     static const float sigma = 0.1f;
-#elif defined(STD_02)
-    static const float sigma = 0.2f;
-#elif defined(STD_05)
+#elif defined(STD5)
     static const float sigma = 0.5f;
-#elif defined(STD_075)
-    static const float sigma = 0.75f;
+#elif defined(STD08)
+    static const float sigma = 0.08f;
+#elif defined(STD05)
+    static const float sigma = 0.05f;
+#elif defined(STD01)
+    static const float sigma = 0.01f;
+#elif defined(STD10E5)
+    static const float sigma = 0.00001f;
+#elif defined(STD10E6)
+    static const float sigma = 0.000001f;
 #else
     static const float sigma = 0.01f;
 #endif
@@ -289,14 +405,24 @@ struct Params
   struct pop
   {
     // size of the population
+#ifdef LARGE_POP
+#ifdef POP1000
+    static const unsigned size = 1000;
+#elif defined(POP500)
+    static const unsigned size = 500;
+#else
+    static const unsigned size = 100;
+#endif
+#else
     static const unsigned size = 20;
+#endif
     
     // number of generations
-    static const unsigned nb_gen = 4500;
+    static const unsigned nb_gen = 10000;
     
     // how often should the result file be written (here, each 50
     // generation)
-    static const int dump_period = 25;
+    static const int dump_period = 10;
     
     // how many individuals should be created during the random
     // generation process?
@@ -379,33 +505,25 @@ struct Params
 
 #ifdef HIGH_STAMINA
 #define STAMINA 800
+#elif defined(STAMINA600)
+#define STAMINA 600
+#elif defined(STAMINA400)
+#define STAMINA 400
+#elif defined(STAMINA200)
+#define STAMINA 200
 #else
 #define STAMINA 200
 #endif
 
 #ifdef NO_COOP
-#define FOOD_HARE_SOLO 400
-#define FOOD_HARE_COOP 400
+#define FOOD_HARE_SOLO 50
+#define FOOD_HARE_COOP 50
 
-#ifdef SSTAG50
-#define FOOD_SMALL_STAG_SOLO 50
-#define FOOD_SMALL_STAG_COOP 50
-#elif defined(SSTAG150)
-#define FOOD_SMALL_STAG_SOLO 150
-#define FOOD_SMALL_STAG_COOP 150
-#elif defined(SSTAG250)
-#define FOOD_SMALL_STAG_SOLO 250
-#define FOOD_SMALL_STAG_COOP 250
-#elif defined(SSTAG350)
-#define FOOD_SMALL_STAG_SOLO 350
-#define FOOD_SMALL_STAG_COOP 350
-#else
-#define FOOD_SMALL_STAG_SOLO 50
-#define FOOD_SMALL_STAG_COOP 50
-#endif
+#define FOOD_SMALL_STAG_SOLO 500
+#define FOOD_SMALL_STAG_COOP 500
 
-#define FOOD_BIG_STAG_SOLO 0
-#define FOOD_BIG_STAG_COOP 0
+#define FOOD_BIG_STAG_SOLO 5000
+#define FOOD_BIG_STAG_COOP 5000
 #else
 #define FOOD_HARE_SOLO 50
 
@@ -415,7 +533,9 @@ struct Params
 #define FOOD_HARE_COOP 50
 #endif
 
-#ifdef SSTAG_SOLO50
+#ifdef SSTAG_SOLO0
+#define FOOD_SMALL_STAG_SOLO 0
+#elif defined(SSTAG_SOLO50)
 #define FOOD_SMALL_STAG_SOLO 50
 #elif defined(SSTAG_SOLO150)
 #define FOOD_SMALL_STAG_SOLO 150
@@ -435,6 +555,8 @@ struct Params
 #define FOOD_SMALL_STAG_COOP 500
 #elif defined(SSTAG250)
 #define FOOD_SMALL_STAG_COOP 250
+#elif defined(SSTAG150)
+#define FOOD_SMALL_STAG_COOP 150
 #elif defined(SSTAG100)
 #define FOOD_SMALL_STAG_COOP 100
 #elif defined(SSTAG50)
@@ -443,7 +565,13 @@ struct Params
 #define FOOD_SMALL_STAG_COOP 1000
 #endif
 
+#ifdef BSTAG_SOLO50
+#define FOOD_BIG_STAG_SOLO 50
+#elif defined BSTAG_SOLO100
+#define FOOD_BIG_STAG_SOLO 100
+#else
 #define FOOD_BIG_STAG_SOLO 0
+#endif
 
 #ifdef BSTAG1500
 #define FOOD_BIG_STAG_COOP 1500
@@ -487,10 +615,6 @@ struct Params
 #ifdef ELITIST
 #define EVAL_PARENTS
 #define N_PLUS_N_REPLACEMENT
-#endif
-
-#ifdef LARGE_POP
-#define NO_DOUBLE_EVAL
 #endif
 
 #if defined(SETTING2) || defined(SETTING4) || defined(SETTING6) || defined(SETTING8) || defined(SETTING13)

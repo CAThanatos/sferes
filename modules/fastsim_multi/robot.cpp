@@ -135,7 +135,7 @@ namespace fastsim
       
     // update camera
     if (_use_camera)
-      _camera.update(_pos, m);
+    	_camera.update(_pos, m);
     
     // This robot must act as a collision with other robots
     _add_robot_obstacle(m);

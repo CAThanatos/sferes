@@ -2,6 +2,7 @@
 
 use strict;
 use POSIX qw/ceil/;
+use POSIX qw/floor/;
 
 use Getopt::Std;
 use GD::Graph::bars;
@@ -14,8 +15,12 @@ my %conf = ();
 
 my $dossier = undef;
 my $maxEval = undef;
+my $drawTheoritical = 0;
+my $drawGeneration = 0;
+my $nbEvalByGen = 100;
 
-getopts( 'd:m:', \%conf ) or die $!;
+
+getopts( 'd:m:t', \%conf ) or die $!;
 
 if($conf{d})
 {
@@ -36,6 +41,11 @@ if($maxEval == -1)
 	$maxEval = undef;
 }
 
+if($conf{t})
+{
+	$drawTheoritical = 1;
+}
+
 opendir DIR, $dossier or die $!;
 my @files = grep {/^[^.]/} readdir(DIR);
 closedir DIR;
@@ -46,6 +56,12 @@ GD::Graph::colour::add_colour(SStagsSolo => [89, 208, 232]);
 GD::Graph::colour::add_colour(SStagsDuo => [51, 102, 153]);
 GD::Graph::colour::add_colour(BStagsSolo => [184, 89, 232]);
 GD::Graph::colour::add_colour(BStagsDuo => [100, 47, 127]);
+
+my $x_label = "Evaluations";
+if($drawGeneration == 1)
+{
+	$x_label = "Generations";
+}
 
 my %dataRuns = ();
 my $maxFitness = 0;
@@ -69,7 +85,7 @@ foreach my $file (@files)
 			chomp $ligne;
 			if($cpt > 0)
 			{
-				if($ligne =~ /^([^,]+),([^,]+),([^,]+)$/)
+				if($ligne =~ /^([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+)$/)
 				{
 					my $evaluation = $1;
 					my $run = $2;
@@ -142,11 +158,17 @@ foreach my $file (@files)
 				push @dataFitness, $hashData{$eval};
 			}
 		}
-		
-#		foreach my $val (@dataFitness)
-#		{
-#			print "$val\n";
-#		}
+
+		if($drawGeneration == 1)
+		{
+			my $cpt = 0;
+			while ($cpt < scalar(@dataEval))
+			{
+				my $eval = $dataEval[$cpt];
+				$dataEval[$cpt] = floor($eval/$nbEvalByGen);
+				$cpt++;
+			}
+		}
 		
 		# BoxPlot
 		my @data = (\@dataEval, \@dataFitness);
@@ -161,7 +183,7 @@ foreach my $file (@files)
 									r_margin => 10,
 								
 									# Self explanatory
-									x_label => "Evaluations",
+									x_label => $x_label,
 									x_label_position => 0.5,
 									y_label => "Fitness",
 								
@@ -170,6 +192,9 @@ foreach my $file (@files)
 #										y_label_skip => 2,
 #										line_width => 2,
 #										long_ticks => 1,
+
+									y_min_value => 0,
+#									y_max_value => 8000,
 
 									lower_percent => 25,
 									upper_percent => 75,
@@ -321,6 +346,20 @@ while($numRun <= $nbRuns)
 		}
 	}
 
+	my $maxEvalTmp = $maxEval;
+	if($drawGeneration == 1)
+	{
+		my $cpt = 0;
+		while ($cpt < scalar(@dataEval))
+		{
+			my $eval = $dataEval[$cpt];
+			$dataEval[$cpt] = floor($eval/$nbEvalByGen);
+			$cpt++;
+		}
+
+		$maxEvalTmp = $maxEval/$nbEvalByGen;
+	}
+
 	# Fitness
 	my @data = (\@dataEval, \@dataFitness);
 	my $graph = GD::Graph::lines->new(800, 600);
@@ -331,14 +370,15 @@ while($numRun <= $nbRuns)
 								t_margin => 10,
 								b_margin => 10,
 								l_margin => 10,
-								r_margin => 10,
+								r_margin => 20,
 						
 								# Self explanatory
-								x_label => "Evaluations",
+								x_label => $x_label,
 								x_label_position => 0.5,
 								y_label => "Fitness",
 						
 								y_max_value => $maxFitness,
+								x_max_value => $maxEvalTmp,
 						
 								y_tick_number => 10,
 								x_tick_number => 10,
@@ -366,7 +406,6 @@ while($numRun <= $nbRuns)
 	binmode IMG;
 	print IMG $image->png();
 	close IMG;
-
 	
 	# Preys repartition
 	@data = (\@dataEval, \@dataHaresSolo, \@dataHaresDuo, \@dataSStagsSolo, \@dataSStagsDuo, \@dataBStagsSolo, \@dataBStagsDuo);
@@ -378,14 +417,15 @@ while($numRun <= $nbRuns)
 								t_margin => 10,
 								b_margin => 10,
 								l_margin => 10,
-								r_margin => 10,
+								r_margin => 20,
 						
 								# Self explanatory
-								x_label => "Evaluations",
+								x_label => $x_label,
 								x_label_position => 0.5,
 								y_label => "Preys Hunted",
 
 								y_max_value => $maxPreys,
+								x_max_value => $maxEvalTmp,
 
 								legend_placement => "RT",
 						

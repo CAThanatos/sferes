@@ -70,7 +70,54 @@ namespace sferes
 				}
       }
     };
+
+    template<typename Phen>
+    struct _parallel_ev_altruism
+    {
+      typedef std::vector<boost::shared_ptr<Phen> > pop_t;
+      pop_t _pop;
+
+      ~_parallel_ev_altruism() { }
+      _parallel_ev_altruism(const pop_t& pop) : _pop(pop) {}
+      _parallel_ev_altruism(const _parallel_ev_altruism& ev) : _pop(ev._pop) {}
+      void operator() (const parallel::range_t& r) const
+      {
+				for (size_t i = r.begin(); i != r.end(); ++i)
+				{
+					assert(i < _pop.size());
+
+					_pop[i]->fit().eval_compet(*_pop[i], *_pop[i]);
+				}
+      }
+    };
     
+    template<typename Phen>
+    struct _parallel_ev_opponent
+    {
+    	typedef std::vector<boost::shared_ptr<Phen> > pop_t;
+    	pop_t _pop;
+    	std::vector<size_t> _opponents;
+    	size_t _ind_ev; 	
+
+      ~_parallel_ev_opponent() { }
+      _parallel_ev_opponent(const pop_t& pop, const std::vector<size_t>& opponents, size_t ind_ev) : _pop(pop), _opponents(opponents), _ind_ev(ind_ev) {}
+      _parallel_ev_opponent(const _parallel_ev_opponent& ev) : _pop(ev._pop), _opponents(ev._opponents), _ind_ev(ev._ind_ev) {}
+      void operator() (const parallel::range_t& r) const
+      {
+				for (size_t i = r.begin(); i != r.end(); ++i)
+				{
+					assert(i < _opponents.size());
+					
+					size_t opponent = _opponents[i];
+					
+					assert(opponent < _pop.size());
+					assert(_ind_ev < _pop.size());
+
+					_pop[_ind_ev]->fit().eval_compet(*_pop[_ind_ev], *_pop[opponent]);
+				}
+      }
+    };
+        
     template<typename Phen>
     struct _parallel_ev_select
     {
@@ -99,6 +146,24 @@ namespace sferes
 					
 					for(size_t j = 0; j < nb_eval; ++j)
 					{
+#ifdef NESTED
+						std::vector<size_t> opponents;
+
+						for(size_t k = 0; k < nb_opponents; ++k)
+						{
+							int opponent = -1;
+							do
+							{
+								opponent = misc::rand(0, _size);
+							} while((opponent == i) || (opponent < 0) || (opponent >= _size));
+							
+							assert(opponent != -1);
+							opponents.push_back(opponent);
+						}
+						assert(opponents.size() == nb_opponents);
+
+						parallel::p_for(parallel::range_t(0, nb_opponents), _parallel_ev_opponent<Phen>(_pop, opponents, i));
+#else
 						for(size_t k = 0; k < nb_opponents; ++k)
 						{
 							int opponent = -1;
@@ -111,10 +176,11 @@ namespace sferes
 							
 							_pop[i]->fit().eval_compet(*_pop[i], *_pop[opponent]);
 						}
+#endif
 					}
 				}
       }
-    };    
+    };
 
 
     SFERES_CLASS(StagHuntEvalParallel)
@@ -163,7 +229,11 @@ namespace sferes
 #endif
 				}
 
-#ifdef NOT_AGAINST_ALL
+#ifdef ALTRUISM
+				parallel::init();
+				parallel::p_for(parallel::range_t(begin, end), _parallel_ev_altruism<Phen>(pop));
+				_nb_eval += (end - begin);
+#elif defined(NOT_AGAINST_ALL)
 				parallel::init();
 				parallel::p_for(parallel::range_t(begin, end), _parallel_ev_select<Phen>(pop, (end - begin)));
 				_nb_eval += (end - begin);

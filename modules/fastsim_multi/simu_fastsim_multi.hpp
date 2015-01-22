@@ -113,9 +113,9 @@ namespace sferes
         {
         	_display->dump_behaviour_log(file);
         }
-        void add_dead_prey(int index)
+        void add_dead_prey(int index, std::string& file, bool alone = true)
         {
-        	_display->add_dead_prey(_robots[index]->get_pos().x(), _robots[index]->get_pos().y(), _robots[index]->get_radius(), _robots[index]->display_color());
+        	_display->add_dead_prey(_robots[index]->get_pos().x(), _robots[index]->get_pos().y(), _robots[index]->get_radius(), _robots[index]->display_color(), file, alone);
         }
         void switch_map()
         {

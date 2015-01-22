@@ -91,7 +91,7 @@ my %dataSStagsSolo = ();
 my %dataBStagsDuo = ();
 my %dataBStagsSolo = ();
 
-my $stringLineGlob = "Evaluation,Run,Fitness\n";
+my $stringLineGlob = "Evaluation,Run,Fitness,NbHaresDuo,NbHaresSolo,NbHares,NbSStagsDuo,NbSStagsSolo,NbSStags,NbBStagsDuo,NbBStagsSolo,NbBStags\n";
 my $numFichier = 0;
 
 # On cherche la dernière itération si besoin
@@ -220,11 +220,11 @@ foreach my $fichier (@fichiers)
 				$lastIteration = $iteration;
 				if(($cumulIteration > $precision) || ($first == 1))
 				{
-					$stringLineGlob = $stringLineGlob . "$iteration,$numFichier,$fitness\n";
-				
 					my $nbHaresDuo = $nbHares - $nbHaresSolo;
 					my $nbSStagsDuo = $nbSStags - $nbSStagsSolo;
 					my $nbBStagsDuo = $nbBStags - $nbBStagsSolo;
+
+					$stringLineGlob = $stringLineGlob . "$iteration,$numFichier,$fitness,$nbHaresDuo,$nbHaresSolo,$nbHares,$nbSStagsDuo,$nbSStagsSolo,$nbSStags,$nbBStagsDuo,$nbBStagsSolo,$nbBStags\n";
 					$stringRun = $stringRun . "$iteration,$fitness,$nbHaresDuo,$nbHaresSolo,$nbHares,$nbSStagsDuo,$nbSStagsSolo,$nbSStags,$nbBStagsDuo,$nbBStagsSolo,$nbBStags\n";
 				
 					if($first == 1)

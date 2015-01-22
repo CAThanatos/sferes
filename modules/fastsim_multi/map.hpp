@@ -36,6 +36,8 @@
 #include "goal.hpp"
 #include "illuminated_switch.hpp"
 
+//#define COMPAS_LANDMARK
+
 namespace fastsim
 {
   // 0, 0 is top left
@@ -203,6 +205,11 @@ namespace fastsim
       }
  		}
 #endif
+
+#ifdef COMPAS_LANDMARK
+    void set_landmark(Posture pos_landmark) { _pos_landmark = pos_landmark; }
+    Posture get_landmark() { return _pos_landmark; }
+#endif
     
   protected:
 
@@ -232,6 +239,10 @@ namespace fastsim
     int _w, _h;
     float _real_w, _real_h;
     float _fx;
+
+#ifdef COMPAS_LANDMARK
+    Posture _pos_landmark;
+#endif
     
 #ifdef LOG_BEHAVIOUR
 		struct Behaviour_map_cell

@@ -86,7 +86,7 @@ namespace sferes
       
       void epoch()
       {
-				assert(this->_pop.size());
+				assert(this->_pop.size()); 
 
 #ifdef TEST_VARIANCE_TRIALS
 				this->_eval.set_gen(this->_gen);

@@ -79,6 +79,7 @@ my $dir = dirname($0);
 
 system "$dir/makeDataFolder.perl -d $dossier -p $prefixeDossier -c";
 system "$dir/make_data.perl -d $dossier/$typeData -p $precision -m $iterMax -o $fileOutput -c";
+system "$dir/make_data.perl -d $dossier/BestEverFit -p $precision -m $iterMax -o $fileOutput -c";
 
 sub printHelp()
 {

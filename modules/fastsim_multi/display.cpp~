@@ -737,6 +737,7 @@ namespace fastsim
 
 		//for(std::vector<fastsim::Robot>::const_iterator it = _robots.begin(); it != _robots.end(); ++it) 
   	_end_positions.clear();
+  	bool first_hunter = true;
 		for(int i = 0; i < _robots.size(); ++i)
 		{
 		  // convert to pixel
@@ -777,7 +778,17 @@ namespace fastsim
 				pos.y = _robots[i]->get_pos().y();
 		  	_end_positions.push_back(pos);
 		  	
-			  _disc(_behaviour_log, x, y, 1, _color_from_id(_behaviour_log,col));
+		  	// To differenciate the two hunters
+		  	if(first_hunter)
+				  _disc(_behaviour_log, x, y, 1, _color_from_id(_behaviour_log,col));
+				else
+				{
+			  	Uint32 color_hunter2 = SDL_MapRGB(_behaviour_log->format, 255, 175, 0);
+				  _disc(_behaviour_log, x, y, 1, color_hunter2);
+				}
+			  
+			  if(first_hunter)
+			  	first_hunter = false;
 			}
 			else
 			{
@@ -805,7 +816,7 @@ namespace fastsim
     // We display the dead preys on the _behaviour_log
     for(int i = 0; i < _dead_preys_list.size(); ++i)
     {
-    	display_dead_prey(_dead_preys_list[i].x, _dead_preys_list[i].y, _dead_preys_list[i].radius, _dead_preys_list[i].color);
+    	display_dead_prey(_dead_preys_list[i].x, _dead_preys_list[i].y, _dead_preys_list[i].radius, _dead_preys_list[i].color, _dead_preys_list[i].solo);
     }
 
     // bumpers
@@ -813,7 +824,7 @@ namespace fastsim
        
     if(_record_video)
     {
-		  if(_cpt_frame%1000 == 0)
+		  if(_cpt_frame%50 == 0)
 		  {
 				std::string file_dump = _file_video;
 			
@@ -905,7 +916,7 @@ namespace fastsim
   	SDL_SaveBMP(_behaviour_log, file);
   }
 
-  void Display :: display_dead_prey(float x, float y, float radius, int color)
+  void Display :: display_dead_prey(float x, float y, float radius, int color, bool alone)
   {
 	  unsigned _x = _map->real_to_pixel(x);
 	  unsigned _y = _map->real_to_pixel(y);
@@ -913,8 +924,26 @@ namespace fastsim
 
 	  //Uint32 _color = _color_from_id(_behaviour_log, color);
 	  Uint32 _color = SDL_MapRGB(_behaviour_log->format, 255, 0, 0);
+	  
 	  _line(_behaviour_log, _x - _r, _y, _x + _r, _y, _color);
 	  _line(_behaviour_log, _x, _y - _r, _x, _y + _r, _color);
+
+		std::cout << alone << std::endl;
+	  if(!alone)
+	  {
+	  	float x1 = x - (cosf(M_PI/4)*radius);
+	  	float x2 = x + (cosf(M_PI/4)*radius);
+	  	float y1 = y - (sinf(M_PI/4)*radius);
+	  	float y2 = y + (sinf(M_PI/4)*radius);
+	  	
+	  	unsigned _x1 = _map->real_to_pixel(x1);
+	  	unsigned _y1 = _map->real_to_pixel(y1);
+	  	unsigned _x2 = _map->real_to_pixel(x2);
+	  	unsigned _y2 = _map->real_to_pixel(y2);
+	  	
+			_line(_behaviour_log, _x1 , _y1, _x2, _y2, _color);
+			_line(_behaviour_log, _x1, _y2, _x2, _y1, _color);
+	  }
   }
 }
 

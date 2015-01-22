@@ -4,7 +4,7 @@ use strict;
 
 my $PROD_DIR = "./build/prod/exp";
 
-my $expe = "-1";
+my $expe = "StagHuntExp3-Duo";
 my $prod = 0;
 my $clean = 0;
 
@@ -40,12 +40,6 @@ while($numArg < scalar(@ARGV))
 	}
 
 	$numArg++;
-}
-
-if($expe =~ "-1")
-{
-	print "You need to specify an experiment !\n";
-	exit 1;
 }
 
 if($clean == 1)

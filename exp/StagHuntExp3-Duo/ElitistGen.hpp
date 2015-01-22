@@ -76,13 +76,16 @@ namespace sferes
 				_check_invariant(); 
       }
       
-      void mutate(float step_size) 
+      void mutate(float step_size = 1.0f) 
       {
+				std::ofstream os("mutations.txt", std::ios::out | std::ios::app);
 #ifdef GAUSSIAN_MUTATION
       	float sigma = Params::evo_float::sigma;
 				for (size_t i = 0; i < Size; i++)
 					if (misc::rand<float>() < Params::evo_float::mutation_rate)
 					{
+						float delta = step_size * misc::gaussian_rand<float>(0, sigma * sigma);
+						os << delta << "\n";
 						float f = _data[i] + step_size * misc::gaussian_rand<float>(0, sigma * sigma);
 						_data[i] = misc::put_in_range(f, 0.0f, 1.0f);
 	  			}
@@ -98,11 +101,14 @@ namespace sferes
 							1 - pow(2.0 * (1.0 - ri), 1.0 / (eta_m + 1.0));
 						assert(!std::isnan(delta_i));
 						assert(!std::isinf(delta_i));
+						float delta = step_size*delta_i;
+						os << delta << "\n";
 						float f = _data[i] + step_size*delta_i;
 						_data[i] = misc::put_in_range(f, 0.0f, 1.0f);
 					}
 #endif
 				_check_invariant();
+				os.close();
 	    }
 
       float data(size_t i) const 

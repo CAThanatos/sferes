@@ -49,8 +49,19 @@ int main(int argc, char *argv[])
 
   int numkey;
   int num_robot = 0;
+
+  Posture pos_center(s.map()->get_real_w()/2, s.map()->get_real_h()/2, 0);
   while(true)
   {
+    float distance_toCenter1 = r1->get_pos().dist_to(pos_center.x(), pos_center.y());
+    float angle_toCenter1 = normalize_angle(atan2(pos_center.y() - r1->get_pos().y(), pos_center.x() - r1->get_pos().x()));
+    angle_toCenter1 = normalize_angle(angle_toCenter1 - r1->get_pos().theta());
+
+    distance_toCenter1 = (3400.0f - distance_toCenter1)/(3400.0f);
+    angle_toCenter1 = (angle_toCenter1 + M_PI)/(2.0*M_PI);
+    std::cout << distance_toCenter1 << "/" << angle_toCenter1 << std::endl;
+
+
     SDL_PumpEvents();
     Uint8* keys = SDL_GetKeyState(&numkey);
     if (keys[SDLK_TAB]) 

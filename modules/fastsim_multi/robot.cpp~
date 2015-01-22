@@ -111,7 +111,6 @@ namespace fastsim
 			_pos.set_theta(theta);
 			_collision = true;
 			_update_bb();
-	    std::cout << _pos.x() << "/" << _pos.y() << std::endl;
     }
     else
     	_collision = false;
@@ -125,6 +124,13 @@ namespace fastsim
     // update lasers
     for (size_t i = 0; i < _lasers.size(); ++i)
       _lasers[i].update(_pos, m);
+      
+    if(collision)
+    {
+	    for (size_t i = 0; i < _lasers.size(); ++i)
+	    	std::cout << _lasers[i].get_dist() << ",";
+	    std::cout << std::endl;
+    }
       
     // update radars
     for (size_t i = 0; i < _radars.size(); ++i)

@@ -15,7 +15,6 @@ my $output = "videoBest.mp4";
 my $rate = 25;
 my $quality = 2;
 my $dossier = undef;
-my $prefix = "Dir";
 
 getopts( 'd:o:m:e:s:r:q:f:', \%conf ) or die $!;
 
@@ -56,11 +55,6 @@ if($conf{q})
 if($conf{r})
 {
 	$rate = $conf{r};
-}
-
-if($conf{f})
-{
-	$prefix = $conf{f};
 }
 
 opendir DIR, $dossier or die $!;

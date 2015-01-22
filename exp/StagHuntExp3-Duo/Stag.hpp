@@ -23,6 +23,24 @@ namespace sferes
 			Stag() : Prey() { _stamina = STAMINA; }
 			Stag(float radius, const fastsim::Posture& pos, int color, type_stag type, unsigned int fur_color) : Prey(radius, pos, (fur_color + color), color/100), _type(type), _fur_color(fur_color)
 			{
+#ifdef CONFUSION
+				if(type == Stag::small)
+				{
+				  	_stamina = STAMINA;
+				  	_type_prey = Prey::SMALL_STAG;
+				  	_fur_color = fur_color;
+				  	_huntable_alone = true;		
+					this->set_display_color(SMALL_STAG_COLOR/100);
+ 				}
+				else
+				{
+					_stamina = STAMINA;
+					_type_prey = Prey::BIG_STAG;
+				  	_fur_color = fur_color;
+					_huntable_alone = true;
+					this->set_display_color(BIG_STAG_COLOR/100);
+				}
+#else
 				if(type == Stag::small)
 				{
 					_stamina = STAMINA;
@@ -33,23 +51,68 @@ namespace sferes
  				}
 				else
 				{
-          if(_fur_color < 50)
-          {
+					if(_fur_color < 50)
+					{
 				  	_stamina = STAMINA;
- 				  	_type_prey = Prey::SMALL_STAG;
- 				  	_fur_color = fur_color;
- 				  	_huntable_alone = true;		
+				  	_type_prey = Prey::SMALL_STAG;
+				  	_fur_color = fur_color;
+				  	_huntable_alone = true;		
 						this->set_display_color(SMALL_STAG_COLOR/100);
-          }
-          else if(_fur_color >= 50)
-          {
+
+#ifdef TRIGO
+#ifdef ONEVALUE
+						float angle_color = 3.0f*M_PI/4.0f;
+#elif defined(QUARTERVALUE)
+						float angle_color = misc::rand(2.0f*M_PI/3.0f, 7.0f*M_PI/6.0f);
+#else
+						float angle_color = misc::rand(2.0f*M_PI/3.0f, 4.0f*M_PI/3.0f);
+
+						while(!(angle_color*10 < ceil(4.0f*M_PI/3.0f)*10))
+							angle_color = misc::rand(2.0f*M_PI/3.0f, 4.0f*M_PI/3.0f);
+#endif
+
+						this->set_angle_color(angle_color);
+						this->set_color(color + angle_color*10);
+#endif
+					}
+					else if(_fur_color >= 50)
+					{
 						_stamina = STAMINA;
 						_type_prey = Prey::BIG_STAG;
-						_fur_color = fur_color;
+				  	_fur_color = fur_color;
 						_huntable_alone = true;
 						this->set_display_color(BIG_STAG_COLOR/100);
-          }
+
+#ifdef TRIGO
+#ifdef ONEVALUE
+						float angle_color = 7.0f*M_PI/4.0f;
+#elif defined(QUARTERVALUE)
+						float angle_color = misc::rand(4.0f*M_PI/3.0f, 11.0f*M_PI/6.0f);
+#else
+						float angle_color = misc::rand(4.0f*M_PI/3.0f, 2.0f*M_PI);
+
+						while(!(angle_color*10 < ceil(2.0f*M_PI)*10))
+							angle_color = misc::rand(4.0f*M_PI/3.0f, 2.0f*M_PI);
+#endif
+
+						this->set_angle_color(angle_color);
+						this->set_color(color + angle_color*10);
+#endif
+					}
+
+#ifdef CONFUSIONPREY
+					float rand_confusion = misc::rand(0.0f, 1.0f);
+
+					// Confusion on the prey : We see the other type
+					// of stag
+					if((rand_confusion < Params::simu::confusion_prey) && (fur_color >= 50))
+					{
+						_fur_color = (fur_color + 50)%100;
+						this->set_color(color + _fur_color);
+					}
+#endif
 				}
+#endif
 			}
 			
 			~Stag()	{}

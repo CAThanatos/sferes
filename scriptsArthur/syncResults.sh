@@ -12,7 +12,7 @@ OPTIONS:
 	-s 	The site from which to copy"
 }
 
-dossier=
+dossier=./ResultatsG5K
 site=
 while getopts "hd:s:" OPTION
 do
@@ -33,12 +33,6 @@ do
 			;;
 	esac
 done
-
-if [[ -z $dossier ]]
-then
-	Usage
-	exit 1
-fi
 
 if [[ -z $site ]]
 then
