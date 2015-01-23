@@ -159,6 +159,16 @@ namespace sferes
 						{
 							float v1 = 4.0*(action[0] * 2.0-1.0);
 							float v2 = 4.0*(action[1] * 2.0-1.0);
+
+#ifdef SLOW_LEADER
+							Hunter* hunter = (Hunter*)robot;
+
+							if(hunter->is_leader())
+							{
+								v1 /= 2.0;
+								v2 /= 2.0;
+							}
+#endif
 							
 							// v1 and v2 are between -4 and 4
 							simu.move_robot(v1, v2, num);

@@ -215,8 +215,13 @@ namespace sferes
 			// First the robots for the two hunters
 			std::vector<Posture> pos_init;
 			
+#ifdef POS_CLOSE
 			pos_init.push_back(Posture(width/2 - 40, 80, M_PI/2));
 			pos_init.push_back(Posture(width/2 + 40, 80, M_PI/2));
+#else
+			pos_init.push_back(Posture(width/2, 80, M_PI/2));
+			pos_init.push_back(Posture(width/2, height - 80, -M_PI/2));
+#endif
 
 			invers_pos = false;
 			

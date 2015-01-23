@@ -30,11 +30,12 @@ def build(bld):
                            target = 'StagHunt',
 #                           json = 'StagHuntExp3.json',
                            variants = [
-                                        'COEVO WAYPOINTS3',
-                                        'COEVO WAYPOINTS5',
                                         'COEVO WAYPOINTS7',
                                         'COEVO WAYPOINTS12',
                                         'COEVO WAYPOINTS18',
+                                        'WAYPOINTS7 ID_LEADER',
+                                        'WAYPOINTS12 ID_LEADER',
+                                        'WAYPOINTS18 ID_LEADER',
                                       ])
 
                                        
