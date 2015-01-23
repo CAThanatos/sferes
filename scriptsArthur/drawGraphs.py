@@ -60,6 +60,7 @@ def drawBestFit(dossier) :
 
 		tabEvaluation = []
 		maxFitness = 0
+		maxNbPreys = 0
 		for fileBest in listBestFit :
 			m = re.search(r'^bestfit(\d*)\.dat$', fileBest)
 			run = int(m.group(1))
@@ -120,6 +121,9 @@ def drawBestFit(dossier) :
 
 							if line['fitness'] > maxFitness :
 								maxFitness = line['fitness']
+
+							if (line['nbHares'] + line['nbBStags']) > maxNbPreys :
+								maxNbPreys = (line['nbHares'] + line['nbBStags'])
 
 							cpt = 0
 
@@ -214,14 +218,16 @@ def drawBestFit(dossier) :
 			barNbBStagsSolo = axe1.bar(range(len(tabNbBStagsSolo)), tabNbBStagsSolo, bottom = np.add(tabNbHaresDuo, tabNbHaresSolo), width = width, color = colorBStagsSolo, alpha = alphaBStags)
 			barNbBStagsDuo = axe1.bar(range(len(tabNbBStagsDuo)), tabNbBStagsDuo, bottom = np.add(tabNbBStagsSolo, np.add(tabNbHaresDuo, tabNbHaresSolo)), width = width, color = colorBStagsDuo, alpha = alphaBStags)
 
-			tabEvaluationTicks = [indice for indice in range(len(tabNbHaresSolo)) if indice % (int(len(tabNbHaresSolo)/10)) == 0]
+			tabEvaluationTicks = [indice for indice in range(len(tabPlotEvaluation)) if indice % (int(len(tabPlotEvaluation)/10)) == 0]
 
 			axe1.set_xticks(tabEvaluationTicks)
 			axe1.set_xticklabels([tabPlotEvaluation[indice] for indice in tabEvaluationTicks])
 			axe1.set_xlabel('Evaluation')
 			# axe1.set_xlim(0, len(tabGenerationTicks))
 
+			axe1.set_ylim(0, maxNbPreys + 0.1*maxNbPreys)
 			axe1.set_ylabel('Number of preys hunted')
+			
 			axe1.set_title('Repartition of preys hunted', fontsize = 10)
 
 			plt.legend([barNbHaresSolo, barNbHaresDuo, barNbBStagsSolo,  barNbBStagsDuo], ['Hares solo', 'Hares coop.', 'Stags solo', 'Stags coop.'], bbox_to_anchor=(0., 1.05, 1., .102), loc=3, ncol=2, mode="expand", borderaxespad=0.)
