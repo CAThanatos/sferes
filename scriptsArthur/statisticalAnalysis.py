@@ -73,8 +73,12 @@ def main(args) :
 						if evaluation < maxEval :
 							tabRatioCoop.append((line['nbBStags'] - line['nbBStagsSolo'])*100/line['nbBStags'] if line['nbBStags'] > 0.0 else 0)
 
-							tabRatio.append(line['nbBStags']*100/(line['nbHares'] + line['nbBStags']))
-							tabRatioHares.append(line['nbHares']*100/(line['nbHares'] + line['nbBStags']))
+							if (line['nbHares'] + (line['nbBStags'] - line['nbBStagsSolo'])) > 0.0 :
+								tabRatio.append((line['nbBStags'] - line['nbBStagsSolo'])*100/(line['nbHares'] + (line['nbBStags'] - line['nbBStagsSolo'])))
+								tabRatioHares.append(line['nbHares']*100/(line['nbHares'] + (line['nbBStags'] - line['nbBStagsSolo'])))
+							else :
+								tabRatio.append(0.0)
+								tabRatioHares.append(0.0)
 
 
 				if len(tabRatioCoop) > 0 and lastEval <= maxEval :
@@ -96,7 +100,7 @@ def main(args) :
 		if args.coop :
 			serie1 = [hashRatioCoop[run][minEval] for run in hashRatioCoop.keys()] 
 		else :
-			serie1 = [hashRatioHares[run][minEval] for run in hashRatioHares.keys()] 
+			serie1 = [hashRatio[run][minEval] for run in hashRatio.keys()] 
 		print(serie1)
 
 
@@ -159,8 +163,12 @@ def main(args) :
 						if evaluation < maxEval :
 							tabRatioCoop.append((line['nbBStags'] - line['nbBStagsSolo'])*100/line['nbBStags'] if line['nbBStags'] > 0.0 else 0)
 
-							tabRatio.append(line['nbBStags']*100/(line['nbHares'] + line['nbBStags']))
-							tabRatioHares.append(line['nbHares']*100/(line['nbHares'] + line['nbBStags']))
+							if (line['nbHares'] + (line['nbBStags'] - line['nbBStagsSolo'])) > 0.0 :
+								tabRatio.append((line['nbBStags'] - line['nbBStagsSolo'])*100/(line['nbHares'] + (line['nbBStags'] - line['nbBStagsSolo'])))
+								tabRatioHares.append(line['nbHares']*100/(line['nbHares'] + (line['nbBStags'] - line['nbBStagsSolo'])))
+							else :
+								tabRatio.append(0.0)
+								tabRatioHares.append(0.0)
 
 
 				if len(tabRatioCoop) > 0 and lastEval <= maxEval :
@@ -183,7 +191,7 @@ def main(args) :
 		if args.coop :
 			serie2 = [hashRatioCoop[run][minEval] for run in hashRatioCoop.keys()] 
 		else :
-			serie2 = [hashRatioHares[run][minEval] for run in hashRatioHares.keys()] 
+			serie2 = [hashRatio[run][minEval] for run in hashRatio.keys()] 
 		print(serie2)
 
 	u, p = stats.mannwhitneyu(serie1, serie2)
