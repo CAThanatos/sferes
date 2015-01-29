@@ -277,11 +277,7 @@ namespace sferes
 
 	    
 			size_t nb_eval() const { return _nb_eval; }
-#ifdef ELITIST
-			void set_nb_eval(size_t gen) { _nb_eval = (gen * Params::pop::size) + Params::pop::mu; }
-#else
-			void set_nb_eval(size_t gen) { _nb_eval = ((gen + 1) * Params::pop::size); }
-#endif
+			void set_nb_eval(size_t gen) { _nb_eval = (gen * Params::pop::size * 2) + Params::pop::mu * 2; }
 			
 			void set_res_dir(std::string res_dir) { _res_dir = res_dir; }
 			void set_gen(int gen) { _gen = gen; }

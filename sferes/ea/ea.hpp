@@ -344,7 +344,7 @@ namespace sferes
             exit(1);
           }
           
-					_gen = atof(fname.substr(fname.find_last_of("_") + 1, fname.length() - 1).c_str()) + 1;
+					_gen = atof(fname.substr(fname.find_last_of("_") + 1, fname.length() - 1).c_str());
           
           typedef boost::archive::binary_iarchive ia_t;
           ia_t ia(ifs);

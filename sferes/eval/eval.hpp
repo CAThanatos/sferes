@@ -62,6 +62,7 @@ namespace sferes
       }
       
       void set_nb_eval(int gen) { _nb_eval = gen * Params::pop::size; }
+      size_t nb_eval() const { return _nb_eval; }
     protected:
     	size_t _nb_eval;
     };
