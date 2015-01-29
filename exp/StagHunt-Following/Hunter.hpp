@@ -144,6 +144,14 @@ namespace sferes
 						current_index += Params::nn::nb_info_by_pixel;
  					}
 
+#ifdef ID_LEADER
+ 					inputs[current_index] = (_bool_leader)?1:0;
+
+ 					// std::cout << inputs[current_index] << "/";
+
+ 					current_index++;
+#endif
+
 					// std::cout << std::endl;
 	
 #ifdef MLP_PERSO
