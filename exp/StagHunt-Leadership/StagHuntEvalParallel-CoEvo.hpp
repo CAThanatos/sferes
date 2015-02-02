@@ -265,6 +265,7 @@ namespace sferes
 
 					pop[i]->set_nb_leader_first(pop[i]->nb_leader_first_at());
 					pop[i]->set_nb_preys_killed_coop(pop[i]->nb_preys_killed_coop_at());
+					pop[i]->set_proportion_leader(pop[i]->proportion_leader_at());
 
 					pop[i]->set_developed_at(false);
 				}

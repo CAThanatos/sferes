@@ -66,6 +66,8 @@ namespace sferes
 			_nb_preys_killed = 0;
 			_nb_preys_killed_coop = 0;
 
+			float proportion_leader = 0;
+
 			// clock_t deb = clock();
 
       for (size_t j = 0; j < Params::simu::nb_trials; ++j)
@@ -98,6 +100,9 @@ namespace sferes
 				prev_pos.set_x(rob->get_pos().x());
 				prev_pos.set_y(rob->get_pos().y());
 #endif
+
+				_nb_leader_first_trial = 0;
+				_nb_preys_killed_coop_trial = 0;
 
 
 				for (size_t i = 0; i < Params::simu::nb_steps && !stop_eval; ++i)
@@ -310,6 +315,10 @@ namespace sferes
        	moy_sstags2_solo += h2->nb_small_stags_hunted_solo();
        	moy_bstags2_solo += h2->nb_big_stags_hunted_solo();
 
+       	_nb_leader_first += _nb_leader_first_trial;
+       	_nb_preys_killed_coop += _nb_preys_killed_coop_trial;
+       	proportion_leader += (0.5 - (_nb_leader_first_trial/_nb_preys_killed_coop_trial));
+
 
 #if defined(BEHAVIOUR_VIDEO)
 				if(this->mode() == fit::mode::view)
@@ -341,6 +350,7 @@ namespace sferes
 
 			_nb_leader_first /= Params::simu::nb_trials;
 			_nb_preys_killed_coop /= Params::simu::nb_trials;
+			proportion_leader /= Params::simu::nb_trials;
 		
 #ifdef NOT_AGAINST_ALL	
 			int nb_encounters = Params::pop::nb_opponents*Params::pop::nb_eval;
@@ -376,9 +386,11 @@ namespace sferes
 
 			_nb_leader_first /= nb_encounters;
 			_nb_preys_killed_coop /= nb_encounters;
+			proportion_leader /= nb_encounters;
 
 			ind1.add_nb_leader_first(_nb_leader_first);
 			ind1.add_nb_preys_killed_coop(_nb_preys_killed_coop);
+			ind1.add_proportion_leader(proportion_leader);
      	
      	food2 /= nb_encounters;
      	food1 /= nb_encounters;
@@ -699,10 +711,10 @@ namespace sferes
 
 				if(!alone)
 				{
-					_nb_preys_killed_coop++;
+					_nb_preys_killed_coop_trial++;
 
 					if(prey->get_leader_first() == 1)
-						_nb_leader_first++;
+						_nb_leader_first_trial++;
 				}
 
    			for(int i = 0; i < hunters.size(); ++i)
@@ -741,6 +753,9 @@ namespace sferes
 		float _nb_leader_first;
 		float _nb_preys_killed;
 		float _nb_preys_killed_coop;
+
+		float _nb_leader_first_trial;
+		float _nb_preys_killed_coop_trial;
 
 		std::string res_dir;
 		size_t gen;

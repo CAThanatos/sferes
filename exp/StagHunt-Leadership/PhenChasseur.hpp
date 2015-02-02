@@ -75,6 +75,7 @@ namespace sferes
 					_nb_bstag_solo = 0;
 					_nb_leader_first = 0;
 					_nb_preys_killed_coop = 0;
+					_proportion_leader = 0;
 					_fit_mov = 0;
 					
 					this->fit().vec_fitness.clear();
@@ -88,6 +89,7 @@ namespace sferes
 					_nb_bstag_solo_at = 0;
 					_nb_leader_first_at = 0;
 					_nb_preys_killed_coop_at = 0;
+					_proportion_leader_at = 0;
 					this->fit().fitness_at = 0;
 				}
 
@@ -147,6 +149,13 @@ namespace sferes
 		    float nb_bstag_at() const { return _nb_bstag_at; }
 		    float nb_bstag_solo_at() const { return _nb_bstag_solo_at; }
 		    void add_nb_bstag(float nb_bstag, float solo) { _nb_bstag_at.fetch_and_store(_nb_bstag_at + nb_bstag); _nb_bstag_solo_at.fetch_and_store(_nb_bstag_solo_at + solo); }
+
+		    
+		    float proportion_leader() const { return _proportion_leader; }
+		    void set_proportion_leader(float proportion_leader) { _proportion_leader = proportion_leader; }
+
+		    float proportion_leader_at() const { return _proportion_leader_at; }
+		    void add_proportion_leader(float proportion_leader) { _proportion_leader_at.fetch_and_store(_proportion_leader_at + proportion_leader); }
 
 
 		    float nb_leader_first() const { return _nb_leader_first; }
@@ -213,6 +222,10 @@ namespace sferes
 		    // Total number of cooperative hunts
 		    float _nb_preys_killed_coop;
 		    tbb::atomic<float> _nb_preys_killed_coop_at;
+
+		    // Proportion of times the designated leader hunted first
+		    float _proportion_leader;
+		    tbb::atomic<float>_proportion_leader_at;
 		    
 		    float _fit_mov;
 		    

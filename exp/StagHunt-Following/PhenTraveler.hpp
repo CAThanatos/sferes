@@ -73,6 +73,9 @@ namespace sferes
 					_nb_waypoints_coop = 0;
 					_nb_waypoints_coop_at = 0;
 
+					_proportion_leader = 0;
+					_proportion_leader_at = 0;
+
 					_developed = true;
 					this->fit().fitness_at = 0;
 				}
@@ -113,6 +116,12 @@ namespace sferes
 				bool developed_at() const { return _developed_at; }
 				void set_developed_at(bool developed) { _developed_at = developed; }
 		    
+		    float proportion_leader() const { return _proportion_leader; }
+		    void set_proportion_leader(float proportion_leader) { _proportion_leader = proportion_leader; }
+
+		    float proportion_leader_at() const { return _proportion_leader_at; }
+		    void add_proportion_leader(float proportion_leader) { _proportion_leader_at.fetch_and_store(_proportion_leader_at + proportion_leader); }
+		    
 		    float nb_leader_first() const { return _nb_leader_first; }
 		    void set_nb_leader_first(float nb_leader_first) { _nb_leader_first = nb_leader_first; }
 
@@ -139,6 +148,9 @@ namespace sferes
 		    
 		    bool _developed;
 		    tbb::atomic<bool> _developed_at;
+
+		    float _proportion_leader;
+		    tbb::atomic<float>_proportion_leader_at;
 
 		    float _nb_leader_first;
 		    tbb::atomic<float> _nb_leader_first_at;

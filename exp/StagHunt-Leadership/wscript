@@ -35,6 +35,7 @@ def build(bld):
                                         'CONTROL1 COEVO BSTAG100',
                                         'CONTROL1 COEVO BSTAG500 POS_CLOSE',
                                         'CONTROL1 COEVO BSTAG250 POS_CLOSE',
+                                        'CONTROL1 COEVO BSTAG175 POS_CLOSE',
                                         'CONTROL1 COEVO BSTAG100 POS_CLOSE',
                                         # 'SETTING15',
                                         # 'SETTING15 ID_LEADER',

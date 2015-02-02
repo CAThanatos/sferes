@@ -49,6 +49,7 @@ namespace sferes
 
      	_nb_leader_first = 0;
      	_nb_waypoints_coop = 0;
+			float proportion_leader = 0.0f;
 
 			// clock_t deb = clock();
       for (size_t j = 0; j < Params::simu::nb_trials; ++j)
@@ -74,6 +75,9 @@ namespace sferes
 #endif
 	
 				float food_trial = 0;
+
+	     	_nb_leader_first_trial = 0;
+	     	_nb_waypoints_coop_trial = 0;
 
 				for (size_t i = 0; i < Params::simu::nb_steps && !stop_eval; ++i)
 				{
@@ -142,6 +146,11 @@ namespace sferes
 	 			// Their fitness is the longest sequence they did divided by the longest sequence they could do
 	 			similarity += longest_sequence/(float)Params::simu::nb_waypoints;
 
+	 			proportion_leader += (0.5 - (_nb_leader_first_trial/_nb_waypoints_coop_trial));
+
+	 			_nb_leader_first += _nb_leader_first_trial;
+	 			_nb_waypoints_coop += _nb_waypoints_coop_trial;
+
 
 #if defined(BEHAVIOUR_VIDEO)
 				if(this->mode() == fit::mode::view)
@@ -153,6 +162,8 @@ namespace sferes
 
 			_nb_leader_first /= Params::simu::nb_trials;
 			_nb_waypoints_coop /= Params::simu::nb_trials;
+			proportion_leader /= Params::simu::nb_trials;
+
 		
 #ifdef NOT_AGAINST_ALL	
 			int nb_encounters = Params::pop::nb_opponents*Params::pop::nb_eval;
@@ -166,11 +177,14 @@ namespace sferes
 
 			_nb_leader_first /= nb_encounters;
 			_nb_waypoints_coop /= nb_encounters;
+			proportion_leader /= nb_encounters;
+
 
 			ind1.fit().add_fitness(similarity);
 
 			ind1.add_nb_leader_first(_nb_leader_first);
 			ind1.add_nb_waypoints_coop(_nb_waypoints_coop);
+			ind1.add_proportion_leader(proportion_leader);
 			
 #if !defined(NOT_AGAINST_ALL) && !defined(ALTRUISM)
 			ind2.fit().add_fitness(similarity);
@@ -339,10 +353,10 @@ namespace sferes
 		   				else
 		   				{
 		   					// This waypoint has already been crossed by another hunter
-		   					_nb_waypoints_coop++;
+		   					_nb_waypoints_coop_trial++;
 
 		   					if(_vec_waypoints[i]->get_leader_first() == 1)
-		   						_nb_leader_first++;
+		   						_nb_leader_first_trial++;
 		   				}
 		   			}
 	   			}
@@ -368,6 +382,9 @@ namespace sferes
 		std::vector<boost::shared_ptr<Waypoint> > _vec_waypoints;
 
 		int _num_leader;
+
+		float _nb_leader_first_trial;
+		float _nb_waypoints_coop_trial;
 
 		float _nb_leader_first;
 		float _nb_waypoints_coop;
