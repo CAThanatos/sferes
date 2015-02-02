@@ -24,7 +24,7 @@ namespace sferes
 				{
 					(*this->_log_file_leadership) << ea.nb_eval() << "," << _best->fit().value();
 
-          (*this->_log_file_leadership) << "," << best->proportion_leader();
+          (*this->_log_file_leadership) << "," << _best->proportion_leader();
           float proportion_leader_first = _best->nb_leader_first()/_best->nb_preys_killed_coop();
           (*this->_log_file_leadership) << "," << proportion_leader_first;
           (*this->_log_file_leadership) << "," << _best->nb_leader_first() << "," << _best->nb_preys_killed_coop() << "," << std::endl;

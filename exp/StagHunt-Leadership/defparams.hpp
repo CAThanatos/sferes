@@ -108,8 +108,22 @@ struct Params
 #endif
 #else
 #if defined(BSTAG_PRES)
-	static const int nb_hares = total_preys/2;
+#ifdef RATIO75
+	static const int nb_big_stags = 0.75*total_preys;
+	static const int nb_hares = total_preys - nb_big_stags;
+#elif defined(RATIO25)
+	static const int nb_hares = 0.75*total_preys;
+	static const int nb_big_stags = total_preys - nb_hares;
+#elif defined(RATIO65)
+	static const int nb_big_stags = 0.65*total_preys;
+	static const int nb_hares = total_preys - nb_big_stags;
+#elif defined(RATIO35)
+	static const int nb_hares = 0.65*total_preys;
+	static const int nb_big_stags = total_preys - nb_hares;
+#else
 	static const int nb_big_stags = total_preys/2;
+	static const int nb_hares = total_preys/2;
+#endif
 	static const float ratio_big_stags = 1;
 #else
 	static const int nb_hares = total_preys;
@@ -339,8 +353,13 @@ struct Params
 #define FOOD_BIG_STAG_SOLO 5000
 #define FOOD_BIG_STAG_COOP 5000
 #else
+#ifdef HARE_BAD
+#define FOOD_HARE_SOLO 0
+#define FOOD_HARE_COOP 0
+#else
 #define FOOD_HARE_SOLO 50
 #define FOOD_HARE_COOP 50
+#endif
 
 #define FOOD_SMALL_STAG_SOLO 50
 #define FOOD_SMALL_STAG_COOP 250

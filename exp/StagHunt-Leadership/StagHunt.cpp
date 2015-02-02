@@ -579,6 +579,8 @@ namespace sferes
 			int nb_big_stags = Params::simu::ratio_big_stags*Params::simu::nb_big_stags;
 			int nb_small_stags = Params::simu::nb_big_stags - nb_big_stags;
 
+			std::cout << Params::simu::nb_hares << "/" << nb_big_stags << std::endl;
+
 			for(int i = 0; i < Params::simu::nb_hares; ++i)
 			{
 				Posture pos;
