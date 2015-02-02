@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 from matplotlib import lines
 import matplotlib.cm as cm
 from matplotlib import animation
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+from operator import itemgetter
 import seaborn as sns
 import numpy as np
 import argparse
@@ -56,6 +59,7 @@ def drawBestFit(dossier) :
 		hashNbBStagsSolo = {}
 		hashNbBStags = {}
 		hashRatio = {}
+		hashRatioSuccess = {}
 		hashRatioHares = {}
 
 		tabEvaluation = []
@@ -83,6 +87,7 @@ def drawBestFit(dossier) :
 				hashNbBStagsSolo[run] = {}
 				hashNbBStags[run] = {}
 				hashRatio[run] = {}
+				hashRatioSuccess[run] = {}
 				hashRatioHares[run] = {}
 
 				dtypes = np.dtype({ 'names' : ('evaluation', 'fitness', 'nbHares', 'nbHaresSolo', 'nbSStags', 'nbSStagsSolo', 'nbBStags', 'nbBStagsSolo'), 'formats' : [np.int, np.float, np.float, np.float, np.float, np.float, np.float, np.float] })
@@ -114,6 +119,7 @@ def drawBestFit(dossier) :
 							hashNbBStagsDuo[run][evaluation] = line['nbBStags'] - line['nbBStagsSolo']
 
 							hashRatio[run][evaluation] = line['nbBStags']*100/(line['nbHares'] + line['nbBStags'])
+							hashRatioSuccess[run][evaluation] = (line['nbBStags'] - line['nbBStagsSolo'])*100/(line['nbHares'] + (line['nbBStags'] - line['nbBStagsSolo'])) 
 							hashRatioHares[run][evaluation] = line['nbHares']*100/(line['nbHares'] + line['nbBStags'])
 
 							if evaluation not in tabEvaluation :
@@ -145,10 +151,28 @@ def drawBestFit(dossier) :
 		sns.set()
 		sns.set_style('white')
 		sns.set_context('paper')
+		palette = sns.color_palette("husl", len(hashNbBStags.keys()))
+
+		matplotlib.rcParams['font.size'] = 15
+		matplotlib.rcParams['font.weight'] = 'bold'
+		matplotlib.rcParams['axes.labelsize'] = 15
+		matplotlib.rcParams['axes.labelweight'] = 'bold'
+		matplotlib.rcParams['xtick.labelsize'] = 15
+		matplotlib.rcParams['ytick.labelsize'] = 15
+		matplotlib.rcParams['legend.fontsize'] = 15
 
 		dpi = 96
+		size = (1280/dpi, 1024/dpi)
 
 		tabPlotEvaluation = tabEvaluation
+
+		with open(os.path.join(dossier, "lastGenBest.dat"), "w") as fileWrite :
+			for run in hashRatioSuccess.keys() :
+				evalEnd = sorted(hashRatioSuccess[run].keys())[-1]
+				lastValue = hashRatioSuccess[run][evalEnd]
+
+				fileWrite.write(str(evalEnd) + "," + str(lastValue) + "\n")
+
 
 		# --- BOXPLOT FITNESS ---
 		dataBoxPlot = []
@@ -200,6 +224,65 @@ def drawBestFit(dossier) :
 			plt.savefig(dossier + "/fitnessRun" + str(run) + ".png", bbox_inches = 'tight')
 			plt.close()
 
+
+
+		# --- RUNS RATIO ---
+		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+
+		cpt = 0
+		lastVals = []
+		captions = []
+		for run in hashRatioSuccess.keys() :
+			tabRatio = [np.mean(hashRatioSuccess[run][evaluation]) for evaluation in tabPlotEvaluation if evaluation in hashRatioSuccess[run].keys()]
+			axe1.plot(range(len(tabRatio)), tabRatio, color = palette[cpt])
+			lastVals.append(tabRatio[-1])
+			captions.append("Run " + str(run))
+
+			cpt += 1
+
+		axe1.set_ylim(0, 100)
+
+		sortedVals = zip(*(sorted(zip(lastVals, range(len(lastVals))), key = itemgetter(0))))
+		sortedLastVals = sortedVals[0]
+		sortedIndexes = sortedVals[1]
+
+		# Create new axes on the right containing captions
+		divider = make_axes_locatable(axe1)
+		rax = divider.append_axes("right", size="25%", pad=0.00)
+
+		# Add captions text on axis, and lines
+		yCaptionsCoords = np.linspace(0., 1., len(sortedIndexes))
+		connectionLinesCoords = []
+		for y, i in zip(yCaptionsCoords, sortedIndexes):
+			cap = captions[i]
+			lastVal = lastVals[i]
+			color = palette[i]
+			rax.text(1.10, y, cap,
+					horizontalalignment='left',
+					verticalalignment='center',
+					transform = rax.transAxes)
+
+			# Add lines
+			normalizedY = float(y) * float(axe1.get_ylim()[1])
+			rax.plot([lastVal, normalizedY], color=color)
+
+
+		rax.set_axis_off()
+		rax.set_ylim(0, 100)
+
+		# Divide the x axis by 10
+		tabGeneration = [(evaluation+30)/40 for evaluation in tabPlotEvaluation]
+		tabGeneration[-1] = 300
+
+		tabEvaluationTicks = [indice for indice in range(len(tabPlotEvaluation)) if indice % (int(len(tabPlotEvaluation)/10)) == 0]
+		axe1.set_xticks(tabEvaluationTicks)
+		axe1.set_xticklabels([tabGeneration[indice] for indice in tabEvaluationTicks])
+		axe1.set_xlabel('Generation')
+
+		axe1.set_ylabel('Pourcentage of stags hunted')
+		# axe1.set_ylim(0, 100)
+
+		plt.savefig(dossier + "/figureRatioBStagsSuccess.png", bbox_inches = 'tight')
 
 
 		# --- BARS ---

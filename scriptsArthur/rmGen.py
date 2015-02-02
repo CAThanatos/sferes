@@ -33,7 +33,6 @@ for subDir in listDirs :
 				gen = int(r.group(1))
 
 				if gen > lastGen :
-					pass
 					os.remove(curFile)
 			else :
 				r = re.search(r"gen_(\d+)$", curFile)
@@ -41,7 +40,6 @@ for subDir in listDirs :
 					gen = int(r.group(1))
 
 					if gen > lastGen :
-						pass
 						os.remove(curFile)
 				else :
 					r = re.search(r"\.dat$", curFile)
