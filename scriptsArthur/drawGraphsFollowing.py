@@ -307,6 +307,7 @@ def drawBestLeadership(dossier) :
 		listBestLeadership = [f for f in os.listdir(dossier) if (os.path.isfile(dossier + "/" + f) and re.match(r"^bestleadership(\d*)\.dat$", f))]
 
 		hashProportion = {}
+		hashProportionAsym = {}
 		hashNbLeaderFirst = {}
 		hashNbTotalCoop = {}
 
@@ -323,11 +324,14 @@ def drawBestLeadership(dossier) :
 
 			if (testRun == None) or (testRun(run)) :
 				hashProportion[run] = {}
+				hashProportionAsym[run] = {}
 				hashNbLeaderFirst[run] = {}
 				hashNbTotalCoop[run] = {}
 
-				dtypes = np.dtype({ 'names' : ('evaluation', 'fitness', 'proportion', 'nb_leader_first', 'nb_total_coop'), 'formats' : [np.int, np.float, np.float, np.float, np.float] })
-				data = np.loadtxt(dossier + "/" + fileBest, delimiter=',', usecols = (0, 1, 2, 3, 4), dtype = dtypes)
+				# dtypes = np.dtype({ 'names' : ('evaluation', 'fitness', 'proportion', 'proportionAsym', 'nb_leader_first', 'nb_total_coop'), 'formats' : [np.int, np.float, np.float, np.float, np.float, np.float] })
+				# data = np.loadtxt(dossier + "/" + fileBest, delimiter=',', usecols = (0, 1, 2, 3, 4, 5), dtype = dtypes)
+				dtypes = np.dtype({ 'names' : ('evaluation', 'fitness', 'proportion', 'proportionAsym'), 'formats' : [np.int, np.float, np.float, np.float] })
+				data = np.loadtxt(dossier + "/" + fileBest, delimiter=',', usecols = (0, 1, 2, 3), dtype = dtypes)
 
 				cpt = 0
 				firstEval = True
@@ -340,9 +344,10 @@ def drawBestLeadership(dossier) :
 
 					if cpt > precision or firstEval :
 						if evaluation < maxEval :
-							hashProportion[run][evaluation] = line['proportion'] - 0.5
-							hashNbLeaderFirst[run][evaluation] = line['nb_leader_first']
-							hashNbTotalCoop[run][evaluation] = line['nb_total_coop']
+							hashProportion[run][evaluation] = line['proportion']
+							hashProportionAsym[run][evaluation] = line['proportionAsym'] - 0.5
+							# hashNbLeaderFirst[run][evaluation] = line['nb_leader_first']
+							# hashNbTotalCoop[run][evaluation] = line['nb_total_coop']
 
 							if evaluation not in tabEvaluation :
 								tabEvaluation.append(evaluation)
@@ -382,13 +387,68 @@ def drawBestLeadership(dossier) :
 
 		tabPlotEvaluation = tabEvaluation
 
-		# --- BOXPLOT FITNESS ---
+		# --- BOXPLOT LEADERSHIP ---
 		dataBoxPlot = []
 		for evaluation in tabPlotEvaluation :
 			listProportion = [hashProportion[run][evaluation] for run in hashProportion.keys() if evaluation in hashProportion[run].keys()]
 
 			if len(listProportion) > 0 :
 				dataBoxPlot.append(listProportion)
+
+		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = (800/dpi, 600/dpi))
+		axe1.boxplot(dataBoxPlot)
+
+		# axe1.add_line(lines.Line2D([0, lastEval], [0.5, 0.5], color="red"))
+		# axe1.add_line(lines.Line2D([0, lastEval], [-0.5, -0.5], color="red"))
+
+		axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
+		axe1.set_xticklabels([tabPlotEvaluation[x] for x in range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10))])
+		axe1.set_xlabel("Evaluation")
+
+		axe1.set_ylabel("Proportion of leadership")
+		axe1.set_ylim(-0.1, 1.1)
+
+		axe1.set_title('Boxplot of best proportion')
+
+		plt.savefig(dossier + "/boxplot.png", bbox_inches = 'tight')
+		plt.close()
+
+
+
+		# --- RUNS LEADERSHIP ---
+		for run in hashProportion.keys() :
+			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = (800/dpi, 600/dpi))
+
+			tabProportion = [hashProportion[run][evaluation] for evaluation in tabPlotEvaluation if evaluation in hashProportion[run].keys()]
+
+			axe1.plot(range(len(tabProportion)), tabProportion)
+
+			# axe1.add_line(lines.Line2D([0, lastEval], [0.5, 0.5], color="red"))
+			# axe1.add_line(lines.Line2D([0, lastEval], [-0.5, -0.5], color="red"))
+
+			# Divide the x axis by 10
+			tabEvaluationTicks = [indice for indice in range(len(tabPlotEvaluation)) if indice % (int(len(tabPlotEvaluation)/10)) == 0]
+
+			axe1.set_xticks(tabEvaluationTicks)
+			axe1.set_xticklabels([tabPlotEvaluation[indice] for indice in tabEvaluationTicks])
+			axe1.set_xlabel('Evaluation')
+
+			axe1.set_ylabel("Proportion of leadership")
+			axe1.set_ylim(-0.1, 1.1)
+
+			axe1.set_title('Best proportion')
+
+			plt.savefig(dossier + "/proportionRun" + str(run) + ".png", bbox_inches = 'tight')
+			plt.close()
+
+
+		# --- BOXPLOT LEADERSHIP ASYM ---
+		dataBoxPlot = []
+		for evaluation in tabPlotEvaluation :
+			listProportionAsym = [hashProportionAsym[run][evaluation] for run in hashProportionAsym.keys() if evaluation in hashProportionAsym[run].keys()]
+
+			if len(listProportionAsym) > 0 :
+				dataBoxPlot.append(listProportionAsym)
 
 		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = (800/dpi, 600/dpi))
 		axe1.boxplot(dataBoxPlot)
@@ -405,18 +465,18 @@ def drawBestLeadership(dossier) :
 
 		axe1.set_title('Boxplot of best proportion')
 
-		plt.savefig(dossier + "/boxplot.png", bbox_inches = 'tight')
+		plt.savefig(dossier + "/boxplotAsym.png", bbox_inches = 'tight')
 		plt.close()
 
 
 
-		# --- RUNS FITNESS ---
-		for run in hashProportion.keys() :
+		# --- RUNS LEADERSHIP ASYM ---
+		for run in hashProportionAsym.keys() :
 			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = (800/dpi, 600/dpi))
 
-			tabProportion = [hashProportion[run][evaluation] for evaluation in tabPlotEvaluation if evaluation in hashProportion[run].keys()]
+			tabProportionAsym = [hashProportionAsym[run][evaluation] for evaluation in tabPlotEvaluation if evaluation in hashProportionAsym[run].keys()]
 
-			axe1.plot(range(len(tabProportion)), tabProportion)
+			axe1.plot(range(len(tabProportionAsym)), tabProportionAsym)
 
 			axe1.add_line(lines.Line2D([0, lastEval], [0.5, 0.5], color="red"))
 			axe1.add_line(lines.Line2D([0, lastEval], [-0.5, -0.5], color="red"))
@@ -433,7 +493,7 @@ def drawBestLeadership(dossier) :
 
 			axe1.set_title('Boxplot of best proportion')
 
-			plt.savefig(dossier + "/proportionRun" + str(run) + ".png", bbox_inches = 'tight')
+			plt.savefig(dossier + "/proportionAsymRun" + str(run) + ".png", bbox_inches = 'tight')
 			plt.close()
 
 
@@ -445,6 +505,7 @@ def drawAllLeadership(dossier) :
 		tabEvaluation = []
 
 		hashProportion = {}
+		hashProportionAsym = {}
 		hashProportionGlob = {}
 		hashNbLeaderFirst = {}
 		hashNbTotalCoop = {}
@@ -462,11 +523,14 @@ def drawAllLeadership(dossier) :
 
 			if (testRun == None) or (testRun(run)) :
 				hashProportion[run] = {}
+				hashProportionAsym[run] = {}
 				hashNbLeaderFirst[run] = {}
 				hashNbTotalCoop[run] = {}
 
-				dtypes = np.dtype({ 'names' : ('evaluation', 'fitness', 'proportion', 'nb_leader_first', 'nb_total_coop'), 'formats' : [np.int, np.float, np.float, np.float, np.float] })
-				data = np.loadtxt(dossier + "/" + fileAll, delimiter=',', usecols = (0, 1, 2, 3, 4), dtype = dtypes)
+				dtypes = np.dtype({ 'names' : ('evaluation', 'fitness', 'proportion', 'proportionAsym'), 'formats' : [np.int, np.float, np.float, np.float] })
+				data = np.loadtxt(dossier + "/" + fileAll, delimiter=',', usecols = (0, 1, 2, 3), dtype = dtypes)
+				# dtypes = np.dtype({ 'names' : ('evaluation', 'fitness', 'proportion', 'proportionAsym', 'nb_leader_first', 'nb_total_coop'), 'formats' : [np.int, np.float, np.float, np.float, np.float, np.float] })
+				# data = np.loadtxt(dossier + "/" + fileAll, delimiter=',', usecols = (0, 1, 2, 3, 4, 5), dtype = dtypes)
 
 				evalDone = []
 				cpt = 0
@@ -488,6 +552,7 @@ def drawAllLeadership(dossier) :
 						if evaluation < maxEval :
 							if evaluation not in evalDone :
 								hashProportion[run][evaluation] = []
+								hashProportionAsym[run][evaluation] = []
 								hashNbLeaderFirst[run][evaluation] = []
 								hashNbTotalCoop[run][evaluation] = []
 
@@ -495,10 +560,11 @@ def drawAllLeadership(dossier) :
 
 								evalDone.append(evaluation)
 
-							hashProportion[run][evaluation].append(line['proportion'] - 0.5)
-							hashFitnessGlob[evaluation].append(line['proportion'] - 0.5)
-							hashNbLeaderFirst[run][evaluation].append(line['nb_leader_first'])
-							hashNbTotalCoop[run][evaluation].append(line['nb_total_coop'])
+							hashProportion[run][evaluation].append(line['proportion'])
+							hashProportionAsym[run][evaluation].append(line['proportionAsym'] - 0.5)
+							hashFitnessGlob[evaluation].append(line['proportionAsym'] - 0.5)
+							# hashNbLeaderFirst[run][evaluation].append(line['nb_leader_first'])
+							# hashNbTotalCoop[run][evaluation].append(line['nb_total_coop'])
 
 							if evaluation not in tabEvaluation :
 								tabEvaluation.append(evaluation)
@@ -542,6 +608,52 @@ def drawAllLeadership(dossier) :
 			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 			axe1.boxplot(dataBoxPlot)
 	
+			# axe1.add_line(lines.Line2D([0, lastEval], [0.5, 0.5], color="red"))
+			# axe1.add_line(lines.Line2D([0, lastEval], [-0.5, -0.5], color="red"))
+
+			axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
+			axe1.set_xticklabels([tabPlotEvaluation[x] for x in range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10))])
+			axe1.set_xlabel("Evaluation")
+
+			axe1.set_ylabel("Proportion of leadership")
+			axe1.set_ylim(-0.1, 1.1)
+
+			axe1.set_title('Boxplot of population proportion')
+
+			plt.savefig(dossier + "/proportionRun" + str(run) + ".png", bbox_inches = 'tight')
+			plt.close()
+
+
+		# --- BOXPLOT ALL RUN PROPORTION ---
+		dataBoxPlot = [hashProportionGlob[evaluation] for evaluation in tabPlotEvaluation if evaluation in hashProportionGlob.keys()]
+
+		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+		axe1.boxplot(dataBoxPlot)
+	
+		# axe1.add_line(lines.Line2D([0, lastEval], [0.5, 0.5], color="red"))
+		# axe1.add_line(lines.Line2D([0, lastEval], [-0.5, -0.5], color="red"))
+
+		axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
+		axe1.set_xticklabels([tabPlotEvaluation[x] for x in range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10))])
+		axe1.set_xlabel("Evaluation")
+
+		axe1.set_ylabel("Proportion of leadership")
+		axe1.set_ylim(-0.1, 1.1)
+
+		axe1.set_title('Boxplot of all proportions')
+
+		plt.savefig(dossier + "/globalProportionAsym", bbox_inches = 'tight')
+		plt.close()
+
+
+		# --- BOXPLOT RUN PROPORTION ASYM ---
+		dataBoxPlot = []
+		for run in hashProportionAsym.keys() :
+			dataBoxPlot = [hashProportionAsym[run][evaluation] for evaluation in tabPlotEvaluation if evaluation in hashProportionAsym[run].keys()]
+
+			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+			axe1.boxplot(dataBoxPlot)
+	
 			axe1.add_line(lines.Line2D([0, lastEval], [0.5, 0.5], color="red"))
 			axe1.add_line(lines.Line2D([0, lastEval], [-0.5, -0.5], color="red"))
 
@@ -554,11 +666,11 @@ def drawAllLeadership(dossier) :
 
 			axe1.set_title('Boxplot of population proportion')
 
-			plt.savefig(dossier + "/proportionRun" + str(run) + ".png", bbox_inches = 'tight')
+			plt.savefig(dossier + "/proportionAsymRun" + str(run) + ".png", bbox_inches = 'tight')
 			plt.close()
 
 
-		# --- BOXPLOT ALL RUN PROPORTION ---
+		# --- BOXPLOT ALL RUN PROPORTION ASYM ---
 		dataBoxPlot = [hashProportionGlob[evaluation] for evaluation in tabPlotEvaluation if evaluation in hashProportionGlob.keys()]
 
 		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)

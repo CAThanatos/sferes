@@ -374,6 +374,8 @@ struct Params
 #define FOOD_BIG_STAG_COOP 500
 #elif defined(BSTAG250)
 #define FOOD_BIG_STAG_COOP 250
+#elif defined(BSTAG175)
+#define FOOD_BIG_STAG_COOP 175
 #elif defined(BSTAG100)
 #define FOOD_BIG_STAG_COOP 100
 #else
