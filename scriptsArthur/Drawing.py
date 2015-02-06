@@ -125,7 +125,7 @@ def drawRunFitness(dossier, **params) :
 
 		axe1.set_title('Best ' + ylabel, fontsize = 10)
 
-		plt.savefig(dossier + "/" + str.lowercase(ylabel) + "Run" + str(run) + ".png", bbox_inches = 'tight')
+		plt.savefig(dossier + "/" + ylabel.lower() + "Run" + str(run) + ".png", bbox_inches = 'tight')
 		plt.close()
 
 
@@ -276,7 +276,7 @@ def drawRunBoxplotFitness(dossier, **params) :
 
 		axe1.set_title('Boxplot of population ' + ylabel)
 
-		plt.savefig(dossier + "/" + str.lowercase(ylabel) + "Run" + str(run) + ".png", bbox_inches = 'tight')
+		plt.savefig(dossier + "/" + ylabel.lower() + "Run" + str(run) + ".png", bbox_inches = 'tight')
 		plt.close()
 
 
@@ -363,24 +363,28 @@ def drawBarsMean(dossier, **params) :
 
 
 
+
+
 ###################################################################
 # - DRAW PARETO                                                 - #
 ###################################################################
 def drawPareto(dossier, **params) :
-	hashNbHaresSolo = loadParam("hashNbHaresSolo", params)
-	hashNbHaresDuo = loadParam("hashNbHaresDuo", params)
-	hashNbBStagsSolo = loadParam("hashNbBStagsSolo", params)
-	hashNbBStagsDuo = loadParam("hashNbBStagsDuo", params)
-	tabPlot = loadParam("tabPlot", params)
-	drawEval = bool(loadParam("drawEval", params))
+	hashObj1 = loadParam("hashObj1", params)
+	hashObj2 = loadParam("hashObj2", params)
+	hashRatio = loadParam("hashRatio", params)
+	hashRatioCoop = loadParam("hashRatioCoop", params)
+	xlabel = loadParam("xlabel", params)
+	ylabel = loadParam("ylabel", params)
+	maxObj1 = loadParam("maxObj1", params)
+	maxObj2 = loadParam("maxObj2", params)
 
-	for run in hashFitness.keys() :
-		assert(len(hashFitness[run].keys()) == len(hashDiversity[run].keys()))
-		lastEvalRun = sorted(hashFitness[run].keys())[-1]
-		assert(lastEvalRun == sorted(hashDiversity[run].keys())[-1])
+	for run in hashObj1.keys() :
+		assert(len(hashObj1[run].keys()) == len(hashObj2[run].keys()))
+		lastEvalRun = sorted(hashObj1[run].keys())[-1]
+		assert(lastEvalRun == sorted(hashObj2[run].keys())[-1])
 
-		listFitness = hashFitness[run][lastEvalRun]
-		listDiversity = hashDiversity[run][lastEvalRun]
+		listObj1 = hashObj1[run][lastEvalRun]
+		listObj2 = hashObj2[run][lastEvalRun]
 
 		listRatio = hashRatio[run][lastEvalRun]
 		listColors = [0 if math.isnan(ratio) else int(ratio) for ratio in listRatio]
@@ -388,17 +392,17 @@ def drawPareto(dossier, **params) :
 		listRatioCoop = hashRatioCoop[run][lastEvalRun]
 		listSizes = [50 if math.isnan(ratio) else 50 + int(ratio*2) for ratio in listRatioCoop]
 
-		p_front = pareto_frontier(listFitness, listDiversity, maxX = True, maxY = True)
+		p_front = pareto_frontier(listObj1, listObj2, maxX = True, maxY = True)
 
-		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = (800/dpi, 600/dpi))
-		axe1.scatter(listFitness, listDiversity, c = listColors, cmap = cm.rainbow, s = listSizes)
+		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+		axe1.scatter(listObj1, listObj2, c = listColors, cmap = cm.rainbow, s = listSizes)
 		axe1.plot(p_front[0], p_front[1])
 
-		axe1.set_xlabel("Fitness")
-		axe1.set_xlim(0, maxFitness + 0.1*maxFitness)
+		axe1.set_xlabel(xlabel)
+		axe1.set_xlim(0, maxObj1 + 0.1*maxObj1)
 
-		axe1.set_ylabel("Diversity")
-		axe1.set_ylim(0, maxDiversity + 0.1*maxDiversity)
+		axe1.set_ylabel(ylabel)
+		axe1.set_ylim(0, maxObj2 + 0.1*maxObj2)
 
 		axe1.set_title('Pareto frontier at last evaluation')
 
@@ -408,6 +412,208 @@ def drawPareto(dossier, **params) :
 
 
 
+
+###################################################################
+# - DRAW PARETO RUN                                             - #
+###################################################################
+def drawPareto(dossier, **params) :
+	hashObj1 = loadParam("hashObj1", params)
+	hashObj2 = loadParam("hashObj2", params)
+	hashRatio = loadParam("hashRatio", params)
+	hashRatioCoop = loadParam("hashRatioCoop", params)
+	xlabel = loadParam("xlabel", params)
+	ylabel = loadParam("ylabel", params)
+	maxObj1 = loadParam("maxObj1", params)
+	maxObj2 = loadParam("maxObj2", params)
+
+	# Pareto Frontier
+	assert(len(hashObj1.keys()) == len(hashObj2.keys()))
+	lastEvalRun = sorted(hashObj1.keys())[-1]
+	assert(lastEvalRun == sorted(hashObj2.keys())[-1])
+
+	paretoEvals = sorted(hashObj1.keys())[0:-1:int(math.floor(len(hashObj1.keys())/20.0))]
+
+	if lastEvalRun not in paretoEvals :
+		paretoEvals.append(lastEvalRun)
+
+	for eval in paretoEvals :
+		listObj1 = hashObj1[eval]
+		listObj2 = hashObj2[eval]
+
+		listRatio = hashRatio[eval]
+		listColors = [0 if math.isnan(ratio) else int(ratio) for ratio in listRatio]
+
+		listRatioCoop = hashRatioCoop[eval]
+		listSizes = [50 if math.isnan(ratio) else 50 + int(ratio*2) for ratio in listRatioCoop]
+
+		p_front = pareto_frontier(listObj1, listObj2, maxX = True, maxY = True)
+
+		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+		axe1.scatter(listObj1, listObj2, c = listColors, cmap = cm.rainbow, s = listSizes)
+		axe1.plot(p_front[0], p_front[1])
+
+		axe1.set_xlabel(xlabel)
+		axe1.set_xlim(0, maxObj1 + 0.1*maxObj1)
+
+		axe1.set_ylabel(ylabel)
+		axe1.set_ylim(0, maxObj2 + 0.1*maxObj2)
+
+		axe1.set_title('Pareto frontier at evaluation ' + str(eval))
+
+		plt.savefig(dossier + "/paretoEval" + str(eval) + ".png", bbox_inches = 'tight')
+		plt.close()
+
+
+
+
+
+###################################################################
+# - DRAW BOXPLOT LEADERSHIP                                     - #
+###################################################################
+def drawBoxplotLeadership(dossier, **params) :
+	hashProportion = loadParam("hashProportion", params)
+	tabPlot = loadParam("tabPlot", params)
+	drawEval = bool(loadParam("drawEval", params))
+
+	dataBoxPlot = []
+
+	for evaluation in tabPlot :
+		listProportion = [hashProportion[run][evaluation] for run in hashProportion.keys() if evaluation in hashProportion[run].keys()]
+
+		if len(listProportion) > 0 :
+			dataBoxPlot.append(listProportion)
+
+	fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+	axe1.boxplot(dataBoxPlot)
+
+	axe1.set_xticks(range(0, len(tabPlot), int(len(tabPlot)/10)))
+	axe1.set_xticklabels([tabPlot[x] for x in range(0, len(tabPlot), int(len(tabPlot)/10))])
+
+	if drawEval :
+		axe1.set_xlabel("Evaluation")
+	else :
+		axe1.set_xlabel("Generation")
+
+	axe1.set_ylabel("Proportion of leadership")
+	axe1.set_ylim(-0.1, 1.1)
+
+	axe1.set_title('Boxplot of best proportion')
+
+	plt.savefig(dossier + "/boxplot.png", bbox_inches = 'tight')
+	plt.close()
+
+
+
+
+###################################################################
+# - DRAW RUN LEADERSHIP                                         - #
+###################################################################
+def drawRunLeadership(dossier, **params) :
+	hashProportion = loadParam("hashProportion", params)
+	tabPlot = loadParam("tabPlot", params)
+	drawEval = bool(loadParam("drawEval", params))
+
+	for run in hashProportion.keys() :
+		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+
+		tabProportion = [hashProportion[run][evaluation] for evaluation in tabPlot if evaluation in hashProportion[run].keys()]
+
+		axe1.plot(range(len(tabProportion)), tabProportion)
+
+
+		setTicks(tabPlot, axe1)
+
+		if drawEval :
+			axe1.set_xlabel("Evaluation")
+		else :
+			axe1.set_xlabel("Generation")
+
+		axe1.set_ylabel("Proportion of leadership")
+		axe1.set_ylim(-0.1, 1.1)
+
+		axe1.set_title('Best proportion')
+
+		plt.savefig(dossier + "/proportionRun" + str(run) + ".png", bbox_inches = 'tight')
+		plt.close()
+
+
+
+
+
+
+###################################################################
+# - DRAW BOXPLOT LEADERSHIP ASYM                                - #
+###################################################################
+def drawBoxplotLeadershipAsym(dossier, **params) :
+	hashProportionAsym = loadParam("hashProportionAsym", params)
+	tabPlot = loadParam("tabPlot", params)
+	drawEval = bool(loadParam("drawEval", params))
+
+	dataBoxPlot = []
+
+	for evaluation in tabPlot :
+		listProportionAsym = [hashProportionAsym[run][evaluation] for run in hashProportionAsym.keys() if evaluation in hashProportionAsym[run].keys()]
+
+		if len(listProportionAsym) > 0 :
+			dataBoxPlot.append(listProportionAsym)
+
+	fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+	axe1.boxplot(dataBoxPlot)
+
+	axe1.add_line(lines.Line2D([0, lastEval], [0.5, 0.5], color="red"))
+	axe1.add_line(lines.Line2D([0, lastEval], [-0.5, -0.5], color="red"))
+
+	setTicks(tabPlot, axe1)
+
+	if drawEval :
+		axe1.set_xlabel("Evaluation")
+	else :
+		axe1.set_xlabel("Generation")
+
+	axe1.set_ylabel("Proportion of leadership")
+	axe1.set_ylim(-0.6, 0.6)
+
+	axe1.set_title('Boxplot of best proportion')
+
+	plt.savefig(dossier + "/boxplotAsym.png", bbox_inches = 'tight')
+	plt.close()
+
+
+
+
+
+###################################################################
+# - DRAW RUN LEADERSHIP ASYM                                    - #
+###################################################################
+def drawRunLeadershipAsym(dossier, **params) :
+	hashProportionAsym = loadParam("hashProportionAsym", params)
+	tabPlot = loadParam("tabPlot", params)
+	drawEval = bool(loadParam("drawEval", params))
+
+	for run in hashProportionAsym.keys() :
+		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+
+		tabProportionAsym = [hashProportionAsym[run][evaluation] for evaluation in tabPlot if evaluation in hashProportionAsym[run].keys()]
+
+		axe1.plot(range(len(tabProportionAsym)), tabProportionAsym)
+
+		axe1.add_line(lines.Line2D([0, lastEval], [0.5, 0.5], color="red"))
+		axe1.add_line(lines.Line2D([0, lastEval], [-0.5, -0.5], color="red"))
+
+		setTicks(tabPlot, axe1)
+
+		if drawEval :
+			axe1.set_xlabel("Evaluation")
+		else :
+			axe1.set_xlabel("Generation")
+
+		axe1.set_ylabel("Proportion of leadership")
+		axe1.set_ylim(-0.6, 0.6)
+
+		axe1.set_title('Boxplot of best proportion')
+
+		plt.savefig(dossier + "/proportionAsymRun" + str(run) + ".png", bbox_inches = 'tight')
+		plt.close()
 
 
 

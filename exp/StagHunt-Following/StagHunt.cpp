@@ -146,7 +146,8 @@ namespace sferes
 	 			// Their fitness is the longest sequence they did divided by the longest sequence they could do
 	 			similarity += longest_sequence/(float)Params::simu::nb_waypoints;
 
-	 			proportion_leader += (0.5 - (_nb_leader_first_trial/_nb_waypoints_coop_trial));
+	 			if(_nb_waypoints_coop_trial > 0)
+		 			proportion_leader += fabs(0.5 - (_nb_leader_first_trial/_nb_waypoints_coop_trial));
 
 	 			_nb_leader_first += _nb_leader_first_trial;
 	 			_nb_waypoints_coop += _nb_waypoints_coop_trial;
@@ -178,6 +179,7 @@ namespace sferes
 			_nb_leader_first /= nb_encounters;
 			_nb_waypoints_coop /= nb_encounters;
 			proportion_leader /= nb_encounters;
+			proportion_leader /= 0.5f;
 
 
 			ind1.fit().add_fitness(similarity);

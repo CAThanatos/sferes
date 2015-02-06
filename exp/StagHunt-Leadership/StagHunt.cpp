@@ -317,7 +317,9 @@ namespace sferes
 
        	_nb_leader_first += _nb_leader_first_trial;
        	_nb_preys_killed_coop += _nb_preys_killed_coop_trial;
-       	proportion_leader += (0.5 - (_nb_leader_first_trial/_nb_preys_killed_coop_trial));
+
+       	if(_nb_preys_killed_coop_trial > 0)
+	       	proportion_leader += fabs(0.5 - (_nb_leader_first_trial/_nb_preys_killed_coop_trial));
 
 
 #if defined(BEHAVIOUR_VIDEO)
@@ -387,6 +389,7 @@ namespace sferes
 			_nb_leader_first /= nb_encounters;
 			_nb_preys_killed_coop /= nb_encounters;
 			proportion_leader /= nb_encounters;
+			proportion_leader /= 0.5f; 
 
 			ind1.add_nb_leader_first(_nb_leader_first);
 			ind1.add_nb_preys_killed_coop(_nb_preys_killed_coop);
@@ -578,8 +581,6 @@ namespace sferes
 			// Then the hares std::vector<Posture> vec_pos;
 			int nb_big_stags = Params::simu::ratio_big_stags*Params::simu::nb_big_stags;
 			int nb_small_stags = Params::simu::nb_big_stags - nb_big_stags;
-
-			std::cout << Params::simu::nb_hares << "/" << nb_big_stags << std::endl;
 
 			for(int i = 0; i < Params::simu::nb_hares; ++i)
 			{
