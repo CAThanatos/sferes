@@ -166,12 +166,12 @@ def drawBestFit(dossier) :
 
 		tabPlotEvaluation = tabEvaluation
 
-		with open(os.path.join(dossier, "lastGenBest.dat"), "w") as fileWrite :
-			for run in hashRatioSuccess.keys() :
-				evalEnd = sorted(hashRatioSuccess[run].keys())[-1]
-				lastValue = hashRatioSuccess[run][evalEnd]
+		# with open(os.path.join(dossier, "lastGenBest.dat"), "w") as fileWrite :
+		# 	for run in hashRatioSuccess.keys() :
+		# 		evalEnd = sorted(hashRatioSuccess[run].keys())[-1]
+		# 		lastValue = hashRatioSuccess[run][evalEnd]
 
-				fileWrite.write(str(evalEnd) + "," + str(lastValue) + "\n")
+		# 		fileWrite.write(str(evalEnd) + "," + str(lastValue) + "\n")
 
 
 		# --- BOXPLOT FITNESS ---
@@ -182,7 +182,7 @@ def drawBestFit(dossier) :
 			if len(listFitness) > 0 :
 				dataBoxPlot.append(listFitness)
 
-		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = (800/dpi, 600/dpi))
+		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 		axe1.boxplot(dataBoxPlot)
 
 		axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
@@ -287,7 +287,7 @@ def drawBestFit(dossier) :
 
 		# --- BARS ---
 		for run in hashNbHaresSolo.keys() :
-			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = (800/dpi, 600/dpi))
+			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 
 			width = 0.8
 
@@ -444,8 +444,18 @@ def drawAllFit(dossier) :
 		sns.set()
 		sns.set_style('white')
 		sns.set_context('paper')
+		palette = sns.color_palette("husl", len(hashNbBStags.keys()))
+
+		matplotlib.rcParams['font.size'] = 15
+		matplotlib.rcParams['font.weight'] = 'bold'
+		matplotlib.rcParams['axes.labelsize'] = 15
+		matplotlib.rcParams['axes.labelweight'] = 'bold'
+		matplotlib.rcParams['xtick.labelsize'] = 15
+		matplotlib.rcParams['ytick.labelsize'] = 15
+		matplotlib.rcParams['legend.fontsize'] = 15
 
 		dpi = 96
+		size = (1280/dpi, 1024/dpi)
 
 		tabPlotEvaluation = tabEvaluation
 
@@ -455,7 +465,7 @@ def drawAllFit(dossier) :
 		for run in hashFitness.keys() :
 			dataBoxPlot = [hashFitness[run][evaluation] for evaluation in tabPlotEvaluation if evaluation in hashFitness[run].keys()]
 
-			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = (800/dpi, 600/dpi))
+			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 			axe1.boxplot(dataBoxPlot)
 
 			axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
@@ -474,7 +484,7 @@ def drawAllFit(dossier) :
 		# --- BOXPLOT ALL RUN FITNESS ---
 		dataBoxPlot = [hashFitnessGlob[evaluation] for evaluation in tabPlotEvaluation if evaluation in hashFitnessGlob.keys()]
 
-		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = (800/dpi, 600/dpi))
+		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 		axe1.boxplot(dataBoxPlot)
 
 		axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
@@ -492,7 +502,7 @@ def drawAllFit(dossier) :
 
 		# --- BARS ---
 		for run in hashNbHaresSolo.keys() :
-			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = (800/dpi, 600/dpi))
+			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 
 			width = 0.8
 
@@ -622,8 +632,18 @@ def drawBestDiv(dossier) :
 		sns.set()
 		sns.set_style('white')
 		sns.set_context('paper')
+		palette = sns.color_palette("husl", len(hashNbBStags.keys()))
+
+		matplotlib.rcParams['font.size'] = 15
+		matplotlib.rcParams['font.weight'] = 'bold'
+		matplotlib.rcParams['axes.labelsize'] = 15
+		matplotlib.rcParams['axes.labelweight'] = 'bold'
+		matplotlib.rcParams['xtick.labelsize'] = 15
+		matplotlib.rcParams['ytick.labelsize'] = 15
+		matplotlib.rcParams['legend.fontsize'] = 15
 
 		dpi = 96
+		size = (1280/dpi, 1024/dpi)
 
 		tabPlotEvaluation = tabEvaluation
 
@@ -635,7 +655,7 @@ def drawBestDiv(dossier) :
 			if len(listDiversity) > 0 :
 				dataBoxPlot.append(listDiversity)
 
-		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = (800/dpi, 600/dpi))
+		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 		axe1.boxplot(dataBoxPlot)
 
 		axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
@@ -655,7 +675,7 @@ def drawBestDiv(dossier) :
 		# --- RUNS FITNESS ---
 		palette = sns.color_palette("husl", len(hashDiversity.keys()))
 		for run in hashDiversity.keys() :
-			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = (800/dpi, 600/dpi))
+			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 
 			tabDiversity = [hashDiversity[run][evaluation] for evaluation in tabPlotEvaluation if evaluation in hashDiversity[run].keys()]
 
@@ -681,7 +701,7 @@ def drawBestDiv(dossier) :
 
 		# --- BARS ---
 		for run in hashNbHaresSolo.keys() :
-			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = (800/dpi, 600/dpi))
+			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 
 			width = 0.8
 
@@ -836,8 +856,18 @@ def drawAllDiv(dossier) :
 		sns.set()
 		sns.set_style('white')
 		sns.set_context('paper')
+		palette = sns.color_palette("husl", len(hashDiversity.keys()))
+
+		matplotlib.rcParams['font.size'] = 15
+		matplotlib.rcParams['font.weight'] = 'bold'
+		matplotlib.rcParams['axes.labelsize'] = 15
+		matplotlib.rcParams['axes.labelweight'] = 'bold'
+		matplotlib.rcParams['xtick.labelsize'] = 15
+		matplotlib.rcParams['ytick.labelsize'] = 15
+		matplotlib.rcParams['legend.fontsize'] = 15
 
 		dpi = 96
+		size = (1280/dpi, 1024/dpi)
 
 		tabPlotEvaluation = tabEvaluation
 
@@ -847,7 +877,7 @@ def drawAllDiv(dossier) :
 		for run in hashDiversity.keys() :
 			dataBoxPlot = [hashDiversity[run][evaluation] for evaluation in tabPlotEvaluation if evaluation in hashDiversity[run].keys()]
 
-			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = (800/dpi, 600/dpi))
+			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 			axe1.boxplot(dataBoxPlot)
 
 			axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
@@ -866,7 +896,7 @@ def drawAllDiv(dossier) :
 		# --- BOXPLOT ALL RUN FITNESS ---
 		dataBoxPlot = [hashDiversityGlob[evaluation] for evaluation in tabPlotEvaluation if evaluation in hashDiversityGlob.keys()]
 
-		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = (800/dpi, 600/dpi))
+		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 		axe1.boxplot(dataBoxPlot)
 
 		axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
@@ -884,7 +914,7 @@ def drawAllDiv(dossier) :
 
 		# --- BARS ---
 		for run in hashNbHaresSolo.keys() :
-			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = (800/dpi, 600/dpi))
+			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 
 			width = 0.8
 
@@ -1119,6 +1149,18 @@ def drawPareto(dossier) :
 		sns.set()
 		sns.set_style('white')
 		sns.set_context('paper')
+		palette = sns.color_palette("husl", len(hashFitness.keys()))
+
+		matplotlib.rcParams['font.size'] = 15
+		matplotlib.rcParams['font.weight'] = 'bold'
+		matplotlib.rcParams['axes.labelsize'] = 15
+		matplotlib.rcParams['axes.labelweight'] = 'bold'
+		matplotlib.rcParams['xtick.labelsize'] = 15
+		matplotlib.rcParams['ytick.labelsize'] = 15
+		matplotlib.rcParams['legend.fontsize'] = 15
+
+		dpi = 96
+		size = (1280/dpi, 1024/dpi)
 
 		dpi = 96
 
@@ -1307,8 +1349,18 @@ def drawParetoRun(dossier, run) :
 			sns.set()
 			sns.set_style('white')
 			sns.set_context('paper')
+			palette = sns.color_palette("husl", len(hashNbBStags.keys()))
+
+			matplotlib.rcParams['font.size'] = 15
+			matplotlib.rcParams['font.weight'] = 'bold'
+			matplotlib.rcParams['axes.labelsize'] = 15
+			matplotlib.rcParams['axes.labelweight'] = 'bold'
+			matplotlib.rcParams['xtick.labelsize'] = 15
+			matplotlib.rcParams['ytick.labelsize'] = 15
+			matplotlib.rcParams['legend.fontsize'] = 15
 
 			dpi = 96
+			size = (1280/dpi, 1024/dpi)
 
 			tabPlotEvaluation = tabEvaluation
 
@@ -1335,7 +1387,7 @@ def drawParetoRun(dossier, run) :
 
 				p_front = pareto_frontier(listFitness, listDiversity, maxX = True, maxY = True)
 
-				fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = (800/dpi, 600/dpi))
+				fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 				axe1.scatter(listFitness, listDiversity, c = listColors, cmap = cm.rainbow, s = listSizes)
 				axe1.plot(p_front[0], p_front[1])
 
@@ -1430,7 +1482,7 @@ def drawBestLeadership(dossier) :
 		matplotlib.rcParams['legend.fontsize'] = 15
 
 		dpi = 96
-		size = (800/dpi, 600/dpi)
+		size = (1280/dpi, 1024/dpi)
 
 		tabPlotEvaluation = tabEvaluation
 
@@ -1442,7 +1494,7 @@ def drawBestLeadership(dossier) :
 			if len(listProportion) > 0 :
 				dataBoxPlot.append(listProportion)
 
-		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = (800/dpi, 600/dpi))
+		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 		axe1.boxplot(dataBoxPlot)
 
 		axe1.add_line(lines.Line2D([0, lastEval], [0.5, 0.5], color="red"))
@@ -1464,7 +1516,7 @@ def drawBestLeadership(dossier) :
 
 		# --- RUNS FITNESS ---
 		for run in hashProportion.keys() :
-			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = (800/dpi, 600/dpi))
+			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 
 			tabProportion = [hashProportion[run][evaluation] for evaluation in tabPlotEvaluation if evaluation in hashProportion[run].keys()]
 
@@ -1581,7 +1633,7 @@ def drawAllLeadership(dossier) :
 		matplotlib.rcParams['legend.fontsize'] = 15
 
 		dpi = 96
-		size = (800/dpi, 600/dpi)
+		size = (1280/dpi, 1024/dpi)
 
 		tabPlotEvaluation = tabEvaluation
 
