@@ -617,6 +617,150 @@ def drawRunLeadershipAsym(dossier, **params) :
 
 
 
+
+
+###################################################################
+# - DRAW BOXPLOT RUN LEADERSHIP                                 - #
+###################################################################
+def drawRunBoxplotLeadership(dossier, **params) :
+	hashProportion = loadParam("hashProportion", params)
+	tabPlot = loadParam("tabPlot", params)
+	drawEval = bool(loadParam("drawEval", params))		
+
+
+	dataBoxPlot = []
+	for run in hashProportion.keys() :
+		dataBoxPlot = [hashProportion[run][evaluation] for evaluation in tabPlot if evaluation in hashProportion[run].keys()]
+
+		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+		axe1.boxplot(dataBoxPlot)
+
+		# axe1.add_line(lines.Line2D([0, lastEval], [0.5, 0.5], color="red"))
+		# axe1.add_line(lines.Line2D([0, lastEval], [-0.5, -0.5], color="red"))
+
+		setTicks(tabPlot, axe1)
+
+		if drawEval :
+			axe1.set_xlabel("Evaluation")
+		else :
+			axe1.set_xlabel("Generation")
+
+		axe1.set_ylabel("Proportion of leadership")
+		axe1.set_ylim(-0.1, 1.1)
+
+		axe1.set_title('Boxplot of population proportion')
+
+		plt.savefig(dossier + "/proportionRun" + str(run) + ".png", bbox_inches = 'tight')
+		plt.close()
+
+
+###################################################################
+# - DRAW BOXPLOT ALL RUN LEADERSHIP                             - #
+###################################################################
+def drawRunBoxplotLeadership(dossier, **params) :
+	hashProportionGlob = loadParam("hashProportionGlob", params)
+	tabPlot = loadParam("tabPlot", params)
+	drawEval = bool(loadParam("drawEval", params))		
+
+
+	dataBoxPlot = [hashProportionGlob[evaluation] for evaluation in tabPlot if evaluation in hashProportionGlob.keys()]
+
+	fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+	axe1.boxplot(dataBoxPlot)
+
+	# axe1.add_line(lines.Line2D([0, lastEval], [0.5, 0.5], color="red"))
+	# axe1.add_line(lines.Line2D([0, lastEval], [-0.5, -0.5], color="red"))
+
+
+	setTicks(tabPlot, axe1)
+
+	if drawEval :
+		axe1.set_xlabel("Evaluation")
+	else :
+		axe1.set_xlabel("Generation")
+
+	axe1.set_ylabel("Proportion of leadership")
+	axe1.set_ylim(-0.1, 1.1)
+
+	axe1.set_title('Boxplot of all proportions')
+
+	plt.savefig(dossier + "/globalProportionAsym", bbox_inches = 'tight')
+	plt.close()
+
+
+###################################################################
+# - DRAW BOXPLOT RUN LEADERSHIP ASYM                            - #
+###################################################################
+def drawRunBoxplotLeadership(dossier, **params) :
+	hashProportionAsym = loadParam("hashProportionAsym", params)
+	tabPlot = loadParam("tabPlot", params)
+	drawEval = bool(loadParam("drawEval", params))		
+
+
+	dataBoxPlot = []
+	for run in hashProportionAsym.keys() :
+		dataBoxPlot = [hashProportionAsym[run][evaluation] for evaluation in tabPlot if evaluation in hashProportionAsym[run].keys()]
+
+		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+		axe1.boxplot(dataBoxPlot)
+
+		axe1.add_line(lines.Line2D([0, lastEval], [0.5, 0.5], color="red"))
+		axe1.add_line(lines.Line2D([0, lastEval], [-0.5, -0.5], color="red"))
+
+
+		setTicks(tabPlot, axe1)
+
+		if drawEval :
+			axe1.set_xlabel("Evaluation")
+		else :
+			axe1.set_xlabel("Generation")
+
+		axe1.set_ylabel("Proportion of leadership")
+		axe1.set_ylim(-0.6, 0.6)
+
+		axe1.set_title('Boxplot of population proportion')
+
+		plt.savefig(dossier + "/proportionAsymRun" + str(run) + ".png", bbox_inches = 'tight')
+		plt.close()
+
+
+
+
+###################################################################
+# - DRAW BOXPLOT ALL RUN LEADERSHIP ASYM                        - #
+###################################################################
+def drawRunBoxplotLeadership(dossier, **params) :
+	hashProportionAsym = loadParam("hashProportionAsym", params)
+	tabPlot = loadParam("tabPlot", params)
+	drawEval = bool(loadParam("drawEval", params))	
+
+	dataBoxPlot = [hashProportionGlob[evaluation] for evaluation in tabPlot if evaluation in hashProportionGlob.keys()]
+
+	fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+	axe1.boxplot(dataBoxPlot)
+
+	axe1.add_line(lines.Line2D([0, lastEval], [0.5, 0.5], color="red"))
+	axe1.add_line(lines.Line2D([0, lastEval], [-0.5, -0.5], color="red"))
+
+
+	setTicks(tabPlot, axe1)
+
+	if drawEval :
+		axe1.set_xlabel("Evaluation")
+	else :
+		axe1.set_xlabel("Generation")
+
+	axe1.set_ylabel("Proportion of leadership")
+	axe1.set_ylim(-0.6, 0.6)
+
+	axe1.set_title('Boxplot of all proportions')
+
+	plt.savefig(dossier + "/globalProportion", bbox_inches = 'tight')
+	plt.close()
+
+
+
+
 def main() :
 	pass
 
