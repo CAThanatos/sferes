@@ -366,6 +366,49 @@ def drawBarsMean(dossier, **params) :
 
 
 ###################################################################
+# - BARS RUN                                                    - #
+###################################################################
+def drawBarsRun(dossier, **params) :
+	hashNbHares = loadParam("hashNbHares", params)
+	hashNbBStagsSolo = loadParam("hashNbBStagsSolo", params)
+	hashNbBStagsDuo = loadParam("hashNbBStagsDuo", params)
+
+	tabPlotRun = loadParam("tabPlotRun", params)
+
+	fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+
+	width = 0.5
+	tabPlotRun = [run for run in sorted(hashNbBStagsDuo.keys())]
+	tabNbHares = [np.mean(hashNbHares[run][tabPlotEvaluation[-1] if tabPlotEvaluation[-1] in hashNbHares[run].keys() else sorted(hashNbHares[run].keys())[-1]]) for run in tabPlotRun]
+	tabNbHaresStd = [np.std(hashNbHares[run][tabPlotEvaluation[-1] if tabPlotEvaluation[-1] in hashNbHares[run].keys() else sorted(hashNbHares[run].keys())[-1]]) for run in tabPlotRun]
+	tabNbBStagsDuo = [np.mean(hashNbBStagsDuo[run][tabPlotEvaluation[-1] if tabPlotEvaluation[-1] in hashNbBStagsDuo[run].keys() else sorted(hashNbBStagsDuo[run].keys())[-1]]) for run in tabPlotRun]
+	tabNbBStagsDuoStd = [np.std(hashNbBStagsDuo[run][tabPlotEvaluation[-1] if tabPlotEvaluation[-1] in hashNbBStagsDuo[run].keys() else sorted(hashNbBStagsDuo[run].keys())[-1]]) for run in tabPlotRun]
+	tabNbBStagsSolo = [np.mean(hashNbBStagsSolo[run][tabPlotEvaluation[-1] if tabPlotEvaluation[-1] in hashNbBStagsSolo[run].keys() else sorted(hashNbBStagsSolo[run].keys())[-1]]) for run in tabPlotRun]
+	tabNbBStagsSoloStd = [np.std(hashNbBStagsSolo[run][tabPlotEvaluation[-1] if tabPlotEvaluation[-1] in hashNbBStagsSolo[run].keys() else sorted(hashNbBStagsSolo[run].keys())[-1]]) for run in tabPlotRun]
+
+	barNbHares = axe1.bar(range(len(tabNbHares)), tabNbHares, width = width, color = 'lime', alpha = 0.5, yerr = tabNbHaresStd, ecolor = 'black')
+	barNbBStagsDuo = axe1.bar(range(len(tabNbBStagsDuo)), tabNbBStagsDuo, bottom = tabNbHares, width = width, color = 'magenta', alpha = 0.5, yerr = tabNbBStagsDuoStd, ecolor = 'black')
+	barNbBStagsSolo = axe1.bar(range(len(tabNbBStagsSolo)), tabNbBStagsSolo, bottom = np.add(tabNbHares, tabNbBStagsDuo), width = width, color = 'grey', alpha = 0.5, yerr = tabNbBStagsSoloStd, ecolor = 'black')
+
+	axe1.set_xticks(np.add(np.arange(len(tabPlotRun)), width/2))
+	axe1.set_xticklabels(tabPlotRun)
+
+	axe1.set_xlim(0, len(tabNbBStagsDuo))
+
+	axe1.set_xlabel('Run')
+
+	axe1.set_ylabel('Number of preys hunted')
+	axe1.set_ylim(0)
+
+	plt.legend([barNbHares, barNbBStagsDuo, barNbBStagsSolo], ['Hares', 'Stags coop.', 'Stags solo'], frameon = True)
+
+	plt.savefig(dossier + "/figureBarsNbPreysSuccess.png", bbox_inches = 'tight')
+
+
+
+
+
+###################################################################
 # - DRAW PARETO                                                 - #
 ###################################################################
 def drawPareto(dossier, **params) :

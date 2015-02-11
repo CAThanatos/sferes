@@ -17,6 +17,7 @@ import math
 
 import makeData
 import Tools
+#import Drawing
 
 colorHaresSolo = 'lime'
 colorHaresDuo = 'green'
@@ -202,7 +203,7 @@ def drawBestFit(dossier) :
 		# --- RUNS FITNESS ---
 		palette = sns.color_palette("husl", len(hashFitness.keys()))
 		for run in hashFitness.keys() :
-			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = (800/dpi, 600/dpi))
+			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 
 			tabFitness = [hashFitness[run][evaluation] for evaluation in tabPlotEvaluation if evaluation in hashFitness[run].keys()]
 
@@ -1184,7 +1185,7 @@ def drawPareto(dossier) :
 
 			p_front = pareto_frontier(listFitness, listDiversity, maxX = True, maxY = True)
 
-			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = (800/dpi, 600/dpi))
+			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 			axe1.scatter(listFitness, listDiversity, c = listColors, cmap = cm.rainbow, s = listSizes)
 			axe1.plot(p_front[0], p_front[1])
 
@@ -1449,7 +1450,7 @@ def drawBestLeadership(dossier) :
 					if cpt > precision or firstEval :
 						if evaluation < maxEval :
 							hashProportion[run][evaluation] = line['proportion']
-							hashProportionAsym[run][evaluation] = line['proportion'] - 0.5
+							hashProportionAsym[run][evaluation] = line['proportionAsym'] - 0.5
 							# hashNbLeaderFirst[run][evaluation] = line['nb_leader_first']
 							# hashNbTotalCoop[run][evaluation] = line['nb_total_coop']
 
@@ -1554,7 +1555,7 @@ def drawBestLeadership(dossier) :
 			if len(listProportionAsym) > 0 :
 				dataBoxPlot.append(listProportionAsym)
 
-		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = (800/dpi, 600/dpi))
+		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 		axe1.boxplot(dataBoxPlot)
 
 		axe1.add_line(lines.Line2D([0, lastEval], [0.5, 0.5], color="red"))
@@ -1576,7 +1577,7 @@ def drawBestLeadership(dossier) :
 
 		# --- RUNS LEADERSHIP ASYM ---
 		for run in hashProportionAsym.keys() :
-			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = (800/dpi, 600/dpi))
+			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 
 			tabProportionAsym = [hashProportionAsym[run][evaluation] for evaluation in tabPlotEvaluation if evaluation in hashProportionAsym[run].keys()]
 
