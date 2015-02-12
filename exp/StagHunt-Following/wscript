@@ -33,6 +33,7 @@ def build(bld):
                                         # 'COEVO WAYPOINTS7 POS_CLOSE',
                                         # 'COEVO WAYPOINTS12 POS_CLOSE',
                                         'COEVO WAYPOINTS18 POS_CLOSE',
+                                        'COEVO WAYPOINTS18 POS_CLOSE NO_COORD',
                                         # 'WAYPOINTS7 ID_LEADER POS_CLOSE',
                                         # 'WAYPOINTS12 ID_LEADER POS_CLOSE',
                                         # 'WAYPOINTS18 ID_LEADER POS_CLOSE',
