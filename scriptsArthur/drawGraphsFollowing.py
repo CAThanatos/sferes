@@ -116,7 +116,7 @@ def drawBestFit(dossier) :
 		matplotlib.rcParams['legend.fontsize'] = 15
 
 		dpi = 96
-		size = (800/dpi, 600/dpi)
+		size = (1280/dpi, 1024/dpi)
 		tabPlotEvaluation = tabEvaluation
 
 		# --- BOXPLOT FITNESS ---
@@ -147,7 +147,7 @@ def drawBestFit(dossier) :
 		# --- RUNS FITNESS ---
 		palette = sns.color_palette("husl", len(hashFitness.keys()))
 		for run in hashFitness.keys() :
-			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = (800/dpi, 600/dpi))
+			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 
 			tabFitness = [hashFitness[run][evaluation] for evaluation in tabPlotEvaluation if evaluation in hashFitness[run].keys()]
 
@@ -257,7 +257,7 @@ def drawAllFit(dossier) :
 		matplotlib.rcParams['legend.fontsize'] = 15
 
 		dpi = 96
-		size = (800/dpi, 600/dpi)
+		size = (1280/dpi, 1024/dpi)
 		tabPlotEvaluation = tabEvaluation
 
 
@@ -285,7 +285,7 @@ def drawAllFit(dossier) :
 		# --- BOXPLOT ALL RUN FITNESS ---
 		dataBoxPlot = [hashFitnessGlob[evaluation] for evaluation in tabPlotEvaluation if evaluation in hashFitnessGlob.keys()]
 
-		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = (800/dpi, 600/dpi))
+		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 		axe1.boxplot(dataBoxPlot)
 
 		axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
@@ -383,7 +383,7 @@ def drawBestLeadership(dossier) :
 		matplotlib.rcParams['legend.fontsize'] = 15
 
 		dpi = 96
-		size = (800/dpi, 600/dpi)
+		size = (1280/dpi, 1024/dpi)
 
 		tabPlotEvaluation = tabEvaluation
 
@@ -395,7 +395,7 @@ def drawBestLeadership(dossier) :
 			if len(listProportion) > 0 :
 				dataBoxPlot.append(listProportion)
 
-		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = (800/dpi, 600/dpi))
+		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 		axe1.boxplot(dataBoxPlot)
 
 		# axe1.add_line(lines.Line2D([0, lastEval], [0.5, 0.5], color="red"))
@@ -417,7 +417,7 @@ def drawBestLeadership(dossier) :
 
 		# --- RUNS LEADERSHIP ---
 		for run in hashProportion.keys() :
-			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = (800/dpi, 600/dpi))
+			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 
 			tabProportion = [hashProportion[run][evaluation] for evaluation in tabPlotEvaluation if evaluation in hashProportion[run].keys()]
 
@@ -450,7 +450,7 @@ def drawBestLeadership(dossier) :
 			if len(listProportionAsym) > 0 :
 				dataBoxPlot.append(listProportionAsym)
 
-		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = (800/dpi, 600/dpi))
+		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 		axe1.boxplot(dataBoxPlot)
 
 		axe1.add_line(lines.Line2D([0, lastEval], [0.5, 0.5], color="red"))
@@ -472,7 +472,7 @@ def drawBestLeadership(dossier) :
 
 		# --- RUNS LEADERSHIP ASYM ---
 		for run in hashProportionAsym.keys() :
-			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = (800/dpi, 600/dpi))
+			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 
 			tabProportionAsym = [hashProportionAsym[run][evaluation] for evaluation in tabPlotEvaluation if evaluation in hashProportionAsym[run].keys()]
 
@@ -595,7 +595,7 @@ def drawAllLeadership(dossier) :
 		matplotlib.rcParams['legend.fontsize'] = 15
 
 		dpi = 96
-		size = (800/dpi, 600/dpi)
+		size = (1280/dpi, 1024/dpi)
 
 		tabPlotEvaluation = tabEvaluation
 
