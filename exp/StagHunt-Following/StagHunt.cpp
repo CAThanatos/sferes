@@ -122,6 +122,9 @@ namespace sferes
 	 			int longest_sequence = 0, current_sequence = 0;
 	 			int k = 0, l = 0;
 
+#ifdef NO_COORD
+	 			similarity += hunter1->get_waypoints_order().size()/(float)Params::simu::nb_waypoints;
+#else
 	 			while(k < hunter1->get_waypoints_order().size())
 	 			{
 	 				if(l >= hunter2->get_waypoints_order().size())
@@ -145,6 +148,7 @@ namespace sferes
 
 	 			// Their fitness is the longest sequence they did divided by the longest sequence they could do
 	 			similarity += longest_sequence/(float)Params::simu::nb_waypoints;
+#endif
 
 	 			if(_nb_waypoints_coop_trial > 0)
 		 			proportion_leader += fabs(0.5 - (_nb_leader_first_trial/_nb_waypoints_coop_trial));
