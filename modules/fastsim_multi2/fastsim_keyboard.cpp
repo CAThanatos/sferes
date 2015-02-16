@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
   typedef simu::FastsimMulti<Params> simu_t;
   simu_t s(true);
 
-	Robot* r1 = new Robot(20.0f, Posture(250, 250, M_PI/3), 2);  
+	Robot* r1 = new Robot(20.0f, Posture(250, 250, -M_PI/2), 2);  
   r1->use_camera();
 	r1->add_laser(Laser(0, 50));
   r1->add_laser(Laser(M_PI / 3, 50));

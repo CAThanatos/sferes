@@ -47,6 +47,7 @@ def build(bld):
 
                                         # 'CONTROL1 BSTAG100 POS_CLOSE',
                                         'CONTROL1 BSTAG100 POS_CLOSE ALTRUISM',
+                                        'CONTROL1 BSTAG250 POS_CLOSE ALTRUISM',
                                       ])
 
                                        
