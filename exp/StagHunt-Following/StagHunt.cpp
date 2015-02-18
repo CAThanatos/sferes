@@ -151,7 +151,7 @@ namespace sferes
 #endif
 
 	 			if(_nb_waypoints_coop_trial > 0)
-		 			proportion_leader += fabs(0.5 - (_nb_leader_first_trial/_nb_waypoints_coop_trial));
+		 			proportion_leader += fabs(0.5 - (_nb_leader_first_trial/_nb_waypoints_coop_trial))*((float)_nb_waypoints_coop_trial/(float)Params::simu::nb_waypoints);
 
 	 			_nb_leader_first += _nb_leader_first_trial;
 	 			_nb_waypoints_coop += _nb_waypoints_coop_trial;

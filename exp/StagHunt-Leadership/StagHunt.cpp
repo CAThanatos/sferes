@@ -49,6 +49,8 @@ namespace sferes
       float moy_hares2_solo = 0, moy_sstags2_solo = 0, moy_bstags2_solo = 0;
      	int food2 = 0;
 
+     	this->set_mode(fit::mode::eval);
+
 #ifdef COEVO
      	_num_leader = num_leader;
      	float fit2 = 0;
@@ -318,8 +320,9 @@ namespace sferes
        	_nb_leader_first += _nb_leader_first_trial;
        	_nb_preys_killed_coop += _nb_preys_killed_coop_trial;
 
+				float max_hunts = Params::simu::nb_steps/STAMINA;
        	if(_nb_preys_killed_coop_trial > 0)
-	       	proportion_leader += fabs(0.5 - (_nb_leader_first_trial/_nb_preys_killed_coop_trial));
+	       	proportion_leader += fabs(0.5 - (_nb_leader_first_trial/_nb_preys_killed_coop_trial));//*(_nb_preys_killed_coop_trial/max_hunts);
 
 
 #if defined(BEHAVIOUR_VIDEO)

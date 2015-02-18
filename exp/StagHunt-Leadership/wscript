@@ -30,24 +30,17 @@ def build(bld):
                            target = 'StagHunt',
 #                           json = 'StagHuntExp3.json',
                            variants = [
-                                        # 'CONTROL1 COEVO BSTAG100 POS_CLOSE RATIO75',
-                                        # 'CONTROL1 COEVO BSTAG250 POS_CLOSE RATIO75',
-                                        # 'CONTROL1 COEVO BSTAG500 POS_CLOSE RATIO75',
-                                        # 'CONTROL1 COEVO BSTAG1000 POS_CLOSE RATIO75',
-
-                                        # 'CONTROL1 COEVO BSTAG100 POS_CLOSE RATIO25',
-                                        # 'CONTROL1 COEVO BSTAG250 POS_CLOSE RATIO25',
-                                        # 'CONTROL1 COEVO BSTAG500 POS_CLOSE RATIO25',
-                                        # 'CONTROL1 COEVO BSTAG1000 POS_CLOSE RATIO25',
-
                                         'CONTROL1 COEVO BSTAG100 POS_CLOSE',
                                         'CONTROL1 COEVO BSTAG250 POS_CLOSE',
-                                        # 'CONTROL1 COEVO BSTAG500 POS_CLOSE',
-                                        # 'CONTROL1 COEVO BSTAG1000 POS_CLOSE',
 
-                                        # 'CONTROL1 BSTAG100 POS_CLOSE',
-                                        'CONTROL1 BSTAG100 POS_CLOSE ALTRUISM',
-                                        'CONTROL1 BSTAG250 POS_CLOSE ALTRUISM',
+                                        'CONTROL1 COEVO BSTAG100 POS_CENTER',
+                                        'CONTROL1 COEVO BSTAG250 POS_CENTER',
+#
+                                        'CONTROL1 BSTAG100 POS_CLOSE',
+                                        'CONTROL1 BSTAG250 POS_CLOSE',
+
+                                        # 'CONTROL1 BSTAG100 POS_CLOSE ALTRUISM',
+                                        # 'CONTROL1 BSTAG250 POS_CLOSE ALTRUISM',
                                       ])
 
                                        
