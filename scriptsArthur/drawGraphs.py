@@ -199,6 +199,66 @@ def drawBestFit(dossier) :
 		plt.close()
 
 
+		# --- BOXPLOT HARES FITNESS ---
+		runHares = []
+		for run in hashNbHares.keys() :
+			lastEvalRun = sorted(hashNbHares[run].keys())[-1]
+			if hashNbHares[run][lastEvalRun] > hashNbBStags[run][lastEvalRun] :
+				runHares.append(run)
+
+		dataBoxPlot = []
+		for evaluation in tabPlotEvaluation :
+			listFitness = [hashFitness[run][evaluation] for run in runHares if evaluation in hashFitness[run].keys()]
+
+			if len(listFitness) > 0 :
+				dataBoxPlot.append(listFitness)
+
+		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+		axe1.boxplot(dataBoxPlot)
+
+		axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
+		axe1.set_xticklabels([tabPlotEvaluation[x] for x in range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10))])
+		axe1.set_xlabel("Evaluation")
+
+		axe1.set_ylabel("Fitness")
+		axe1.set_ylim(0, maxFitness + 0.1*maxFitness)
+
+		axe1.set_title('Boxplot of best fitness')
+
+		plt.savefig(dossier + "/boxplotRunHares.png", bbox_inches = 'tight')
+		plt.close()
+
+
+		# --- BOXPLOT STAGS FITNESS ---
+		runStags = []
+		for run in hashNbBStags.keys() :
+			lastEvalRun = sorted(hashNbHares[run].keys())[-1]
+			if hashNbBStagsDuo[run][lastEvalRun] > hashNbHares[run][lastEvalRun] :
+				runStags.append(run)
+
+		dataBoxPlot = []
+		for evaluation in tabPlotEvaluation :
+			listFitness = [hashFitness[run][evaluation] for run in runStags if evaluation in hashFitness[run].keys()]
+
+			if len(listFitness) > 0 :
+				dataBoxPlot.append(listFitness)
+
+		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+		axe1.boxplot(dataBoxPlot)
+
+		axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
+		axe1.set_xticklabels([tabPlotEvaluation[x] for x in range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10))])
+		axe1.set_xlabel("Evaluation")
+
+		axe1.set_ylabel("Fitness")
+		axe1.set_ylim(0, maxFitness + 0.1*maxFitness)
+
+		axe1.set_title('Boxplot of best fitness')
+
+		plt.savefig(dossier + "/boxplotRunStags.png", bbox_inches = 'tight')
+		plt.close()
+
+
 
 		# --- RUNS FITNESS ---
 		palette = sns.color_palette("husl", len(hashFitness.keys()))
