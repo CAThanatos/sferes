@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 
 import matplotlib
+
+# For ssh compatibility
+matplotlib.use('Agg')
+
 import matplotlib.pyplot as plt
 from matplotlib import lines
 import matplotlib.cm as cm
@@ -1877,7 +1881,6 @@ def draw(**parametres) :
 	nbEvalByGen = parametres["argEvalByGen"]
 
 	dossier = parametres["argDirectory"]
-
 
 	if os.path.isdir(dossier) :
 		listSubDirs = [d for d in os.listdir(dossier) if os.path.isdir(dossier + '/' + d)]

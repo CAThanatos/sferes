@@ -318,8 +318,9 @@ namespace sferes
        	_nb_leader_first += _nb_leader_first_trial;
        	_nb_preys_killed_coop += _nb_preys_killed_coop_trial;
 
+				float max_hunts = Params::simu::nb_steps/STAMINA;
        	if(_nb_preys_killed_coop_trial > 0)
-	       	proportion_leader += fabs(0.5 - (_nb_leader_first_trial/_nb_preys_killed_coop_trial));
+	       	proportion_leader += fabs(0.5 - (_nb_leader_first_trial/_nb_preys_killed_coop_trial));//*(_nb_preys_killed_coop_trial/max_hunts);
 
 
 #if defined(BEHAVIOUR_VIDEO)

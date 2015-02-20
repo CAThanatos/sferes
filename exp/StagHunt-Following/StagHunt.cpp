@@ -152,6 +152,7 @@ namespace sferes
 
 	 			if(_nb_waypoints_coop_trial > 0)
 		 			proportion_leader += fabs(0.5 - (_nb_leader_first_trial/_nb_waypoints_coop_trial));
+		 			// proportion_leader += fabs(0.5 - (_nb_leader_first_trial/_nb_waypoints_coop_trial))*((float)_nb_waypoints_coop_trial/(float)Params::simu::nb_waypoints);
 
 	 			_nb_leader_first += _nb_leader_first_trial;
 	 			_nb_waypoints_coop += _nb_waypoints_coop_trial;
@@ -238,6 +239,9 @@ namespace sferes
 #ifdef POS_CLOSE
 			pos_init.push_back(Posture(width/2 - 40, 80, M_PI/2));
 			pos_init.push_back(Posture(width/2 + 40, 80, M_PI/2));
+#elif defined(POS_CENTER)
+			pos_init.push_back(Posture(width/2, height/2 - 80, M_PI/2));
+			pos_init.push_back(Posture(width/2, height/2 + 80, -M_PI/2));
 #else
 			pos_init.push_back(Posture(width/2, 80, M_PI/2));
 			pos_init.push_back(Posture(width/2, height - 80, -M_PI/2));
