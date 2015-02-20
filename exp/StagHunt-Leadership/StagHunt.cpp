@@ -49,8 +49,6 @@ namespace sferes
       float moy_hares2_solo = 0, moy_sstags2_solo = 0, moy_bstags2_solo = 0;
      	int food2 = 0;
 
-     	this->set_mode(fit::mode::eval);
-
 #ifdef COEVO
      	_num_leader = num_leader;
      	float fit2 = 0;
