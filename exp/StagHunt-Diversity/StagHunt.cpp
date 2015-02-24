@@ -49,7 +49,7 @@ namespace sferes
 #endif
 
 #ifdef DIVSM
-     	std::vector<float> vec_sm(Params::nn::nb_inputs + Params::nn::nb_outputs, 0.0f);
+     	std::vector<float> vec_sm;
 #endif
 
 #ifdef PROXIMITY
@@ -84,7 +84,7 @@ namespace sferes
 #endif
 
 #ifdef DIVSM
-				std::vector<float> vec_sm_trials(Params::nn::nb_inputs + Params::nn::nb_outputs, 0.0f);
+				std::vector<float> vec_sm_trial(Params::nn::nb_inputs + Params::nn::nb_outputs, 0.0f);
 #endif
 
 #ifdef PROXIMITY
@@ -320,7 +320,7 @@ namespace sferes
 #ifdef DIVSM
 							if(0 == num || 1 == num)
 								for(size_t l = 0; l < action.size(); ++l)
-									vec_sm_trials[Params::nn::nb_inputs + l] = action[l];
+									vec_sm_trial[Params::nn::nb_inputs + l] = action[l];
 #endif
 						}
 					} // End for(robots)
@@ -386,7 +386,7 @@ namespace sferes
 					std::vector<float>& vec_inputs_rob = ((Hunter*)(simu.robots()[0]))->get_last_inputs();
 
 					for(size_t l = 0; l < vec_inputs_rob.size(); ++l)
-						vec_sm_trials[l] = vec_inputs_rob[l];
+						vec_sm_trial[l] = vec_inputs_rob[l];
 #endif
 
 
@@ -615,8 +615,8 @@ namespace sferes
 #endif
 
 #ifdef DIVSM
-       	for(size_t l = 0; l < vec_sm_trials.size(); ++l)
-       		vec_sm[l] += vec_sm_trials[l]/(float)Params::simu::nb_steps;
+       	for(size_t l = 0; l < vec_sm_trial.size(); ++l)
+       		vec_sm.push_back(vec_sm_trial[l]);
 #endif
 
        	
@@ -713,7 +713,6 @@ namespace sferes
 #ifdef DIVSM
 			for(size_t l = 0; l < vec_sm.size(); ++l)
 			{
-				vec_sm[l] /= Params::simu::nb_trials;
 				vec_sm[l] /= nb_encounters;
 				ind1.add_vec_sm(vec_sm[l], l);
 			}
