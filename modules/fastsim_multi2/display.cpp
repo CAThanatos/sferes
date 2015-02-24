@@ -821,7 +821,8 @@ namespace fastsim
 		  	}
 				else
 				{
-			  	Uint32 color_hunter2 = SDL_MapRGB(_behaviour_log->format, 255, 175, 0);
+			  	// Uint32 color_hunter2 = SDL_MapRGB(_behaviour_log->format, 255, 175, 0);
+			  	Uint32 color_hunter2 = SDL_MapRGB(_behaviour_log->format, 0, 0, 255);
 			  	pos_traj.color = color_hunter2;
 		  		_trajectory_log[1].push_back(pos_traj);
 				}
@@ -959,7 +960,8 @@ namespace fastsim
 		unsigned _r = _map->real_to_pixel(radius);
 
 	  //Uint32 _color = _color_from_id(_behaviour_log, color);
-	  Uint32 _color = SDL_MapRGB(_behaviour_log->format, 255, 0, 0);
+	  Uint32 _color = SDL_MapRGB(_behaviour_log->format, 0, 0, 0);
+	  // Uint32 _color = SDL_MapRGB(_behaviour_log->format, 255, 0, 0);
 	  
 	  _line(_behaviour_log, _x - _r, _y, _x + _r, _y, _color);
 	  _line(_behaviour_log, _x, _y - _r, _x, _y + _r, _color);

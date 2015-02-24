@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 
 import matplotlib
+
+# For ssh compatibility
+matplotlib.use('Agg')
+
 import matplotlib.pyplot as plt
 from matplotlib import lines
 import matplotlib.cm as cm
