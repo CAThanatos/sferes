@@ -98,9 +98,11 @@ namespace sferes
 
 #ifdef DIVSM
 					_vec_sm_at.clear();
-					_vec_sm_at.resize(Params::nn::nb_inputs + Params::nn::nb_outputs);
+					_vec_sm_at.resize((Params::nn::nb_inputs + Params::nn::nb_outputs)*Params::simu::nb_trials);
+					// _vec_sm_at.resize(Params::nn::nb_inputs + Params::nn::nb_outputs);
 					_vec_sm.clear();
-					_vec_sm.resize(Params::nn::nb_inputs + Params::nn::nb_outputs);
+					_vec_sm.resize((Params::nn::nb_inputs + Params::nn::nb_outputs)*Params::simu::nb_trials);
+					// _vec_sm.resize(Params::nn::nb_inputs + Params::nn::nb_outputs);
 #endif
 
 #ifdef PROXIMITY
@@ -202,7 +204,7 @@ namespace sferes
 					for(size_t i = 0; i < _vec_similarity.size(); ++i)
 						_vector_diversity[i] = _vec_similarity[i];
 #elif defined(DIVSM)
-					_vector_diversity.resize(Params::nn::nb_inputs + Params::nn::nb_outputs);
+					_vector_diversity.resize(_vec_sm.size());
 					for(size_t i = 0; i < _vec_sm.size(); ++i)
 						_vector_diversity[i] = _vec_sm[i];
 #elif defined(PROXIMITY)
@@ -349,6 +351,7 @@ namespace sferes
 
 				void set_vec_sm()
 				{
+					_vec_sm.resize(_vec_sm_at.size());
 					for(size_t i = 0; i < _vec_sm_at.size(); ++i)
 					{
 						_vec_sm[i] = _vec_sm_at[i];

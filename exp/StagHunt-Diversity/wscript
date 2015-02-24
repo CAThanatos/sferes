@@ -37,11 +37,14 @@ def build(bld):
                                         # 'MULTI_SIM SIM_WINDOW ALTRUISM POS_CLOSE SIZE100 BSTAG100',
                                         # 'MULTI_ACTIVITY DIVERSITY DIVSM ALTRUISM POS_CLOSE SIZE100 BSTAG100',
 
-                                        'MULTI_SIM SIM_MEAN RATIO_SIM01 ALTRUISM POS_CLOSE SIZE100 BSTAG100',
-                                        'MULTI_SIM SIM_MEAN RATIO_SIM05 ALTRUISM POS_CLOSE SIZE100 BSTAG100',
+                                        # 'MULTI_SIM SIM_MEAN RATIO_SIM01 ALTRUISM POS_CLOSE SIZE100 BSTAG100',
+                                        # 'MULTI_SIM SIM_MEAN RATIO_SIM05 ALTRUISM POS_CLOSE SIZE100 BSTAG100',
                                         # 'MULTI_SIM SIM_MEAN ALTRUISM POS_CLOSE SIZE100 BSTAG100',
-                                        'MULTI_SIM SIM_MEAN LIMITED_SENSORS ALTRUISM POS_CLOSE SIZE100 BSTAG100',
-                                        'MULTI_SIM SIM_MEAN DIVERSITY DIVSM ALTRUISM POS_CLOSE SIZE100 BSTAG100'
+                                        # 'MULTI_SIM SIM_MEAN LIMITED_SENSORS ALTRUISM POS_CLOSE SIZE100 BSTAG100',
+                                        # 'MULTI_SIM SIM_MEAN DIVERSITY DIVSM ALTRUISM POS_CLOSE SIZE100 BSTAG100',
+
+                                        'DIVERSITY DIVSM ALTRUISM POS_CLOSE SIZE20 BSTAG250',
+                                        # 'DIVERSITY DIVSM ALTRUISM POS_CLOSE SIZE100 BSTAG250',
                                       ])
                                        
 #def build(bld):
