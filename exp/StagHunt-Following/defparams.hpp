@@ -231,7 +231,7 @@ struct Params
 
 //#define PRED_CONF
 
-//#define BEHAVIOUR_LOG
+#define BEHAVIOUR_LOG
 
 #define BEHAVIOUR_VIDEO
 

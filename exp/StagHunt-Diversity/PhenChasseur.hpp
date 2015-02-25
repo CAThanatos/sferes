@@ -98,10 +98,10 @@ namespace sferes
 
 #ifdef DIVSM
 					_vec_sm_at.clear();
-					_vec_sm_at.resize((Params::nn::nb_inputs + Params::nn::nb_outputs)*Params::simu::nb_trials);
+					_vec_sm_at.resize((Params::nn::nb_inputs + Params::nn::nb_outputs)*Params::simu::nb_steps*Params::simu::nb_trials);
 					// _vec_sm_at.resize(Params::nn::nb_inputs + Params::nn::nb_outputs);
 					_vec_sm.clear();
-					_vec_sm.resize((Params::nn::nb_inputs + Params::nn::nb_outputs)*Params::simu::nb_trials);
+					_vec_sm.resize((Params::nn::nb_inputs + Params::nn::nb_outputs)*Params::simu::nb_steps*Params::simu::nb_trials);
 					// _vec_sm.resize(Params::nn::nb_inputs + Params::nn::nb_outputs);
 #endif
 
