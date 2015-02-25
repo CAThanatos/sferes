@@ -84,7 +84,7 @@ namespace sferes
 #endif
 
 #ifdef DIVSM
-				std::vector<float> vec_sm_trial(Params::nn::nb_inputs + Params::nn::nb_outputs, 0.0f);
+				std::vector<float> vec_sm_trial;
 #endif
 
 #ifdef PROXIMITY
@@ -318,9 +318,10 @@ namespace sferes
 #endif
 
 #ifdef DIVSM
-							if(0 == num || 1 == num)
+							if(0 == num)
 								for(size_t l = 0; l < action.size(); ++l)
-									vec_sm_trial[Params::nn::nb_inputs + l] = action[l];
+									vec_sm_trial.push_back(action[l]);
+									// vec_sm_trial[Params::nn::nb_inputs + l] = action[l];
 #endif
 						}
 					} // End for(robots)
@@ -386,7 +387,8 @@ namespace sferes
 					std::vector<float>& vec_inputs_rob = ((Hunter*)(simu.robots()[0]))->get_last_inputs();
 
 					for(size_t l = 0; l < vec_inputs_rob.size(); ++l)
-						vec_sm_trial[l] = vec_inputs_rob[l];
+						// vec_sm_trial[l] = vec_inputs_rob[l];
+						vec_sm_trial.push_back(vec_inputs_rob[l]);
 #endif
 
 

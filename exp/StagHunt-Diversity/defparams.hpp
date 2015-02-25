@@ -171,7 +171,7 @@ struct Params
 		
 		static const int nb_levels = 2;
 
-		static const float nb_steps = 20000;
+		static const int nb_steps = 20000;
 		
 #ifdef TRIALS1
 		static const int nb_trials = 1;

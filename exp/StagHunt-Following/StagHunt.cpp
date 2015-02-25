@@ -157,6 +157,17 @@ namespace sferes
 	 			_nb_leader_first += _nb_leader_first_trial;
 	 			_nb_waypoints_coop += _nb_waypoints_coop_trial;
 
+#if defined(BEHAVIOUR_LOG)
+	 			if(this->mode() == fit::mode::view)
+	 			{
+					std::string fileDump = _file_behaviour + ".bmp";
+ 	 				simu.dump_behaviour_log(fileDump);
+					// std::string fileDump = _file_behaviour + boost::lexical_cast<std::string>(cpt_files + 1) + ".bmp";
+   		// 		simu.add_dead_prey(index, fileDump, alone);
+   		// 		cpt_files++;
+	 			}
+#endif
+
 
 #if defined(BEHAVIOUR_VIDEO)
 				if(this->mode() == fit::mode::view)
