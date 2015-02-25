@@ -31,13 +31,16 @@ exclusion = None
 directories = None
 outputDir = "GraphsResults"
 drawStatAnalysis = False
+removeOutput = False
 
 
-def drawHuntingTask(args) :
+def drawHuntingTask() :
 	if os.path.isdir(outputDir) :
-		shutil.rmtree(outputDir)
-
-	os.makedirs(outputDir)
+		if removeOutput :
+			shutil.rmtree(outputDir)
+			os.makedirs(outputDir)
+	else :
+		os.makedirs(outputDir)
 
 
 	tabEvaluation = []
@@ -60,7 +63,7 @@ def drawHuntingTask(args) :
 			hashRatioSuccess = {}
 			hashRatioHares = {}
 
-			tabEvaluation = []
+			# tabEvaluation = []
 			for fileBest in listBestFit :
 				m = re.search(r'^bestfit(\d*)\.dat$', fileBest)
 				run = int(m.group(1))
@@ -149,12 +152,12 @@ def drawHuntingTask(args) :
 
 
 	tabEvaluation = sorted(tabEvaluation)
-	lastEval = tabEvaluation[-1]
-	diffEvals = lastEval - tabEvaluation[-2]
+	# lastEval = tabEvaluation[-1]
+	# diffEvals = lastEval - tabEvaluation[-2]
 
-	while lastEval <= maxEval :
-		lastEval += diffEvals
-		tabEvaluation.append(lastEval)
+	# while lastEval <= maxEval :
+	# 	lastEval += diffEvals
+	# 	tabEvaluation.append(lastEval)
 
 
 	# Statistical Analysis
@@ -190,7 +193,7 @@ def drawHuntingTask(args) :
 				print("Min1 = " + str(minEvalSerie1) + ", Min2 = " + str(minEvalSerie2))
 				print("Mann-Whitney (" + directories[cpt] + ", " + directories[cpt2] + ")\n\t -> U = " + str(U) + "/P = " + str(P))
 
-				with open(os.path.join(outputDir, "statAnalysis.txt")) as fileWrite :
+				with open(os.path.join(outputDir, "statAnalysis.txt"), 'w') as fileWrite :
 					fileWrite.write("Min1 = " + str(minEvalSerie1) + ", Min2 = " + str(minEvalSerie2))
 					fileWrite.write("Mann-Whitney (" + directories[cpt] + ", " + directories[cpt2] + ")\n\t -> U = " + str(U) + "/P = " + str(P))
 
@@ -305,7 +308,9 @@ def drawHuntingTask(args) :
 		runStags = []
 		for run in hashNbBStags.keys() :
 			lastEvalRun = sorted(hashNbHares[run].keys())[-1]
-			if hashNbBStags[run][lastEvalRun] > hashNbHares[run][lastEvalRun] and hashNbBStags[run][lastEvalRun] > 1 :
+			# if hashNbBStags[run][lastEvalRun] > hashNbHares[run][lastEvalRun] and hashNbBStags[run][lastEvalRun] > 1 :
+			# 	runStags.append(run)
+			if hashNbBStagsDuo[run][lastEvalRun] > hashNbHares[run][lastEvalRun] and hashNbBStagsDuo[run][lastEvalRun] > 1 :
 				runStags.append(run)
 
 		for evaluation in tabPlotEvaluation :
@@ -322,6 +327,24 @@ def drawHuntingTask(args) :
 			dataPerc25.append(perc25)
 			dataPerc75.append(perc75)
 
+		cpt = 0
+		while cpt < len(dataPlot) :
+			if math.isnan(dataPlot[cpt]) :
+				if cpt > 0 and cpt < len(dataPlot) - 1 :
+					dataPlot[cpt] = (dataPlot[cpt + 1] + dataPlot[cpt - 1])/2
+					dataPerc25[cpt] = (dataPerc25[cpt + 1] + dataPerc25[cpt - 1])/2
+					dataPerc75[cpt] = (dataPerc75[cpt + 1] + dataPerc75[cpt - 1])/2
+				elif cpt > 0 :
+					dataPlot[cpt] = dataPlot[cpt - 1]
+					dataPerc25[cpt] = dataPerc25[cpt - 1]
+					dataPerc75[cpt] = dataPerc75[cpt - 1]
+				else :
+					dataPlot[cpt] = dataPlot[cpt + 1]
+					dataPerc25[cpt] = dataPerc25[cpt + 1]
+					dataPerc75[cpt] = dataPerc75[cpt + 1]
+
+			cpt += 1
+
 		axe1.plot(range(len(dataPlot)), dataPlot, color=palette[cptData], linestyle=linestyles[cptData], linewidth=linewidth, marker=markers[cptData])
 
 		plt.fill_between(range(len(dataPlot)), dataPerc25, dataPerc75, alpha=0.25, linewidth=0, color=palette[cptData])
@@ -336,7 +359,7 @@ def drawHuntingTask(args) :
 	axe1.set_ylabel("Fitness")
 	# axe1.set_ylim(0, maxFitness + 0.1*maxFitness)
 
-	legend = plt.legend(['Aclonal', 'Clonal', 'Coevo'], loc = 4, frameon=True)
+	legend = plt.legend(['Aclonal', 'Clonal', 'Co-evolution'], loc = 4, frameon=True)
 	frame = legend.get_frame()
 	frame.set_facecolor('0.9')
 	frame.set_edgecolor('0.9')
@@ -348,31 +371,22 @@ def drawHuntingTask(args) :
 
 
 
-def drawWaypointsTask(args) :
-	maxEval = int(args.max)
-	precision = int(args.precision)
-	selection = args.selection
-	exclusion = args.exclusion
+def drawWaypointsTask() :
+	if os.path.isdir(outputDir) :
+		if removeOutput :
+			shutil.rmtree(outputDir)
+			os.makedirs(outputDir)
+	else :
+		os.makedirs(outputDir)
 
 	tabEvaluation = []
-
-	directories = args.directories
 	dataHash = []
-
-	outputDir = args.output
-	if os.path.isdir(outputDir) :
-		shutil.rmtree(outputDir)
-
-	os.makedirs(outputDir)
-
-
 	for directory in directories :
 		if os.path.isdir(directory) :
 			listBestFit = [f for f in os.listdir(directory) if (os.path.isfile(directory + "/" + f) and re.match(r"^bestfit(\d*)\.dat$", f))]
 
 			hashFitness = {}
 
-			tabEvaluation = []
 			for fileBest in listBestFit :
 				m = re.search(r'^bestfit(\d*)\.dat$', fileBest)
 				run = int(m.group(1))
@@ -405,9 +419,6 @@ def drawWaypointsTask(args) :
 								if evaluation not in tabEvaluation :
 									tabEvaluation.append(evaluation)
 
-								if line['fitness'] > maxFitness :
-									maxFitness = line['fitness']
-
 								cpt = 0
 
 						if firstEval :
@@ -422,12 +433,12 @@ def drawWaypointsTask(args) :
 
 
 	tabEvaluation = sorted(tabEvaluation)
-	lastEval = tabEvaluation[-1]
-	diffEvals = lastEval - tabEvaluation[-2]
+	# lastEval = tabEvaluation[-1]
+	# diffEvals = lastEval - tabEvaluation[-2]
 
-	while lastEval <= maxEval :
-		lastEval += diffEvals
-		tabEvaluation.append(lastEval)
+	# while lastEval <= maxEval :
+	# 	lastEval += diffEvals
+	# 	tabEvaluation.append(lastEval)
 
 
 	# Statistical Analysis
@@ -462,7 +473,7 @@ def drawWaypointsTask(args) :
 				print("Min1 = " + str(minEvalSerie1) + ", Min2 = " + str(minEvalSerie2))
 				print("Mann-Whitney (" + directories[cpt] + ", " + directories[cpt2] + ")\n\t -> U = " + str(U) + "/P = " + str(P))
 
-				with open(os.path.join(outputDir, "statAnalysis.txt")) as fileWrite :
+				with open(os.path.join(outputDir, "statAnalysis.txt"), 'w') as fileWrite :
 					fileWrite.write("Min1 = " + str(minEvalSerie1) + ", Min2 = " + str(minEvalSerie2))
 					fileWrite.write("Mann-Whitney (" + directories[cpt] + ", " + directories[cpt2] + ")\n\t -> U = " + str(U) + "/P = " + str(P))
 
@@ -485,6 +496,7 @@ def drawWaypointsTask(args) :
 	matplotlib.rcParams['legend.fontsize'] = 15
 
 	linewidth = 2
+	# linestyles = ['-', '-', '-']
 	linestyles = ['-', '--', '-.', ':']
 	markers = [None, None, None, None] #['o', '+', '*']
 
@@ -585,11 +597,32 @@ def drawWaypointsTask(args) :
 			dataPerc25.append(perc25)
 			dataPerc75.append(perc75)
 
+		cpt = 0
+		while cpt < len(dataPlot) :
+			if math.isnan(dataPlot[cpt]) :
+				if cpt > 0 and cpt < len(dataPlot) - 1 :
+					dataPlot[cpt] = (dataPlot[cpt + 1] + dataPlot[cpt - 1])/2
+					dataPerc25[cpt] = (dataPerc25[cpt + 1] + dataPerc25[cpt - 1])/2
+					dataPerc75[cpt] = (dataPerc75[cpt + 1] + dataPerc75[cpt - 1])/2
+				elif cpt > 0 :
+					dataPlot[cpt] = dataPlot[cpt - 1]
+					dataPerc25[cpt] = dataPerc25[cpt - 1]
+					dataPerc75[cpt] = dataPerc75[cpt - 1]
+				else :
+					dataPlot[cpt] = dataPlot[cpt + 1]
+					dataPerc25[cpt] = dataPerc25[cpt + 1]
+					dataPerc75[cpt] = dataPerc75[cpt + 1]
+
+			cpt += 1
+
+
+		# print(dataPlot)
 		axe1.plot(range(len(dataPlot)), dataPlot, color=palette[cptData], linestyle=linestyles[cptData], linewidth=linewidth, marker=markers[cptData])
 
 		plt.fill_between(range(len(dataPlot)), dataPerc25, dataPerc75, alpha=0.25, linewidth=0, color=palette[cptData])
 
 		cptData += 1
+		# break
 
 
 	axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
@@ -599,7 +632,7 @@ def drawWaypointsTask(args) :
 	axe1.set_ylabel("Fitness")
 	# axe1.set_ylim(0, maxFitness + 0.1*maxFitness)
 
-	legend = plt.legend(['Aclonal', 'Clonal', 'Coevo'], loc = 4, frameon=True)
+	legend = plt.legend(['Aclonal', 'Clonal', 'Co-evolution'], loc = 4, frameon=True)
 	frame = legend.get_frame()
 	frame.set_facecolor('0.9')
 	frame.set_edgecolor('0.9')
@@ -611,11 +644,13 @@ def drawWaypointsTask(args) :
 
 
 
-def drawLeadership(args) :
+def drawLeadership() :
 	if os.path.isdir(outputDir) :
-		shutil.rmtree(outputDir)
-
-	os.makedirs(outputDir)
+		if removeOutput :
+			shutil.rmtree(outputDir)
+			os.makedirs(outputDir)
+	else :
+		os.makedirs(outputDir)
 
 	tabEvaluation = []
 	dataHash = []
@@ -629,7 +664,6 @@ def drawLeadership(args) :
 			hashNbLeaderFirst = {}
 			hashNbTotalCoop = {}
 
-			tabEvaluation = []
 			for fileBest in listBestLeadership :
 				m = re.search(r'^bestleadership(\d*)\.dat$', fileBest)
 				run = int(m.group(1))
@@ -685,12 +719,12 @@ def drawLeadership(args) :
 
 
 	tabEvaluation = sorted(tabEvaluation)
-	lastEval = tabEvaluation[-1]
-	diffEvals = lastEval - tabEvaluation[-2]
+	# lastEval = tabEvaluation[-1]
+	# diffEvals = lastEval - tabEvaluation[-2]
 
-	while lastEval <= maxEval :
-		lastEval += diffEvals
-		tabEvaluation.append(lastEval)
+	# while lastEval <= maxEval :
+	# 	lastEval += diffEvals
+	# 	tabEvaluation.append(lastEval)
 
 
 	# Statistical Analysis
@@ -725,7 +759,7 @@ def drawLeadership(args) :
 				print("Min1 = " + str(minEvalSerie1) + ", Min2 = " + str(minEvalSerie2))
 				print("Mann-Whitney (" + directories[cpt] + ", " + directories[cpt2] + ")\n\t -> U = " + str(U) + "/P = " + str(P))
 
-				with open(os.path.join(outputDir, "statAnalysis.txt")) as fileWrite :
+				with open(os.path.join(outputDir, "statAnalysis.txt"), 'w') as fileWrite :
 					fileWrite.write("Min1 = " + str(minEvalSerie1) + ", Min2 = " + str(minEvalSerie2))
 					fileWrite.write("Mann-Whitney (" + directories[cpt] + ", " + directories[cpt2] + ")\n\t -> U = " + str(U) + "/P = " + str(P))
 
@@ -834,8 +868,14 @@ def drawLeadership(args) :
 		dataPerc75 = []
 		hashProportion = data['hashProportion']
 
+		runSuccess = []
+		for run in hashProportion.keys() :
+			lastEvalRun = sorted(hashProportion[run].keys())[-1]
+			if hashProportion[run][lastEvalRun] > 0.75 :
+				runSuccess.append(run)
+
 		for evaluation in tabPlotEvaluation :
-			proportionEval = [hashProportion[run][evaluation] for run in hashProportion.keys() if evaluation in hashProportion[run].keys()]
+			proportionEval = [hashProportion[run][evaluation] for run in hashProportion.keys() if run in runSuccess and evaluation in hashProportion[run].keys()]
 			proportionMed = np.median(proportionEval)
 
 			perc25 = proportionMed
@@ -847,6 +887,24 @@ def drawLeadership(args) :
 			dataPlot.append(proportionMed)
 			dataPerc25.append(perc25)
 			dataPerc75.append(perc75)
+
+		cpt = 0
+		while cpt < len(dataPlot) :
+			if math.isnan(dataPlot[cpt]) :
+				if cpt > 0 and cpt < len(dataPlot) - 1 :
+					dataPlot[cpt] = (dataPlot[cpt + 1] + dataPlot[cpt - 1])/2
+					dataPerc25[cpt] = (dataPerc25[cpt + 1] + dataPerc25[cpt - 1])/2
+					dataPerc75[cpt] = (dataPerc75[cpt + 1] + dataPerc75[cpt - 1])/2
+				elif cpt > 0 :
+					dataPlot[cpt] = dataPlot[cpt - 1]
+					dataPerc25[cpt] = dataPerc25[cpt - 1]
+					dataPerc75[cpt] = dataPerc75[cpt - 1]
+				else :
+					dataPlot[cpt] = dataPlot[cpt + 1]
+					dataPerc25[cpt] = dataPerc25[cpt + 1]
+					dataPerc75[cpt] = dataPerc75[cpt + 1]
+
+			cpt += 1
 
 		axe1.plot(range(len(dataPlot)), dataPlot, color=palette[cptData], linestyle=linestyles[cptData], linewidth=linewidth, marker=markers[cptData])
 
@@ -862,7 +920,76 @@ def drawLeadership(args) :
 	axe1.set_ylabel("Proportion")
 	# axe1.set_ylim(0, maxFitness + 0.1*maxFitness)
 
-	legend = plt.legend(['Aclonal', 'Clonal', 'Coevo'], loc = 4, frameon=True)
+	legend = plt.legend(['Aclonal', 'Clonal', 'Co-evolution'], loc = 4, frameon=True)
+	frame = legend.get_frame()
+	frame.set_facecolor('0.9')
+	frame.set_edgecolor('0.9')
+
+	axe1.set_title('Boxplot of best proportion')
+
+	plt.savefig(outputDir + "/boxplotProportionSuccess.png", bbox_inches = 'tight')
+	plt.close()
+
+
+	# Fitness Boxplots Success
+	fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+	# plt.axes(frameon=0)
+	plt.grid()
+
+	cptData = 0
+	for data in dataHash :
+		dataPlot = []
+		dataPerc25 = []
+		dataPerc75 = []
+		hashProportion = data['hashProportion']
+
+		for evaluation in tabPlotEvaluation :
+			proportionEval = [hashProportion[run][evaluation] for run in hashProportion.keys() if evaluation in hashProportion[run].keys()]
+			proportionMed = np.median(proportionEval)
+
+			perc25 = proportionMed
+			perc75 = proportionMed
+			if len(proportionEval) > 1 :
+				perc25 = np.percentile(proportionEval, 25)
+				perc75 = np.percentile(proportionEval, 75)
+
+			dataPlot.append(proportionMed)
+			dataPerc25.append(perc25)
+			dataPerc75.append(perc75)
+
+		cpt = 0
+		while cpt < len(dataPlot) :
+			if math.isnan(dataPlot[cpt]) :
+				if cpt > 0 and cpt < len(dataPlot) - 1 :
+					dataPlot[cpt] = (dataPlot[cpt + 1] + dataPlot[cpt - 1])/2
+					dataPerc25[cpt] = (dataPerc25[cpt + 1] + dataPerc25[cpt - 1])/2
+					dataPerc75[cpt] = (dataPerc75[cpt + 1] + dataPerc75[cpt - 1])/2
+				elif cpt > 0 :
+					dataPlot[cpt] = dataPlot[cpt - 1]
+					dataPerc25[cpt] = dataPerc25[cpt - 1]
+					dataPerc75[cpt] = dataPerc75[cpt - 1]
+				else :
+					dataPlot[cpt] = dataPlot[cpt + 1]
+					dataPerc25[cpt] = dataPerc25[cpt + 1]
+					dataPerc75[cpt] = dataPerc75[cpt + 1]
+
+			cpt += 1
+
+		axe1.plot(range(len(dataPlot)), dataPlot, color=palette[cptData], linestyle=linestyles[cptData], linewidth=linewidth, marker=markers[cptData])
+
+		plt.fill_between(range(len(dataPlot)), dataPerc25, dataPerc75, alpha=0.25, linewidth=0, color=palette[cptData])
+
+		cptData += 1
+
+
+	axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
+	axe1.set_xticklabels([tabPlotEvaluation[x] for x in range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10))])
+	axe1.set_xlabel("Evaluation")
+
+	axe1.set_ylabel("Proportion")
+	# axe1.set_ylim(0, maxFitness + 0.1*maxFitness)
+
+	legend = plt.legend(['Aclonal', 'Clonal', 'Co-evolution'], loc = 4, frameon=True)
 	frame = legend.get_frame()
 	frame.set_facecolor('0.9')
 	frame.set_edgecolor('0.9')
@@ -871,7 +998,6 @@ def drawLeadership(args) :
 
 	plt.savefig(outputDir + "/boxplotProportion.png", bbox_inches = 'tight')
 	plt.close()
-
 
 def main(args) :
 	global maxEval
@@ -882,6 +1008,9 @@ def main(args) :
 
 	global outputDir
 	outputDir = args.output
+
+	global removeOutput
+	removeOutput = bool(args.removeOutput)
 
 	global drawStatAnalysis
 	drawStatAnalysis = bool(args.statAnalysis)
@@ -895,12 +1024,15 @@ def main(args) :
 	global directories
 	directories = args.directories
 
-	if not args.drawLeadership :
+	if args.drawLeadership :
+		print("\t-> Drawing Leadership")
 		drawLeadership()
 	else :
 		if not args.drawWaypoints :
+			print("\t-> Drawing Hunting Task")
 			drawHuntingTask()
 		else :
+			print("\t-> Drawing Waypoints Task")
 			drawWaypointsTask()
 
 
@@ -915,6 +1047,7 @@ if __name__ == "__main__" :
 	parser.add_argument('-p', '--precision', help = "Precision", default='100', type=int)
 
 	parser.add_argument('-o', '--output', help = "Output directory", default='GraphsResults')
+	parser.add_argument('-r', '--removeOutput', help = "Remove output directory if exists", default=False, action='store_true')
 
 	parser.add_argument('-a', '--statAnalysis', help = "Compute Mann-Whitney", default=False, action='store_true')
 	parser.add_argument('-w', '--drawWaypoints', help = "Draw waypoints task", default=False, action='store_true')
