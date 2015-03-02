@@ -55,7 +55,7 @@ namespace sferes
       {
 				assert(!ea.pop().empty());
 				_best = *ea.pop().begin();
-				if (ea.dump_enabled() && (ea.gen() % Params::pop::dump_period == 0))
+				if (ea.dump_enabled() && (ea.gen() % Params::pop::video_dump_period == 0))
 				{
 					_best->fit().set_mode(fit::mode::view);
 

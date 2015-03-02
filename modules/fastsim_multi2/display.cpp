@@ -100,7 +100,7 @@ namespace fastsim
   }
 
   Display :: Display(const boost::shared_ptr<Map>& m, const std::vector<Robot*>& r) : 
-    _map(m), _robots(r), _selected(0), _record_video(false), _display_sensors(true), _num_frame(0), _cpt_frame(0)
+    _map(m), _robots(r), _selected(0), _record_video(false), _display_sensors(true), _num_frame(0), _cpt_frame(0), _first_refresh(true)
   {
     _w = _map->get_pixel_w();
     _h = _map->get_pixel_h();
@@ -451,6 +451,10 @@ namespace fastsim
 			if (sw.get_on() && !sw.is_robot())
 			{
 				_disc(_screen, x, y, rad, color);
+
+				if(_first_refresh)
+				  _disc(_behaviour_log, x, y, rad, _color_from_id(_behaviour_log, sw.get_display_color()));
+				// _circle(_behaviour_log, x, y, r, 0, 0, 0);
 			}
     }
   }
@@ -910,6 +914,9 @@ namespace fastsim
 		  _bb_to_sdl(_robots[i]->get_bb(), &_prev_bb[i]);
     }
 #endif
+
+    if(_first_refresh)
+    	_first_refresh = false;
   }
   
   void Display :: dump_display(const char * file)
@@ -953,15 +960,19 @@ namespace fastsim
 		_behaviour_log = SDL_ConvertSurface(_map_bmp, _map_bmp->format, SDL_SWSURFACE);
   }
 
-  void Display :: display_dead_prey(float x, float y, float radius, int color, bool alone)
+  void Display :: display_dead_prey(float x, float y, float radius, bool alone, bool first_robot)
   {
 	  unsigned _x = _map->real_to_pixel(x);
 	  unsigned _y = _map->real_to_pixel(y);
 		unsigned _r = _map->real_to_pixel(radius);
 
-	  //Uint32 _color = _color_from_id(_behaviour_log, color);
+	  // Uint32 _color = _color_from_id(_behaviour_log, color);
+
 	  Uint32 _color = SDL_MapRGB(_behaviour_log->format, 0, 0, 0);
-	  // Uint32 _color = SDL_MapRGB(_behaviour_log->format, 255, 0, 0);
+	  if(first_robot)
+			_color = SDL_MapRGB(_behaviour_log->format, 255, 0, 0);
+		else
+			_color = SDL_MapRGB(_behaviour_log->format, 0, 0, 255);
 	  
 	  _line(_behaviour_log, _x - _r, _y, _x + _r, _y, _color);
 	  _line(_behaviour_log, _x, _y - _r, _x, _y + _r, _color);

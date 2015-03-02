@@ -161,7 +161,7 @@ namespace sferes
 	 			if(this->mode() == fit::mode::view)
 	 			{
 					std::string fileDump = _file_behaviour + ".bmp";
- 	 				simu.dump_behaviour_log(fileDump);
+ 	 				simu.dump_behaviour_log(fileDump.c_str());
 					// std::string fileDump = _file_behaviour + boost::lexical_cast<std::string>(cpt_files + 1) + ".bmp";
    		// 		simu.add_dead_prey(index, fileDump, alone);
    		// 		cpt_files++;
@@ -375,6 +375,13 @@ namespace sferes
 		   				{
 		   					// This waypoint has already been crossed by another hunter
 		   					_nb_waypoints_coop_trial++;
+
+#ifdef BEHAVIOUR_LOG
+		   					// Is the first robot the first one on the target ?
+		   					bool first_robot = (_vec_waypoints[i]->get_leader_first() == 1) == (((Hunter*)simu.robots()[0])->is_leader());
+								if(this->mode() == fit::mode::view)
+		       				simu.add_dead_prey(wx, wy, _vec_waypoints[i]->get_radius(), false, first_robot);
+#endif
 
 		   					if(_vec_waypoints[i]->get_leader_first() == 1)
 		   						_nb_leader_first_trial++;

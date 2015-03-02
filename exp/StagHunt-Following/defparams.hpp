@@ -159,6 +159,9 @@ struct Params
     // generation)
     static const int dump_period = 10;
     
+    // how often should the video be done
+    static const int video_dump_period = 100;
+    
     // how many individuals should be created during the random
     // generation process?
     static const int initial_aleat = 1;
@@ -231,7 +234,7 @@ struct Params
 
 //#define PRED_CONF
 
-#define BEHAVIOUR_LOG
+// #define BEHAVIOUR_LOG
 
 #define BEHAVIOUR_VIDEO
 

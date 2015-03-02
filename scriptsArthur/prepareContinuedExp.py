@@ -44,7 +44,16 @@ dicExp = {}
 with open(fileToContinu, "r") as fileRead :
 	fileRead = fileRead.readlines()
 	lines = [line.rstrip('\n').split('\t') for line in fileRead]
-	dicExp = {directory:execPath for directory, execPath in lines}
+
+	dicExp = {}
+	dicRuns = {}
+	for line in lines :
+		dicExp[line[0]] = line[1]
+
+		if len(line) > 2 :
+			runs = line[2].split(',')
+			dicRuns[line[0]] = [int(run) for run in runs]
+
 
 # We scan across all the directories
 reFileGen = re.compile(r"^popGen_(\d+)$")
@@ -57,35 +66,38 @@ for dir in listDirs :
 
 		# And across all the results directories
 		for subDir in listSubDirs :
-			curDir = os.path.join(os.path.join(directory, dir), subDir)
-			listFilesGen = [fileGen for fileGen in os.listdir(curDir) if (os.path.isfile(os.path.join(curDir, fileGen)) and reFileGen.search(fileGen))]
+			if not dicRuns.has_key(dir) or (int(reDir.search(subDir).group(1)) in dicRuns[dir]) :
+				curDir = os.path.join(os.path.join(directory, dir), subDir)
+				listFilesGen = [fileGen for fileGen in os.listdir(curDir) if (os.path.isfile(os.path.join(curDir, fileGen)) and reFileGen.search(fileGen))]
 
-			# We then look for the file corresponding to the last generation
-			max = 0
-			fileGenMax = None
-			for fileGen in listFilesGen :
-				r = reFileGen.search(fileGen)
-				gen = int(r.group(1))
+				# We then look for the file corresponding to the last generation
+				max = 0
+				fileGenMax = None
+				for fileGen in listFilesGen :
+					r = reFileGen.search(fileGen)
+					gen = int(r.group(1))
 
-				if gen >= max :
-					max = gen
-					fileGenMax = fileGen
+					if gen >= max :
+						max = gen
+						fileGenMax = fileGen
 
-			# The file is copied to the output directory
-			dirOut = os.path.join(lastGenPopDir, os.path.join(dir, subDir))
-			os.makedirs(dirOut)
-			shutil.copy(os.path.join(curDir, fileGenMax), dirOut)
+				# The file is copied to the output directory
+				dirOut = os.path.join(lastGenPopDir, os.path.join(dir, subDir))
+				os.makedirs(dirOut)
+				shutil.copy(os.path.join(curDir, fileGenMax), dirOut)
 
 
-			# And we then update the string which will be written in the experiment file
-			r = reDir.search(subDir)
-			stringOut += "[" + dir.replace("_", " ") + " DIR" + str(r.group(1)) + "]\n"
-			stringOut += "nb_runs:1\n"
-			stringOut += "exec:" + dicExp[dir] + " -c " + os.path.join(dirOut, fileGenMax) + "\n"
-			stringOut += "res:ResultatsG5K/" + date + "/StagHuntExp3-Duo/" + dir + "/" + subDir + "\n"
-			stringOut += "build:./sferes2-0.99/waf --exp StagHuntExp3-Duo\n\n"
+				# And we then update the string which will be written in the experiment file
+				r = reDir.search(subDir)
+				stringOut += "[" + dir.replace("_", " ") + " DIR" + str(r.group(1)) + "]\n"
+				stringOut += "nb_runs:1\n"
+				stringOut += "exec:" + dicExp[dir] + " -c " + os.path.join(dirOut, fileGenMax) + "\n"
+				stringOut += "res:ResultatsG5K/" + date + "/StagHunt-Leadership/" + dir + "/" + subDir + "\n"
+				stringOut += "build:./sferes2-0.99/waf --exp StagHunt-Leadership\n\n"
+				# stringOut += "res:ResultatsG5K/" + date + "/StagHuntExp3-Duo/" + dir + "/" + subDir + "\n"
+				# stringOut += "build:./sferes2-0.99/waf --exp StagHuntExp3-Duo\n\n"
 
-			nbRuns += 1
+				nbRuns += 1
 
 		print("L'expérience " + dir + " sera continuée")
 	else :

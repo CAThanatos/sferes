@@ -267,9 +267,12 @@ struct Params
     // number of generations
     static const unsigned nb_gen = 4500;
     
-    // how often should the result file be written (here, each 50
+    // how often should the result file be written (here, each 10
     // generation)
     static const int dump_period = 10;
+    
+    // how often should the video be done
+    static const int video_dump_period = 100;
     
     // how many individuals should be created during the random
     // generation process?
@@ -400,7 +403,7 @@ struct Params
 
 //#define PRED_CONF
 
-#define BEHAVIOUR_LOG
+// #define BEHAVIOUR_LOG
 
 #define BEHAVIOUR_VIDEO
 

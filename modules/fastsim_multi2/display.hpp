@@ -66,8 +66,9 @@ namespace fastsim
     void dump_display(const char * file);
     void dump_behaviour_log(const char * file);
     
-    void add_dead_prey(float x, float y, float radius, int color, std::string file, bool alone = true) { display_dead_prey(x, y, radius, color, alone); dump_behaviour_log(file.c_str()); }
-    void display_dead_prey(float x, float y, float radius, int color, bool alone = true);
+    void add_dead_prey(float x, float y, float radius, std::string file, bool alone = true, bool first_robot = true) { display_dead_prey(x, y, radius, alone, first_robot); dump_behaviour_log(file.c_str()); }
+    void add_dead_prey(float x, float y, float radius, bool alone = true, bool first_robot = true) { display_dead_prey(x, y, radius, alone, first_robot); }
+    void display_dead_prey(float x, float y, float radius, bool alone = true, bool first_robot = true);
 #else
     Display(const boost::shared_ptr<Map>& m, const std::vector<Robot*>& r) : _map(m), _robots(r), _selected(0) {}
     ~Display() {}
@@ -177,6 +178,8 @@ namespace fastsim
 		bool _display_sensors;
 		int _num_frame;
 		int _cpt_frame; 
+
+    bool _first_refresh;
     
     struct Position
     {
