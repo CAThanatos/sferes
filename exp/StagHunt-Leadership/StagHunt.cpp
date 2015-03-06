@@ -30,8 +30,10 @@ namespace sferes
       nn_t nn1(Params::nn::nb_inputs, Params::nn::nb_hidden, Params::nn::nb_outputs);
       nn_t nn2(Params::nn::nb_inputs, Params::nn::nb_hidden, Params::nn::nb_outputs);
 
+#ifndef MLP_PERSO
       nn1.set_all_weights(ind1.data());
       nn2.set_all_weights(ind2.data());
+#endif
 
       typedef simu::FastsimMulti<Params> simu_t;
       typedef fastsim::Map map_t;
@@ -84,12 +86,23 @@ namespace sferes
 #endif
 	
 #ifdef MLP_PERSO
-				StagHuntRobot* robotTmp = (StagHuntRobot*)(simu.robots()[0]);
-				Hunter* hunterTmp = (Hunter*)robotTmp;
-				hunterTmp->set_weights(ind1.data());
-				robotTmp = (StagHuntRobot*)(simu.robots()[1]);
-				hunterTmp = (Hunter*)robotTmp;
-				hunterTmp->set_weights(ind2.data());
+				StagHuntRobot* robot1 = (StagHuntRobot*)(simu.robots()[0]);
+				StagHuntRobot* robot2 = (StagHuntRobot*)(simu.robots()[1]);
+				Hunter* hunter1 = (Hunter*)robot1;
+				Hunter* hunter2 = (Hunter*)robot2;
+
+#ifdef DOUBLE_NN
+				float rand1 = misc::rand(1.0f);
+				float rand2 = misc::rand(1.0f);
+				float diff_hunters = rand1 - rand2;
+				diff_hunters = (diff_hunters/2.0f) + 0.5f;
+
+				hunter1->choose_nn(ind1.data(), diff_hunters);
+				hunter2->choose_nn(ind2.data(), 1 - diff_hunters);
+#else
+				hunter1->set_weights(ind1.data());
+				hunter2->set_weights(ind2.data());
+#endif
 #endif
 	
 				float food_trial = 0;
@@ -231,11 +244,14 @@ namespace sferes
 						bool alone = (nb_blocked > 1) ? false : true;
 
 #ifdef BEHAVIOUR_LOG
+   					// Is the first robot the first one on the target ?
+   					bool first_robot = (((Prey*)simu.robots()[index])->get_leader_first() == 1) == (((Hunter*)simu.robots()[0])->is_leader());
+
 						if(this->mode() == fit::mode::view)
 						{
-							std::string fileDump = _file_behaviour + boost::lexical_cast<std::string>(cpt_files + 1) + ".bmp";
-       				simu.add_dead_prey(index, fileDump, alone);
-       				cpt_files++;
+							// std::string fileDump = _file_behaviour + boost::lexical_cast<std::string>(cpt_files + 1) + ".bmp";
+       				simu.add_dead_prey(index, alone, first_robot);
+       				// cpt_files++;
 						}
 #endif
 
@@ -321,6 +337,14 @@ namespace sferes
 				float max_hunts = Params::simu::nb_steps/STAMINA;
        	if(_nb_preys_killed_coop_trial > 0)
 	       	proportion_leader += fabs(0.5 - (_nb_leader_first_trial/_nb_preys_killed_coop_trial));//*(_nb_preys_killed_coop_trial/max_hunts);
+
+#if defined(BEHAVIOUR_LOG)
+	 			if(this->mode() == fit::mode::view)
+	 			{
+					std::string fileDump = _file_behaviour + ".bmp";
+ 	 				simu.dump_behaviour_log(fileDump.c_str());
+	 			}
+#endif
 
 
 #if defined(BEHAVIOUR_VIDEO)
@@ -813,7 +837,11 @@ int main(int argc, char **argv)
 //  typedef gen::Cmaes<90, Params> gen_t;
 #else
 #ifdef ELITIST
+#ifdef DOUBLE_NN
+  typedef gen::ElitistGen<((Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs) * 2 + 1, Params> gen_t;
+#else
   typedef gen::ElitistGen<(Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs, Params> gen_t;
+#endif
 #else
   typedef gen::EvoFloat<(Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs, Params> gen_t;
 #endif

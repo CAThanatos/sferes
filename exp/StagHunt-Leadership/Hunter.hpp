@@ -24,6 +24,7 @@ namespace sferes
 				_direction_hunter = 0.0f;
 
 				_bool_leader = false;
+				_bool_nn1 = false;
 
 #ifdef SCREAM
 				_scream_value = 0.0f;
@@ -347,7 +348,37 @@ namespace sferes
 					_weights[i] = weights[i];
 				}
 			}
+
+			void choose_nn(const std::vector<float>& data, float diff_hunters)
+			{
+				int nb_weights = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;
+
+				_weights.clear();
+				_weights.resize(nb_weights);
+
+				int first_weight = 0;
+
+#ifdef DECISION_THRESHOLD
+				if(diff_hunters > (data[nb_weights * 2] + 1.0f)/2.0f)
+					first_weight = nb_weights;
+#else
+				float lambda = 5.0f;
+				float out = diff_hunters*data[nb_weights * 2];
+				out = (1.0 / (exp(-out * lambda) + 1));
+
+				if(out > 0.5f)
+					first_weight = nb_weights;
 #endif
+
+				if(first_weight == 0)
+					_bool_nn1 = true;
+
+				for(size_t i = first_weight; i < first_weight + nb_weights; ++i)
+					_weights[i - first_weight] = data[i];
+			}
+#endif
+
+			bool nn1_chosen() { return _bool_nn1; }
   	
       int get_color_type(int pixel)
       {
@@ -433,6 +464,8 @@ namespace sferes
 			float _direction_hunter;
 
 			bool _bool_leader;
+
+			bool _bool_nn1;
 
 #ifdef SCREAM
 			float _scream_value;
