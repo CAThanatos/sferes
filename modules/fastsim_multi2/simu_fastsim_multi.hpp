@@ -111,6 +111,10 @@ namespace sferes
         {
         	_display->add_dead_prey(_robots[index]->get_pos().x(), _robots[index]->get_pos().y(), _robots[index]->get_radius(), file, alone, first_robot);
         }
+        void add_dead_prey(int index, bool alone = true, bool first_robot = true)
+        {
+            _display->add_dead_prey(_robots[index]->get_pos().x(), _robots[index]->get_pos().y(), _robots[index]->get_radius(), alone, first_robot);
+        }
         void add_dead_prey(float x, float y, float radius, bool alone = true, bool first_robot = true)
         {
             _display->add_dead_prey(x, y, radius, alone, first_robot);

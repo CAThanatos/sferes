@@ -30,9 +30,14 @@ def build(bld):
                            target = 'StagHunt',
 #                           json = 'StagHuntExp3.json',
                            variants = [
-                                        'CONTROL1 COEVO BSTAG250 POS_CLOSE',
-                                        'CONTROL1 BSTAG250 POS_CLOSE',
-                                        'CONTROL1 BSTAG250 POS_CLOSE ALTRUISM',
+                                        # 'CONTROL1 COEVO BSTAG250 POS_CLOSE',
+                                        # 'CONTROL1 BSTAG250 POS_CLOSE',
+                                        # 'CONTROL1 BSTAG250 POS_CLOSE ALTRUISM',
+                                        'CONTROL2 COEVO BSTAG250 POS_CLOSE',
+                                        'CONTROL3 COEVO BSTAG250 POS_CLOSE',
+
+                                        'SETTING15 DOUBLE_NN BSTAG250 POS_CLOSE',
+                                        'SETTING15 DOUBLE_NN DECISION_THRESHOLD BSTAG250 POS_CLOSE',
                                       ])
 
                                        

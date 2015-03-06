@@ -162,9 +162,6 @@ namespace sferes
 	 			{
 					std::string fileDump = _file_behaviour + ".bmp";
  	 				simu.dump_behaviour_log(fileDump.c_str());
-					// std::string fileDump = _file_behaviour + boost::lexical_cast<std::string>(cpt_files + 1) + ".bmp";
-   		// 		simu.add_dead_prey(index, fileDump, alone);
-   		// 		cpt_files++;
 	 			}
 #endif
 

@@ -40,7 +40,7 @@ then
 			case $yn in
 				[Yy]* ) checkSite=true; break;;
 				[Nn]* ) checkSite=false; break;;
-				* ) echo "False considered."; checkSite=false; break;;
+				* ) echo "No considered."; checkSite=false; break;;
 			esac
 		done
 
