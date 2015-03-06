@@ -15,6 +15,7 @@ from operator import itemgetter
 import seaborn as sns
 import numpy as np
 
+from pylab import Polygon
 from scipy import stats
 
 import os
@@ -34,6 +35,32 @@ drawStatAnalysis = False
 removeOutput = False
 
 
+
+# SEABORN
+sns.set()
+sns.set_style('white')
+sns.set_context('paper')
+palette = sns.color_palette("husl", 3)
+
+# MATPLOTLIB PARAMS
+matplotlib.rcParams['font.size'] = 15
+matplotlib.rcParams['font.weight'] = 'bold'
+matplotlib.rcParams['axes.labelsize'] = 25
+matplotlib.rcParams['axes.labelweight'] = 'bold'
+matplotlib.rcParams['xtick.labelsize'] = 25
+matplotlib.rcParams['ytick.labelsize'] = 25
+matplotlib.rcParams['legend.fontsize'] = 25
+
+# GRAPHS GLOBAL VARIABLES
+linewidth = 2
+linestyles = ['-', '--', '-.']
+markers = [None, None, None] #['o', '+', '*']
+
+dpi = 96
+size = (1280/dpi, 1024/dpi)
+
+
+
 def drawHuntingTask() :
 	if os.path.isdir(outputDir) :
 		if removeOutput :
@@ -45,6 +72,7 @@ def drawHuntingTask() :
 
 	tabEvaluation = []
 	dataHash = []
+	directoryCoevo = False
 	for directory in directories :
 		if os.path.isdir(directory) :
 			listBestFit = [f for f in os.listdir(directory) if (os.path.isfile(directory + "/" + f) and re.match(r"^bestfit(\d*)\.dat$", f))]
@@ -62,6 +90,9 @@ def drawHuntingTask() :
 			hashRatio = {}
 			hashRatioSuccess = {}
 			hashRatioHares = {}
+
+			if re.search(r"COEVO", directory) :
+				directoryCoevo = True
 
 			# tabEvaluation = []
 			for fileBest in listBestFit :
@@ -95,14 +126,19 @@ def drawHuntingTask() :
 					cpt = 0
 					firstEval = True
 					lastEval = 0
+					maxEvalDone = False
 					for line in data :
 						evaluation = line['evaluation']
+
+						# MERGE COEVO						
+						if directoryCoevo :
+							evaluation += 10
 
 						cpt += evaluation - lastEval
 						lastEval = evaluation
 
 						if cpt > precision or firstEval :
-							if evaluation < maxEval :
+							if not maxEvalDone :
 								hashFitness[run][evaluation] = line['fitness']
 
 								hashNbHares[run][evaluation] = line['nbHares']
@@ -128,6 +164,9 @@ def drawHuntingTask() :
 									tabEvaluation.append(evaluation)
 
 								cpt = 0
+
+								if evaluation > maxEval :
+									maxEvalDone = True
 
 						if firstEval :
 							firstEval = False
@@ -160,6 +199,24 @@ def drawHuntingTask() :
 	# 	tabEvaluation.append(lastEval)
 
 
+	hashRunStags = []
+	for data in dataHash :
+		hashNbBStags = data['hashNbBStags']
+		hashNbBStagsDuo = data['hashNbBStagsDuo']
+		hashNbHares = data['hashNbHares']
+		runStags = []
+
+		for run in hashNbBStags.keys() :
+			lastEvalRun = sorted(hashNbHares[run].keys())[-1]
+
+			# if hashNbBStags[run][lastEvalRun] > hashNbHares[run][lastEvalRun] and hashNbBStags[run][lastEvalRun] > 1 :
+			# 	runStags.append(run)
+			if hashNbBStagsDuo[run][lastEvalRun] > hashNbHares[run][lastEvalRun] and hashNbBStagsDuo[run][lastEvalRun] > 1 :
+				runStags.append(run)
+
+		hashRunStags.append(runStags)
+
+
 	# Statistical Analysis
 	if args.statAnalysis :
 		cpt = 0
@@ -167,27 +224,29 @@ def drawHuntingTask() :
 			minEvalSerie1 = None
 			hashFitness = dataHash[cpt]["hashFitness"]
 
-			for run in hashFitness.keys() :
+			for run in hashRunStags[cpt] :
 				lastEval = sorted(hashFitness[run].keys())[-1]
 
 				if minEvalSerie1 == None or lastEval < minEvalSerie1 :
 					minEvalSerie1 = lastEval
 
-			serie1 = [hashFitness[run][minEvalSerie1] for run in hashFitness.keys()]
+			serie1 = [hashFitness[run][minEvalSerie1] for run in hashRunStags[cpt]]
 			# print([sorted(hashFitness[run].keys())[-1] for run in hashFitness.keys()])
+			# print(serie1)
 			
 			cpt2 = cpt + 1
 			while cpt2 < len(dataHash) :
 				minEvalSerie2 = None
 				hashFitness = dataHash[cpt2]["hashFitness"]
 
-				for run in hashFitness.keys() :
+				for run in hashRunStags[cpt2] :
 					lastEval = sorted(hashFitness[run].keys())[-1]
 
 					if minEvalSerie2 == None or lastEval < minEvalSerie2 :
 						minEvalSerie2 = lastEval
 
-				serie2 = [hashFitness[run][minEvalSerie2] for run in hashFitness.keys()]
+				serie2 = [hashFitness[run][minEvalSerie2] for run in hashRunStags[cpt2]]
+				# print(serie2)
 
 				U, P = stats.mannwhitneyu(serie1, serie2)
 				print("Min1 = " + str(minEvalSerie1) + ", Min2 = " + str(minEvalSerie2))
@@ -200,94 +259,7 @@ def drawHuntingTask() :
 				cpt2 += 1
 			cpt += 1
 
-
-	# SEABORN
-	sns.set()
-	sns.set_style('white')
-	sns.set_context('paper')
-	palette = sns.color_palette("husl", len(directories))
-
-	matplotlib.rcParams['font.size'] = 15
-	matplotlib.rcParams['font.weight'] = 'bold'
-	matplotlib.rcParams['axes.labelsize'] = 15
-	matplotlib.rcParams['axes.labelweight'] = 'bold'
-	matplotlib.rcParams['xtick.labelsize'] = 15
-	matplotlib.rcParams['ytick.labelsize'] = 15
-	matplotlib.rcParams['legend.fontsize'] = 15
-
-	linewidth = 2
-	linestyles = ['-', '--', '-.']
-	markers = [None, None, None] #['o', '+', '*']
-
-	dpi = 96
-	size = (1280/dpi, 1024/dpi)
-
 	tabPlotEvaluation = tabEvaluation
-
-
-	# # Fitness Boxplots Stags
-	# fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
-
-	# cptData = 0
-	# for data in dataHash :
-	# 	dataBoxPlot = []
-	# 	hashFitness = data['hashFitness']
-	# 	hashNbBStags = data['hashNbBStags']
-	# 	hashNbBStagsDuo = data['hashNbBStagsDuo']
-	# 	hashNbHares = data['hashNbHares']
-
-	# 	runStags = []
-	# 	for run in hashNbBStags.keys() :
-	# 		lastEvalRun = sorted(hashNbHares[run].keys())[-1]
-	# 		if hashNbBStagsDuo[run][lastEvalRun] > hashNbHares[run][lastEvalRun] :
-	# 			runStags.append(run)
-
-	# 	for evaluation in tabPlotEvaluation :
-	# 		listFitness = [hashFitness[run][evaluation] for run in hashFitness.keys() if run in runStags and evaluation in hashFitness[run].keys()]
-
-	# 		if len(listFitness) > 0 :
-	# 			dataBoxPlot.append(listFitness)
-
-	# 	bp = axe1.boxplot(dataBoxPlot)
-
-	# 	for i in range(0, len(bp['boxes'])):
-	# 	   bp['boxes'][i].set_color(palette[cptData])
-	# 	   # we have two whiskers!
-	# 	   bp['whiskers'][i*2].set_color(palette[cptData])
-	# 	   bp['whiskers'][i*2 + 1].set_color(palette[cptData])
-	# 	   bp['whiskers'][i*2].set_linewidth(2)
-	# 	   bp['whiskers'][i*2 + 1].set_linewidth(2)
-
-	# 	   # top and bottom fliers
-	# 	   # (set allows us to set many parameters at once)
-	# 	   # bp['fliers'][i * 2].set(markerfacecolor=palette[cptData],
-	# 	   #                 marker='o', alpha=0.75, markersize=6,
-	# 	   #                 markeredgecolor='none')
-	# 	   # bp['fliers'][i * 2 + 1].set(markerfacecolor=palette[cptData],
-	# 	   #                 marker='o', alpha=0.75, markersize=6,
-	# 	   #                 markeredgecolor='none')
-
-	# 	   bp['medians'][i].set_color('black')
-	# 	   bp['medians'][i].set_linewidth(3)
-
-	# 	   # and 4 caps to remove
-	# 	   for c in bp['caps']:
-	# 	       c.set_linewidth(0)
-
-	# 	cptData += 1
-
-
-	# axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
-	# axe1.set_xticklabels([tabPlotEvaluation[x] for x in range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10))])
-	# axe1.set_xlabel("Evaluation")
-
-	# axe1.set_ylabel("Fitness")
-	# # axe1.set_ylim(0, maxFitness + 0.1*maxFitness)
-
-	# axe1.set_title('Boxplot of best fitness')
-
-	# plt.savefig(outputDir + "/boxplotStags.png", bbox_inches = 'tight')
-	# plt.close()
 
 
 	# Fitness Boxplots Stags
@@ -305,16 +277,8 @@ def drawHuntingTask() :
 		hashNbBStagsDuo = data['hashNbBStagsDuo']
 		hashNbHares = data['hashNbHares']
 
-		runStags = []
-		for run in hashNbBStags.keys() :
-			lastEvalRun = sorted(hashNbHares[run].keys())[-1]
-			# if hashNbBStags[run][lastEvalRun] > hashNbHares[run][lastEvalRun] and hashNbBStags[run][lastEvalRun] > 1 :
-			# 	runStags.append(run)
-			if hashNbBStagsDuo[run][lastEvalRun] > hashNbHares[run][lastEvalRun] and hashNbBStagsDuo[run][lastEvalRun] > 1 :
-				runStags.append(run)
-
 		for evaluation in tabPlotEvaluation :
-			fitnessEval = [hashFitness[run][evaluation] for run in hashFitness.keys() if run in runStags and evaluation in hashFitness[run].keys()]
+			fitnessEval = [hashFitness[run][evaluation] for run in hashFitness.keys() if run in hashRunStags[cptData] and evaluation in hashFitness[run].keys()]
 			fitnessMed = np.median(fitnessEval)
 
 			perc25 = fitnessMed
@@ -352,9 +316,21 @@ def drawHuntingTask() :
 		cptData += 1
 
 
-	axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
-	axe1.set_xticklabels([tabPlotEvaluation[x] for x in range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10))])
+	tabPlotTicks = []
+	for eval in tabPlotEvaluation :
+		if eval > maxEval :
+			tabPlotTicks.append(maxEval)
+		else :
+			tabPlotTicks.append(eval)
+
+	ticks = range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/2))
+	if len(tabPlotEvaluation) - 1 not in ticks :
+		ticks.append(len(tabPlotEvaluation) - 1)
+
+	axe1.set_xticks(ticks)
+	axe1.set_xticklabels([tabPlotTicks[x] for x in ticks])
 	axe1.set_xlabel("Evaluation")
+	axe1.set_xlim(0, len(tabPlotEvaluation) - 1)
 
 	axe1.set_ylabel("Fitness")
 	# axe1.set_ylim(0, maxFitness + 0.1*maxFitness)
@@ -364,9 +340,10 @@ def drawHuntingTask() :
 	frame.set_facecolor('0.9')
 	frame.set_edgecolor('0.9')
 
-	axe1.set_title('Boxplot of best fitness')
+	# axe1.set_title('Boxplot of best fitness')
 
 	plt.savefig(outputDir + "/boxplotStags.png", bbox_inches = 'tight')
+	plt.savefig(outputDir + "/boxplotStags.svg", bbox_inches = 'tight')
 	plt.close()
 
 
@@ -406,31 +383,37 @@ def drawWaypointsTask() :
 					cpt = 0
 					firstEval = True
 					lastEval = 0
+					maxEvalDone = False
 					for line in data :
 						evaluation = line['evaluation']
 
 						cpt += evaluation - lastEval
 						lastEval = evaluation
 
+
 						if cpt > precision or firstEval :
-							if evaluation < maxEval :
-								hashFitness[run][evaluation] = line['fitness']
+							if not maxEvalDone :
+								hashFitness[run][evaluation] = line['fitness']*18
 
 								if evaluation not in tabEvaluation :
 									tabEvaluation.append(evaluation)
 
 								cpt = 0
 
+								if evaluation > maxEval :
+									maxEvalDone = True
+
 						if firstEval :
 							firstEval = False
 
+			# if maxEval not in hashFitness[0].keys() :
+			# 	for run in hashFitness.keys() :
+			# 		hashFitness[run][maxEval] = (hashFitness[run][sorted(hashFitness[run].keys()[-1])] + hashFitness[run][sorted(hashFitness[run].keys()[-2])])/2
 
 			hashData = {}
 			hashData["hashFitness"] = hashFitness
 
 			dataHash.append(hashData)
-
-
 
 	tabEvaluation = sorted(tabEvaluation)
 	# lastEval = tabEvaluation[-1]
@@ -480,96 +463,7 @@ def drawWaypointsTask() :
 				cpt2 += 1
 			cpt += 1
 
-
-	# SEABORN
-	sns.set()
-	sns.set_style('white')
-	sns.set_context('paper')
-	palette = sns.color_palette("husl", len(directories))
-
-	matplotlib.rcParams['font.size'] = 15
-	matplotlib.rcParams['font.weight'] = 'bold'
-	matplotlib.rcParams['axes.labelsize'] = 15
-	matplotlib.rcParams['axes.labelweight'] = 'bold'
-	matplotlib.rcParams['xtick.labelsize'] = 15
-	matplotlib.rcParams['ytick.labelsize'] = 15
-	matplotlib.rcParams['legend.fontsize'] = 15
-
-	linewidth = 2
-	# linestyles = ['-', '-', '-']
-	linestyles = ['-', '--', '-.', ':']
-	markers = [None, None, None, None] #['o', '+', '*']
-
-	dpi = 96
-	size = (1280/dpi, 1024/dpi)
-
 	tabPlotEvaluation = tabEvaluation
-
-
-	# # Fitness Boxplots Stags
-	# fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
-
-	# cptData = 0
-	# for data in dataHash :
-	# 	dataBoxPlot = []
-	# 	hashFitness = data['hashFitness']
-	# 	hashNbBStags = data['hashNbBStags']
-	# 	hashNbBStagsDuo = data['hashNbBStagsDuo']
-	# 	hashNbHares = data['hashNbHares']
-
-	# 	runStags = []
-	# 	for run in hashNbBStags.keys() :
-	# 		lastEvalRun = sorted(hashNbHares[run].keys())[-1]
-	# 		if hashNbBStagsDuo[run][lastEvalRun] > hashNbHares[run][lastEvalRun] :
-	# 			runStags.append(run)
-
-	# 	for evaluation in tabPlotEvaluation :
-	# 		listFitness = [hashFitness[run][evaluation] for run in hashFitness.keys() if run in runStags and evaluation in hashFitness[run].keys()]
-
-	# 		if len(listFitness) > 0 :
-	# 			dataBoxPlot.append(listFitness)
-
-	# 	bp = axe1.boxplot(dataBoxPlot)
-
-	# 	for i in range(0, len(bp['boxes'])):
-	# 	   bp['boxes'][i].set_color(palette[cptData])
-	# 	   # we have two whiskers!
-	# 	   bp['whiskers'][i*2].set_color(palette[cptData])
-	# 	   bp['whiskers'][i*2 + 1].set_color(palette[cptData])
-	# 	   bp['whiskers'][i*2].set_linewidth(2)
-	# 	   bp['whiskers'][i*2 + 1].set_linewidth(2)
-
-	# 	   # top and bottom fliers
-	# 	   # (set allows us to set many parameters at once)
-	# 	   # bp['fliers'][i * 2].set(markerfacecolor=palette[cptData],
-	# 	   #                 marker='o', alpha=0.75, markersize=6,
-	# 	   #                 markeredgecolor='none')
-	# 	   # bp['fliers'][i * 2 + 1].set(markerfacecolor=palette[cptData],
-	# 	   #                 marker='o', alpha=0.75, markersize=6,
-	# 	   #                 markeredgecolor='none')
-
-	# 	   bp['medians'][i].set_color('black')
-	# 	   bp['medians'][i].set_linewidth(3)
-
-	# 	   # and 4 caps to remove
-	# 	   for c in bp['caps']:
-	# 	       c.set_linewidth(0)
-
-	# 	cptData += 1
-
-
-	# axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
-	# axe1.set_xticklabels([tabPlotEvaluation[x] for x in range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10))])
-	# axe1.set_xlabel("Evaluation")
-
-	# axe1.set_ylabel("Fitness")
-	# # axe1.set_ylim(0, maxFitness + 0.1*maxFitness)
-
-	# axe1.set_title('Boxplot of best fitness')
-
-	# plt.savefig(outputDir + "/boxplotStags.png", bbox_inches = 'tight')
-	# plt.close()
-
 
 	# Fitness Boxplots
 	fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
@@ -624,10 +518,21 @@ def drawWaypointsTask() :
 		cptData += 1
 		# break
 
+	tabPlotTicks = []
+	for eval in tabPlotEvaluation :
+		if eval > maxEval :
+			tabPlotTicks.append(maxEval)
+		else :
+			tabPlotTicks.append(eval)
 
-	axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
-	axe1.set_xticklabels([tabPlotEvaluation[x] for x in range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10))])
+	ticks = range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/2))
+	if len(tabPlotEvaluation) - 1 not in ticks :
+		ticks.append(len(tabPlotEvaluation) - 1)
+
+	axe1.set_xticks(ticks)
+	axe1.set_xticklabels([tabPlotTicks[x] for x in ticks])
 	axe1.set_xlabel("Evaluation")
+	axe1.set_xlim(0, len(tabPlotEvaluation) - 1)
 
 	axe1.set_ylabel("Fitness")
 	# axe1.set_ylim(0, maxFitness + 0.1*maxFitness)
@@ -637,9 +542,10 @@ def drawWaypointsTask() :
 	frame.set_facecolor('0.9')
 	frame.set_edgecolor('0.9')
 
-	axe1.set_title('Boxplot of best fitness')
+	# axe1.set_title('Boxplot of best fitness')
 
-	plt.savefig(outputDir + "/boxplot.png", bbox_inches = 'tight')
+	plt.savefig(outputDir + "/boxplotWaypoints.png", bbox_inches = 'tight')
+	plt.savefig(outputDir + "/boxplotWaypoints.svg", bbox_inches = 'tight')
 	plt.close()
 
 
@@ -688,6 +594,7 @@ def drawLeadership() :
 					cpt = 0
 					firstEval = True
 					lastEval = 0
+					maxEvalDone = False
 					for line in data :
 						evaluation = line['evaluation']
 
@@ -695,7 +602,7 @@ def drawLeadership() :
 						lastEval = evaluation
 
 						if cpt > precision or firstEval :
-							if evaluation < maxEval :
+							if not maxEvalDone :
 								hashProportion[run][evaluation] = line['proportion']
 								hashProportionAsym[run][evaluation] = line['proportionAsym'] - 0.5
 								# hashNbLeaderFirst[run][evaluation] = line['nb_leader_first']
@@ -705,6 +612,9 @@ def drawLeadership() :
 									tabEvaluation.append(evaluation)
 
 								cpt = 0
+
+								if evaluation > maxEval :
+									maxEvalDone = True
 
 						if firstEval :
 							firstEval = False
@@ -717,7 +627,6 @@ def drawLeadership() :
 			dataHash.append(hashData)
 
 
-
 	tabEvaluation = sorted(tabEvaluation)
 	# lastEval = tabEvaluation[-1]
 	# diffEvals = lastEval - tabEvaluation[-2]
@@ -725,6 +634,19 @@ def drawLeadership() :
 	# while lastEval <= maxEval :
 	# 	lastEval += diffEvals
 	# 	tabEvaluation.append(lastEval)
+
+	hashRunSuccess = []
+	for data in dataHash :
+		hashProportion = data['hashProportion']
+		runSuccess = []
+
+		for run in hashProportion.keys() :
+			lastEvalRun = sorted(hashProportion[run].keys())[-1]
+
+			if hashProportion[run][lastEvalRun] > 0.75 :
+				runSuccess.append(run)
+
+		hashRunSuccess.append(runSuccess)
 
 
 	# Statistical Analysis
@@ -734,26 +656,26 @@ def drawLeadership() :
 			minEvalSerie1 = None
 			hashProportion = dataHash[cpt]["hashProportion"]
 
-			for run in hashProportion.keys() :
+			for run in hashRunSuccess[cpt] :
 				lastEval = sorted(hashProportion[run].keys())[-1]
 
 				if minEvalSerie1 == None or lastEval < minEvalSerie1 :
 					minEvalSerie1 = lastEval
 
-			serie1 = [hashProportion[run][minEvalSerie1] for run in hashProportion.keys()]
+			serie1 = [hashProportion[run][minEvalSerie1] for run in hashRunSuccess[cpt]]
 			
 			cpt2 = cpt + 1
 			while cpt2 < len(dataHash) :
 				minEvalSerie2 = None
 				hashProportion = dataHash[cpt2]["hashProportion"]
 
-				for run in hashProportion.keys() :
+				for run in hashRunSuccess[cpt2] :
 					lastEval = sorted(hashProportion[run].keys())[-1]
 
 					if minEvalSerie2 == None or lastEval < minEvalSerie2 :
 						minEvalSerie2 = lastEval
 
-				serie2 = [hashProportion[run][minEvalSerie2] for run in hashProportion.keys()]
+				serie2 = [hashProportion[run][minEvalSerie2] for run in hashRunSuccess[cpt2]]
 
 				U, P = stats.mannwhitneyu(serie1, serie2)
 				print("Min1 = " + str(minEvalSerie1) + ", Min2 = " + str(minEvalSerie2))
@@ -766,94 +688,101 @@ def drawLeadership() :
 				cpt2 += 1
 			cpt += 1
 
-
-	# SEABORN
-	sns.set()
-	sns.set_style('white')
-	sns.set_context('paper')
-	palette = sns.color_palette("husl", len(directories))
-
-	matplotlib.rcParams['font.size'] = 15
-	matplotlib.rcParams['font.weight'] = 'bold'
-	matplotlib.rcParams['axes.labelsize'] = 15
-	matplotlib.rcParams['axes.labelweight'] = 'bold'
-	matplotlib.rcParams['xtick.labelsize'] = 15
-	matplotlib.rcParams['ytick.labelsize'] = 15
-	matplotlib.rcParams['legend.fontsize'] = 15
-
-	linewidth = 2
-	linestyles = ['-', '--', '-.', ':']
-	markers = [None, None, None, None] #['o', '+', '*']
-
-	dpi = 96
-	size = (1280/dpi, 1024/dpi)
-
 	tabPlotEvaluation = tabEvaluation
 
 
-	# # Fitness Boxplots Stags
-	# fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+	# Fitness Boxplots
+	cptData = 0
+	dataNames = ["Aclonal", "Clonal", "Coevo"]
+	for data in dataHash :
+		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+		plt.grid()
 
-	# cptData = 0
-	# for data in dataHash :
-	# 	dataBoxPlot = []
-	# 	hashFitness = data['hashFitness']
-	# 	hashNbBStags = data['hashNbBStags']
-	# 	hashNbBStagsDuo = data['hashNbBStagsDuo']
-	# 	hashNbHares = data['hashNbHares']
+		dataBoxPlot = []
+		hashProportion = data['hashProportion']
 
-	# 	runStags = []
-	# 	for run in hashNbBStags.keys() :
-	# 		lastEvalRun = sorted(hashNbHares[run].keys())[-1]
-	# 		if hashNbBStagsDuo[run][lastEvalRun] > hashNbHares[run][lastEvalRun] :
-	# 			runStags.append(run)
+		tabEvals = []
+		for evaluation in tabPlotEvaluation :
+			listProportion = [hashProportion[run][evaluation] for run in hashProportion.keys() if run in hashRunSuccess[cptData] and evaluation in hashProportion[run].keys()]
 
-	# 	for evaluation in tabPlotEvaluation :
-	# 		listFitness = [hashFitness[run][evaluation] for run in hashFitness.keys() if run in runStags and evaluation in hashFitness[run].keys()]
+			if len(listProportion) > 0 :
+				dataBoxPlot.append(listProportion)
+				tabEvals.append(evaluation)
 
-	# 		if len(listFitness) > 0 :
-	# 			dataBoxPlot.append(listFitness)
+		bp = axe1.boxplot(dataBoxPlot)
 
-	# 	bp = axe1.boxplot(dataBoxPlot)
+		for i in range(0, len(bp['boxes'])):
+			# We fill the boxes
+			box = bp['boxes'][i]
+			box.set_linewidth(0)
+			boxX = []
+			boxY = []
 
-	# 	for i in range(0, len(bp['boxes'])):
-	# 	   bp['boxes'][i].set_color(palette[cptData])
-	# 	   # we have two whiskers!
-	# 	   bp['whiskers'][i*2].set_color(palette[cptData])
-	# 	   bp['whiskers'][i*2 + 1].set_color(palette[cptData])
-	# 	   bp['whiskers'][i*2].set_linewidth(2)
-	# 	   bp['whiskers'][i*2 + 1].set_linewidth(2)
+			for j in range(5) :
+				boxX.append(box.get_xdata()[j])
+				boxY.append(box.get_ydata()[j])
 
-	# 	   # top and bottom fliers
-	# 	   # (set allows us to set many parameters at once)
-	# 	   # bp['fliers'][i * 2].set(markerfacecolor=palette[cptData],
-	# 	   #                 marker='o', alpha=0.75, markersize=6,
-	# 	   #                 markeredgecolor='none')
-	# 	   # bp['fliers'][i * 2 + 1].set(markerfacecolor=palette[cptData],
-	# 	   #                 marker='o', alpha=0.75, markersize=6,
-	# 	   #                 markeredgecolor='none')
+			boxCoords = zip(boxX, boxY)
+			boxPolygon = Polygon(boxCoords, facecolor = palette[2], linewidth = 0)
+			axe1.add_patch(boxPolygon)
 
-	# 	   bp['medians'][i].set_color('black')
-	# 	   bp['medians'][i].set_linewidth(3)
+			bp['boxes'][i].set_color(palette[2])
 
-	# 	   # and 4 caps to remove
-	# 	   for c in bp['caps']:
-	# 	       c.set_linewidth(0)
+			# we have two whiskers!
+			bp['whiskers'][i*2].set_color(palette[2])
+			bp['whiskers'][i*2 + 1].set_color(palette[2])
+			bp['whiskers'][i*2].set_linewidth(2)
+			bp['whiskers'][i*2 + 1].set_linewidth(2)
 
-	# 	cptData += 1
+			# top and bottom fliers
+			# (set allows us to set many parameters at once)
+			# if (i * 2 + 1) < len(bp['fliers']) :
+			# 	bp['fliers'][i * 2].set(markerfacecolor=palette[2],
+			# 	                marker='o', alpha=0.75, markersize=6,
+			# 	                markeredgecolor='none')
+			# 	bp['fliers'][i * 2 + 1].set(markerfacecolor=palette[2],
+			# 	                marker='o', alpha=0.75, markersize=6,
+			# 	                markeredgecolor='none')
 
 
-	# axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
-	# axe1.set_xticklabels([tabPlotEvaluation[x] for x in range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10))])
-	# axe1.set_xlabel("Evaluation")
+			bp['medians'][i].set_color('black')
+			bp['medians'][i].set_linewidth(3)
 
-	# axe1.set_ylabel("Fitness")
-	# # axe1.set_ylim(0, maxFitness + 0.1*maxFitness)
+			# and 4 caps to remove
+			for c in bp['caps']:
+			   c.set_linewidth(0)
 
-	# axe1.set_title('Boxplot of best fitness')
+		axe1.add_line(lines.Line2D([0, maxEval], [1, 1], color="red"))
 
-	# plt.savefig(outputDir + "/boxplotStags.png", bbox_inches = 'tight')
-	# plt.close()
+
+		tabPlotTicks = []
+		for eval in tabEvals :
+			if eval > maxEval :
+				tabPlotTicks.append(maxEval)
+			else :
+				tabPlotTicks.append(eval)
+
+		ticks = range(0, len(tabEvals), int(len(tabEvals)/2))
+		if len(tabEvals) - 1 not in ticks :
+			ticks.append(len(tabEvals) - 1)
+
+		axe1.set_xticks(ticks)
+		axe1.set_xticklabels([tabPlotTicks[x] for x in ticks])
+		axe1.set_xlabel("Evaluation")
+		axe1.set_xlim(0, len(tabPlotTicks) - 1)
+
+		axe1.set_ylabel("Proportion")
+		axe1.set_ylim(0, 1.1)
+
+		# axe1.set_title('Boxplot of best fitness')
+
+		plt.savefig(outputDir + "/boxplotLeadership" + dataNames[cptData] + ".png", bbox_inches = 'tight')
+		plt.savefig(outputDir + "/boxplotLeadership" + dataNames[cptData] + ".svg", bbox_inches = 'tight')
+		plt.close()
+
+		cptData += 1
+
+
 
 
 	# Fitness Boxplots
@@ -868,14 +797,8 @@ def drawLeadership() :
 		dataPerc75 = []
 		hashProportion = data['hashProportion']
 
-		runSuccess = []
-		for run in hashProportion.keys() :
-			lastEvalRun = sorted(hashProportion[run].keys())[-1]
-			if hashProportion[run][lastEvalRun] > 0.75 :
-				runSuccess.append(run)
-
 		for evaluation in tabPlotEvaluation :
-			proportionEval = [hashProportion[run][evaluation] for run in hashProportion.keys() if run in runSuccess and evaluation in hashProportion[run].keys()]
+			proportionEval = [hashProportion[run][evaluation] for run in hashProportion.keys() if run in hashRunSuccess[cptData] and evaluation in hashProportion[run].keys()]
 			proportionMed = np.median(proportionEval)
 
 			perc25 = proportionMed
@@ -925,9 +848,10 @@ def drawLeadership() :
 	frame.set_facecolor('0.9')
 	frame.set_edgecolor('0.9')
 
-	axe1.set_title('Boxplot of best proportion')
+	# axe1.set_title('Boxplot of best proportion')
 
 	plt.savefig(outputDir + "/boxplotProportionSuccess.png", bbox_inches = 'tight')
+	plt.savefig(outputDir + "/boxplotProportionSuccess.svg", bbox_inches = 'tight')
 	plt.close()
 
 
@@ -994,9 +918,10 @@ def drawLeadership() :
 	frame.set_facecolor('0.9')
 	frame.set_edgecolor('0.9')
 
-	axe1.set_title('Boxplot of best proportion')
+	# axe1.set_title('Boxplot of best proportion')
 
 	plt.savefig(outputDir + "/boxplotProportion.png", bbox_inches = 'tight')
+	plt.savefig(outputDir + "/boxplotProportion.svg", bbox_inches = 'tight')
 	plt.close()
 
 def main(args) :
