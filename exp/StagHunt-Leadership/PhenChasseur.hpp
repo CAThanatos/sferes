@@ -76,6 +76,11 @@ namespace sferes
 					_nb_leader_first = 0;
 					_nb_preys_killed_coop = 0;
 					_proportion_leader = 0;
+#ifdef DOUBLE_NN
+					_nb_nn1_chosen = 0;
+					_nb_bigger_nn1_chosen = 0;
+					_nb_role_divisions = 0;
+#endif
 					_fit_mov = 0;
 					
 					this->fit().vec_fitness.clear();
@@ -90,6 +95,11 @@ namespace sferes
 					_nb_leader_first_at = 0;
 					_nb_preys_killed_coop_at = 0;
 					_proportion_leader_at = 0;
+#ifdef DOUBLE_NN
+					_nb_nn1_chosen_at = 0;
+					_nb_bigger_nn1_chosen_at = 0;
+					_nb_role_divisions_at = 0;
+#endif
 					this->fit().fitness_at = 0;
 				}
 
@@ -170,6 +180,29 @@ namespace sferes
 		    
 		    float nb_preys_killed_coop_at() const { return _nb_preys_killed_coop_at; }
 		    void add_nb_preys_killed_coop(float nb_preys_killed_coop) { _nb_preys_killed_coop_at.fetch_and_store(_nb_preys_killed_coop_at + nb_preys_killed_coop); }
+
+
+#ifdef DOUBLE_NN
+		    float nb_nn1_chosen() const { return _nb_nn1_chosen; }
+		    void set_nb_nn1_chosen(float nb_nn1_chosen) { _nb_nn1_chosen = nb_nn1_chosen; }
+		    
+		    float nb_nn1_chosen_at() const { return _nb_nn1_chosen_at; }
+		    void add_nb_nn1_chosen(float nb_nn1_chosen) { _nb_nn1_chosen_at.fetch_and_store(_nb_nn1_chosen_at + nb_nn1_chosen); }
+
+
+		    float nb_bigger_nn1_chosen() const { return _nb_bigger_nn1_chosen; }
+		    void set_nb_bigger_nn1_chosen(float nb_bigger_nn1_chosen) { _nb_bigger_nn1_chosen = nb_bigger_nn1_chosen; }
+		    
+		    float nb_bigger_nn1_chosen_at() const { return _nb_bigger_nn1_chosen_at; }
+		    void add_nb_bigger_nn1_chosen(float nb_bigger_nn1_chosen) { _nb_bigger_nn1_chosen_at.fetch_and_store(_nb_bigger_nn1_chosen_at + nb_bigger_nn1_chosen); }
+
+
+		    float nb_role_divisions() const { return _nb_role_divisions; }
+		    void set_nb_role_divisions(float nb_role_divisions) { _nb_role_divisions = nb_role_divisions; }
+		    
+		    float nb_role_divisions_at() const { return _nb_role_divisions_at; }
+		    void add_nb_role_divisions(float nb_role_divisions) { _nb_role_divisions_at.fetch_and_store(_nb_role_divisions_at + nb_role_divisions); }
+#endif
 				
 
 		    float fit_mov() const { return _fit_mov; }
@@ -225,7 +258,21 @@ namespace sferes
 
 		    // Proportion of times the designated leader hunted first
 		    float _proportion_leader;
-		    tbb::atomic<float>_proportion_leader_at;
+		    tbb::atomic<float> _proportion_leader_at;
+
+#ifdef DOUBLE_NN
+		    // Total number of times the first nn was chosen
+		    float _nb_nn1_chosen;
+		    tbb::atomic<float> _nb_nn1_chosen_at;
+
+		    // Number of times the first nn was chosen when the random number was bigger
+		    float _nb_bigger_nn1_chosen;
+		    tbb::atomic<float> _nb_bigger_nn1_chosen_at;
+
+		    // Number of times the individuals chose a different nn
+		    float _nb_role_divisions;
+		    tbb::atomic<float> _nb_role_divisions_at;
+#endif
 		    
 		    float _fit_mov;
 		    

@@ -53,6 +53,9 @@ namespace sferes
 
 #ifdef COEVO
      	_num_leader = num_leader;
+#endif
+
+#ifdef DIFF_FIT
      	float fit2 = 0;
 #endif
 
@@ -71,6 +74,12 @@ namespace sferes
 			float proportion_leader = 0;
 
 			// clock_t deb = clock();
+
+#ifdef DOUBLE_NN
+			float nb_nn1_chosen = 0;
+			float nb_bigger_nn1_chosen = 0;
+			float nb_role_divisions = 0;
+#endif
 
       for (size_t j = 0; j < Params::simu::nb_trials; ++j)
       {
@@ -99,6 +108,19 @@ namespace sferes
 
 				hunter1->choose_nn(ind1.data(), diff_hunters);
 				hunter2->choose_nn(ind2.data(), 1 - diff_hunters);
+
+				// Is the nn chosen because of the two random numbers ?
+				if(hunter1->nn1_chosen())
+				{
+					if(rand1 > rand2)
+						nb_bigger_nn1_chosen++;
+
+					nb_nn1_chosen++;
+				}
+
+				// Did the two individuals select a different nn ?
+				if(hunter1->nn1_chosen() != hunter2->nn1_chosen())
+					nb_role_divisions++;
 #else
 				hunter1->set_weights(ind1.data());
 				hunter2->set_weights(ind2.data());
@@ -232,7 +254,6 @@ namespace sferes
 #endif
 					
 					// We remove the dead preys
-
 					while(!dead_preys.empty())
 					{
 						int index = dead_preys.back();
@@ -378,6 +399,12 @@ namespace sferes
 			_nb_leader_first /= Params::simu::nb_trials;
 			_nb_preys_killed_coop /= Params::simu::nb_trials;
 			proportion_leader /= Params::simu::nb_trials;
+
+#ifdef DOUBLE_NN
+			nb_nn1_chosen /= Params::simu::nb_trials;
+			nb_bigger_nn1_chosen /= Params::simu::nb_trials;
+			nb_role_divisions /= Params::simu::nb_trials;
+#endif
 		
 #ifdef NOT_AGAINST_ALL	
 			int nb_encounters = Params::pop::nb_opponents*Params::pop::nb_eval;
@@ -419,6 +446,16 @@ namespace sferes
 			ind1.add_nb_leader_first(_nb_leader_first);
 			ind1.add_nb_preys_killed_coop(_nb_preys_killed_coop);
 			ind1.add_proportion_leader(proportion_leader);
+
+#ifdef DOUBLE_NN
+			nb_nn1_chosen /= nb_encounters;
+			nb_bigger_nn1_chosen /= nb_encounters;
+			nb_role_divisions /= nb_encounters;
+
+			ind1.add_nb_nn1_chosen(nb_nn1_chosen);
+			ind1.add_nb_bigger_nn1_chosen(nb_bigger_nn1_chosen);
+			ind1.add_nb_role_divisions(nb_role_divisions);
+#endif
      	
      	food2 /= nb_encounters;
      	food1 /= nb_encounters;
@@ -876,6 +913,10 @@ int main(int argc, char **argv)
 		  sferes::stat::AllFitEvalStat<phen_t, Params>,
 		  sferes::stat::BestLeadershipEval<phen_t, Params>,
 		  sferes::stat::AllLeadershipEvalStat<phen_t, Params>,
+#ifdef DOUBLE_NN
+		  sferes::stat::BestNNEval<phen_t, Params>,
+		  sferes::stat::AllNNEvalStat<phen_t, Params>,
+#endif
 #ifdef BEHAVIOUR_VIDEO
 		  sferes::stat::BestFitBehaviourVideo<phen_t, Params>,
 #endif

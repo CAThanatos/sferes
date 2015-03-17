@@ -365,7 +365,14 @@ struct Params
 #endif
 
 #define FOOD_SMALL_STAG_SOLO 50
+
+#ifdef SSTAG250
 #define FOOD_SMALL_STAG_COOP 250
+#elif defined(SSTAG125)
+#define FOOD_SMALL_STAG_COOP 125
+#else
+#define FOOD_SMALL_STAG_COOP 250
+#endif
 
 #ifdef BSTAG_SOLO50
 #define FOOD_BIG_STAG_SOLO 50

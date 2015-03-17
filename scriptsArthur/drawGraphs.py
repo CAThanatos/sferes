@@ -133,8 +133,8 @@ def drawBestFit(dossier) :
 							if line['fitness'] > maxFitness :
 								maxFitness = line['fitness']
 
-							if (line['nbHares'] + line['nbBStags']) > maxNbPreys :
-								maxNbPreys = (line['nbHares'] + line['nbBStags'])
+							if (line['nbHares'] + line['nbBStags'] + line['nbSStags']) > maxNbPreys :
+								maxNbPreys = (line['nbHares'] + line['nbBStags'] + line['nbSStags'])
 
 							cpt = 0
 
@@ -240,20 +240,21 @@ def drawBestFit(dossier) :
 			if len(listFitness) > 0 :
 				dataBoxPlot.append(listFitness)
 
-		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
-		axe1.boxplot(dataBoxPlot)
+		if len(dataBoxPlot) > 0 :
+			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+			axe1.boxplot(dataBoxPlot)
 
-		axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
-		axe1.set_xticklabels([tabPlotEvaluation[x] for x in range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10))])
-		axe1.set_xlabel("Evaluation")
+			axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
+			axe1.set_xticklabels([tabPlotEvaluation[x] for x in range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10))])
+			axe1.set_xlabel("Evaluation")
 
-		axe1.set_ylabel("Fitness")
-		axe1.set_ylim(0, maxFitness + 0.1*maxFitness)
+			axe1.set_ylabel("Fitness")
+			axe1.set_ylim(0, maxFitness + 0.1*maxFitness)
 
-		axe1.set_title('Boxplot of best fitness')
+			axe1.set_title('Boxplot of best fitness')
 
-		plt.savefig(dossier + "/boxplotRunHares.png", bbox_inches = 'tight')
-		plt.close()
+			plt.savefig(dossier + "/boxplotRunHares.png", bbox_inches = 'tight')
+			plt.close()
 
 
 		# --- BOXPLOT STAGS FITNESS ---
@@ -270,20 +271,21 @@ def drawBestFit(dossier) :
 			if len(listFitness) > 0 :
 				dataBoxPlot.append(listFitness)
 
-		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
-		axe1.boxplot(dataBoxPlot)
+		if len(dataBoxPlot) > 0 :
+			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+			axe1.boxplot(dataBoxPlot)
 
-		axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
-		axe1.set_xticklabels([tabPlotEvaluation[x] for x in range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10))])
-		axe1.set_xlabel("Evaluation")
+			axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
+			axe1.set_xticklabels([tabPlotEvaluation[x] for x in range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10))])
+			axe1.set_xlabel("Evaluation")
 
-		axe1.set_ylabel("Fitness")
-		axe1.set_ylim(0, maxFitness + 0.1*maxFitness)
+			axe1.set_ylabel("Fitness")
+			axe1.set_ylim(0, maxFitness + 0.1*maxFitness)
 
-		axe1.set_title('Boxplot of best fitness')
+			axe1.set_title('Boxplot of best fitness')
 
-		plt.savefig(dossier + "/boxplotRunStags.png", bbox_inches = 'tight')
-		plt.close()
+			plt.savefig(dossier + "/boxplotRunStags.png", bbox_inches = 'tight')
+			plt.close()
 
 
 
@@ -381,13 +383,17 @@ def drawBestFit(dossier) :
 
 			tabNbHaresSolo = [hashNbHaresSolo[run][evaluation] for evaluation in tabPlotEvaluation if evaluation in hashNbHaresSolo[run].keys()]
 			tabNbHaresDuo = [hashNbHaresDuo[run][evaluation] for evaluation in tabPlotEvaluation if evaluation in hashNbHaresDuo[run].keys()]
+			tabNbSStagsSolo = [hashNbSStagsSolo[run][evaluation] for evaluation in tabPlotEvaluation if evaluation in hashNbSStagsSolo[run].keys()]
+			tabNbSStagsDuo = [hashNbSStagsDuo[run][evaluation] for evaluation in tabPlotEvaluation if evaluation in hashNbSStagsDuo[run].keys()]
 			tabNbBStagsSolo = [hashNbBStagsSolo[run][evaluation] for evaluation in tabPlotEvaluation if evaluation in hashNbBStagsSolo[run].keys()]
 			tabNbBStagsDuo = [hashNbBStagsDuo[run][evaluation] for evaluation in tabPlotEvaluation if evaluation in hashNbBStagsDuo[run].keys()]
 
 			barNbHaresSolo = axe1.bar(range(len(tabNbHaresSolo)), tabNbHaresSolo, width = width, color = colorHaresSolo, alpha = alphaHares)
 			barNbHaresDuo = axe1.bar(range(len(tabNbHaresDuo)), tabNbHaresDuo, bottom = tabNbHaresSolo, width = width, color = colorHaresDuo, alpha = alphaHares)
-			barNbBStagsSolo = axe1.bar(range(len(tabNbBStagsSolo)), tabNbBStagsSolo, bottom = np.add(tabNbHaresDuo, tabNbHaresSolo), width = width, color = colorBStagsSolo, alpha = alphaBStags)
-			barNbBStagsDuo = axe1.bar(range(len(tabNbBStagsDuo)), tabNbBStagsDuo, bottom = np.add(tabNbBStagsSolo, np.add(tabNbHaresDuo, tabNbHaresSolo)), width = width, color = colorBStagsDuo, alpha = alphaBStags)
+			barNbSStagsSolo = axe1.bar(range(len(tabNbSStagsSolo)), tabNbSStagsSolo, bottom = np.add(tabNbHaresDuo, tabNbHaresSolo), width = width, color = colorSStagsSolo, alpha = alphaSStags)
+			barNbSStagsDuo = axe1.bar(range(len(tabNbSStagsDuo)), tabNbSStagsDuo, bottom = np.add(tabNbSStagsSolo, np.add(tabNbHaresDuo, tabNbHaresSolo)), width = width, color = colorSStagsDuo, alpha = alphaSStags)
+			barNbBStagsSolo = axe1.bar(range(len(tabNbBStagsSolo)), tabNbBStagsSolo, bottom = np.add(tabNbSStagsDuo, np.add(tabNbSStagsSolo, np.add(tabNbHaresDuo, tabNbHaresSolo))), width = width, color = colorBStagsSolo, alpha = alphaBStags)
+			barNbBStagsDuo = axe1.bar(range(len(tabNbBStagsDuo)), tabNbBStagsDuo, bottom = np.add(tabNbBStagsSolo, np.add(tabNbSStagsDuo, np.add(tabNbSStagsSolo, np.add(tabNbHaresDuo, tabNbHaresSolo)))), width = width, color = colorBStagsDuo, alpha = alphaBStags)
 
 			tabEvaluationTicks = [indice for indice in range(len(tabPlotEvaluation)) if indice % (int(len(tabPlotEvaluation)/10)) == 0]
 
@@ -401,7 +407,8 @@ def drawBestFit(dossier) :
 			
 			axe1.set_title('Repartition of preys hunted', fontsize = 10)
 
-			plt.legend([barNbHaresSolo, barNbHaresDuo, barNbBStagsSolo,  barNbBStagsDuo], ['Hares solo', 'Hares coop.', 'Stags solo', 'Stags coop.'], bbox_to_anchor=(0., 1.05, 1., .102), loc=3, ncol=2, mode="expand", borderaxespad=0.)
+			# plt.legend([barNbHaresSolo, barNbHaresDuo, barNbBStagsSolo,  barNbBStagsDuo], ['Hares solo', 'Hares coop.', 'Stags solo', 'Stags coop.'], bbox_to_anchor=(0., 1.05, 1., .102), loc=3, ncol=2, mode="expand", borderaxespad=0.)
+			# plt.legend([barNbHaresSolo, barNbHaresDuo, barNbSStagsSolo, barNbSStagsDuo, barNbBStagsSolo,  barNbBStagsDuo], ['Hares solo', 'Hares coop.', 'Small stags solo', 'Small stags coop.', 'Big stags solo', 'Big stags coop.'], bbox_to_anchor=(0., 1.05, 1., .102), loc=3, ncol=2, mode="expand", borderaxespad=0.)
 
 			plt.savefig(dossier + "/preysRun" + str(run) + ".png", bbox_inches = 'tight')
 			plt.close()
@@ -1882,6 +1889,202 @@ def drawAllLeadership(dossier) :
 
 		plt.savefig(dossier + "/globalProportion", bbox_inches = 'tight')
 		plt.close()
+
+
+
+def drawBestNN(dossier) :
+	if os.path.isdir(dossier) :
+		listBestNN = [f for f in os.listdir(dossier) if (os.path.isfile(dossier + "/" + f) and re.match(r"^bestnn(\d*)\.dat$", f))]
+
+		hashProportion = {}
+		hashProportionAsym = {}
+		hashNbLeaderFirst = {}
+		hashNbTotalCoop = {}
+
+		tabEvaluation = []
+		for fileBest in listBestNN :
+			m = re.search(r'^bestnn(\d*)\.dat$', fileBest)
+			run = int(m.group(1))
+
+			testRun = None
+			if selection != None :
+				testRun = lambda run : run in selection
+			elif exclusion != None :
+				testRun = lambda run : run not in exclusion
+
+			if (testRun == None) or (testRun(run)) :
+				hashProportion[run] = {}
+				hashProportionAsym[run] = {}
+				hashNbLeaderFirst[run] = {}
+				hashNbTotalCoop[run] = {}
+
+				# dtypes = np.dtype({ 'names' : ('evaluation', 'fitness', 'proportion', 'proportionAsym', 'nb_leader_first', 'nb_total_coop'), 'formats' : [np.int, np.float, np.float, np.float, np.float, np.float] })
+				# data = np.loadtxt(dossier + "/" + fileBest, delimiter=',', usecols = (0, 1, 2, 3, 4, 5), dtype = dtypes)
+				dtypes = np.dtype({ 'names' : ('evaluation', 'fitness', 'proportion', 'proportionAsym'), 'formats' : [np.int, np.float, np.float, np.float] })
+				data = np.loadtxt(dossier + "/" + fileBest, delimiter=',', usecols = (0, 1, 2, 3), dtype = dtypes)
+
+				cpt = 0
+				firstEval = True
+				lastEval = 0
+				for line in data :
+					evaluation = line['evaluation']
+
+					cpt += evaluation - lastEval
+					lastEval = evaluation
+
+					if cpt > precision or firstEval :
+						if evaluation < maxEval :
+							hashProportion[run][evaluation] = line['proportion']
+							hashProportionAsym[run][evaluation] = line['proportionAsym'] - 0.5
+							# hashNbLeaderFirst[run][evaluation] = line['nb_leader_first']
+							# hashNbTotalCoop[run][evaluation] = line['nb_total_coop']
+
+							if evaluation not in tabEvaluation :
+								tabEvaluation.append(evaluation)
+
+							cpt = 0
+
+					if firstEval :
+						firstEval = False
+
+		tabEvaluation = sorted(tabEvaluation)
+		lastEval = tabEvaluation[-1]
+		diffEvals = lastEval - tabEvaluation[-2]
+
+		while lastEval <= maxEval :
+			lastEval += diffEvals
+			tabEvaluation.append(lastEval)
+
+		tabGeneration = [int(math.floor((evaluation-nbPopFirstGen)/nbEvalByGen)) for evaluation in tabEvaluation]
+
+
+		# SEABORN
+		sns.set()
+		sns.set_style('white')
+		sns.set_context('paper')
+		palette = sns.color_palette("husl", len(hashProportion.keys()))
+
+		matplotlib.rcParams['font.size'] = 15
+		matplotlib.rcParams['font.weight'] = 'bold'
+		matplotlib.rcParams['axes.labelsize'] = 15
+		matplotlib.rcParams['axes.labelweight'] = 'bold'
+		matplotlib.rcParams['xtick.labelsize'] = 15
+		matplotlib.rcParams['ytick.labelsize'] = 15
+		matplotlib.rcParams['legend.fontsize'] = 15
+
+		dpi = 96
+		size = (1280/dpi, 1024/dpi)
+
+		tabPlotEvaluation = tabEvaluation
+
+		# --- BOXPLOT LEADERSHIP ---
+		dataBoxPlot = []
+		for evaluation in tabPlotEvaluation :
+			listProportion = [hashProportion[run][evaluation] for run in hashProportion.keys() if evaluation in hashProportion[run].keys()]
+
+			if len(listProportion) > 0 :
+				dataBoxPlot.append(listProportion)
+
+		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+		axe1.boxplot(dataBoxPlot)
+
+		# axe1.add_line(lines.Line2D([0, lastEval], [0.5, 0.5], color="red"))
+		# axe1.add_line(lines.Line2D([0, lastEval], [-0.5, -0.5], color="red"))
+
+		axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
+		axe1.set_xticklabels([tabPlotEvaluation[x] for x in range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10))])
+		axe1.set_xlabel("Evaluation")
+
+		axe1.set_ylabel("Proportion of leadership")
+		axe1.set_ylim(-0.1, 1.1)
+
+		axe1.set_title('Boxplot of best proportion')
+
+		plt.savefig(dossier + "/boxplot.png", bbox_inches = 'tight')
+		plt.close()
+
+
+
+		# --- RUNS LEADERSHIP ---
+		for run in hashProportion.keys() :
+			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+
+			tabProportion = [hashProportion[run][evaluation] for evaluation in tabPlotEvaluation if evaluation in hashProportion[run].keys()]
+
+			axe1.plot(range(len(tabProportion)), tabProportion)
+
+			# axe1.add_line(lines.Line2D([0, lastEval], [0.5, 0.5], color="red"))
+			# axe1.add_line(lines.Line2D([0, lastEval], [-0.5, -0.5], color="red"))
+
+			# Divide the x axis by 10
+			tabEvaluationTicks = [indice for indice in range(len(tabPlotEvaluation)) if indice % (int(len(tabPlotEvaluation)/10)) == 0]
+
+			axe1.set_xticks(tabEvaluationTicks)
+			axe1.set_xticklabels([tabPlotEvaluation[indice] for indice in tabEvaluationTicks])
+			axe1.set_xlabel('Evaluation')
+
+			axe1.set_ylabel("Proportion of leadership")
+			axe1.set_ylim(-0.1, 1.1)
+
+			axe1.set_title('Best proportion')
+
+			plt.savefig(dossier + "/proportionRun" + str(run) + ".png", bbox_inches = 'tight')
+			plt.close()
+
+
+		# --- BOXPLOT LEADERSHIP ASYM ---
+		dataBoxPlot = []
+		for evaluation in tabPlotEvaluation :
+			listProportionAsym = [hashProportionAsym[run][evaluation] for run in hashProportionAsym.keys() if evaluation in hashProportionAsym[run].keys()]
+
+			if len(listProportionAsym) > 0 :
+				dataBoxPlot.append(listProportionAsym)
+
+		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+		axe1.boxplot(dataBoxPlot)
+
+		axe1.add_line(lines.Line2D([0, lastEval], [0.5, 0.5], color="red"))
+		axe1.add_line(lines.Line2D([0, lastEval], [-0.5, -0.5], color="red"))
+
+		axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
+		axe1.set_xticklabels([tabPlotEvaluation[x] for x in range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10))])
+		axe1.set_xlabel("Evaluation")
+
+		axe1.set_ylabel("Proportion of leadership")
+		axe1.set_ylim(-0.6, 0.6)
+
+		axe1.set_title('Boxplot of best proportion')
+
+		plt.savefig(dossier + "/boxplotAsym.png", bbox_inches = 'tight')
+		plt.close()
+
+
+
+		# --- RUNS LEADERSHIP ASYM ---
+		for run in hashProportionAsym.keys() :
+			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+
+			tabProportionAsym = [hashProportionAsym[run][evaluation] for evaluation in tabPlotEvaluation if evaluation in hashProportionAsym[run].keys()]
+
+			axe1.plot(range(len(tabProportionAsym)), tabProportionAsym)
+
+			axe1.add_line(lines.Line2D([0, lastEval], [0.5, 0.5], color="red"))
+			axe1.add_line(lines.Line2D([0, lastEval], [-0.5, -0.5], color="red"))
+
+			# Divide the x axis by 10
+			tabEvaluationTicks = [indice for indice in range(len(tabPlotEvaluation)) if indice % (int(len(tabPlotEvaluation)/10)) == 0]
+
+			axe1.set_xticks(tabEvaluationTicks)
+			axe1.set_xticklabels([tabPlotEvaluation[indice] for indice in tabEvaluationTicks])
+			axe1.set_xlabel('Evaluation')
+
+			axe1.set_ylabel("Proportion of leadership")
+			axe1.set_ylim(-0.6, 0.6)
+
+			axe1.set_title('Boxplot of best proportion')
+
+			plt.savefig(dossier + "/proportionAsymRun" + str(run) + ".png", bbox_inches = 'tight')
+			plt.close()
 
 
 def draw(**parametres) : 

@@ -254,6 +254,12 @@ namespace sferes
 					pop[i]->set_nb_preys_killed_coop(pop[i]->nb_preys_killed_coop_at());
 					pop[i]->set_proportion_leader(pop[i]->proportion_leader_at());
 
+#ifdef DOUBLE_NN
+					pop[i]->set_nb_nn1_chosen(pop[i]->nb_nn1_chosen_at());
+					pop[i]->set_nb_bigger_nn1_chosen(pop[i]->nb_bigger_nn1_chosen_at());
+					pop[i]->set_nb_role_divisions(pop[i]->nb_role_divisions_at());
+#endif
+
 					pop[i]->set_developed_at(false);
 				}
 
