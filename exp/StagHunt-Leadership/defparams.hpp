@@ -66,8 +66,19 @@ struct Params
 {
 	struct simu
 	{
+#ifdef MAP800
 		SFERES_STRING(map_name, SFERES_ROOT "/exp/StagHunt-Leadership/map800x800.pbm");
 		static const float real_w = 2400.0f;
+#elif defined(MAP1600)
+		SFERES_STRING(map_name, SFERES_ROOT "/exp/StagHunt-Leadership/map1600x1600.pbm");
+		static const float real_w = 4800.0f;
+#elif defined(MAP2400)
+		SFERES_STRING(map_name, SFERES_ROOT "/exp/StagHunt-Leadership/map2400x2400.pbm");
+		static const float real_w = 7200.0f;
+#else
+		SFERES_STRING(map_name, SFERES_ROOT "/exp/StagHunt-Leadership/map800x800.pbm");
+		static const float real_w = 2400.0f;
+#endif
 		
 		static const float hunter_radius = 20.0f;
 		
@@ -342,6 +353,10 @@ struct Params
 
 #ifdef NO_STAMINA
 #define STAMINA 1
+#elif defined(STAMINA50)
+#define STAMINA 50
+#elif defined(STAMINA100)
+#define STAMINA 100
 #else
 #define STAMINA 800
 #endif
@@ -370,6 +385,8 @@ struct Params
 #define FOOD_SMALL_STAG_COOP 250
 #elif defined(SSTAG125)
 #define FOOD_SMALL_STAG_COOP 125
+#elif defined(SSTAG50)
+#define FOOD_SMALL_STAG_COOP 50
 #else
 #define FOOD_SMALL_STAG_COOP 250
 #endif
@@ -380,7 +397,9 @@ struct Params
 #define FOOD_BIG_STAG_SOLO 0
 #endif
 
-#ifdef BSTAG1000
+#ifdef BSTAG2500
+#define FOOD_BIG_STAG_COOP 2500
+#elif defined(BSTAG1000)
 #define FOOD_BIG_STAG_COOP 1000
 #elif defined(BSTAG500)
 #define FOOD_BIG_STAG_COOP 500
@@ -399,6 +418,10 @@ struct Params
 #ifdef SCREAM
 #define SCREAM_MAX 100
 #define SCREAM_DECAY 10
+#endif
+
+#ifdef STAG_STUN
+#define STUN_TIME 5000
 #endif
 
 

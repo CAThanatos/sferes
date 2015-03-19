@@ -1896,10 +1896,10 @@ def drawBestNN(dossier) :
 	if os.path.isdir(dossier) :
 		listBestNN = [f for f in os.listdir(dossier) if (os.path.isfile(dossier + "/" + f) and re.match(r"^bestnn(\d*)\.dat$", f))]
 
-		hashProportion = {}
-		hashProportionAsym = {}
-		hashNbLeaderFirst = {}
-		hashNbTotalCoop = {}
+		hashNbNN1Chosen = {}
+		hashNbBiggerNN1Chosen = {}
+		hashNbRoleDivisions = {}
+		hashProportionNN1 = {}
 
 		tabEvaluation = []
 		for fileBest in listBestNN :
@@ -1913,15 +1913,13 @@ def drawBestNN(dossier) :
 				testRun = lambda run : run not in exclusion
 
 			if (testRun == None) or (testRun(run)) :
-				hashProportion[run] = {}
-				hashProportionAsym[run] = {}
-				hashNbLeaderFirst[run] = {}
-				hashNbTotalCoop[run] = {}
+				hashNbNN1Chosen[run] = {}
+				hashNbBiggerNN1Chosen[run] = {}
+				hashNbRoleDivisions[run] = {}
+				hashProportionNN1[run] = {}
 
-				# dtypes = np.dtype({ 'names' : ('evaluation', 'fitness', 'proportion', 'proportionAsym', 'nb_leader_first', 'nb_total_coop'), 'formats' : [np.int, np.float, np.float, np.float, np.float, np.float] })
-				# data = np.loadtxt(dossier + "/" + fileBest, delimiter=',', usecols = (0, 1, 2, 3, 4, 5), dtype = dtypes)
-				dtypes = np.dtype({ 'names' : ('evaluation', 'fitness', 'proportion', 'proportionAsym'), 'formats' : [np.int, np.float, np.float, np.float] })
-				data = np.loadtxt(dossier + "/" + fileBest, delimiter=',', usecols = (0, 1, 2, 3), dtype = dtypes)
+				dtypes = np.dtype({ 'names' : ('evaluation', 'fitness', 'nb_nn1_chosen', 'nb_bigger_nn1_chosen', 'nb_role_divisions'), 'formats' : [np.int, np.float, np.float, np.float, np.float] })
+				data = np.loadtxt(dossier + "/" + fileBest, delimiter=',', usecols = (0, 1, 2, 3, 4), dtype = dtypes)
 
 				cpt = 0
 				firstEval = True
@@ -1934,10 +1932,15 @@ def drawBestNN(dossier) :
 
 					if cpt > precision or firstEval :
 						if evaluation < maxEval :
-							hashProportion[run][evaluation] = line['proportion']
-							hashProportionAsym[run][evaluation] = line['proportionAsym'] - 0.5
-							# hashNbLeaderFirst[run][evaluation] = line['nb_leader_first']
-							# hashNbTotalCoop[run][evaluation] = line['nb_total_coop']
+							hashNbNN1Chosen[run][evaluation] = line['nb_nn1_chosen']
+							hashNbBiggerNN1Chosen[run][evaluation] = line['nb_bigger_nn1_chosen']
+
+							if line['nb_nn1_chosen'] == 0 :
+								hashProportionNN1[run][evaluation] = 0
+							else :
+								hashProportionNN1[run][evaluation] = ((line['nb_bigger_nn1_chosen']/line['nb_nn1_chosen'])*2) - 1
+
+							hashNbRoleDivisions[run][evaluation] = line['nb_role_divisions']
 
 							if evaluation not in tabEvaluation :
 								tabEvaluation.append(evaluation)
@@ -1962,7 +1965,7 @@ def drawBestNN(dossier) :
 		sns.set()
 		sns.set_style('white')
 		sns.set_context('paper')
-		palette = sns.color_palette("husl", len(hashProportion.keys()))
+		palette = sns.color_palette("husl", len(hashProportionNN1.keys()))
 
 		matplotlib.rcParams['font.size'] = 15
 		matplotlib.rcParams['font.weight'] = 'bold'
@@ -1977,44 +1980,17 @@ def drawBestNN(dossier) :
 
 		tabPlotEvaluation = tabEvaluation
 
-		# --- BOXPLOT LEADERSHIP ---
-		dataBoxPlot = []
-		for evaluation in tabPlotEvaluation :
-			listProportion = [hashProportion[run][evaluation] for run in hashProportion.keys() if evaluation in hashProportion[run].keys()]
 
-			if len(listProportion) > 0 :
-				dataBoxPlot.append(listProportion)
-
-		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
-		axe1.boxplot(dataBoxPlot)
-
-		# axe1.add_line(lines.Line2D([0, lastEval], [0.5, 0.5], color="red"))
-		# axe1.add_line(lines.Line2D([0, lastEval], [-0.5, -0.5], color="red"))
-
-		axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
-		axe1.set_xticklabels([tabPlotEvaluation[x] for x in range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10))])
-		axe1.set_xlabel("Evaluation")
-
-		axe1.set_ylabel("Proportion of leadership")
-		axe1.set_ylim(-0.1, 1.1)
-
-		axe1.set_title('Boxplot of best proportion')
-
-		plt.savefig(dossier + "/boxplot.png", bbox_inches = 'tight')
-		plt.close()
-
-
-
-		# --- RUNS LEADERSHIP ---
-		for run in hashProportion.keys() :
+		# --- RUNS PROPORTION ASYM ---
+		for run in hashProportionNN1.keys() :
 			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 
-			tabProportion = [hashProportion[run][evaluation] for evaluation in tabPlotEvaluation if evaluation in hashProportion[run].keys()]
+			tabProportionNN1 = [hashProportionNN1[run][evaluation] for evaluation in tabPlotEvaluation if evaluation in hashProportionNN1[run].keys()]
 
-			axe1.plot(range(len(tabProportion)), tabProportion)
+			axe1.plot(range(len(tabProportionNN1)), tabProportionNN1)
 
-			# axe1.add_line(lines.Line2D([0, lastEval], [0.5, 0.5], color="red"))
-			# axe1.add_line(lines.Line2D([0, lastEval], [-0.5, -0.5], color="red"))
+			axe1.add_line(lines.Line2D([0, lastEval], [1, 1], color="red"))
+			axe1.add_line(lines.Line2D([0, lastEval], [-1, -1], color="red"))
 
 			# Divide the x axis by 10
 			tabEvaluationTicks = [indice for indice in range(len(tabPlotEvaluation)) if indice % (int(len(tabPlotEvaluation)/10)) == 0]
@@ -2023,68 +1999,16 @@ def drawBestNN(dossier) :
 			axe1.set_xticklabels([tabPlotEvaluation[indice] for indice in tabEvaluationTicks])
 			axe1.set_xlabel('Evaluation')
 
-			axe1.set_ylabel("Proportion of leadership")
-			axe1.set_ylim(-0.1, 1.1)
+			axe1.set_ylabel("Proportion")
+			axe1.set_ylim(-1.1, 1.1)
 
-			axe1.set_title('Best proportion')
+			axe1.set_title('Choice of first nn')
 
 			plt.savefig(dossier + "/proportionRun" + str(run) + ".png", bbox_inches = 'tight')
 			plt.close()
 
-
-		# --- BOXPLOT LEADERSHIP ASYM ---
-		dataBoxPlot = []
-		for evaluation in tabPlotEvaluation :
-			listProportionAsym = [hashProportionAsym[run][evaluation] for run in hashProportionAsym.keys() if evaluation in hashProportionAsym[run].keys()]
-
-			if len(listProportionAsym) > 0 :
-				dataBoxPlot.append(listProportionAsym)
-
-		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
-		axe1.boxplot(dataBoxPlot)
-
-		axe1.add_line(lines.Line2D([0, lastEval], [0.5, 0.5], color="red"))
-		axe1.add_line(lines.Line2D([0, lastEval], [-0.5, -0.5], color="red"))
-
-		axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
-		axe1.set_xticklabels([tabPlotEvaluation[x] for x in range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10))])
-		axe1.set_xlabel("Evaluation")
-
-		axe1.set_ylabel("Proportion of leadership")
-		axe1.set_ylim(-0.6, 0.6)
-
-		axe1.set_title('Boxplot of best proportion')
-
-		plt.savefig(dossier + "/boxplotAsym.png", bbox_inches = 'tight')
-		plt.close()
-
-
-
-		# --- RUNS LEADERSHIP ASYM ---
-		for run in hashProportionAsym.keys() :
-			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
-
-			tabProportionAsym = [hashProportionAsym[run][evaluation] for evaluation in tabPlotEvaluation if evaluation in hashProportionAsym[run].keys()]
-
-			axe1.plot(range(len(tabProportionAsym)), tabProportionAsym)
-
-			axe1.add_line(lines.Line2D([0, lastEval], [0.5, 0.5], color="red"))
-			axe1.add_line(lines.Line2D([0, lastEval], [-0.5, -0.5], color="red"))
-
-			# Divide the x axis by 10
-			tabEvaluationTicks = [indice for indice in range(len(tabPlotEvaluation)) if indice % (int(len(tabPlotEvaluation)/10)) == 0]
-
-			axe1.set_xticks(tabEvaluationTicks)
-			axe1.set_xticklabels([tabPlotEvaluation[indice] for indice in tabEvaluationTicks])
-			axe1.set_xlabel('Evaluation')
-
-			axe1.set_ylabel("Proportion of leadership")
-			axe1.set_ylim(-0.6, 0.6)
-
-			axe1.set_title('Boxplot of best proportion')
-
-			plt.savefig(dossier + "/proportionAsymRun" + str(run) + ".png", bbox_inches = 'tight')
-			plt.close()
+def drawAllNN(dossier) :
+	print('Not implemented !')
 
 
 def draw(**parametres) : 
@@ -2146,6 +2070,14 @@ def draw(**parametres) :
 					print('\t -> Drawing allleadership directory : ' + curDir)
 					drawAllLeadership(dossier + '/' + curDir)
 
+			if parametres["argNN"] == True :
+				if re.match(r'^BestNN$', curDir) and parametres["argAll"] != True :
+					print('\t -> Drawing bestNN directory : ' + curDir)
+					drawBestNN(dossier + '/' + curDir)
+				elif re.match(r'^AllNN$', curDir) and parametres["argBest"] != True :
+					print('\t -> Drawing allNN directory : ' + curDir)
+					drawAllNN(dossier + '/' + curDir)
+
 
 def main(args) :
 	parametres =  { 
@@ -2161,6 +2093,7 @@ def main(args) :
 									"argNoDrawFit" : args.noDrawFit,
 									"argDiversity" : args.diversity,
 									"argLeadership" : args.leadership,
+									"argNN" : args.nn,
 									"argDrawRun" : args.drawRun
 								}
 	draw(**parametres)
@@ -2177,6 +2110,7 @@ if __name__ == '__main__' :
 	parser.add_argument('-a', '--all', help = "All only", default=False, action="store_true")
 	parser.add_argument('-d', '--diversity', help = "Drawing of diversity", default=False, action="store_true")
 	parser.add_argument('-l', '--leadership', help = "Drawing of leadership", default=False, action="store_true")
+	parser.add_argument('-n', '--nn', help = "Drawing of nn stat", default=False, action="store_true")
 	parser.add_argument('-f', '--noDrawFit', help = "No drawing of the fitness", default=False, action="store_true")
 	parser.add_argument('-u', '--drawRun', help = "Drawing of each run pareto frontier", default=False, action="store_true")
 

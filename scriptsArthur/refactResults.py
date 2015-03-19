@@ -44,12 +44,14 @@ def main(args) :
 	listRefactDirFit = ['BestFit', 'AllFit', 'BestEverFit']
 	listRefactDirDiv = ['BestDiv', 'AllDiv', 'BestEverDiv', 'ParetoFront']
 	listRefactDirLeadership = ['BestLeadership', 'AllLeadership']
+	listRefactDirNN = ['BestNN', 'AllNN']
 	regexp = r"^" + re.escape(args.prefix)
 	for topDirectory in listTopDirectories :
 		if os.path.isdir(topDirectory) :
 			dicoDirFit = {name : os.path.join(topDirectory, name) for name in listRefactDirFit}
 			dicoDirDiv = {name : os.path.join(topDirectory, name) for name in listRefactDirDiv}
 			dicoDirLeadership = {name : os.path.join(topDirectory, name) for name in listRefactDirLeadership}
+			dicoDirNN = {name : os.path.join(topDirectory, name) for name in listRefactDirNN}
 
 			listSubDirs = [d for d in os.listdir(topDirectory) if os.path.isdir(os.path.join(topDirectory, d))]
 
@@ -85,6 +87,13 @@ def main(args) :
 
 			if args.leadership :
 				for refactDir in dicoDirLeadership.values() :
+					if os.path.isdir(refactDir) :
+						shutil.rmtree(refactDir)
+
+					os.makedirs(refactDir)
+
+			if args.nn :
+				for refactDir in dicoDirNN.values() :
 					if os.path.isdir(refactDir) :
 						shutil.rmtree(refactDir)
 
@@ -127,6 +136,11 @@ def main(args) :
 						elif(re.match(r'^allleadership.dat$', curFile) and args.leadership == True) :
 							copyFile(os.path.join(curDir, curFile), os.path.join(dicoDirLeadership['AllLeadership'], 'allleadership{0}.dat'.format(numRun)), int(args.evalRm))
 
+						elif(re.match(r'^bestnn.dat$', curFile) and args.nn == True) :
+							copyFile(os.path.join(curDir, curFile), os.path.join(dicoDirNN['BestNN'], 'bestnn{0}.dat'.format(numRun)), int(args.evalRm))
+						elif(re.match(r'^allnn.dat$', curFile) and args.nn == True) :
+							copyFile(os.path.join(curDir, curFile), os.path.join(dicoDirNN['AllNN'], 'allnn{0}.dat'.format(numRun)), int(args.evalRm))
+
 
 					numRun += 1
 
@@ -143,6 +157,7 @@ def main(args) :
 								"argAll" : args.all,
 								"argDiversity" : args.diversity,
 								"argLeadership" : args.leadership,
+								"argNN" : args.nn,
 								"argNoDrawFit" : args.noDrawFit,
 								"argDrawRun" : args.drawRun
 							}
@@ -165,6 +180,7 @@ if __name__ == "__main__" :
 	parser.add_argument('-a', '--all', help = "All only", default=False, action="store_true")
 	parser.add_argument('-d', '--diversity', help = "Drawing of diversity", default=False, action="store_true")
 	parser.add_argument('-l', '--leadership', help = "Drawing of leadership behavior", default=False, action="store_true")
+	parser.add_argument('-n', '--nn', help = "Drawing of nn stat", default=False, action="store_true")
 	parser.add_argument('-F', '--noDrawFit', help = "No drawing of fitness", default=False, action="store_true")
 	parser.add_argument('-u', '--drawRun', help = "Drawing of each run pareto frontier", default=False, action="store_true")
 

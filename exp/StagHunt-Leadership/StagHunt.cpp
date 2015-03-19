@@ -121,6 +121,21 @@ namespace sferes
 				// Did the two individuals select a different nn ?
 				if(hunter1->nn1_chosen() != hunter2->nn1_chosen())
 					nb_role_divisions++;
+
+#ifdef DIFF_FIT
+				if(rand1 > rand2)
+				{
+					_num_leader = 1;
+					hunter1->set_bool_leader(true);
+					hunter2->set_bool_leader(false);
+				}
+				else
+				{
+					_num_leader = 2;
+					hunter1->set_bool_leader(false);
+					hunter2->set_bool_leader(true);
+				}
+#endif
 #else
 				hunter1->set_weights(ind1.data());
 				hunter2->set_weights(ind2.data());
@@ -796,7 +811,17 @@ namespace sferes
    				else if(type == Prey::SMALL_STAG)
    					hunters[i]->eat_small_stag(alone);
    				else
+   				{
    					hunters[i]->eat_big_stag(alone);
+
+#ifdef STAG_STUN
+   					if(alone)
+   						hunters[i]->stun_hunter();
+#elif defined(STAG_KILL)
+   					if(alone)
+   						hunters[i]->kill_hunter();
+#endif
+   				}
    			}
    		}
    	}

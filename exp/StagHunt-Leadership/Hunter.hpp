@@ -331,6 +331,10 @@ namespace sferes
 #ifdef SCREAM
 					outf[2] = -1.0f;
 #endif
+
+#ifdef STAG_STUN
+					decay_stun();
+#endif
 				}
 
 				return outf;
@@ -444,6 +448,15 @@ namespace sferes
 			void decay_scream() { if(_scream_value > 0) _scream_value = std::max(0.0f, _scream_value - SCREAM_DECAY); }
 #endif
 
+#ifdef STAG_STUN
+			void stun_hunter() { _stun_time = STUN_TIME; _deactivated = true; }
+			void decay_stun() { _stun_time--; if(_stun_time <= 0) _deactivated = false; }
+#endif
+
+#ifdef STAG_KILL
+			void kill_hunter() { _deactivated = true; }
+#endif
+
 		private :
 #ifdef MLP_PERSO
 			std::vector<float> _weights;
@@ -469,6 +482,10 @@ namespace sferes
 
 #ifdef SCREAM
 			float _scream_value;
+#endif
+
+#ifdef STAG_STUN
+			int _stun_time;
 #endif
 
 #ifdef OBSTACLE_AVOIDANCE
