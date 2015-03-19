@@ -382,6 +382,24 @@ namespace sferes
 				for(size_t i = first_weight; i < first_weight + nb_weights; ++i)
 					_weights[i - first_weight] = data[i];
 			}
+
+			void choose_nn(int nn_chosen, const std::vector<float>& data)
+			{
+				int nb_weights = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;
+
+				_weights.clear();
+				_weights.resize(nb_weights);
+
+				int first_weight = 0;
+				if(nn_chosen > 1)
+					first_weight = nb_weights;
+
+				if(first_weight == 0)
+					_bool_nn1 = true;
+
+				for(size_t i = first_weight; i < first_weight + nb_weights; ++i)
+					_weights[i - first_weight] = data[i];
+			}
 #endif
 
 			bool nn1_chosen() { return _bool_nn1; }

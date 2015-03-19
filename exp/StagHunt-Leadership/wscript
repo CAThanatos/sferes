@@ -33,7 +33,6 @@ def build(bld):
                                         # 'CONTROL1 COEVO BSTAG250 POS_CLOSE',
                                         # 'CONTROL1 BSTAG250 POS_CLOSE',
                                         # 'CONTROL1 BSTAG250 POS_CLOSE ALTRUISM',
-                                          'CONTROL1 DIVERSITY BSTAG250 POS_CLOSE ALTRUISM',
 
 
                     #                     'CONTROL2 COEVO SSTAG250 POS_CLOSE',
@@ -43,10 +42,10 @@ def build(bld):
                                           # 'CONTROL3 COEVO BSTAG250 SSTAG125 POS_CLOSE',
                                           # 'CONTROL3 COEVO BSTAG500 SSTAG250 POS_CLOSE',
 
-                                          # 'CONTROL3 COEVO BSTAG2500 SSTAG250 STAG_STUN POS_CLOSE',
-                                          # 'CONTROL3 COEVO BSTAG2500 SSTAG250 STAG_KILL POS_CLOSE',
-                                          # 'CONTROL3 COEVO BSTAG2500 SSTAG50 STAG_STUN POS_CLOSE',
-                                          # 'CONTROL3 COEVO BSTAG2500 SSTAG50 STAG_KILL POS_CLOSE',
+                                          'CONTROL3 COEVO BSTAG250 SSTAG250 STAG_STUN POS_CLOSE',
+                                          'CONTROL3 COEVO BSTAG250 SSTAG250 STAG_KILL POS_CLOSE',
+                                          'CONTROL3 COEVO BSTAG500 SSTAG50 STAG_STUN POS_CLOSE',
+                                          'CONTROL3 COEVO BSTAG500 SSTAG50 STAG_KILL POS_CLOSE',
 
                                           # 'CONTROL3 COEVO BSTAG500 SSTAG250 STAMINA50',
                                           # 'CONTROL3 COEVO BSTAG500 SSTAG250 MAP2400',
@@ -55,9 +54,9 @@ def build(bld):
 																				# 'SETTING15 BSTAG250 POS_CLOSE',
                     #                     'SETTING15 DOUBLE_NN BSTAG250 POS_CLOSE',
                     #                     'SETTING15 DOUBLE_NN DECISION_THRESHOLD BSTAG250 POS_CLOSE',
-                                          # 'SETTING15 DOUBLE_NN FORCE_LEADERSHIP BSTAG250 POS_CLOSE',
-                                          # 'SETTING15 DOUBLE_NN DIFF_FIT FITFOLLOW BSTAG250 POS_CLOSE',
-                                          # 'SETTING15 DOUBLE_NN DIFF_FIT FITFOLLOW FORCE_LEADERSHIP BSTAG250 POS_CLOSE',
+                                          'SETTING15 DOUBLE_NN FORCE_LEADERSHIP BSTAG250 POS_CLOSE',
+                                          'SETTING15 DOUBLE_NN DIFF_FIT FITFOLLOW BSTAG250 POS_CLOSE',
+                                          'SETTING15 DOUBLE_NN DIFF_FIT FITFOLLOW FORCE_LEADERSHIP BSTAG250 POS_CLOSE',
                                       ])
 
                                        

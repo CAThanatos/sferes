@@ -110,8 +110,34 @@ namespace sferes
 				float diff_hunters = rand1 - rand2;
 				diff_hunters = (diff_hunters/2.0f) + 0.5f;
 
+				if(rand1 > rand2)
+				{
+					_num_leader = 1;
+					hunter1->set_bool_leader(true);
+					hunter2->set_bool_leader(false);
+				}
+				else
+				{
+					_num_leader = 2;
+					hunter1->set_bool_leader(false);
+					hunter2->set_bool_leader(true);
+				}
+
+#ifdef NN_LEADER
+				if(hunter1->is_leader())
+				{
+					hunter1->choose_nn(1, ind1.data());
+					hunter2->choose_nn(2, ind1.data());
+				}
+				else
+				{
+					hunter1->choose_nn(2, ind1.data());
+					hunter2->choose_nn(1, ind1.data());
+				}
+#else
 				hunter1->choose_nn(ind1.data(), diff_hunters);
 				hunter2->choose_nn(ind2.data(), 1 - diff_hunters);
+#endif
 
 				// Is the nn chosen because of the two random numbers ?
 				if(hunter1->nn1_chosen())
@@ -125,21 +151,6 @@ namespace sferes
 				// Did the two individuals select a different nn ?
 				if(hunter1->nn1_chosen() != hunter2->nn1_chosen())
 					nb_role_divisions++;
-
-#ifdef DIFF_FIT
-				if(rand1 > rand2)
-				{
-					_num_leader = 1;
-					hunter1->set_bool_leader(true);
-					hunter2->set_bool_leader(false);
-				}
-				else
-				{
-					_num_leader = 2;
-					hunter1->set_bool_leader(false);
-					hunter2->set_bool_leader(true);
-				}
-#endif
 #else
 				hunter1->set_weights(ind1.data());
 				hunter2->set_weights(ind2.data());
@@ -502,37 +513,27 @@ namespace sferes
      	food2 /= nb_encounters;
      	food1 /= nb_encounters;
 
-#ifdef DIFF_FIT
 #ifdef FITFOLLOW
      	fit2 = fit_follow/(Params::simu::nb_steps * Params::simu::nb_trials);
      	fit2 /= nb_encounters;
-#endif
 
      	if (_num_leader == 1)
-#ifdef MOVING_LEADER
      	{
-     		dist_traveled /= (Params::simu::nb_steps * Params::simu::nb_trials);
-     		dist_traveled /= nb_encounters;
-     		ind1.fit().add_fitness(dist_traveled);
-     	}
+#ifdef COEVO
+     		ind1.fit().add_fitness(food1);
 #else
-				ind1.fit().add_fitness(food1);
-#endif
-			else
-#ifdef FITSECOND
-				ind1.fit().add_fitness(food1);
-#else
-				ind1.fit().add_fitness(fit2);
-#endif
+     		// float max_hunts = (float)Params::simu::nb_steps/(float)STAMINA;
+     		float max_hunts = 15;
+     		float max_fitness = max_hunts*(float)FOOD_BIG_STAG_COOP;
+     		float fit1 = (float)food1/max_fitness;
 
-#else
-#ifdef FITFOLLOW
-			fit_follow /= (Params::simu::nb_steps * Params::simu::nb_trials);
-     	fit_follow /= nb_encounters;
-			ind1.fit().add_fitness(fit_follow);
-#else
-			ind1.fit().add_fitness(food1);
+     		if (fit1 >= 1.0) fit1 = 1.0;
+
+     		ind1.fit().add_fitness(fit1);
 #endif
+     	}
+     	else
+     		ind1.fit().add_fitness(fit2);
 #endif
 			
 #if !defined(NOT_AGAINST_ALL) && !defined(ALTRUISM)
