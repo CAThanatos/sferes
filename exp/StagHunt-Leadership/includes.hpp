@@ -51,6 +51,13 @@
 #include "AllLeadershipEvalStat-CoEvo.hpp"
 #endif
 
+#ifdef DIVERSITY
+#include "BestDiversityEval.hpp"
+#include "BestEverDiversityEval.hpp"
+#include "MeanDiversityEval.hpp"
+#include "AllDiversityEvalStat.hpp"
+#endif
+
 #include "StopEval.hpp"
 #include "BestFitBehaviour.hpp"
 #include "BestFitBehaviourVideo.hpp"

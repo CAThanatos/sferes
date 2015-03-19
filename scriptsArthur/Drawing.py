@@ -51,6 +51,8 @@ matplotlib.rcParams['legend.fontsize'] = 15
 dpi = 96
 size = (1280/dpi, 1024/dpi)
 
+plt.grid()
+
 
 def loadParam(param, **params) :
 	if param in params.keys() : 
@@ -801,6 +803,94 @@ def drawRunBoxplotLeadership(dossier, **params) :
 	plt.savefig(dossier + "/globalProportion", bbox_inches = 'tight')
 	plt.close()
 
+
+
+
+###################################################################
+# - DRAW MEDIAN BEST                                            - #
+###################################################################
+def drawMedianBest(dossier, **params) :
+	fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+
+	dataHash = loadParam("dataHas", params)
+	tabPlot = loadParam("tabPlot", params)
+	drawEval = bool(loadParam("drawEval", params))	
+
+	cptData = 0
+	for data in dataHash :
+		dataPlot = []
+		dataPerc25 = []
+		dataPerc75 = []
+		hashFitness = data['hashFitness']
+		hashNbBStags = data['hashNbBStags']
+		hashNbBStagsDuo = data['hashNbBStagsDuo']
+		hashNbHares = data['hashNbHares']
+
+		for evaluation in tabPlot :
+			fitnessEval = [hashFitness[run][evaluation] for run in hashFitness.keys() if run in hashRunStags[cptData] and evaluation in hashFitness[run].keys()]
+			fitnessMed = np.median(fitnessEval)
+
+			perc25 = fitnessMed
+			perc75 = fitnessMed
+			if len(fitnessEval) > 1 :
+				perc25 = np.percentile(fitnessEval, 25)
+				perc75 = np.percentile(fitnessEval, 75)
+
+			dataPlot.append(fitnessMed)
+			dataPerc25.append(perc25)
+			dataPerc75.append(perc75)
+
+		cpt = 0
+		while cpt < len(dataPlot) :
+			if math.isnan(dataPlot[cpt]) :
+				if cpt > 0 and cpt < len(dataPlot) - 1 :
+					dataPlot[cpt] = (dataPlot[cpt + 1] + dataPlot[cpt - 1])/2
+					dataPerc25[cpt] = (dataPerc25[cpt + 1] + dataPerc25[cpt - 1])/2
+					dataPerc75[cpt] = (dataPerc75[cpt + 1] + dataPerc75[cpt - 1])/2
+				elif cpt > 0 :
+					dataPlot[cpt] = dataPlot[cpt - 1]
+					dataPerc25[cpt] = dataPerc25[cpt - 1]
+					dataPerc75[cpt] = dataPerc75[cpt - 1]
+				else :
+					dataPlot[cpt] = dataPlot[cpt + 1]
+					dataPerc25[cpt] = dataPerc25[cpt + 1]
+					dataPerc75[cpt] = dataPerc75[cpt + 1]
+
+			cpt += 1
+
+		axe1.plot(range(len(dataPlot)), dataPlot, color=palette[cptData], linestyle=linestyles[cptData], linewidth=linewidth, marker=markers[cptData])
+
+		plt.fill_between(range(len(dataPlot)), dataPerc25, dataPerc75, alpha=0.25, linewidth=0, color=palette[cptData])
+
+		cptData += 1
+
+
+
+	setTicks(tabPlot, axe1)
+
+	if drawEval :
+		axe1.set_xlabel("Evaluation")
+	else :
+		axe1.set_xlabel("Generation")
+
+	axe1.set_ylabel(yLabel)
+	axe1.set_ylim(-0.6, 0.6)
+
+	axe1.set_title('Boxplot of all fitness')
+
+	plt.savefig(dossier + "/boxplotMedians.png", bbox_inches = 'tight')
+	plt.close()
+
+	legend = plt.legend(['Control', 'Clonal', 'Coevolution'], loc = 4, frameon=True)
+	frame = legend.get_frame()
+	frame.set_facecolor('0.9')
+	frame.set_edgecolor('0.9')
+
+	# axe1.set_title('Boxplot of best fitness')
+
+	plt.savefig(outputDir + "/boxplotStags.png", bbox_inches = 'tight')
+	plt.savefig(outputDir + "/boxplotStags.svg", bbox_inches = 'tight')
+	plt.close()
 
 
 

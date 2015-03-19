@@ -318,6 +318,8 @@ namespace sferes
 					for(size_t j = 0; j < outf.size(); j++)
 						if(isnan(outf[j]))
 							outf[j] = 0.0;
+
+					_last_inputs = inputs;
 				}
 				else
 				{
@@ -434,7 +436,7 @@ namespace sferes
 			
 			nn_t& get_nn() { return _nn; }
 
-			std::vector<std::vector<float> > last_inputs;
+			std::vector<float>& get_last_inputs() { return _last_inputs; }
 
 			void set_bool_leader(bool bool_leader) 
 			{ 
@@ -479,6 +481,8 @@ namespace sferes
 			bool _bool_leader;
 
 			bool _bool_nn1;
+
+			std::vector<float> _last_inputs;
 
 #ifdef SCREAM
 			float _scream_value;

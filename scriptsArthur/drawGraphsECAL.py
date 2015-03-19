@@ -131,8 +131,8 @@ def drawHuntingTask() :
 						evaluation = line['evaluation']
 
 						# MERGE COEVO						
-						if directoryCoevo :
-							evaluation += 10
+						# if directoryCoevo :
+						# 	evaluation += 10
 
 						cpt += evaluation - lastEval
 						lastEval = evaluation
@@ -327,6 +327,10 @@ def drawHuntingTask() :
 	if len(tabPlotEvaluation) - 1 not in ticks :
 		ticks.append(len(tabPlotEvaluation) - 1)
 
+	tabPlotTicks[ticks[0]] = 0
+	tabPlotTicks[ticks[1]] = 20000
+	tabPlotTicks[ticks[2]] = 40000
+
 	axe1.set_xticks(ticks)
 	axe1.set_xticklabels([tabPlotTicks[x] for x in ticks])
 	axe1.set_xlabel("Evaluation")
@@ -335,7 +339,7 @@ def drawHuntingTask() :
 	axe1.set_ylabel("Fitness")
 	# axe1.set_ylim(0, maxFitness + 0.1*maxFitness)
 
-	legend = plt.legend(['Aclonal', 'Clonal', 'Co-evolution'], loc = 4, frameon=True)
+	legend = plt.legend(['Control', 'Clonal', 'Coevolution'], loc = 4, frameon=True)
 	frame = legend.get_frame()
 	frame.set_facecolor('0.9')
 	frame.set_edgecolor('0.9')
@@ -529,6 +533,10 @@ def drawWaypointsTask() :
 	if len(tabPlotEvaluation) - 1 not in ticks :
 		ticks.append(len(tabPlotEvaluation) - 1)
 
+	tabPlotTicks[ticks[0]] = 0
+	tabPlotTicks[ticks[1]] = 20000
+	tabPlotTicks[ticks[2]] = 40000
+
 	axe1.set_xticks(ticks)
 	axe1.set_xticklabels([tabPlotTicks[x] for x in ticks])
 	axe1.set_xlabel("Evaluation")
@@ -537,7 +545,7 @@ def drawWaypointsTask() :
 	axe1.set_ylabel("Fitness")
 	# axe1.set_ylim(0, maxFitness + 0.1*maxFitness)
 
-	legend = plt.legend(['Aclonal', 'Clonal', 'Co-evolution'], loc = 4, frameon=True)
+	legend = plt.legend(['Control', 'Clonal', 'Coevolution'], loc = 4, frameon=True)
 	frame = legend.get_frame()
 	frame.set_facecolor('0.9')
 	frame.set_edgecolor('0.9')
@@ -693,7 +701,7 @@ def drawLeadership() :
 
 	# Fitness Boxplots
 	cptData = 0
-	dataNames = ["Aclonal", "Clonal", "Coevo"]
+	dataNames = ["Control", "Clonal", "Coevo"]
 	for data in dataHash :
 		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 		plt.grid()
@@ -765,6 +773,10 @@ def drawLeadership() :
 		ticks = range(0, len(tabEvals), int(len(tabEvals)/2))
 		if len(tabEvals) - 1 not in ticks :
 			ticks.append(len(tabEvals) - 1)
+
+		tabPlotTicks[ticks[0]] = 0
+		tabPlotTicks[ticks[1]] = 20000
+		tabPlotTicks[ticks[2]] = 40000
 
 		axe1.set_xticks(ticks)
 		axe1.set_xticklabels([tabPlotTicks[x] for x in ticks])
@@ -843,7 +855,7 @@ def drawLeadership() :
 	axe1.set_ylabel("Proportion")
 	# axe1.set_ylim(0, maxFitness + 0.1*maxFitness)
 
-	legend = plt.legend(['Aclonal', 'Clonal', 'Co-evolution'], loc = 4, frameon=True)
+	legend = plt.legend(['Control', 'Clonal', 'Coevolution'], loc = 4, frameon=True)
 	frame = legend.get_frame()
 	frame.set_facecolor('0.9')
 	frame.set_edgecolor('0.9')
@@ -913,7 +925,7 @@ def drawLeadership() :
 	axe1.set_ylabel("Proportion")
 	# axe1.set_ylim(0, maxFitness + 0.1*maxFitness)
 
-	legend = plt.legend(['Aclonal', 'Clonal', 'Co-evolution'], loc = 4, frameon=True)
+	legend = plt.legend(['Control', 'Clonal', 'Coevolution'], loc = 4, frameon=True)
 	frame = legend.get_frame()
 	frame.set_facecolor('0.9')
 	frame.set_edgecolor('0.9')

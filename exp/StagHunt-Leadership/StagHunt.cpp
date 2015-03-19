@@ -81,6 +81,10 @@ namespace sferes
 			float nb_role_divisions = 0;
 #endif
 
+#ifdef DIVERSITY
+			std::vector<float> vec_sm;
+#endif
+
       for (size_t j = 0; j < Params::simu::nb_trials; ++j)
       {
       	// init
@@ -154,6 +158,9 @@ namespace sferes
 				_nb_leader_first_trial = 0;
 				_nb_preys_killed_coop_trial = 0;
 
+#ifdef DIVERSITY
+				std::vector<float> vec_sm_trial;
+#endif
 
 				for (size_t i = 0; i < Params::simu::nb_steps && !stop_eval; ++i)
 				{
@@ -227,6 +234,12 @@ namespace sferes
 							
 							// v1 and v2 are between -4 and 4
 							simu.move_robot(v1, v2, num);
+
+#ifdef DIVERSITY
+							if (0 == num)
+								for(size_t l = 0; l < action.size(); ++l)
+									vec_sm_trial.push_back(action[l]);
+#endif
 						}
 
 #ifdef SCREAM
@@ -239,6 +252,14 @@ namespace sferes
 						}
 #endif
 					}
+
+#ifdef DIVERSITY
+					std::vector<float>& vec_inputs_rob = ((Hunter*)(simu.robots()[0]))->get_last_inputs();
+
+					for (size_t l = 0; l < vec_inputs_rob.size(); ++l)
+						vec_sm_trial.push_back(vec_inputs_rob[l]);
+#endif
+
 					update_simu(simu);
 
 					// And then we update their status : food gathered, prey dead
@@ -373,6 +394,12 @@ namespace sferes
 				float max_hunts = Params::simu::nb_steps/STAMINA;
        	if(_nb_preys_killed_coop_trial > 0)
 	       	proportion_leader += fabs(0.5 - (_nb_leader_first_trial/_nb_preys_killed_coop_trial));//*(_nb_preys_killed_coop_trial/max_hunts);
+
+#ifdef DIVERSITY
+	      for (size_t l = 0; l < vec_sm_trial.size(); ++l)
+	      	vec_sm.push_back(vec_sm_trial[l]);
+#endif
+
 
 #if defined(BEHAVIOUR_LOG)
 	 			if(this->mode() == fit::mode::view)
@@ -510,6 +537,14 @@ namespace sferes
 			
 #if !defined(NOT_AGAINST_ALL) && !defined(ALTRUISM)
 			ind2.fit().add_fitness(food2);
+#endif
+
+#ifdef DIVERSITY
+			for(size_t l = 0; l < vec_sm.size(); ++l)
+			{
+				vec_sm[l] /= nb_encounters;
+				ind1.add_vec_sm(vec_sm[l], l);
+			}
 #endif
     } // *** end of eval ***
 
@@ -944,6 +979,12 @@ int main(int argc, char **argv)
 #endif
 #ifdef BEHAVIOUR_VIDEO
 		  sferes::stat::BestFitBehaviourVideo<phen_t, Params>,
+#endif
+#ifdef DIVERSITY
+		  sferes::stat::BestDiversityEval<phen_t, Params>,
+		  // sferes::stat::MeanDiversityEval<phen_t, Params>,
+		  // sferes::stat::BestEverDiversityEval<phen_t, Params>,
+		  // sferes::stat::AllDiversityEvalStat<phen_t, Params>,
 #endif
 #endif
 		  sferes::stat::StopEval<Params>

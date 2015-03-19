@@ -101,6 +101,16 @@ namespace sferes
 					_nb_role_divisions_at = 0;
 #endif
 					this->fit().fitness_at = 0;
+
+#ifdef DIVERSITY
+					_vector_diversity_init = false;
+					_vector_diversity.clear();
+
+					_vec_sm_at.clear();
+					_vec_sm_at.resize((Params::nn::nb_inputs + Params::nn::nb_outputs)*Params::simu::nb_steps*Params::simu::nb_trials);
+					_vec_sm.clear();
+					_vec_sm.resize((Params::nn::nb_inputs + Params::nn::nb_outputs)*Params::simu::nb_steps*Params::simu::nb_trials);
+#endif
 				}
 
 				float data(size_t i) const { assert(i < size()); return _params[i]; }
@@ -203,7 +213,82 @@ namespace sferes
 		    float nb_role_divisions_at() const { return _nb_role_divisions_at; }
 		    void add_nb_role_divisions(float nb_role_divisions) { _nb_role_divisions_at.fetch_and_store(_nb_role_divisions_at + nb_role_divisions); }
 #endif
-				
+
+#ifdef DIVERSITY
+		    const std::vector<float>& vector_diversity() const { return _vector_diversity; }
+				void set_vector_diversity(size_t index, float value)
+				{
+					assert(index < _vector_diversity.size());
+					_vector_diversity[index] = value;
+				}
+
+				bool is_vector_diversity_init() { return _vector_diversity_init; }
+
+				void create_vector_diversity()
+				{
+					_vector_diversity.resize(_vec_sm.size());
+					for (size_t i = 0; i < _vec_sm.size(); ++i)
+						_vector_diversity[i] = _vec_sm[i];
+				}
+
+				float dist_diversity(const PhenChasseur& chasseur)
+				{
+					float dist = 0.0f;
+					for (size_t i = 0; i < _vector_diversity.size(); ++i)
+					{
+						assert(0.0f <= _vector_diversity[i]);
+						assert(_vector_diversity[i] <= 1.0f);
+
+						assert(0.0f <= chasseur.vector_diversity()[i]);
+						assert(chasseur.vector_diversity()[i] <= 1.0f);
+
+						float x = _vector_diversity[i] - chasseur.vector_diversity()[i];
+						dist += x * x;
+					}
+
+					return sqrtf(dist)/sqrt(_vector_diversity.size());
+				}
+
+				float dist_hamming_diversity(const PhenChasseur& chasseur)
+				{
+					float dist = 0.0f;
+					for (size_t i = 0; i < _vector_diversity.size(); ++i)
+					{
+						assert(0.0f <= _vector_diversity[i]);
+						assert(_vector_diversity[i] <= 1.0f);
+
+						assert(0.0f <= chasseur.vector_diversity()[i]);
+						assert(chasseur.vector_diversity()[i] <= 1.0f);
+
+						dist += abs((int)_vector_diversity[i] - (int)chasseur.vector_diversity()[i]);
+					}
+
+					return dist/(float)_vector_diversity.size();
+				}
+
+				void add_vec_sm(float value, int index)
+				{
+					assert(index < _vec_sm_at.size());
+					_vec_sm_at[index].fetch_and_store(_vec_sm_at[index] + value);
+				}
+
+				void set_vec_sm()
+				{
+					_vec_sm.resize(_vec_sm_at.size());
+					for (size_t i = 0; i < _vec_sm_at.size(); ++i)
+					{
+						_vec_sm[i] = _vec_sm_at[i];
+						_vec_sm[i] = (_vec_sm[i] > Params::simu::threshold_hamming) ? 1 : 0;
+					}
+				}
+
+				float vec_sm(int index)
+				{
+					assert(index < _vec_sm_at.size());
+					return _vec_sm_at[index];
+				}
+#endif
+
 
 		    float fit_mov() const { return _fit_mov; }
 		    void set_fit_mov(float fit_mov) { _fit_mov = fit_mov; }
@@ -272,6 +357,14 @@ namespace sferes
 		    // Number of times the individuals chose a different nn
 		    float _nb_role_divisions;
 		    tbb::atomic<float> _nb_role_divisions_at;
+#endif
+
+#ifdef DIVERSITY
+		    std::vector<float> _vector_diversity;
+		    bool _vector_diversity_init;
+
+		    std::vector<tbb::atomic<float> > _vec_sm_at;
+		    std::vector<float> _vec_sm;
 #endif
 		    
 		    float _fit_mov;

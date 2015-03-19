@@ -211,7 +211,11 @@ namespace sferes
 					// We need to set all the objective values to 0
 					pop[i]->fit().set_value(0);
 						
+#ifdef DIVERSITY
+					pop[i]->fit().resize_objs(2);
+#else
 					pop[i]->fit().resize_objs(1);
+#endif
 					for(int k = 0; k < pop[i]->fit().objs().size(); ++k)
 						pop[i]->fit().set_obj(k, 0);
 				}
@@ -260,8 +264,36 @@ namespace sferes
 					pop[i]->set_nb_role_divisions(pop[i]->nb_role_divisions_at());
 #endif
 
+#ifdef DIVERSITY
+					pop[i]->set_vec_sm();
+					pop[i]->create_vector_diversity();
+#endif
+
+#ifndef DIVERSITY
+					pop[i]->set_developed_at(false);
+#endif
+				}
+
+#ifdef DIVERSITY
+				for (size_t i = begin; i != end; ++i)
+				{
+					float diversity = 0.0f;
+					for (size_t j = begin; j != end; ++j)
+					{
+						if (i != j)
+#ifdef DIST_HAMMING
+							diversity += pop[i]->dist_hamming_diversity(*pop[j]);
+#else
+							diversity += pop[i]->dist_diversity(*pop[j]);
+#endif
+					}
+
+					diversity /= end - begin - 1;
+					pop[i]->fit().set_obj(1, diversity);
 					pop[i]->set_developed_at(false);
 				}
+#endif
+
 
 #ifndef NDEBUG
 				os << "GEN : " << time(NULL) - duration << std::endl;

@@ -62,6 +62,10 @@
 #define OPPONENTS5
 #endif
 
+#ifdef DIVSM
+#define DIST_HAMMING
+#endif
+
 struct Params
 {
 	struct simu
@@ -189,6 +193,8 @@ struct Params
 		static const int nb_bumpers = 0;
 		
 		static const int nb_camera_pixels = 12;
+
+		static const int threshold_hamming = 0.5f;
 	};
 	
 	struct nn
