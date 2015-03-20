@@ -517,6 +517,7 @@ namespace sferes
      	fit2 = fit_follow/(Params::simu::nb_steps * Params::simu::nb_trials);
      	fit2 /= nb_encounters;
 
+
      	if (_num_leader == 1)
      	{
 #ifdef COEVO
@@ -534,6 +535,8 @@ namespace sferes
      	}
      	else
      		ind1.fit().add_fitness(fit2);
+#else
+     	ind1.fit().add_fitness(food1);
 #endif
 			
 #if !defined(NOT_AGAINST_ALL) && !defined(ALTRUISM)
