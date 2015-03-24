@@ -2007,6 +2007,83 @@ def drawBestNN(dossier) :
 			plt.savefig(dossier + "/proportionRun" + str(run) + ".png", bbox_inches = 'tight')
 			plt.close()
 
+
+		# --- BOXPLOT ROLE DIVISION
+		dataBoxPlot = []
+		for evaluation in tabPlotEvaluation :
+			listRoleDivision = [hashNbRoleDivisions[run][evaluation] for run in hashNbRoleDivisions.keys() if evaluation in hashNbRoleDivisions[run].keys()]
+
+			if len(listRoleDivision) > 0 :
+				dataBoxPlot.append(listRoleDivision)
+
+		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+		bp = axe1.boxplot(dataBoxPlot)
+
+		axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
+		axe1.set_xticklabels([tabPlotEvaluation[x] for x in range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10))])
+		axe1.set_xlabel("Evaluation")
+
+		axe1.set_ylabel("Proportion of role division")
+		axe1.set_ylim(0, 1.1)
+
+		axe1.set_title('Boxplot of role division')
+
+		for i in range(0, len(bp['boxes'])):
+		   bp['boxes'][i].set_color(palette[0])
+		   # we have two whiskers!
+		   bp['whiskers'][i*2].set_color(palette[0])
+		   bp['whiskers'][i*2 + 1].set_color(palette[0])
+		   bp['whiskers'][i*2].set_linewidth(2)
+		   bp['whiskers'][i*2 + 1].set_linewidth(2)
+
+		   # top and bottom fliers
+		   # (set allows us to set many parameters at once)
+		   # bp['fliers'][i * 2].set(markerfacecolor=palette[0],
+		   #                 marker='o', alpha=0.75, markersize=6,
+		   #                 markeredgecolor='none')
+		   # bp['fliers'][i * 2 + 1].set(markerfacecolor=palette[0],
+		   #                 marker='o', alpha=0.75, markersize=6,
+		   #                 markeredgecolor='none')
+
+		   bp['medians'][i].set_color('black')
+		   bp['medians'][i].set_linewidth(3)
+
+		   # and 4 caps to remove
+		   for c in bp['caps']:
+		       c.set_linewidth(0)
+
+		plt.savefig(dossier + "/boxplot.png", bbox_inches = 'tight')
+		plt.close()
+
+
+
+		# --- RUNS ROLE DIVISION ---
+		for run in hashNbRoleDivisions.keys() :
+			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+
+			tabRoleDivision = [hashNbRoleDivisions[run][evaluation] for evaluation in tabPlotEvaluation if evaluation in hashNbRoleDivisions[run].keys()]
+
+			axe1.plot(range(len(tabRoleDivision)), tabRoleDivision)
+
+			# Divide the x axis by 10
+			# tabEvaluationTicks = [indice for indice in range(len(tabFitness)) if indice % (int(len(tabFitness)/10)) == 0]
+			tabEvaluationTicks = [indice for indice in range(len(tabPlotEvaluation)) if indice % (int(len(tabPlotEvaluation)/10)) == 0]
+
+			axe1.set_xticks(tabEvaluationTicks)
+			axe1.set_xticklabels([tabPlotEvaluation[indice] for indice in tabEvaluationTicks])
+			axe1.set_xlabel('Evaluation')
+
+			axe1.set_ylabel("Proportion of role division")
+			axe1.set_ylim(0, 1.1)
+
+			# axe1.set_title('Best role', fontsize = 10)
+
+			plt.savefig(dossier + "/roleDivisionRun" + str(run) + ".png", bbox_inches = 'tight')
+			plt.close()
+
+
+
+
 def drawAllNN(dossier) :
 	print('Not implemented !')
 

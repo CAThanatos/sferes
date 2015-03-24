@@ -63,7 +63,11 @@ namespace sferes
 				{
           for(int i = 0; i < ea.pop().size(); ++i)
           {
+#ifdef MONO_OBJ
             (*this->_log_file) << ea.nb_eval() << "," << ea.pop()[i]->fit().value();
+#else
+            (*this->_log_file) << ea.nb_eval() << "," << ea.pop()[i]->fit().obj(0);
+#endif
             (*this->_log_file) << "," << ea.pop()[i]->nb_hares() << "," << ea.pop()[i]->nb_hares_solo() << "," << ea.pop()[i]->nb_sstag() << "," << ea.pop()[i]->nb_sstag_solo() << "," << ea.pop()[i]->nb_bstag() << "," << ea.pop()[i]->nb_bstag_solo() << std::endl;
           
             (*this->_log_file_genome) << ea.nb_eval();
@@ -76,7 +80,11 @@ namespace sferes
 
 					for(int i = 0; i < ea.pop_co().size(); ++i)
 					{
-						(*this->_log_file_co) << ea.nb_eval() << "," << ea.pop_co()[i]->fit().value();
+#ifdef MONO_OBJ
+            (*this->_log_file_co) << ea.nb_eval() << "," << ea.pop_co()[i]->fit().value();
+#else
+            (*this->_log_file_co) << ea.nb_eval() << "," << ea.pop_co()[i]->fit().obj(0);
+#endif
 						(*this->_log_file_co) << "," << ea.pop_co()[i]->nb_hares() << "," << ea.pop_co()[i]->nb_hares_solo() << "," << ea.pop_co()[i]->nb_sstag() << "," << ea.pop_co()[i]->nb_sstag_solo() << "," << ea.pop_co()[i]->nb_bstag() << "," << ea.pop_co()[i]->nb_bstag_solo() << std::endl;
 					
 						(*this->_log_file_genome_co) << ea.nb_eval();

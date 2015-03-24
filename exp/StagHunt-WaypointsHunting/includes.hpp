@@ -33,6 +33,9 @@
 #include "StagHuntEvalParallel.hpp"
 #include "BestLeadershipEval.hpp"
 #include "AllLeadershipEvalStat.hpp"
+#include "BestWaypointsEval.hpp"
+#include "AllWaypointsEvalStat.hpp"
+#include "MeanWaypointsEval.hpp"
 #include "Waypoints.hpp"
 
 #ifdef COEVO
@@ -46,6 +49,11 @@
 #include "BestFitBehaviourVideo-CoEvo.hpp"
 #include "BestLeadershipEval-CoEvo.hpp"
 #include "AllLeadershipEvalStat-CoEvo.hpp"
+#include "BestWaypointsEval-CoEvo.hpp"
+#include "AllWaypointsEvalStat-CoEvo.hpp"
+#include "MeanWaypointsEval-CoEvo.hpp"
+
+#include <sferes/ea/nsga2-CoEvo.hpp>
 #endif
 
 #include "StopEval.hpp"

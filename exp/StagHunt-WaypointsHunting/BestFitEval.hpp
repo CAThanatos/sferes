@@ -54,12 +54,29 @@ namespace sferes
 				void refresh(const E& ea)
       {
 				assert(!ea.pop().empty());
-				_best = *ea.pop().begin();
+        _best = *ea.pop().begin();
+
+#ifndef MONO_OBJ
+        float max = ea.pop()[0]->fit().obj(0);
+        for(size_t i = 0; i < ea.pop().size(); ++i)
+        {
+          if(ea.pop()[i]->fit().obj(0) > max)
+          {
+            _best = ea.pop()[i];
+            max = _best->fit().obj(0);
+          }
+        }
+#endif
+
 				this->_create_log_file(ea, "bestfit.dat");
 				this->_create_log_file_genome(ea, "bestgenome.dat");
 				if (ea.dump_enabled())
 				{
+#ifdef MONO_OBJ
 					(*this->_log_file) << ea.nb_eval() << "," << _best->fit().value();
+#else
+          (*this->_log_file) << ea.nb_eval() << "," << _best->fit().obj(0);
+#endif
 					(*this->_log_file) << "," << _best->nb_hares() << "," << _best->nb_hares_solo() << "," << _best->nb_sstag() << "," << _best->nb_sstag_solo() << "," << _best->nb_bstag() << "," << _best->nb_bstag_solo() << std::endl;
 					
 					(*this->_log_file_genome) << ea.nb_eval();

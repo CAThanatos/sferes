@@ -98,8 +98,7 @@ namespace sferes
 					_nb_leader_waypoints_first = 0;
 					_nb_waypoints_coop = 0;
 					_proportion_leader_waypoints = 0;
-					
-					this->fit().vec_fitness.clear();
+
 					_developed = true;
 
 					_nb_hares_at = 0;
@@ -116,7 +115,15 @@ namespace sferes
 					_nb_leader_preys_first_at = 0;
 					_nb_preys_killed_coop_at = 0;
 					_proportion_leader_preys_at = 0;
+
+#ifdef MONO_OBJ
 					this->fit().fitness_at = 0;
+#else					
+					this->fit().vec_fitness_at.clear();
+					this->fit().vec_fitness_at.resize(2);
+					for(unsigned k = 0; k < this->fit().vec_fitness_at.size(); ++k)
+						this->fit().vec_fitness_at[k] = 0.0f;
+#endif
 				}
 
 				float data(size_t i) const { assert(i < size()); return _params[i]; }

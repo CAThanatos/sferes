@@ -260,7 +260,10 @@ namespace sferes
 	 			}
 
 	 			// Their fitness is the longest sequence they did divided by the longest sequence they could do
-	 			similarity += longest_sequence/(float)Params::simu::nb_waypoints;
+	 			if(Params::simu::nb_waypoints > 0)
+		 			similarity += longest_sequence/(float)Params::simu::nb_waypoints;
+		 		else
+		 			similarity += 0.0f;
 
 	 			if(_nb_waypoints_coop_trial > 0)
 		 			proportion_leader_waypoints += fabs(0.5 - (_nb_leader_waypoints_first_trial/_nb_waypoints_coop_trial));
@@ -346,6 +349,7 @@ namespace sferes
      	food1 /= nb_encounters;
      	similarity /= nb_encounters;
 
+#ifdef MONO_OBJ
      	float max_hunts = 15;
      	float max_fitness = max_hunts*(float)FOOD_BIG_STAG_COOP;
      	float fit1 = (float)food1/max_fitness;
@@ -354,6 +358,10 @@ namespace sferes
 
      	float fitness = (Params::simu::coeff_hunting*fit1 + Params::simu::coeff_waypoints*similarity)/(Params::simu::coeff_hunting + Params::simu::coeff_waypoints);
 			ind1.fit().add_fitness(fitness);
+#else
+			ind1.fit().add_fitness(food1, 0);
+			ind1.fit().add_fitness(similarity, 1);
+#endif
     } // *** end of eval ***
 
     
@@ -705,13 +713,22 @@ namespace sferes
 		int cpt_files;
 #endif
 
-		std::vector<float> vec_fitness;
+#ifdef MONO_OBJ
 		tbb::atomic<float> fitness_at;
 		
 		void add_fitness(float fitness)
 		{
 			fitness_at.fetch_and_store(fitness_at + fitness);
 		}
+#else
+		std::vector<tbb::atomic<float> > vec_fitness_at;
+
+		void add_fitness(float fitness, int obj)
+		{
+			assert(obj < vec_fitness_at.size());
+			vec_fitness_at[obj].fetch_and_store(vec_fitness_at[obj] + fitness);
+		}
+#endif
   };
 }
 
@@ -725,18 +742,18 @@ int main(int argc, char **argv)
   typedef FitStagHunt<Params> fit_t;
 
 	// GENOTYPE
+#ifndef MONO_OBJ
+  typedef gen::EvoFloat<(Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs, Params> gen_t;
+#else
 #ifdef CMAES
   typedef gen::Cmaes<(Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs, Params> gen_t;
 //  typedef gen::Cmaes<90, Params> gen_t;
 #else
 #ifdef ELITIST
-#ifdef DOUBLE_NN
-  typedef gen::ElitistGen<((Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs) * 2 + 1, Params> gen_t;
-#else
   typedef gen::ElitistGen<(Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs, Params> gen_t;
-#endif
 #else
   typedef gen::EvoFloat<(Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs, Params> gen_t;
+#endif
 #endif
 #endif
   
@@ -759,6 +776,10 @@ int main(int argc, char **argv)
 		  sferes::stat::AllFitEvalStatCoEvo<phen_t, Params>,
 		  sferes::stat::BestLeadershipEvalCoEvo<phen_t, Params>,
 		  sferes::stat::AllLeadershipEvalStatCoEvo<phen_t, Params>,
+#ifndef MONO_OBJ
+		  sferes::stat::BestWaypointsEvalCoEvo<phen_t, Params>,
+		  sferes::stat::AllWaypointsEvalStatCoEvo<phen_t, Params>,
+#endif
 #ifdef BEHAVIOUR_VIDEO
 		  sferes::stat::BestFitBehaviourVideoCoEvo<phen_t, Params>,
 #endif
@@ -769,9 +790,9 @@ int main(int argc, char **argv)
 		  sferes::stat::AllFitEvalStat<phen_t, Params>,
 		  sferes::stat::BestLeadershipEval<phen_t, Params>,
 		  sferes::stat::AllLeadershipEvalStat<phen_t, Params>,
-#ifdef DOUBLE_NN
-		  sferes::stat::BestNNEval<phen_t, Params>,
-		  sferes::stat::AllNNEvalStat<phen_t, Params>,
+#ifndef MONO_OBJ
+		  sferes::stat::BestWaypointsEval<phen_t, Params>,
+		  sferes::stat::AllWaypointsEvalStat<phen_t, Params>,
 #endif
 #ifdef BEHAVIOUR_VIDEO
 		  sferes::stat::BestFitBehaviourVideo<phen_t, Params>,
@@ -784,6 +805,9 @@ int main(int argc, char **argv)
   typedef modif::Dummy<Params> modifier_t;
 
 	// EVOLUTION ALGORITHM
+#ifndef MONO_OBJ
+	typedef ea::Nsga2CoEvo<phen_t, eval_t, stat_t, modifier_t, Params> ea_t; 
+#else
 #ifdef FITPROP
   typedef ea::FitnessProp<phen_t, eval_t, stat_t, modifier_t, Params> ea_t; 
 #elif defined(CMAES)
@@ -796,6 +820,7 @@ int main(int argc, char **argv)
 #endif
 #else
   typedef ea::RankSimple<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
+#endif
 #endif
 
   ea_t ea;

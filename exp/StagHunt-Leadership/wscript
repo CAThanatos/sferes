@@ -35,12 +35,18 @@ def build(bld):
                                           'CONTROL3 COEVO BSTAG250 SSTAG50 STAG_STUN POS_CLOSE',
                                           'CONTROL3 COEVO BSTAG250 SSTAG50 STAG_KILL POS_CLOSE',
 
-                                          'CONTROL3 COEVO BSTAG250 SSTAG50 MAP1600 POS_CLOSE',
-                                          'CONTROL3 COEVO BSTAG250 SSTAG50 STAMINA50 POS_CLOSE',
+                                          'CONTROL3 COEVO BSTAG500 SSTAG125 STAG_STUN POS_CLOSE',
+                                          'CONTROL3 COEVO BSTAG500 SSTAG50 STAG_STUN POS_CLOSE',
 
-                                          'SETTING15 DOUBLE_NN FORCE_LEADERSHIP BSTAG250 POS_CLOSE',
-                                          # 'SETTING15 DOUBLE_NN DIFF_FIT FITFOLLOW BSTAG250 POS_CLOSE',
-                                          'SETTING15 DOUBLE_NN NN_LEADER BSTAG250 POS_CLOSE',
+                                          'CONTROL3 COEVO BSTAG250 SSTAG50 MAP2400 POS_CLOSE',
+                                          'CONTROL3 COEVO BSTAG250 SSTAG125 MAP2400 POS_CLOSE',
+                                          'CONTROL3 COEVO BSTAG250 SSTAG50 STAMINA50 POS_CLOSE',
+                                          'CONTROL3 COEVO BSTAG250 SSTAG125 STAMINA50 POS_CLOSE',
+                                          'CONTROL3 COEVO BSTAG250 SSTAG50 STAMINA100 POS_CLOSE',
+                                          'CONTROL3 COEVO BSTAG250 SSTAG125 STAMINA100 POS_CLOSE',
+
+                                          'SETTING15 DOUBLE_NN BINARY_DIFF FORCE_LEADERSHIP BSTAG250 POS_CLOSE',
+                                          'SETTING15 DOUBLE_NN BINARY_DIFF BSTAG250 POS_CLOSE',
                                       ])
 
                                        

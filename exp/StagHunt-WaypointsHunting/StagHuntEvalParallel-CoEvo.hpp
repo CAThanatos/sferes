@@ -223,7 +223,11 @@ namespace sferes
 					// We need to set all the objective values to 0
 					pop[i]->fit().set_value(0);
 						
+#ifdef MONO_OBJ
 					pop[i]->fit().resize_objs(1);
+#else
+					pop[i]->fit().resize_objs(2);
+#endif
 					for(int k = 0; k < pop[i]->fit().objs().size(); ++k)
 						pop[i]->fit().set_obj(k, 0);
 				}
@@ -256,7 +260,12 @@ namespace sferes
 					float total_hares = 0.f, total_sstags = 0.f, total_bstags = 0.f;
 					float total_hares_solo = 0.f, total_sstags_solo = 0.f, total_bstags_solo = 0.f;
 					
+#ifdef MONO_OBJ
 					pop[i]->fit().set_value(pop[i]->fit().fitness_at);
+#else
+					for(int k = 0; k < pop[i]->fit().vec_fitness_at.size(); ++k)
+						pop[i]->fit().set_obj(k, pop[i]->fit().vec_fitness_at[k]);
+#endif
 
 					pop[i]->set_nb_hares(pop[i]->nb_hares_at(), pop[i]->nb_hares_solo_at());
 					pop[i]->set_nb_sstag(pop[i]->nb_sstag_at(), pop[i]->nb_sstag_solo_at());

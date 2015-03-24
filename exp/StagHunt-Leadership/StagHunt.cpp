@@ -135,8 +135,21 @@ namespace sferes
 					hunter2->choose_nn(1, ind1.data());
 				}
 #else
+#ifdef BINARY_DIFF
+				if(rand1 > rand2)
+				{
+					hunter1->choose_nn(ind1.data(), 1);
+					hunter2->choose_nn(ind2.data(), 0);
+				}
+				else
+				{
+					hunter1->choose_nn(ind1.data(), 0);
+					hunter2->choose_nn(ind2.data(), 1);
+				}
+#else
 				hunter1->choose_nn(ind1.data(), diff_hunters);
 				hunter2->choose_nn(ind2.data(), 1 - diff_hunters);
+#endif
 #endif
 
 				// Is the nn chosen because of the two random numbers ?
@@ -933,6 +946,9 @@ int main(int argc, char **argv)
   typedef FitStagHunt<Params> fit_t;
 
 	// GENOTYPE
+#ifdef DIVERSITY
+  typedef gen::EvoFloat<(Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs, Params> gen_t;
+#else
 #ifdef CMAES
   typedef gen::Cmaes<(Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs, Params> gen_t;
 //  typedef gen::Cmaes<90, Params> gen_t;
@@ -945,6 +961,7 @@ int main(int argc, char **argv)
 #endif
 #else
   typedef gen::EvoFloat<(Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs, Params> gen_t;
+#endif
 #endif
 #endif
   
@@ -998,6 +1015,9 @@ int main(int argc, char **argv)
   typedef modif::Dummy<Params> modifier_t;
 
 	// EVOLUTION ALGORITHM
+#ifdef DIVERSITY
+	typedef ea::Nsga2<phen_t, eval_t, stat_t, modifier_t, Params> ea_t; 
+#else
 #ifdef FITPROP
   typedef ea::FitnessProp<phen_t, eval_t, stat_t, modifier_t, Params> ea_t; 
 #elif defined(CMAES)
@@ -1010,6 +1030,7 @@ int main(int argc, char **argv)
 #endif
 #else
   typedef ea::RankSimple<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
+#endif
 #endif
 
   ea_t ea;

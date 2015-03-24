@@ -54,7 +54,7 @@ namespace sferes
       {
 				float s = 0;
 				BOOST_FOREACH(boost::shared_ptr<typename E::phen_t> i, ea.pop())
-#ifdef MULTI
+#ifndef MONO_OBJ
 					s += i->fit().obj(0);
 #else
 					s += i->fit().value();
@@ -67,7 +67,7 @@ namespace sferes
 
         s = 0;
         BOOST_FOREACH(boost::shared_ptr<typename E::phen_t> i, ea.pop_co())
-#ifdef MULTI
+#ifndef MONO_OBJ
          s += i->fit().obj(0);
 #else
           s += i->fit().value();

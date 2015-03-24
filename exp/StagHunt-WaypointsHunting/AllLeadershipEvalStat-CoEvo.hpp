@@ -24,7 +24,11 @@ namespace sferes
 				{
           for(int i = 0; i < ea.pop().size(); ++i)
           {
+#ifdef MONO_OBJ
             (*this->_log_file_leadership) << ea.nb_eval() << "," << ea.pop()[i]->fit().value();
+#else
+            (*this->_log_file_leadership) << ea.nb_eval() << "," << ea.pop()[i]->fit().obj(0);
+#endif
 
             float proportion_leader_preys_first = ea.pop()[i]->nb_leader_preys_first()/ea.pop()[i]->nb_preys_killed_coop();
             (*this->_log_file_leadership) << "," << proportion_leader_preys_first;
@@ -37,7 +41,11 @@ namespace sferes
 
 					for(int i = 0; i < ea.pop_co().size(); ++i)
 					{
+#ifdef MONO_OBJ
             (*this->_log_file_leadership_co) << ea.nb_eval() << "," << ea.pop_co()[i]->fit().value();
+#else
+            (*this->_log_file_leadership_co) << ea.nb_eval() << "," << ea.pop_co()[i]->fit().obj(0);
+#endif
 
             float proportion_leader_preys_first = ea.pop_co()[i]->nb_leader_preys_first()/ea.pop_co()[i]->nb_preys_killed_coop();
             (*this->_log_file_leadership_co) << "," << proportion_leader_preys_first;

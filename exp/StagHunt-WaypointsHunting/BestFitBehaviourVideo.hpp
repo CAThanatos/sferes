@@ -54,7 +54,22 @@ namespace sferes
 				void refresh(const E& ea)
       {
 				assert(!ea.pop().empty());
-				_best = *ea.pop().begin();
+
+#ifdef MONO_OBJ
+        _best = *ea.pop().begin();
+#else
+        float max = ea.pop()[0]->fit().obj(0);
+        _best = *ea.pop().begin();
+        for(size_t i = 0; i < ea.pop().size(); ++i)
+        {
+          if(ea.pop()[i]->fit().obj(0) > max)
+          {
+            _best = ea.pop()[i];
+            max = _best->fit().obj(0);
+          }
+        }
+#endif
+
 				if (ea.dump_enabled() && (ea.gen() % Params::pop::video_dump_period == 0))
 				{
 					_best->fit().set_mode(fit::mode::view);
