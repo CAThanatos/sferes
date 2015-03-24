@@ -53,6 +53,7 @@ namespace sferes
       template<typename E>
 				void refresh(const E& ea)
       {
+        assert(!ea.pop().empty());
 				assert(!ea.pop_co().empty());
 
 #ifdef MONO_OBJ
