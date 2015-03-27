@@ -60,7 +60,7 @@ namespace sferes
 				{
 					for(int i = 0; i < ea.pop().size(); ++i)
 					{
-            (*this->_log_file) << ea.nb_eval() << "," << ea.pop()[i]->obj(1).value() << std::endl;
+            (*this->_log_file) << ea.nb_eval() << "," << ea.pop()[i]->fit().obj(1) << std::endl;
 					}
 				}
       }

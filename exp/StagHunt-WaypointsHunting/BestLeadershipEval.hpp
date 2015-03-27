@@ -41,12 +41,12 @@ namespace sferes
 #endif
 
           (*this->_log_file_leadership) << "," << _best->proportion_leader_preys();
-          float proportion_leader_preys_first = _best->nb_leader_first()/_best->nb_preys_killed_coop();
+          float proportion_leader_preys_first = _best->nb_leader_preys_first()/_best->nb_preys_killed_coop();
           (*this->_log_file_leadership) << "," << proportion_leader_preys_first;
           (*this->_log_file_leadership) << "," << _best->nb_leader_preys_first() << "," << _best->nb_preys_killed_coop();
 
           (*this->_log_file_leadership) << "," << _best->proportion_leader_waypoints();
-          float proportion_leader_waypoints_first = _best->nb_leader_first()/_best->nb_preys_killed_coop();
+          float proportion_leader_waypoints_first = _best->nb_leader_preys_first()/_best->nb_preys_killed_coop();
           (*this->_log_file_leadership) << "," << proportion_leader_waypoints_first;
           (*this->_log_file_leadership) << "," << _best->nb_leader_waypoints_first() << "," << _best->nb_preys_killed_coop() << "," << std::endl;
 				}

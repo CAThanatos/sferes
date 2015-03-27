@@ -2,7 +2,7 @@
 #define COEVO
 #define NO_PREYS
 #define POS_CLOSE
-#line 1 "/home/abernard/sferes2-0.99/exp/StagHunt-WaypointsHunting/StagHunt.cpp"
+#line 1 "/home/asriellursat/sferes2-0.99/exp/StagHunt-WaypointsHunting/StagHunt.cpp"
 #include "includes.hpp"
 #include "defparams.hpp"
 
@@ -811,7 +811,11 @@ int main(int argc, char **argv)
 
 	// EVOLUTION ALGORITHM
 #ifndef MONO_OBJ
+#ifdef COEVO
 	typedef ea::Nsga2CoEvo<phen_t, eval_t, stat_t, modifier_t, Params> ea_t; 
+#else
+	typedef ea::Nsga2<phen_t, eval_t, stat_t, modifier_t, Params> ea_t; 
+#endif
 #else
 #ifdef FITPROP
   typedef ea::FitnessProp<phen_t, eval_t, stat_t, modifier_t, Params> ea_t; 

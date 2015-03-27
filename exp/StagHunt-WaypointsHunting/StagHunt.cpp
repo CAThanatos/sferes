@@ -806,7 +806,11 @@ int main(int argc, char **argv)
 
 	// EVOLUTION ALGORITHM
 #ifndef MONO_OBJ
+#ifdef COEVO
 	typedef ea::Nsga2CoEvo<phen_t, eval_t, stat_t, modifier_t, Params> ea_t; 
+#else
+	typedef ea::Nsga2<phen_t, eval_t, stat_t, modifier_t, Params> ea_t; 
+#endif
 #else
 #ifdef FITPROP
   typedef ea::FitnessProp<phen_t, eval_t, stat_t, modifier_t, Params> ea_t; 
