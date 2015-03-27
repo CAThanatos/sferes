@@ -313,7 +313,6 @@ namespace sferes
 					}
 
 					diversity /= (end - begin)/2 - 1;
-					std::cout << diversity << std::endl;
 					pop[i]->fit().set_obj(1, diversity);
 					pop[i]->set_developed_at(false);
 				}

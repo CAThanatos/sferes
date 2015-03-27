@@ -446,7 +446,9 @@ struct Params
 
 #define CATCHING_DISTANCE 10
 
+#ifndef NEVAL_ALL
 #define EA_EVAL_ALL
+#endif
 
 #define NOSTOP
 

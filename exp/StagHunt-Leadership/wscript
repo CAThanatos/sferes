@@ -30,19 +30,22 @@ def build(bld):
 													 target = 'StagHunt',
 #                           json = 'StagHuntExp3.json',
 													 variants = [
-																					# 'CONTROL3 BSTAG250 SSTAG125 POS_CLOSE',
-																					# 'CONTROL3 BSTAG250 SSTAG50 POS_CLOSE',
+																					'CONTROL3 BSTAG250 SSTAG125 POS_CLOSE',
+																					'CONTROL3 BSTAG250 SSTAG50 POS_CLOSE',
 
-																					# 'CONTROL3 BSTAG0 SSTAG125 POS_CLOSE',
-																					# 'CONTROL3 BSTAG0 SSTAG50 POS_CLOSE',
+																					'CONTROL3 BSTAG0 SSTAG125 POS_CLOSE',
+																					'CONTROL3 BSTAG0 SSTAG50 POS_CLOSE',
 
-																					# 'CONTROL3 COEVO BSTAG0 SSTAG125 POS_CLOSE',
-																					# 'CONTROL3 COEVO BSTAG0 SSTAG50 POS_CLOSE',
+																					'CONTROL3 COEVO BSTAG0 SSTAG125 POS_CLOSE',
+																					'CONTROL3 COEVO BSTAG0 SSTAG50 POS_CLOSE',
 
-																					# 'CONTROL1 COEVO DIVERSITY BSTAG250 POS_CLOSE',
-																					# 'CONTROL1 ALTRUISM DIVERSITY BSTAG250 POS_CLOSE',
+																					'CONTROL1 NEVAL_ALL COEVO DIVERSITY BSTAG250 POS_CLOSE',
+																					'CONTROL1 COEVO DIVERSITY BSTAG250 POS_CLOSE',
 
-																					'CONTROL1 ELMAN BSTAG250 POS_CLOSE',
+																					'CONTROL1 NEVAL_ALL ALTRUISM DIVERSITY BSTAG250 POS_CLOSE',
+																					'CONTROL1 ALTRUISM DIVERSITY BSTAG250 POS_CLOSE',
+
+																					# 'CONTROL1 ELMAN BSTAG250 POS_CLOSE',
 
 																					# 'SETTING15 DOUBLE_NN BINARY_DIFF BSTAG250 POS_CLOSE',
 																			])

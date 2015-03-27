@@ -44,6 +44,7 @@ def build(bld):
                                         # 'MULTI_SIM SIM_MEAN DIVERSITY DIVSM ALTRUISM POS_CLOSE SIZE100 BSTAG100',
 
                                         'DIVERSITY DIVSM ALTRUISM POS_CLOSE SIZE20 BSTAG250',
+                                        'DIVERSITY DIVSM NEVAL_ALL ALTRUISM POS_CLOSE SIZE20 BSTAG250',
                                         # 'DIVERSITY DIVSM ALTRUISM POS_CLOSE SIZE100 BSTAG250',
                                       ])
                                        
