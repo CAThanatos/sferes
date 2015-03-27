@@ -3,12 +3,12 @@
 import sferes;
 
 def build(bld):
-    cxxflags_kdtree = \
-        bld.get_env()['CXXFLAGS']\
-        + ['-I.'] \
-        + ['-DLIBSSRCKDTREE_HAVE_BOOST'] \
-        + ['-std=c++0x'] \
-        + ['-m32']
+		cxxflags_kdtree = \
+				bld.get_env()['CXXFLAGS']\
+				+ ['-I.'] \
+				+ ['-DLIBSSRCKDTREE_HAVE_BOOST'] \
+				+ ['-std=c++0x'] \
+				+ ['-m32']
 
 #    lz = bld.new_task_gen('cxx', 'staticlib')
 #    lz.source = 'fastlz.cpp'
@@ -19,45 +19,35 @@ def build(bld):
 #    bld.get_env()['LIBPATH_BZIP2'] = 'bzlib2/lib/'
 
 #bz = bld.new_task_gen('cxx', 'staticlib')
-    #bz.source = 'bzlib2/bzlib.cpp'
-    #bz.target = 'bz'
+		#bz.source = 'bzlib2/bzlib.cpp'
+		#bz.target = 'bz'
 
-    sferes.create_variants(bld,
-                           source='StagHunt.cpp',
-                           uselib_local = 'sferes2 fastsim_multi',
+		sferes.create_variants(bld,
+													 source='StagHunt.cpp',
+													 uselib_local = 'sferes2 fastsim_multi',
 #                           uselib = 'EIGEN2 TBB',
-                           uselib = 'EIGEN2 SDL FF BOOST_GRAPH TBB',
-                           target = 'StagHunt',
+													 uselib = 'EIGEN2 SDL FF BOOST_GRAPH TBB',
+													 target = 'StagHunt',
 #                           json = 'StagHuntExp3.json',
-                           variants = [
-                                          # 'CONTROL3 COEVO BSTAG250 SSTAG125 STAG_STUN POS_CLOSE',
-                                          # 'CONTROL3 COEVO BSTAG250 SSTAG125 STAG_KILL POS_CLOSE',
-                                          # 'CONTROL3 COEVO BSTAG250 SSTAG50 STAG_STUN POS_CLOSE',
-                                          # 'CONTROL3 COEVO BSTAG250 SSTAG50 STAG_KILL POS_CLOSE',
+													 variants = [
+																					# 'CONTROL3 BSTAG250 SSTAG125 POS_CLOSE',
+																					# 'CONTROL3 BSTAG250 SSTAG50 POS_CLOSE',
 
-                                          # 'CONTROL3 COEVO BSTAG500 SSTAG125 STAG_STUN POS_CLOSE',
-                                          # 'CONTROL3 COEVO BSTAG500 SSTAG50 STAG_STUN POS_CLOSE',
+																					# 'CONTROL3 BSTAG0 SSTAG125 POS_CLOSE',
+																					# 'CONTROL3 BSTAG0 SSTAG50 POS_CLOSE',
 
-                                          # 'CONTROL3 COEVO BSTAG250 SSTAG50 MAP2400 POS_CLOSE',
-                                          # 'CONTROL3 COEVO BSTAG250 SSTAG125 MAP2400 POS_CLOSE',
-                                          # 'CONTROL3 COEVO BSTAG250 SSTAG50 STAMINA50 POS_CLOSE',
-                                          # 'CONTROL3 COEVO BSTAG250 SSTAG125 STAMINA50 POS_CLOSE',
-                                          # 'CONTROL3 COEVO BSTAG250 SSTAG50 STAMINA100 POS_CLOSE',
-                                          # 'CONTROL3 COEVO BSTAG250 SSTAG125 STAMINA100 POS_CLOSE',
+																					# 'CONTROL3 COEVO BSTAG0 SSTAG125 POS_CLOSE',
+																					# 'CONTROL3 COEVO BSTAG0 SSTAG50 POS_CLOSE',
 
-                                          'CONTROL3 BSTAG250 SSTAG125 POS_CLOSE',
-                                          'CONTROL3 BSTAG250 SSTAG50 POS_CLOSE',
+																					# 'CONTROL1 COEVO DIVERSITY BSTAG250 POS_CLOSE',
+																					# 'CONTROL1 ALTRUISM DIVERSITY BSTAG250 POS_CLOSE',
 
-                                          'CONTROL3 BSTAG0 SSTAG125 POS_CLOSE',
-                                          'CONTROL3 BSTAG0 SSTAG50 POS_CLOSE',
+																					'CONTROL1 ELMAN BSTAG250 POS_CLOSE',
 
-                                          'CONTROL3 COEVO BSTAG0 SSTAG125 POS_CLOSE',
-                                          'CONTROL3 COEVO BSTAG0 SSTAG50 POS_CLOSE',
+																					# 'SETTING15 DOUBLE_NN BINARY_DIFF BSTAG250 POS_CLOSE',
+																			])
 
-                                          'SETTING15 DOUBLE_NN BINARY_DIFF BSTAG250 POS_CLOSE',
-                                      ])
-
-                                       
+																			 
 #def build(bld):
 #    obj.source = 'StagHuntExp1.cpp'
 #    obj.includes = '. ../../'

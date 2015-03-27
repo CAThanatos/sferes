@@ -8,7 +8,10 @@
 #endif
 
 #define GAUSSIAN_MUTATION
+
+#ifndef ELMAN
 #define MLP_PERSO
+#endif
 
 #define NO_BOOLEAN
 
@@ -227,6 +230,14 @@ struct Params
 		static const size_t nb_hidden = 8;
 		
 		static const size_t nb_outputs = 2 + Params::nn::nb_outputs_scream;
+
+#ifdef DOUBLE_NN
+		static const size_t genome_size = ((Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs) * 2 + 1;
+#elif defined(ELMAN)
+		static const size_t genome_size = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + (Params::nn::nb_hidden + 3) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;
+#else
+		static const size_t genome_size = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;
+#endif
 	};
 	
 #ifdef CMAES

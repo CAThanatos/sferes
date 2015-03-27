@@ -1,6 +1,6 @@
 // All necessary includes and defines are here
 
-
+#include "defparams.hpp"
 #include <iostream>
 #include <math.h>
 #include <ctime>
@@ -17,6 +17,10 @@
 
 #include <modules/fastsim_multi2/simu_fastsim_multi.hpp>
 #include <modules/nn2/mlp.hpp>
+
+#ifdef ELMAN
+#include <modules/nn2/elman.hpp>
+#endif
 
 #include "Hare.hpp"
 #include "Hunter.hpp"
@@ -56,6 +60,10 @@
 #include "BestEverDiversityEval.hpp"
 #include "MeanDiversityEval.hpp"
 #include "AllDiversityEvalStat.hpp"
+
+#ifdef COEVO
+#include <sferes/ea/nsga2-CoEvo.hpp>
+#endif
 #endif
 
 #include "StopEval.hpp"

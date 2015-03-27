@@ -56,6 +56,29 @@ namespace sferes
 				assert(!ea.pop_co().empty());
 				_best = *ea.pop().begin();
         _best_co = *ea.pop_co().begin();
+
+#ifdef DIVERSITY
+        float max = ea.pop()[0]->fit().obj(0);
+        for(size_t i = 0; i < ea.pop().size(); ++i)
+        {
+          if(ea.pop()[i]->fit().obj(0) > max)
+          {
+            _best = ea.pop()[i];
+            max = _best->fit().obj(0);
+          }
+        }
+
+        float max_co = ea.pop_co()[0]->fit().obj(0);
+        for(size_t i = 0; i < ea.pop_co().size(); ++i)
+        {
+          if(ea.pop_co()[i]->fit().obj(0) > max_co)
+          {
+            _best_co = ea.pop_co()[i];
+            max_co = _best_co->fit().obj(0);
+          }
+        }
+#endif
+
 				this->_create_log_file(ea, "bestfit.dat");
 				this->_create_log_file_genome(ea, "bestgenome.dat");
         this->_create_log_file_co(ea, "bestfit-co.dat");
@@ -63,7 +86,11 @@ namespace sferes
 
 				if (ea.dump_enabled())
 				{
-					(*this->_log_file) << ea.nb_eval() << "," << _best->fit().value();
+#ifdef DIVERSITY
+          (*this->_log_file) << ea.nb_eval() << "," << _best->fit().obj(0);
+#else
+          (*this->_log_file) << ea.nb_eval() << "," << _best->fit().value();
+#endif
 					(*this->_log_file) << "," << _best->nb_hares() << "," << _best->nb_hares_solo() << "," << _best->nb_sstag() << "," << _best->nb_sstag_solo() << "," << _best->nb_bstag() << "," << _best->nb_bstag_solo() << std::endl;
 					
 					(*this->_log_file_genome) << ea.nb_eval();
@@ -73,7 +100,11 @@ namespace sferes
 					}
 					(*this->_log_file_genome) << std::endl;
 
+#ifdef DIVERSITY
+          (*this->_log_file_co) << ea.nb_eval() << "," << _best_co->fit().obj(0);
+#else
           (*this->_log_file_co) << ea.nb_eval() << "," << _best_co->fit().value();
+#endif
           (*this->_log_file_co) << "," << _best_co->nb_hares() << "," << _best_co->nb_hares_solo() << "," << _best_co->nb_sstag() << "," << _best_co->nb_sstag_solo() << "," << _best_co->nb_bstag() << "," << _best_co->nb_bstag_solo() << std::endl;
           
           (*this->_log_file_genome_co) << ea.nb_eval();

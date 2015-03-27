@@ -55,29 +55,72 @@ namespace sferes
       {
 				assert(!ea.pop().empty());
 
-				if(_bestEver == NULL || (*ea.pop().begin())->fit().value() > _bestEver->fit().value())
-				{
-						_bestEver = boost::shared_ptr<Phen>(new Phen(**(ea.pop().begin())));
-				}
 
-				this->_create_log_file(ea, "besteverfit.dat");
+#ifdef DIVERSITY
+        boost::shared_ptr<Phen> best = *ea.pop().begin();
+        boost::shared_ptr<Phen> best_co = *ea.pop_co().begin();
 
-				if (ea.dump_enabled())
-				{
-					(*this->_log_file) << ea.nb_eval() << "," << _bestEver->fit().value();
-					(*this->_log_file) << "," << _bestEver->nb_hares() << "," << _bestEver->nb_hares_solo() << "," << _bestEver->nb_sstag() << "," << _bestEver->nb_sstag_solo() << "," << _bestEver->nb_bstag() << "," << _bestEver->nb_bstag_solo() << std::endl;
-				}
+        float max = ea.pop()[0]->fit().obj(0);
+        for(size_t i = 0; i < ea.pop().size(); ++i)
+        {
+          if(ea.pop()[i]->fit().obj(0) > max)
+          {
+            best = ea.pop()[i];
+            max = best->fit().obj(0);
+          }
+        }
+
+        float max_co = ea.pop_co()[0]->fit().obj(0);
+        for(size_t i = 0; i < ea.pop_co().size(); ++i)
+        {
+          if(ea.pop_co()[i]->fit().obj(0) > max_co)
+          {
+            best_co = ea.pop_co()[i];
+            max_co = best_co->fit().obj(0);
+          }
+        }
+
+        if(_bestEver == NULL || best->fit().obj(0) > _bestEver->fit().obj(0))
+        {
+            _bestEver = boost::shared_ptr<Phen>(new Phen(*best));
+        }
+
+        if(_bestEver_co == NULL || best_co->fit().obj(0) > _bestEver_co->fit().obj(0))
+        {
+            _bestEver_co = boost::shared_ptr<Phen>(new Phen(*best_co));
+        }
+#else
+        if(_bestEver == NULL || (*ea.pop().begin())->fit().value() > _bestEver->fit().value())
+        {
+            _bestEver = boost::shared_ptr<Phen>(new Phen(**(ea.pop().begin())));
+        }
 
         if(_bestEver_co == NULL || (*ea.pop_co().begin())->fit().value() > _bestEver_co->fit().value())
         {
             _bestEver_co = boost::shared_ptr<Phen>(new Phen(**(ea.pop_co().begin())));
         }
+#endif
+				this->_create_log_file(ea, "besteverfit.dat");
+
+				if (ea.dump_enabled())
+				{
+#ifdef DIVERSITY
+          (*this->_log_file) << ea.nb_eval() << "," << _bestEver->fit().obj(0);
+#else
+					(*this->_log_file) << ea.nb_eval() << "," << _bestEver->fit().value();
+#endif
+					(*this->_log_file) << "," << _bestEver->nb_hares() << "," << _bestEver->nb_hares_solo() << "," << _bestEver->nb_sstag() << "," << _bestEver->nb_sstag_solo() << "," << _bestEver->nb_bstag() << "," << _bestEver->nb_bstag_solo() << std::endl;
+				}
         
         this->_create_log_file_co(ea, "besteverfit-co.dat");
 
         if (ea.dump_enabled())
         {
+#ifdef DIVERSITY
+          (*this->_log_file_co) << ea.nb_eval() << "," << _bestEver_co->fit().obj(0);
+#else
           (*this->_log_file_co) << ea.nb_eval() << "," << _bestEver_co->fit().value();
+#endif
           (*this->_log_file_co) << "," << _bestEver_co->nb_hares() << "," << _bestEver_co->nb_hares_solo() << "," << _bestEver_co->nb_sstag() << "," << _bestEver_co->nb_sstag_solo() << "," << _bestEver_co->nb_bstag() << "," << _bestEver_co->nb_bstag_solo() << std::endl;
         }
       }

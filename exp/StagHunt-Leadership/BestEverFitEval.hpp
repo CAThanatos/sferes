@@ -54,14 +54,39 @@ namespace sferes
 				void refresh(const E& ea)
       {
 				assert(!ea.pop().empty());
-				if(_bestEver == NULL || (*ea.pop().begin())->fit().value() > _bestEver->fit().value())
-				{
-						_bestEver = boost::shared_ptr<Phen>(new Phen(**(ea.pop().begin())));
-				}
+
+        boost::shared_ptr<Phen> best = *ea.pop().begin();
+
+#ifdef DIVERSITY
+        float max = ea.pop()[0]->fit().obj(0);
+        for(size_t i = 0; i < ea.pop().size(); ++i)
+        {
+          if(ea.pop()[i]->fit().obj(0) > max)
+          {
+            best = ea.pop()[i];
+            max = best->fit().obj(0);
+          }
+        }
+
+        if(_bestEver == NULL || best->fit().obj(0) > _bestEver->fit().obj(0))
+        {
+            _bestEver = boost::shared_ptr<Phen>(new Phen(*best));
+        }
+#else
+        if(_bestEver == NULL || best->fit().value() > _bestEver->fit().value())
+        {
+            _bestEver = boost::shared_ptr<Phen>(new Phen(*best));
+        }
+#endif
+        
 				this->_create_log_file(ea, "besteverfit.dat");
 				if (ea.dump_enabled())
 				{
-					(*this->_log_file) << ea.nb_eval() << "," << _bestEver->fit().value();
+#ifdef DIVERSITY
+          (*this->_log_file) << ea.nb_eval() << "," << _bestEver->fit().obj(0);
+#else
+          (*this->_log_file) << ea.nb_eval() << "," << _bestEver->fit().value();
+#endif
 					(*this->_log_file) << "," << _bestEver->nb_hares() << "," << _bestEver->nb_hares_solo() << "," << _bestEver->nb_sstag() << "," << _bestEver->nb_sstag_solo() << "," << _bestEver->nb_bstag() << "," << _bestEver->nb_bstag_solo() << std::endl;
 				}
       }

@@ -90,6 +90,7 @@ namespace sferes
 	_selection (_parent_pop, _child_pop);
  	parallel::p_for(parallel::range_t(0, _child_pop.size()),
  			mutate<crowd::Indiv<Phen> >(_child_pop));
+
 #ifndef EA_EVAL_ALL
 	_eval_pop(_child_pop);
 	_merge(_parent_pop, _child_pop, _mixed_pop);

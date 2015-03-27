@@ -248,6 +248,7 @@ namespace sferes
 					float total_hares = 0.f, total_sstags = 0.f, total_bstags = 0.f;
 					float total_hares_solo = 0.f, total_sstags_solo = 0.f, total_bstags_solo = 0.f;
 					
+					pop[i]->fit().set_obj(0, pop[i]->fit().fitness_at);
 					pop[i]->fit().set_value(pop[i]->fit().fitness_at);
 
 					pop[i]->set_nb_hares(pop[i]->nb_hares_at(), pop[i]->nb_hares_solo_at());

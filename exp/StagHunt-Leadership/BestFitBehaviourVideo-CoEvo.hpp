@@ -59,6 +59,28 @@ namespace sferes
 				_best = *ea.pop().begin();
 				_best_co = *ea.pop_co().begin();
 
+#ifdef DIVERSITY
+        float max = ea.pop()[0]->fit().obj(0);
+        for(size_t i = 0; i < ea.pop().size(); ++i)
+        {
+          if(ea.pop()[i]->fit().obj(0) > max)
+          {
+            _best = ea.pop()[i];
+            max = _best->fit().obj(0);
+          }
+        }
+
+        float max_co = ea.pop_co()[0]->fit().obj(0);
+        for(size_t i = 0; i < ea.pop_co().size(); ++i)
+        {
+          if(ea.pop_co()[i]->fit().obj(0) > max_co)
+          {
+            _best_co = ea.pop_co()[i];
+            max_co = _best_co->fit().obj(0);
+          }
+        }
+#endif
+
 				if (ea.dump_enabled() && (ea.gen() % Params::pop::video_dump_period == 0))
 				{
 					_best->fit().set_mode(fit::mode::view);

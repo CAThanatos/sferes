@@ -4,6 +4,7 @@
 #include <modules/fastsim_multi/posture.hpp>
 #include <modules/fastsim_multi/simu_fastsim_multi.hpp>
 #include <modules/nn2/nn.hpp>
+#include <modules/nn2/elman.hpp>
 
 #include "defparams.hpp"
 #include "StagHuntRobot.hpp"
@@ -15,7 +16,11 @@ namespace sferes
 	class Hunter : public StagHuntRobot
 	{
 		public :
+#ifdef ELMAN
+			typedef Elman< Neuron<PfWSum<>, AfSigmoidNoBias<> >, Connection<> > nn_t;
+#else
 			typedef Mlp< Neuron<PfWSum<>, AfSigmoidNoBias<> >, Connection<> > nn_t;
+#endif
 			
 			Hunter(float radius, const fastsim::Posture& pos, unsigned int color, nn_t& nn, bool deactivated = false, bool leader = false) : StagHuntRobot(radius, pos, color, color/100), _nn(nn), _food_gathered(0), _nb_hares_hunted(0), _nb_hares_hunted_solo(0), _nb_small_stags_hunted(0), _nb_small_stags_hunted_solo(0), _nb_big_stags_hunted(0), _nb_big_stags_hunted_solo(0), _deactivated(deactivated) 
 			{	
@@ -58,10 +63,6 @@ namespace sferes
 			std::vector<float> step_action()
 			{
 				using namespace fastsim;
-
-#ifndef MLP_PERSO
-				_nn.init();
-#endif
 
 				std::vector<float> inputs;
 				std::vector<float> outf(Params::nn::nb_outputs);

@@ -11,7 +11,11 @@ namespace sferes
   public:
 		typedef Neuron<PfWSum<>, AfSigmoidNoBias<> > neuron_t;
 		typedef Connection<float> connection_t;
+#ifdef ELMAN
+		typedef Elman< neuron_t, connection_t > nn_t;
+#else
 		typedef Mlp< neuron_t, connection_t > nn_t;
+#endif
 
     template<typename Indiv>
       void eval(Indiv& ind) 
@@ -33,6 +37,9 @@ namespace sferes
 #ifndef MLP_PERSO
       nn1.set_all_weights(ind1.data());
       nn2.set_all_weights(ind2.data());
+
+      nn1.init();
+      nn2.init();
 #endif
 
       typedef simu::FastsimMulti<Params> simu_t;
@@ -947,20 +954,16 @@ int main(int argc, char **argv)
 
 	// GENOTYPE
 #ifdef DIVERSITY
-  typedef gen::EvoFloat<(Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs, Params> gen_t;
+  typedef gen::EvoFloat<Params::nn::genome_size, Params> gen_t;
 #else
 #ifdef CMAES
-  typedef gen::Cmaes<(Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs, Params> gen_t;
+  typedef gen::Cmaes<Params::nn::genome_size, Params> gen_t;
 //  typedef gen::Cmaes<90, Params> gen_t;
 #else
 #ifdef ELITIST
-#ifdef DOUBLE_NN
-  typedef gen::ElitistGen<((Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs) * 2 + 1, Params> gen_t;
+  typedef gen::ElitistGen<Params::nn::genome_size, Params> gen_t;
 #else
-  typedef gen::ElitistGen<(Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs, Params> gen_t;
-#endif
-#else
-  typedef gen::EvoFloat<(Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs, Params> gen_t;
+  typedef gen::EvoFloat<Params::nn::genome_size, Params> gen_t;
 #endif
 #endif
 #endif
@@ -1001,12 +1004,12 @@ int main(int argc, char **argv)
 #ifdef BEHAVIOUR_VIDEO
 		  sferes::stat::BestFitBehaviourVideo<phen_t, Params>,
 #endif
+#endif
 #ifdef DIVERSITY
 		  sferes::stat::BestDiversityEval<phen_t, Params>,
 		  // sferes::stat::MeanDiversityEval<phen_t, Params>,
 		  // sferes::stat::BestEverDiversityEval<phen_t, Params>,
 		  // sferes::stat::AllDiversityEvalStat<phen_t, Params>,
-#endif
 #endif
 		  sferes::stat::StopEval<Params>
     >  stat_t;
@@ -1016,7 +1019,11 @@ int main(int argc, char **argv)
 
 	// EVOLUTION ALGORITHM
 #ifdef DIVERSITY
+#ifdef COEVO
+	typedef ea::Nsga2CoEvo<phen_t, eval_t, stat_t, modifier_t, Params> ea_t; 
+#else
 	typedef ea::Nsga2<phen_t, eval_t, stat_t, modifier_t, Params> ea_t; 
+#endif
 #else
 #ifdef FITPROP
   typedef ea::FitnessProp<phen_t, eval_t, stat_t, modifier_t, Params> ea_t; 
