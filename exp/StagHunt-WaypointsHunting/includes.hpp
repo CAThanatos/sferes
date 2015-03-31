@@ -1,6 +1,7 @@
 // All necessary includes and defines are here
 
 
+#include "defparams.hpp"
 #include <iostream>
 #include <math.h>
 #include <ctime>

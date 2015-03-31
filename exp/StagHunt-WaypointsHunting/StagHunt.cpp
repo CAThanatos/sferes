@@ -523,7 +523,7 @@ namespace sferes
     	void check_preys_status(Simu &simu, Prey* prey, std::vector<int>& dead_preys, int position)
    	{
    		using namespace fastsim;
-   		
+
    		// We compute the distance between this prey and each of its hunters
    		std::vector<Hunter*> hunters;
    		float px = prey->get_pos().x();
@@ -655,9 +655,6 @@ namespace sferes
    		// If the two hunters have crossed all the waypoints, we stop the trial
  			Hunter* hunter1 = (Hunter*)(simu.robots()[0]);
  			Hunter* hunter2 = (Hunter*)(simu.robots()[1]);
-
- 			if((hunter1->get_nb_waypoints_done() == Params::simu::nb_waypoints) && (hunter2->get_nb_waypoints_done() == Params::simu::nb_waypoints))
- 				stop_eval = true;
    	}
    	    
 		

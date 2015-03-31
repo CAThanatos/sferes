@@ -983,7 +983,6 @@ int main(int argc, char **argv)
 #ifdef COEVO
 		  sferes::stat::BestFitEvalCoEvo<phen_t, Params>,
 		  sferes::stat::MeanFitEvalCoEvo<phen_t, Params>,
-		  sferes::stat::BestEverFitEvalCoEvo<phen_t, Params>,
 		  sferes::stat::AllFitEvalStatCoEvo<phen_t, Params>,
 		  sferes::stat::BestLeadershipEvalCoEvo<phen_t, Params>,
 		  sferes::stat::AllLeadershipEvalStatCoEvo<phen_t, Params>,
@@ -993,7 +992,6 @@ int main(int argc, char **argv)
 #else
 		  sferes::stat::BestFitEval<phen_t, Params>,
 		  sferes::stat::MeanFitEval<phen_t, Params>,
-		  sferes::stat::BestEverFitEval<phen_t, Params>,
 		  sferes::stat::AllFitEvalStat<phen_t, Params>,
 		  sferes::stat::BestLeadershipEval<phen_t, Params>,
 		  sferes::stat::AllLeadershipEvalStat<phen_t, Params>,
@@ -1007,9 +1005,9 @@ int main(int argc, char **argv)
 #endif
 #ifdef DIVERSITY
 		  sferes::stat::BestDiversityEval<phen_t, Params>,
+		  sferes::stat::AllDiversityEvalStat<phen_t, Params>,
 		  // sferes::stat::MeanDiversityEval<phen_t, Params>,
 		  // sferes::stat::BestEverDiversityEval<phen_t, Params>,
-		  // sferes::stat::AllDiversityEvalStat<phen_t, Params>,
 #endif
 		  sferes::stat::StopEval<Params>
     >  stat_t;

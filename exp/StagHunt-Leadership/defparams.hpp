@@ -293,7 +293,7 @@ struct Params
     static const unsigned size = 20;
     
     // number of generations
-    static const unsigned nb_gen = 4500;
+    static const unsigned nb_gen = 10000;
     
     // how often should the result file be written (here, each 10
     // generation)

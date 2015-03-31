@@ -55,18 +55,12 @@ namespace sferes
       {
 				assert(!ea.pop().empty());
 
-#ifdef MONO_DIV
-        int indice_div = 0;
-#else
-        int indice_div = 1;
-#endif
-
 				this->_create_log_file(ea, "alldivevalstat.dat");
 				if (ea.dump_enabled())
 				{
 					for(int i = 0; i < ea.pop().size(); ++i)
 					{
-						(*this->_log_file) << ea.nb_eval() << "," << ea.pop()[i]->fit().obj(indice_div);
+						(*this->_log_file) << ea.nb_eval() << "," << ea.pop()[i]->fit().obj(1);
 						(*this->_log_file) << "," << ea.pop()[i]->nb_hares() << "," << ea.pop()[i]->nb_hares_solo() << "," << ea.pop()[i]->nb_sstag() << "," << ea.pop()[i]->nb_sstag_solo() << "," << ea.pop()[i]->nb_bstag() << "," << ea.pop()[i]->nb_bstag_solo() << std::endl;
 					}
 				}

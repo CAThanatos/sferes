@@ -251,7 +251,9 @@ namespace sferes
 					pop[i]->fit().set_value(pop[i]->fit().fitness_at);
 #else
 					for(int k = 0; k < pop[i]->fit().vec_fitness_at.size(); ++k)
+					{
 						pop[i]->fit().set_obj(k, pop[i]->fit().vec_fitness_at[k]);
+					}
 #endif
 
 					pop[i]->set_nb_hares(pop[i]->nb_hares_at(), pop[i]->nb_hares_solo_at());

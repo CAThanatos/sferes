@@ -22,7 +22,11 @@ namespace sferes
 				{
           for(int i = 0; i < ea.pop().size(); ++i)
           {
+#ifdef DIVERSITY
+            (*this->_log_file_leadership) << ea.nb_eval() << "," << ea.pop()[i]->fit().obj(0);
+#else
             (*this->_log_file_leadership) << ea.nb_eval() << "," << ea.pop()[i]->fit().value();
+#endif
 
             float proportion_leader_first = ea.pop()[i]->nb_leader_first()/ea.pop()[i]->nb_preys_killed_coop();
             (*this->_log_file_leadership) << "," << proportion_leader_first;
