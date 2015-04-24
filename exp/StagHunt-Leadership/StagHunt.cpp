@@ -759,6 +759,19 @@ namespace sferes
 					simu.add_robot(r);
 				}
 			}
+
+#ifdef LIGHTS
+			for(int i = 0; i < Params::simu::nb_lights; ++i)
+			{
+				Posture pos;
+
+				if(simu.map()->get_random_initial_position(Params::simu::light_radius + 5, pos))
+				{
+					fastsim::Map::ill_sw_t sw = boost::shared_ptr<IlluminatedSwitch>(new IlluminatedSwitch(HARE_COLOR, Params::simu::light_radius, pos.x(), pos.y(), true, HARE_COLOR/100));
+					simu.add_illuminated_switch(sw);
+				}
+			}
+#endif
 		}
     
     // *** Refresh infos about the robots

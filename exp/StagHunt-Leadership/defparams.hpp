@@ -208,6 +208,11 @@ struct Params
 		static const int nb_camera_pixels = 12;
 
 		static const int threshold_hamming = 0.5f;
+
+#ifdef LIGHTS
+		static const int nb_lights = 3;
+		static const float light_radius = 20.0f;
+#endif
 	};
 	
 	struct nn

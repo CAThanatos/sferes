@@ -219,7 +219,6 @@ namespace sferes
 				for(int i = begin; i < end; ++i)
 				{
 					pop[i]->develop();
-					pop[i]->set_pop_pos(i);
 
 					// We need to set all the objective values to 0
 					pop[i]->fit().set_value(0);
