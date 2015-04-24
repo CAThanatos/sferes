@@ -308,6 +308,8 @@ struct Params
 #else
 		static const unsigned nb_eval = 1;
 #endif
+
+		static const float invasion_frequency = 0.01f;
   };
   
   struct trajectory

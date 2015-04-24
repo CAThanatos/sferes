@@ -35,8 +35,8 @@
 
 
 
-#ifndef BEST_FIT_BEHAVIOUR_VIDEO_
-#define BEST_FIT_BEHAVIOUR_VIDEO_
+#ifndef BEST_EVER_DIVERSITY_EVAL_
+#define BEST_EVER_DIVERSITY_EVAL_
 
 #include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/nvp.hpp>
@@ -46,79 +46,57 @@ namespace sferes
 {
   namespace stat
   {
-    // assume that the population is sorted !
-    SFERES_STAT(BestFitBehaviourVideo, Stat)
+    SFERES_STAT(BestEverDiversityEval, Stat)
     {
     public:
       template<typename E>
 				void refresh(const E& ea)
       {
 				assert(!ea.pop().empty());
-				_best = *ea.pop().begin();
 
-#ifdef DIVERSITY
-        float max = ea.pop()[0]->fit().obj(0);
-        for(size_t i = 0; i < ea.pop().size(); ++i)
-        {
-          if(ea.pop()[i]->fit().obj(0) > max)
-          {
-            _best = ea.pop()[i];
-            max = _best->fit().obj(0);
-          }
-        }
+#ifdef MONO_DIV
+        int indice_div = 0;
+#else
+        int indice_div = 1;
 #endif
 
-        if (ea.dump_enabled() && (ea.gen() % Params::pop::video_dump_period == 0))
+        float max_div = ea.pop()[0]->fit().obj(indice_div);
+        boost::shared_ptr<Phen> _best = *ea.pop().begin();
+        for(size_t i = 0; i < ea.pop().size(); ++i)
+        {
+          if(ea.pop()[i]->fit().obj(indice_div) > max_div)
+          {
+            _best = ea.pop()[i];
+            max_div = _best->fit().obj(indice_div);
+          }
+        }
+
+				if(_bestEver == NULL || (max_div > _bestEver->fit().obj(indice_div)))
+						_bestEver = boost::shared_ptr<Phen>(new Phen(*_best));
+
+        this->_create_log_file(ea, "besteverdiv.dat");
+				if (ea.dump_enabled())
 				{
-					_best->fit().set_mode(fit::mode::view);
-
-          std::string video_dir = ea.res_dir() + "/behaviourVideoGen_" + boost::lexical_cast<std::string>(ea.gen());
-          boost::filesystem::path my_path(video_dir);
-          boost::filesystem::create_directory(my_path);
-
-					std::string file_video = video_dir + "/behaviourVideoFrame_";
-					_best->fit().set_file_video(file_video);
-					_best->fit().eval_compet(*_best, *_best);
-
-					// We delete the existing archive
-					std::string command;
-					int retour;
-					if(ea.gen() > 0)
-					{
-						std::string archive_prefix = ea.res_dir() + "/behaviourVideo*.tar.gz";
-						command = "rm -f " + archive_prefix;
-						retour = system(command.c_str());
-					}
-
-					// We create a compressed archive of the images					
-					std::string name_archive = video_dir + ".tar.gz";
-					command = "tar -zcf " + name_archive + " " + video_dir;
-					retour = system(command.c_str());
-					
-					command = "rm -rf " + video_dir;
-					retour = system(command.c_str());
-  
- 					_best->fit().set_mode(fit::mode::eval);
+					(*this->_log_file) << ea.nb_eval() << "," << _bestEver->fit().obj(indice_div);
+					(*this->_log_file) << "," << _bestEver->nb_hares() << "," << _bestEver->nb_hares_solo() << "," << _bestEver->nb_sstag() << "," << _bestEver->nb_sstag_solo() << "," << _bestEver->nb_bstag() << "," << _bestEver->nb_bstag_solo() << std::endl;
 				}
       }
+
       void show(std::ostream& os, size_t k)
       {
-				_best->develop();
-				_best->show(os);
-				_best->fit().set_mode(fit::mode::view);
-
-				std::string file_video = "./behaviourVideoFrame_";
-				_best->fit().set_file_video(file_video);
-				_best->fit().eval_compet(*_best, *_best);
+				_bestEver->develop();
+				_bestEver->show(os);
+				_bestEver->fit().set_mode(fit::mode::view);
+				_bestEver->fit().eval_compet(*_bestEver, *_bestEver);
       }
-      const boost::shared_ptr<Phen> best() const { return _best; }
+      const boost::shared_ptr<Phen> best() const { return _bestEver; }
       template<class Archive>
       void serialize(Archive & ar, const unsigned int version)
       {
-        ar & BOOST_SERIALIZATION_NVP(_best);
+        ar & BOOST_SERIALIZATION_NVP(_bestEver);
       }
     protected:
-      boost::shared_ptr<Phen> _best;
+      boost::shared_ptr<Phen> _bestEver;
     };
   }
 }

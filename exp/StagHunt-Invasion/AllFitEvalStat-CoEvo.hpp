@@ -35,8 +35,8 @@
 
 
 
-#ifndef ALL_FIT_EVAL_
-#define ALL_FIT_EVAL_
+#ifndef ALL_FIT_EVAL_CO_EVO_
+#define ALL_FIT_EVAL_CO_EVO_
 
 #include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/nvp.hpp>
@@ -47,32 +47,44 @@ namespace sferes
   namespace stat
   {
     // assume that the population is sorted !
-    SFERES_STAT(AllFitEvalStat, Stat)
+    SFERES_STAT(AllFitEvalStatCoEvo, Stat)
     {
     public:
       template<typename E>
 				void refresh(const E& ea)
       {
-				assert(!ea.pop().empty());
-				this->_create_log_file(ea, "allfitevalstat.dat");
-				this->_create_log_file_genome(ea, "allgenomes.dat");
+				assert(!ea.pop_co().empty());
+        this->_create_log_file(ea, "allfitevalstat.dat");
+        this->_create_log_file_genome(ea, "allgenomes.dat");
+				this->_create_log_file_co(ea, "allfitevalstat-co.dat");
+				this->_create_log_file_genome_co(ea, "allgenomes-co.dat");
+
 				if (ea.dump_enabled())
 				{
-					for(int i = 0; i < ea.pop().size(); ++i)
+          for(int i = 0; i < ea.pop().size(); ++i)
+          {
+            (*this->_log_file) << ea.nb_eval() << "," << ea.pop()[i]->fit().value();
+            (*this->_log_file) << "," << ea.pop()[i]->nb_hares() << "," << ea.pop()[i]->nb_hares_solo() << "," << ea.pop()[i]->nb_sstag() << "," << ea.pop()[i]->nb_sstag_solo() << "," << ea.pop()[i]->nb_bstag() << "," << ea.pop()[i]->nb_bstag_solo() << std::endl;
+          
+            (*this->_log_file_genome) << ea.nb_eval();
+            for(size_t j = 0; j < ea.pop()[i]->gen().size(); ++j)
+            {
+              (*this->_log_file_genome) << "," << ea.pop()[i]->gen().data(j);
+            }
+            (*this->_log_file_genome) << std::endl;
+          }
+
+					for(int i = 0; i < ea.pop_co().size(); ++i)
 					{
-#ifdef DIVERSITY
-            (*this->_log_file) << ea.nb_eval() << "," << ea.pop()[i]->fit().obj(0);
-#else
-						(*this->_log_file) << ea.nb_eval() << "," << ea.pop()[i]->fit().value();
-#endif
-						(*this->_log_file) << "," << ea.pop()[i]->nb_hares() << "," << ea.pop()[i]->nb_hares_solo() << "," << ea.pop()[i]->nb_sstag() << "," << ea.pop()[i]->nb_sstag_solo() << "," << ea.pop()[i]->nb_bstag() << "," << ea.pop()[i]->nb_bstag_solo() << std::endl;
+						(*this->_log_file_co) << ea.nb_eval() << "," << ea.pop_co()[i]->fit().value();
+						(*this->_log_file_co) << "," << ea.pop_co()[i]->nb_hares() << "," << ea.pop_co()[i]->nb_hares_solo() << "," << ea.pop_co()[i]->nb_sstag() << "," << ea.pop_co()[i]->nb_sstag_solo() << "," << ea.pop_co()[i]->nb_bstag() << "," << ea.pop_co()[i]->nb_bstag_solo() << std::endl;
 					
-						(*this->_log_file_genome) << ea.nb_eval();
-						for(size_t j = 0; j < ea.pop()[i]->gen().size(); ++j)
+						(*this->_log_file_genome_co) << ea.nb_eval();
+						for(size_t j = 0; j < ea.pop_co()[i]->gen().size(); ++j)
 						{
-							(*this->_log_file_genome) << "," << ea.pop()[i]->gen().data(j);
+							(*this->_log_file_genome_co) << "," << ea.pop_co()[i]->gen().data(j);
 						}
-						(*this->_log_file_genome) << std::endl;
+						(*this->_log_file_genome_co) << std::endl;
 					}
 				}
       }
@@ -88,6 +100,8 @@ namespace sferes
       }
     protected:
       boost::shared_ptr<std::ofstream> _log_file_genome;
+      boost::shared_ptr<std::ofstream> _log_file_co;
+      boost::shared_ptr<std::ofstream> _log_file_genome_co;
       
       template<typename E>
       void _create_log_file_genome(const E& ea, const std::string& name)
@@ -97,6 +111,26 @@ namespace sferes
 					std::string log = ea.res_dir() + "/" + name;
 					_log_file_genome = boost::shared_ptr<std::ofstream>(new std::ofstream(log.c_str()));
 				}
+      }
+      
+      template<typename E>
+      void _create_log_file_co(const E& ea, const std::string& name)
+      {
+        if (!_log_file_co && ea.dump_enabled())
+        {
+          std::string log = ea.res_dir() + "/" + name;
+          _log_file_co = boost::shared_ptr<std::ofstream>(new std::ofstream(log.c_str()));
+        }
+      }
+      
+      template<typename E>
+      void _create_log_file_genome_co(const E& ea, const std::string& name)
+      {
+        if (!_log_file_genome_co && ea.dump_enabled())
+        {
+          std::string log = ea.res_dir() + "/" + name;
+          _log_file_genome_co = boost::shared_ptr<std::ofstream>(new std::ofstream(log.c_str()));
+        }
       }
     };
   }

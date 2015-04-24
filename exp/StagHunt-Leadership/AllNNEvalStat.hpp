@@ -22,7 +22,11 @@ namespace sferes
 				{
           for(int i = 0; i < ea.pop().size(); ++i)
           {
+#ifdef DIVERSITY
+            (*this->_log_file) << ea.nb_eval() << "," << ea.pop()[i]->fit().obj(0);
+#else
             (*this->_log_file) << ea.nb_eval() << "," << ea.pop()[i]->fit().value();
+#endif
 
             (*this->_log_file) << "," << ea.pop()[i]->nb_nn1_chosen();
             (*this->_log_file) << "," << ea.pop()[i]->nb_bigger_nn1_chosen();

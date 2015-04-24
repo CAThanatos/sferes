@@ -35,8 +35,8 @@
 
 
 
-#ifndef STAG_HUNT_EVAL_PARALLEL_HPP_
-#define STAG_HUNT_EVAL_PARALLEL_HPP_
+#ifndef STAG_HUNT_EVAL_PARALLEL_COEVO_HPP_
+#define STAG_HUNT_EVAL_PARALLEL_COEVO_HPP_
 
 #include <sferes/stc.hpp>
 #include <sferes/parallel.hpp>
@@ -50,15 +50,15 @@ namespace sferes
   namespace eval
   {
     template<typename Phen>
-    struct _parallel_ev
+    struct _parallel_ev_coevo
     {
       typedef std::vector<boost::shared_ptr<Phen> > pop_t;
       pop_t _pop;
       size_t _opponent;
 
-      ~_parallel_ev() { }
-      _parallel_ev(size_t opponent, const pop_t& pop) : _pop(pop), _opponent(opponent) {}
-      _parallel_ev(const _parallel_ev& ev) : _pop(ev._pop), _opponent(ev._opponent) {}
+      ~_parallel_ev_coevo() { }
+      _parallel_ev_coevo(size_t opponent, const pop_t& pop) : _pop(pop), _opponent(opponent) {}
+      _parallel_ev_coevo(const _parallel_ev_coevo& ev) : _pop(ev._pop), _opponent(ev._opponent) {}
       void operator() (const parallel::range_t& r) const
       {
 				for (size_t i = r.begin(); i != r.end(); ++i)
@@ -72,14 +72,14 @@ namespace sferes
     };
 
     template<typename Phen>
-    struct _parallel_ev_altruism
+    struct _parallel_ev_altruism_coevo
     {
       typedef std::vector<boost::shared_ptr<Phen> > pop_t;
       pop_t _pop;
 
-      ~_parallel_ev_altruism() { }
-      _parallel_ev_altruism(const pop_t& pop) : _pop(pop) {}
-      _parallel_ev_altruism(const _parallel_ev_altruism& ev) : _pop(ev._pop) {}
+      ~_parallel_ev_altruism_coevo() { }
+      _parallel_ev_altruism_coevo(const pop_t& pop) : _pop(pop) {}
+      _parallel_ev_altruism_coevo(const _parallel_ev_altruism_coevo& ev) : _pop(ev._pop) {}
       void operator() (const parallel::range_t& r) const
       {
 				for (size_t i = r.begin(); i != r.end(); ++i)
@@ -92,16 +92,16 @@ namespace sferes
     };
     
     template<typename Phen>
-    struct _parallel_ev_opponent
+    struct _parallel_ev_opponent_coevo
     {
     	typedef std::vector<boost::shared_ptr<Phen> > pop_t;
     	pop_t _pop;
     	std::vector<size_t> _opponents;
     	size_t _ind_ev; 	
 
-      ~_parallel_ev_opponent() { }
-      _parallel_ev_opponent(const pop_t& pop, const std::vector<size_t>& opponents, size_t ind_ev) : _pop(pop), _opponents(opponents), _ind_ev(ind_ev) {}
-      _parallel_ev_opponent(const _parallel_ev_opponent& ev) : _pop(ev._pop), _opponents(ev._opponents), _ind_ev(ev._ind_ev) {}
+      ~_parallel_ev_opponent_coevo() { }
+      _parallel_ev_opponent_coevo(const pop_t& pop, const std::vector<size_t>& opponents, size_t ind_ev) : _pop(pop), _opponents(opponents), _ind_ev(ind_ev) {}
+      _parallel_ev_opponent_coevo(const _parallel_ev_opponent_coevo& ev) : _pop(ev._pop), _opponents(ev._opponents), _ind_ev(ev._ind_ev) {}
       void operator() (const parallel::range_t& r) const
       {
 				for (size_t i = r.begin(); i != r.end(); ++i)
@@ -119,7 +119,7 @@ namespace sferes
     };
         
     template<typename Phen>
-    struct _parallel_ev_select
+    struct _parallel_ev_select_coevo
     {
       typedef std::vector<boost::shared_ptr<Phen> > pop_t;
       pop_t _pop;
@@ -127,13 +127,13 @@ namespace sferes
       int nb_eval;
       int _size;
 
-      ~_parallel_ev_select() { }
-      _parallel_ev_select(const pop_t& pop, int size) : _pop(pop), _size(size)
+      ~_parallel_ev_select_coevo() { }
+      _parallel_ev_select_coevo(const pop_t& pop, int size) : _pop(pop), _size(size)
       {
 		    nb_opponents = Params::pop::nb_opponents;
 		    nb_eval = Params::pop::nb_eval;
       }
-      _parallel_ev_select(const _parallel_ev_select& ev) : _pop(ev._pop), _size(ev._size)
+      _parallel_ev_select_coevo(const _parallel_ev_select_coevo& ev) : _pop(ev._pop), _size(ev._size)
       {
 		    nb_opponents = Params::pop::nb_opponents;
 		    nb_eval = Params::pop::nb_eval;
@@ -169,12 +169,26 @@ namespace sferes
 							int opponent = -1;
 							do
 							{
-								opponent = misc::rand(0, _size);
+								// We evaluate one part of the population against the other
+								if(i < _size/2)
+									opponent = misc::rand(_size/2, _size);
+								else
+									opponent = misc::rand(0, _size/2);
 							} while((opponent == i) || (opponent < 0) || (opponent >= _size));
 							
 							assert(opponent != -1);
-							
-							_pop[i]->fit().eval_compet(*_pop[i], *_pop[opponent]);
+
+#ifdef INVERS_LEADER
+							if (i < _size/2)
+								_pop[i]->fit().eval_compet(*_pop[i], *_pop[opponent], 2);
+							else
+								_pop[i]->fit().eval_compet(*_pop[i], *_pop[opponent], 1);
+#else
+							if (i < _size/2)
+								_pop[i]->fit().eval_compet(*_pop[i], *_pop[opponent], 1);
+							else
+								_pop[i]->fit().eval_compet(*_pop[i], *_pop[opponent], 2);
+#endif
 						}
 #endif
 					}
@@ -182,13 +196,12 @@ namespace sferes
       }
     };
 
-
-    SFERES_CLASS(StagHuntEvalParallel)
+    SFERES_CLASS(StagHuntEvalParallelCoEvo)
     {
     public:
 	    enum status_t { free = 0, obstacle = 255 };
 
-    	StagHuntEvalParallel() : _nb_eval(0) { }
+    	StagHuntEvalParallelCoEvo() : _nb_eval(0) { }
     
 			template<typename Phen>
 				void eval(std::vector<boost::shared_ptr<Phen> >& pop, size_t begin, size_t end)
@@ -197,7 +210,7 @@ namespace sferes
 				assert(pop.size());
 				assert(begin < pop.size());
 				assert(end <= pop.size());
-			
+
 #ifndef NDEBUG
 				std::ofstream os("debug.txt", std::ios::out | std::ios::app);
 				int duration = time(NULL);
@@ -222,18 +235,18 @@ namespace sferes
 
 #ifdef ALTRUISM
 				parallel::init();
-				parallel::p_for(parallel::range_t(begin, end), _parallel_ev_altruism<Phen>(pop));
+				parallel::p_for(parallel::range_t(begin, end), _parallel_ev_altruism_coevo<Phen>(pop));
 				_nb_eval += (end - begin);
 #elif defined(NOT_AGAINST_ALL)
 				parallel::init();
-				parallel::p_for(parallel::range_t(begin, end), _parallel_ev_select<Phen>(pop, (end - begin)));
+				parallel::p_for(parallel::range_t(begin, end), _parallel_ev_select_coevo<Phen>(pop, (end - begin)));
 				_nb_eval += (end - begin);
 #else
 				for(size_t i = begin; i != end; ++i)
 				{
 					parallel::init();
 					parallel::p_for(parallel::range_t(i + 1, end), 
-					_parallel_ev<Phen>(i, pop));
+					_parallel_ev_coevo<Phen>(i, pop));
 					_nb_eval++;
 				}
 #endif
@@ -269,7 +282,17 @@ namespace sferes
 				for (size_t i = begin; i != end; ++i)
 				{
 					float diversity = 0.0f;
-					for (size_t j = begin; j != end; ++j)
+
+					int first = 0, last = end/2;
+					int size = end - begin;
+
+					if (i >= size/2)
+					{
+						first = size/2;
+						last = end;
+					}
+
+					for (size_t j = first; j != last; ++j)
 					{
 						if (i != j)
 #ifdef DIST_HAMMING
@@ -279,12 +302,11 @@ namespace sferes
 #endif
 					}
 
-					diversity /= end - begin - 1;
+					diversity /= (end - begin)/2 - 1;
 					pop[i]->fit().set_obj(1, diversity);
 					pop[i]->set_developed_at(false);
 				}
 #endif
-
 
 #ifndef NDEBUG
 				os << "GEN : " << time(NULL) - duration << std::endl;
@@ -294,11 +316,7 @@ namespace sferes
 
 	    
 			size_t nb_eval() const { return _nb_eval; }
-#ifdef ELITIST
-			void set_nb_eval(size_t gen) { _nb_eval = (gen * Params::pop::size) + Params::pop::mu; }
-#else
-			void set_nb_eval(size_t gen) { _nb_eval = ((gen + 1) * Params::pop::size); }
-#endif
+			void set_nb_eval(size_t gen) { _nb_eval = (gen * Params::pop::size * 2) + Params::pop::mu * 2; }
 			
 			void set_res_dir(std::string res_dir) { _res_dir = res_dir; }
 			void set_gen(int gen) { _gen = gen; }

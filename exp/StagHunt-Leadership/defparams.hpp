@@ -154,7 +154,17 @@ struct Params
 #if defined(BSTAG_PRES)
 	static const int nb_hares = 0;
 	static const int nb_big_stags = total_preys;
+#ifdef RATIO75
+	static const float ratio_big_stags = 0.75;
+#elif defined(RATIO25)
+	static const float ratio_big_stags = 0.25;
+#elif defined(RATIO65)
+	static const float ratio_big_stags = 0.65;
+#elif defined(RATIO35)
+	static const float ratio_big_stags = 0.35;
+#else
 	static const float ratio_big_stags = 0.5;
+#endif
 #else
 	static const int nb_hares = 0;
 	static const int nb_big_stags = total_preys;

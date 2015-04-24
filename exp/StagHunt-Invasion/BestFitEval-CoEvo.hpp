@@ -35,8 +35,8 @@
 
 
 
-#ifndef BEST_FIT_EVAL_
-#define BEST_FIT_EVAL_
+#ifndef BEST_FIT_EVAL_CO_EVO_
+#define BEST_FIT_EVAL_CO_EVO_
 
 #include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/nvp.hpp>
@@ -47,14 +47,15 @@ namespace sferes
   namespace stat
   {
     // assume that the population is sorted !
-    SFERES_STAT(BestFitEval, Stat)
+    SFERES_STAT(BestFitEvalCoEvo, Stat)
     {
     public:
       template<typename E>
 				void refresh(const E& ea)
       {
-				assert(!ea.pop().empty());
+				assert(!ea.pop_co().empty());
 				_best = *ea.pop().begin();
+        _best_co = *ea.pop_co().begin();
 
 #ifdef DIVERSITY
         float max = ea.pop()[0]->fit().obj(0);
@@ -66,10 +67,23 @@ namespace sferes
             max = _best->fit().obj(0);
           }
         }
+
+        float max_co = ea.pop_co()[0]->fit().obj(0);
+        for(size_t i = 0; i < ea.pop_co().size(); ++i)
+        {
+          if(ea.pop_co()[i]->fit().obj(0) > max_co)
+          {
+            _best_co = ea.pop_co()[i];
+            max_co = _best_co->fit().obj(0);
+          }
+        }
 #endif
 
 				this->_create_log_file(ea, "bestfit.dat");
 				this->_create_log_file_genome(ea, "bestgenome.dat");
+        this->_create_log_file_co(ea, "bestfit-co.dat");
+        this->_create_log_file_genome_co(ea, "bestgenome-co.dat");
+
 				if (ea.dump_enabled())
 				{
 #ifdef DIVERSITY
@@ -85,25 +99,45 @@ namespace sferes
 						(*this->_log_file_genome) << "," << _best->gen().data(i);
 					}
 					(*this->_log_file_genome) << std::endl;
+
+#ifdef DIVERSITY
+          (*this->_log_file_co) << ea.nb_eval() << "," << _best_co->fit().obj(0);
+#else
+          (*this->_log_file_co) << ea.nb_eval() << "," << _best_co->fit().value();
+#endif
+          (*this->_log_file_co) << "," << _best_co->nb_hares() << "," << _best_co->nb_hares_solo() << "," << _best_co->nb_sstag() << "," << _best_co->nb_sstag_solo() << "," << _best_co->nb_bstag() << "," << _best_co->nb_bstag_solo() << std::endl;
+          
+          (*this->_log_file_genome_co) << ea.nb_eval();
+          for(size_t i = 0; i < _best_co->gen().size(); ++i)
+          {
+            (*this->_log_file_genome_co) << "," << _best_co->gen().data(i);
+          }
+          (*this->_log_file_genome_co) << std::endl;
 				}
       }
       void show(std::ostream& os, size_t k)
       {
 				_best->develop();
+        _best_co->develop();
 				_best->show(os);
+        _best_co->show(os);
 				_best->fit().set_mode(fit::mode::view);
-				_best->fit().eval_compet(*_best, *_best);
+				_best->fit().eval_compet(*_best, *_best_co);
       }
       const boost::shared_ptr<Phen> best() const { return _best; }
       template<class Archive>
       void serialize(Archive & ar, const unsigned int version)
       {
         ar & BOOST_SERIALIZATION_NVP(_best);
+        ar & BOOST_SERIALIZATION_NVP(_best_co);
       }
     protected:
       boost::shared_ptr<Phen> _best;
+      boost::shared_ptr<Phen> _best_co;
       
       boost::shared_ptr<std::ofstream> _log_file_genome;
+      boost::shared_ptr<std::ofstream> _log_file_co;
+      boost::shared_ptr<std::ofstream> _log_file_genome_co;
       
       template<typename E>
       void _create_log_file_genome(const E& ea, const std::string& name)
@@ -113,6 +147,26 @@ namespace sferes
 					std::string log = ea.res_dir() + "/" + name;
 					_log_file_genome = boost::shared_ptr<std::ofstream>(new std::ofstream(log.c_str()));
 				}
+      }
+      
+      template<typename E>
+      void _create_log_file_co(const E& ea, const std::string& name)
+      {
+        if (!_log_file_co && ea.dump_enabled())
+        {
+          std::string log = ea.res_dir() + "/" + name;
+          _log_file_co = boost::shared_ptr<std::ofstream>(new std::ofstream(log.c_str()));
+        }
+      }
+      
+      template<typename E>
+      void _create_log_file_genome_co(const E& ea, const std::string& name)
+      {
+        if (!_log_file_genome_co && ea.dump_enabled())
+        {
+          std::string log = ea.res_dir() + "/" + name;
+          _log_file_genome_co = boost::shared_ptr<std::ofstream>(new std::ofstream(log.c_str()));
+        }
       }
     };
   }

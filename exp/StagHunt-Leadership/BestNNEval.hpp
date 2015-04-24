@@ -18,11 +18,27 @@ namespace sferes
       {
         _best = *ea.pop().begin();
 
+#ifdef DIVERSITY
+        float max = ea.pop()[0]->fit().obj(0);
+        for(size_t i = 0; i < ea.pop().size(); ++i)
+        {
+          if(ea.pop()[i]->fit().obj(0) > max)
+          {
+            _best = ea.pop()[i];
+            max = _best->fit().obj(0);
+          }
+        }
+#endif
+
         this->_create_log_file(ea, "bestnn.dat");
 
         if (ea.dump_enabled())
         {
+#ifdef DIVERSITY
+          (*this->_log_file) << ea.nb_eval() << "," << _best->fit().obj(0);
+#else
           (*this->_log_file) << ea.nb_eval() << "," << _best->fit().value();
+#endif
 
           (*this->_log_file) << "," << _best->nb_nn1_chosen();
           (*this->_log_file) << "," << _best->nb_bigger_nn1_chosen();

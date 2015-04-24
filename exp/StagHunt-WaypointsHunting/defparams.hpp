@@ -281,8 +281,13 @@ struct Params
   
   struct pop
   {
+#ifdef SIZE10
+    // size of the population
+    static const unsigned size = 10;
+#else
     // size of the population
     static const unsigned size = 20;
+#endif
     
     // number of generations
     static const unsigned nb_gen = 4500;
@@ -402,6 +407,8 @@ struct Params
 
 #ifdef BSTAG_SOLO50
 #define FOOD_BIG_STAG_SOLO 50
+#elif defined(BSTAG_SOLO1000)
+#define FOOD_BIG_STAG_SOLO 1000
 #else
 #define FOOD_BIG_STAG_SOLO 0
 #endif
@@ -436,7 +443,9 @@ struct Params
 
 #define CATCHING_DISTANCE 10
 
+#ifndef NEVAL_ALL
 #define EA_EVAL_ALL
+#endif
 
 #define NOSTOP
 

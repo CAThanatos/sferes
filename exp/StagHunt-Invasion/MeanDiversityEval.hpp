@@ -4,13 +4,13 @@
 //|
 //| This software is a computer program whose purpose is to facilitate
 //| experiments in evolutionary computation and evolutionary robotics.
-//|
+//| 
 //| This software is governed by the CeCILL license under French law
 //| and abiding by the rules of distribution of free software.  You
 //| can use, modify and/ or redistribute the software under the terms
 //| of the CeCILL license as circulated by CEA, CNRS and INRIA at the
 //| following URL "http://www.cecill.info".
-//|
+//| 
 //| As a counterpart to the access to the source code and rights to
 //| copy, modify and redistribute granted by the license, users are
 //| provided only with a limited warranty and the software's author,
@@ -35,69 +35,51 @@
 
 
 
-#ifndef ALL_FIT_EVAL_
-#define ALL_FIT_EVAL_
+#ifndef MEAN_DIVERSITY_EVAL_
+#define MEAN_DIVERSITY_EVAL_
 
-#include <boost/serialization/shared_ptr.hpp>
+#include <boost/foreach.hpp>
 #include <boost/serialization/nvp.hpp>
-#include <sferes/stat/stat.hpp>
+#include <sferes/stc.hpp>
 
 namespace sferes
 {
   namespace stat
   {
-    // assume that the population is sorted !
-    SFERES_STAT(AllFitEvalStat, Stat)
+    SFERES_STAT(MeanDiversityEval, Stat)
     {
     public:
       template<typename E>
-				void refresh(const E& ea)
+	      void refresh(const E& ea)
       {
-				assert(!ea.pop().empty());
-				this->_create_log_file(ea, "allfitevalstat.dat");
-				this->_create_log_file_genome(ea, "allgenomes.dat");
-				if (ea.dump_enabled())
-				{
-					for(int i = 0; i < ea.pop().size(); ++i)
-					{
-#ifdef DIVERSITY
-            (*this->_log_file) << ea.nb_eval() << "," << ea.pop()[i]->fit().obj(0);
+				float s = 0;
+				BOOST_FOREACH(boost::shared_ptr<typename E::phen_t> i, ea.pop())
+#ifdef MONO_DIV
+        s += i->fit().obj(0);
 #else
-						(*this->_log_file) << ea.nb_eval() << "," << ea.pop()[i]->fit().value();
+				s += i->fit().obj(1);
 #endif
-						(*this->_log_file) << "," << ea.pop()[i]->nb_hares() << "," << ea.pop()[i]->nb_hares_solo() << "," << ea.pop()[i]->nb_sstag() << "," << ea.pop()[i]->nb_sstag_solo() << "," << ea.pop()[i]->nb_bstag() << "," << ea.pop()[i]->nb_bstag_solo() << std::endl;
-					
-						(*this->_log_file_genome) << ea.nb_eval();
-						for(size_t j = 0; j < ea.pop()[i]->gen().size(); ++j)
-						{
-							(*this->_log_file_genome) << "," << ea.pop()[i]->gen().data(j);
-						}
-						(*this->_log_file_genome) << std::endl;
-					}
-				}
+				_mean = s / ea.pop().size();
+
+				this->_create_log_file(ea, "meandiv.dat");
+				if (ea.dump_enabled())
+				  (*this->_log_file) << ea.nb_eval() << "," << _mean << std::endl;
       }
 
-      void show(std::ostream& os, size_t k)
+      void show(std::ostream& os, size_t k) const
       {
       	std::cout << "No sense in showing this stat !" << std::endl;
       }
 
+      float mean() const { return _mean; }
+
       template<class Archive>
-      void serialize(Archive & ar, const unsigned int version)
+				void serialize(Archive & ar, const unsigned int version)
       {
+        ar & BOOST_SERIALIZATION_NVP(_mean);
       }
     protected:
-      boost::shared_ptr<std::ofstream> _log_file_genome;
-      
-      template<typename E>
-      void _create_log_file_genome(const E& ea, const std::string& name)
-      {
-				if (!_log_file_genome && ea.dump_enabled())
-				{
-					std::string log = ea.res_dir() + "/" + name;
-					_log_file_genome = boost::shared_ptr<std::ofstream>(new std::ofstream(log.c_str()));
-				}
-      }
+      float _mean;
     };
   }
 }

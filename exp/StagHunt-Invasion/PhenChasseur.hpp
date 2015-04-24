@@ -55,7 +55,7 @@ namespace sferes
 #ifdef EIGEN_CORE_H
 		    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 #endif
-		    PhenChasseur() : _params((*this)._gen.size()), _nb_hares(0), _nb_hares_solo(0), _nb_sstag(0), _nb_sstag_solo(0), _nb_bstag(0), _nb_bstag_solo(0), _fit_mov(0), _pop_pos(-1), _developed(false) 					{
+		    PhenChasseur() : _params((*this)._gen.size()), _nb_hares(0), _nb_hares_solo(0), _nb_sstag(0), _nb_sstag_solo(0), _nb_bstag(0), _nb_bstag_solo(0), _nb_leader_first(0), _nb_preys_killed_coop(0), _fit_mov(0), _pop_pos(-1), _developed(false) 					{
 		    }
 		    
 		    typedef float type_t;
@@ -73,6 +73,14 @@ namespace sferes
 					_nb_sstag_solo = 0;
 					_nb_bstag = 0;
 					_nb_bstag_solo = 0;
+					_nb_leader_first = 0;
+					_nb_preys_killed_coop = 0;
+					_proportion_leader = 0;
+#ifdef DOUBLE_NN
+					_nb_nn1_chosen = 0;
+					_nb_bigger_nn1_chosen = 0;
+					_nb_role_divisions = 0;
+#endif
 					_fit_mov = 0;
 					
 					this->fit().vec_fitness.clear();
@@ -84,6 +92,14 @@ namespace sferes
 					_nb_sstag_solo_at = 0;
 					_nb_bstag_at = 0;
 					_nb_bstag_solo_at = 0;
+					_nb_leader_first_at = 0;
+					_nb_preys_killed_coop_at = 0;
+					_proportion_leader_at = 0;
+#ifdef DOUBLE_NN
+					_nb_nn1_chosen_at = 0;
+					_nb_bigger_nn1_chosen_at = 0;
+					_nb_role_divisions_at = 0;
+#endif
 					this->fit().fitness_at = 0;
 
 #ifdef DIVERSITY
@@ -153,6 +169,50 @@ namespace sferes
 		    float nb_bstag_at() const { return _nb_bstag_at; }
 		    float nb_bstag_solo_at() const { return _nb_bstag_solo_at; }
 		    void add_nb_bstag(float nb_bstag, float solo) { _nb_bstag_at.fetch_and_store(_nb_bstag_at + nb_bstag); _nb_bstag_solo_at.fetch_and_store(_nb_bstag_solo_at + solo); }
+
+		    
+		    float proportion_leader() const { return _proportion_leader; }
+		    void set_proportion_leader(float proportion_leader) { _proportion_leader = proportion_leader; }
+
+		    float proportion_leader_at() const { return _proportion_leader_at; }
+		    void add_proportion_leader(float proportion_leader) { _proportion_leader_at.fetch_and_store(_proportion_leader_at + proportion_leader); }
+
+
+		    float nb_leader_first() const { return _nb_leader_first; }
+		    void set_nb_leader_first(float nb_leader_first) { _nb_leader_first = nb_leader_first; }
+		    
+		    float nb_leader_first_at() const { return _nb_leader_first_at; }
+		    void add_nb_leader_first(float nb_leader_first) { _nb_leader_first_at.fetch_and_store(_nb_leader_first_at + nb_leader_first); }
+
+
+		    float nb_preys_killed_coop() const { return _nb_preys_killed_coop; }
+		    void set_nb_preys_killed_coop(float nb_preys_killed_coop) { _nb_preys_killed_coop = nb_preys_killed_coop; }
+		    
+		    float nb_preys_killed_coop_at() const { return _nb_preys_killed_coop_at; }
+		    void add_nb_preys_killed_coop(float nb_preys_killed_coop) { _nb_preys_killed_coop_at.fetch_and_store(_nb_preys_killed_coop_at + nb_preys_killed_coop); }
+
+
+#ifdef DOUBLE_NN
+		    float nb_nn1_chosen() const { return _nb_nn1_chosen; }
+		    void set_nb_nn1_chosen(float nb_nn1_chosen) { _nb_nn1_chosen = nb_nn1_chosen; }
+		    
+		    float nb_nn1_chosen_at() const { return _nb_nn1_chosen_at; }
+		    void add_nb_nn1_chosen(float nb_nn1_chosen) { _nb_nn1_chosen_at.fetch_and_store(_nb_nn1_chosen_at + nb_nn1_chosen); }
+
+
+		    float nb_bigger_nn1_chosen() const { return _nb_bigger_nn1_chosen; }
+		    void set_nb_bigger_nn1_chosen(float nb_bigger_nn1_chosen) { _nb_bigger_nn1_chosen = nb_bigger_nn1_chosen; }
+		    
+		    float nb_bigger_nn1_chosen_at() const { return _nb_bigger_nn1_chosen_at; }
+		    void add_nb_bigger_nn1_chosen(float nb_bigger_nn1_chosen) { _nb_bigger_nn1_chosen_at.fetch_and_store(_nb_bigger_nn1_chosen_at + nb_bigger_nn1_chosen); }
+
+
+		    float nb_role_divisions() const { return _nb_role_divisions; }
+		    void set_nb_role_divisions(float nb_role_divisions) { _nb_role_divisions = nb_role_divisions; }
+		    
+		    float nb_role_divisions_at() const { return _nb_role_divisions_at; }
+		    void add_nb_role_divisions(float nb_role_divisions) { _nb_role_divisions_at.fetch_and_store(_nb_role_divisions_at + nb_role_divisions); }
+#endif
 
 #ifdef DIVERSITY
 		    const std::vector<float>& vector_diversity() const { return _vector_diversity; }
@@ -272,6 +332,32 @@ namespace sferes
 
 		    tbb::atomic<float> _nb_bstag_at;
 		    tbb::atomic<float> _nb_bstag_solo_at;
+		    
+		    // Number of times the leader arrived first on a prey
+		    float _nb_leader_first;
+		    tbb::atomic<float> _nb_leader_first_at;
+		    
+		    // Total number of cooperative hunts
+		    float _nb_preys_killed_coop;
+		    tbb::atomic<float> _nb_preys_killed_coop_at;
+
+		    // Proportion of times the designated leader hunted first
+		    float _proportion_leader;
+		    tbb::atomic<float> _proportion_leader_at;
+
+#ifdef DOUBLE_NN
+		    // Total number of times the first nn was chosen
+		    float _nb_nn1_chosen;
+		    tbb::atomic<float> _nb_nn1_chosen_at;
+
+		    // Number of times the first nn was chosen when the random number was bigger
+		    float _nb_bigger_nn1_chosen;
+		    tbb::atomic<float> _nb_bigger_nn1_chosen_at;
+
+		    // Number of times the individuals chose a different nn
+		    float _nb_role_divisions;
+		    tbb::atomic<float> _nb_role_divisions_at;
+#endif
 
 #ifdef DIVERSITY
 		    std::vector<float> _vector_diversity;

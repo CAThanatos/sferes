@@ -17,22 +17,52 @@ namespace sferes
 				void refresh(const E& ea)
       {
 				assert(!ea.pop_co().empty());
-				_best = *ea.pop().begin();
+        _best = *ea.pop().begin();
         _best_co = *ea.pop_co().begin();
+
+#ifdef DIVERSITY
+        float max = ea.pop()[0]->fit().obj(0);
+        for(size_t i = 0; i < ea.pop().size(); ++i)
+        {
+          if(ea.pop()[i]->fit().obj(0) > max)
+          {
+            _best = ea.pop()[i];
+            max = _best->fit().obj(0);
+          }
+        }
+
+        float max_co = ea.pop_co()[0]->fit().obj(0);
+        for(size_t i = 0; i < ea.pop_co().size(); ++i)
+        {
+          if(ea.pop_co()[i]->fit().obj(0) > max_co)
+          {
+            _best_co = ea.pop_co()[i];
+            max_co = _best_co->fit().obj(0);
+          }
+        }
+#endif
 
 				this->_create_log_file_leadership(ea, "bestleadership.dat");
         this->_create_log_file_leadership_co(ea, "bestleadership-co.dat");
 
 				if (ea.dump_enabled())
 				{
+#ifdef DIVERSITY
+          (*this->_log_file_leadership) << ea.nb_eval() << "," << _best->fit().obj(0);
+#else
 					(*this->_log_file_leadership) << ea.nb_eval() << "," << _best->fit().value();
+#endif
 
           (*this->_log_file_leadership) << "," << _best->proportion_leader();
           float proportion_leader_first = _best->nb_leader_first()/_best->nb_preys_killed_coop();
           (*this->_log_file_leadership) << "," << proportion_leader_first;
           (*this->_log_file_leadership) << "," << _best->nb_leader_first() << "," << _best->nb_preys_killed_coop() << "," << std::endl;
 
+#ifdef DIVERSITY
+          (*this->_log_file_leadership_co) << ea.nb_eval() << "," << _best_co->fit().obj(0);
+#else
           (*this->_log_file_leadership_co) << ea.nb_eval() << "," << _best_co->fit().value();
+#endif
 
           (*this->_log_file_leadership_co) << "," << _best_co->proportion_leader();
           proportion_leader_first = _best_co->nb_leader_first()/_best_co->nb_preys_killed_coop();

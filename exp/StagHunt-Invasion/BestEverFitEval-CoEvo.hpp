@@ -35,8 +35,8 @@
 
 
 
-#ifndef BEST_EVER_FIT_EVAL_
-#define BEST_EVER_FIT_EVAL_
+#ifndef BEST_EVER_FIT_EVAL_CO_EVO_
+#define BEST_EVER_FIT_EVAL_CO_EVO_
 
 #include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/nvp.hpp>
@@ -47,7 +47,7 @@ namespace sferes
   namespace stat
   {
     // assume that the population is sorted !
-    SFERES_STAT(BestEverFitEval, Stat)
+    SFERES_STAT(BestEverFitEvalCoEvo, Stat)
     {
     public:
       template<typename E>
@@ -55,9 +55,11 @@ namespace sferes
       {
 				assert(!ea.pop().empty());
 
-        boost::shared_ptr<Phen> best = *ea.pop().begin();
 
 #ifdef DIVERSITY
+        boost::shared_ptr<Phen> best = *ea.pop().begin();
+        boost::shared_ptr<Phen> best_co = *ea.pop_co().begin();
+
         float max = ea.pop()[0]->fit().obj(0);
         for(size_t i = 0; i < ea.pop().size(); ++i)
         {
@@ -68,44 +70,92 @@ namespace sferes
           }
         }
 
+        float max_co = ea.pop_co()[0]->fit().obj(0);
+        for(size_t i = 0; i < ea.pop_co().size(); ++i)
+        {
+          if(ea.pop_co()[i]->fit().obj(0) > max_co)
+          {
+            best_co = ea.pop_co()[i];
+            max_co = best_co->fit().obj(0);
+          }
+        }
+
         if(_bestEver == NULL || best->fit().obj(0) > _bestEver->fit().obj(0))
         {
             _bestEver = boost::shared_ptr<Phen>(new Phen(*best));
         }
-#else
-        if(_bestEver == NULL || best->fit().value() > _bestEver->fit().value())
+
+        if(_bestEver_co == NULL || best_co->fit().obj(0) > _bestEver_co->fit().obj(0))
         {
-            _bestEver = boost::shared_ptr<Phen>(new Phen(*best));
+            _bestEver_co = boost::shared_ptr<Phen>(new Phen(*best_co));
+        }
+#else
+        if(_bestEver == NULL || (*ea.pop().begin())->fit().value() > _bestEver->fit().value())
+        {
+            _bestEver = boost::shared_ptr<Phen>(new Phen(**(ea.pop().begin())));
+        }
+
+        if(_bestEver_co == NULL || (*ea.pop_co().begin())->fit().value() > _bestEver_co->fit().value())
+        {
+            _bestEver_co = boost::shared_ptr<Phen>(new Phen(**(ea.pop_co().begin())));
         }
 #endif
-        
 				this->_create_log_file(ea, "besteverfit.dat");
+
 				if (ea.dump_enabled())
 				{
 #ifdef DIVERSITY
           (*this->_log_file) << ea.nb_eval() << "," << _bestEver->fit().obj(0);
 #else
-          (*this->_log_file) << ea.nb_eval() << "," << _bestEver->fit().value();
+					(*this->_log_file) << ea.nb_eval() << "," << _bestEver->fit().value();
 #endif
 					(*this->_log_file) << "," << _bestEver->nb_hares() << "," << _bestEver->nb_hares_solo() << "," << _bestEver->nb_sstag() << "," << _bestEver->nb_sstag_solo() << "," << _bestEver->nb_bstag() << "," << _bestEver->nb_bstag_solo() << std::endl;
 				}
+        
+        this->_create_log_file_co(ea, "besteverfit-co.dat");
+
+        if (ea.dump_enabled())
+        {
+#ifdef DIVERSITY
+          (*this->_log_file_co) << ea.nb_eval() << "," << _bestEver_co->fit().obj(0);
+#else
+          (*this->_log_file_co) << ea.nb_eval() << "," << _bestEver_co->fit().value();
+#endif
+          (*this->_log_file_co) << "," << _bestEver_co->nb_hares() << "," << _bestEver_co->nb_hares_solo() << "," << _bestEver_co->nb_sstag() << "," << _bestEver_co->nb_sstag_solo() << "," << _bestEver_co->nb_bstag() << "," << _bestEver_co->nb_bstag_solo() << std::endl;
+        }
       }
 
       void show(std::ostream& os, size_t k)
       {
 				_bestEver->develop();
 				_bestEver->show(os);
+        _bestEver_co->develop();
+        _bestEver_co->show(os);
 				_bestEver->fit().set_mode(fit::mode::view);
-				_bestEver->fit().eval_compet(*_bestEver, *_bestEver);
+				_bestEver->fit().eval_compet(*_bestEver, *_bestEver_co);
       }
       const boost::shared_ptr<Phen> best() const { return _bestEver; }
       template<class Archive>
       void serialize(Archive & ar, const unsigned int version)
       {
         ar & BOOST_SERIALIZATION_NVP(_bestEver);
+        ar & BOOST_SERIALIZATION_NVP(_bestEver_co);
       }
     protected:
       boost::shared_ptr<Phen> _bestEver;
+      boost::shared_ptr<Phen> _bestEver_co;
+
+      boost::shared_ptr<std::ofstream> _log_file_co;
+      
+      template<typename E>
+      void _create_log_file_co(const E& ea, const std::string& name)
+      {
+        if (!_log_file_co && ea.dump_enabled())
+        {
+          std::string log = ea.res_dir() + "/" + name;
+          _log_file_co = boost::shared_ptr<std::ofstream>(new std::ofstream(log.c_str()));
+        }
+      }
     };
   }
 }

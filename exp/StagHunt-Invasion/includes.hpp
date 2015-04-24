@@ -31,6 +31,9 @@
 #include "FitnessProp.hpp"
 #include "Elitist.hpp"
 #include "StagHuntEvalParallel.hpp"
+#include "InvasionEa.hpp"
+#include "EvalInvasion.hpp"
+#include "PhenInvasion.hpp"
 
 #ifdef COEVO
 #include "Elitist-CoEvo.hpp"

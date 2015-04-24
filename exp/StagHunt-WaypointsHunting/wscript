@@ -31,16 +31,21 @@ def build(bld):
 #                           json = 'StagHuntExp3.json',
                            variants = [
                                           # 'CONTROL1 COEVO BSTAG250 NO_WAYPOINTS POS_CLOSE',
-                                          'CONTROL1 BSTAG250 NO_WAYPOINTS POS_CLOSE',
+                                          # 'CONTROL1 BSTAG250 NO_WAYPOINTS POS_CLOSE',
+                                          'CONTROL1 BSTAG1000 BSTAG_SOLO1000 NO_WAYPOINTS POS_CLOSE',
+                                          'CONTROL1 NEVAL_ALL BSTAG1000 BSTAG_SOLO1000 NO_WAYPOINTS POS_CLOSE',
+                                          'CONTROL1 BSTAG1000 BSTAG_SOLO1000 NO_WAYPOINTS SIZE10 POS_CLOSE',
 
                                           # 'COEVO NO_PREYS POS_CLOSE',
-                                          'NO_PREYS POS_CLOSE',
+                                          # 'NO_PREYS POS_CLOSE',
 
                                           # 'SETTING15 COEVO BSTAG250 POS_CLOSE',
-                                          # 'SETTING15 COEVO BSTAG250 NO_WAYPOINTS POS_CLOSE',
+                                          # 'SETTING15 BSTAG250 NO_WAYPOINTS POS_CLOSE',
+                                          # 'SETTING15 BSTAG250 POS_CLOSE',
 
                                           # 'CONTROL1 COEVO BSTAG250 POS_CLOSE',
                                           # 'CONTROL1 BSTAG250 POS_CLOSE',
+                                          # 'CONTROL1 BSTAG1000 BSTAG_SOLO1000 POS_CLOSE',
                                       ])
 
                                        

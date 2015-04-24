@@ -16,13 +16,29 @@ namespace sferes
       template<typename E>
 				void refresh(const E& ea)
       {
-				_best = *ea.pop().begin();
+        _best = *ea.pop().begin();
+
+#ifdef DIVERSITY
+        float max = ea.pop()[0]->fit().obj(0);
+        for(size_t i = 0; i < ea.pop().size(); ++i)
+        {
+          if(ea.pop()[i]->fit().obj(0) > max)
+          {
+            _best = ea.pop()[i];
+            max = _best->fit().obj(0);
+          }
+        }
+#endif
 
 				this->_create_log_file_leadership(ea, "bestleadership.dat");
 
 				if (ea.dump_enabled())
 				{
+#ifdef DIVERSITY
+          (*this->_log_file_leadership) << ea.nb_eval() << "," << _best->fit().obj(0);
+#else
 					(*this->_log_file_leadership) << ea.nb_eval() << "," << _best->fit().value();
+#endif
 
           (*this->_log_file_leadership) << "," << _best->proportion_leader();
           float proportion_leader_first = _best->nb_leader_first()/_best->nb_preys_killed_coop();

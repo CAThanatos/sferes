@@ -35,8 +35,8 @@
 
 
 
-#ifndef BEST_FIT_BEHAVIOUR_VIDEO_
-#define BEST_FIT_BEHAVIOUR_VIDEO_
+#ifndef BEST_FIT_BEHAVIOUR_VIDEO_CO_EVO_
+#define BEST_FIT_BEHAVIOUR_VIDEO_CO_EVO_
 
 #include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/nvp.hpp>
@@ -47,14 +47,17 @@ namespace sferes
   namespace stat
   {
     // assume that the population is sorted !
-    SFERES_STAT(BestFitBehaviourVideo, Stat)
+    SFERES_STAT(BestFitBehaviourVideoCoEvo, Stat)
     {
     public:
       template<typename E>
 				void refresh(const E& ea)
       {
 				assert(!ea.pop().empty());
+				assert(!ea.pop_co().empty());
+
 				_best = *ea.pop().begin();
+				_best_co = *ea.pop_co().begin();
 
 #ifdef DIVERSITY
         float max = ea.pop()[0]->fit().obj(0);
@@ -66,9 +69,19 @@ namespace sferes
             max = _best->fit().obj(0);
           }
         }
+
+        float max_co = ea.pop_co()[0]->fit().obj(0);
+        for(size_t i = 0; i < ea.pop_co().size(); ++i)
+        {
+          if(ea.pop_co()[i]->fit().obj(0) > max_co)
+          {
+            _best_co = ea.pop_co()[i];
+            max_co = _best_co->fit().obj(0);
+          }
+        }
 #endif
 
-        if (ea.dump_enabled() && (ea.gen() % Params::pop::video_dump_period == 0))
+				if (ea.dump_enabled() && (ea.gen() % Params::pop::video_dump_period == 0))
 				{
 					_best->fit().set_mode(fit::mode::view);
 
@@ -78,7 +91,7 @@ namespace sferes
 
 					std::string file_video = video_dir + "/behaviourVideoFrame_";
 					_best->fit().set_file_video(file_video);
-					_best->fit().eval_compet(*_best, *_best);
+					_best->fit().eval_compet(*_best, *_best_co);
 
 					// We delete the existing archive
 					std::string command;
@@ -105,20 +118,25 @@ namespace sferes
       {
 				_best->develop();
 				_best->show(os);
+				_best_co->develop();
+				_best_co->show(os);
+
 				_best->fit().set_mode(fit::mode::view);
 
 				std::string file_video = "./behaviourVideoFrame_";
 				_best->fit().set_file_video(file_video);
-				_best->fit().eval_compet(*_best, *_best);
+				_best->fit().eval_compet(*_best, *_best_co);
       }
       const boost::shared_ptr<Phen> best() const { return _best; }
       template<class Archive>
       void serialize(Archive & ar, const unsigned int version)
       {
         ar & BOOST_SERIALIZATION_NVP(_best);
+        ar & BOOST_SERIALIZATION_NVP(_best_co);
       }
     protected:
       boost::shared_ptr<Phen> _best;
+      boost::shared_ptr<Phen> _best_co;
     };
   }
 }

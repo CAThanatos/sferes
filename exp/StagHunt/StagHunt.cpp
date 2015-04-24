@@ -19,14 +19,24 @@ namespace sferes
 			std::cout << "Nop !" << std::endl;
 		}
 
+#ifdef COEVO
+    template<typename Indiv>
+      void eval_compet(Indiv& ind1, Indiv& ind2, int num_leader = 1) 
+#else
     template<typename Indiv>
       void eval_compet(Indiv& ind1, Indiv& ind2) 
+#endif
     {
       nn_t nn1(Params::nn::nb_inputs, Params::nn::nb_hidden, Params::nn::nb_outputs);
       nn_t nn2(Params::nn::nb_inputs, Params::nn::nb_hidden, Params::nn::nb_outputs);
 
+#ifndef MLP_PERSO
       nn1.set_all_weights(ind1.data());
       nn2.set_all_weights(ind2.data());
+
+      nn1.init();
+      nn2.init();
+#endif
 
       typedef simu::FastsimMulti<Params> simu_t;
       typedef fastsim::Map map_t;
@@ -44,6 +54,12 @@ namespace sferes
       float moy_hares2_solo = 0, moy_sstags2_solo = 0, moy_bstags2_solo = 0;
      	int food2 = 0;
 
+			// clock_t deb = clock();
+
+#ifdef DIVERSITY
+			std::vector<float> vec_sm;
+#endif
+
       for (size_t j = 0; j < Params::simu::nb_trials; ++j)
       {
       	// init
@@ -51,23 +67,24 @@ namespace sferes
 				simu_t simu(map, (this->mode() == fit::mode::view));
 				init_simu(simu, nn1, nn2);
 
+
 #ifdef BEHAVIOUR_LOG
 				_file_behaviour = "behaviourTrace";
 				cpt_files = 0;
 #endif
 	
 #ifdef MLP_PERSO
-				StagHuntRobot* robotTmp = (StagHuntRobot*)(simu.robots()[0]);
-				Hunter* hunterTmp = (Hunter*)robotTmp;
-				hunterTmp->set_weights(ind1.data());
-				robotTmp = (StagHuntRobot*)(simu.robots()[1]);
-				hunterTmp = (Hunter*)robotTmp;
-				hunterTmp->set_weights(ind2.data());
+				hunter1->set_weights(ind1.data());
+				hunter2->set_weights(ind2.data());
 #endif
-
+	
 				float food_trial = 0;
 
-     		for (size_t i = 0; i < Params::simu::nb_steps && !stop_eval; ++i)
+#ifdef DIVERSITY
+				std::vector<float> vec_sm_trial;
+#endif
+
+				for (size_t i = 0; i < Params::simu::nb_steps && !stop_eval; ++i)
 				{
 					// Number of steps the robots are evaluated
 					_nb_eval = i + 1;
@@ -75,30 +92,6 @@ namespace sferes
 					// We compute the robots' actions in an ever-changing order
 					std::vector<size_t> ord_vect;
 					misc::rand_ind(ord_vect, simu.robots().size());
-					
-					// We update the compas information of each hunter
-					// StagHuntRobot* robot1 = (StagHuntRobot*)(simu.robots()[0]);
-					// Hunter* hunter1 = (Hunter*)robot1;
-					// StagHuntRobot* robot2 = (StagHuntRobot*)(simu.robots()[1]);
-					// Hunter* hunter2 = (Hunter*)robot2;
-	
-					// float distance_toPred = robot1->get_pos().dist_to(robot2->get_pos().x(), robot2->get_pos().y());
-					// hunter1->set_distance_hunter(distance_toPred);
-					// hunter2->set_distance_hunter(distance_toPred);
-					
-					// float angle_toPred2 = normalize_angle(atan2(robot2->get_pos().y() - robot1->get_pos().y(), robot2->get_pos().x() - robot1->get_pos().x()));
-					// angle_toPred2 = normalize_angle(angle_toPred2 - robot1->get_pos().theta());
-					// hunter1->set_angle_hunter(angle_toPred2);
-					
-					// float angle_toPred1 = normalize_angle(atan2(robot1->get_pos().y() - robot2->get_pos().y(), robot1->get_pos().x() - robot2->get_pos().x()));
-					// angle_toPred1 = normalize_angle(angle_toPred1 - robot2->get_pos().theta());
-					// hunter2->set_angle_hunter(angle_toPred1);
-
-					// float direction_toPred2 = normalize_angle(robot2->get_pos().theta() - robot1->get_pos().theta());
-					// hunter1->set_direction_hunter(direction_toPred2);
-
-					// float direction_toPred1 = normalize_angle(robot1->get_pos().theta() - robot2->get_pos().theta());
-					// hunter2->set_direction_hunter(direction_toPred1);
 
 					for(int k = 0; k < ord_vect.size(); ++k)
 					{
@@ -106,7 +99,7 @@ namespace sferes
 						assert(num < simu.robots().size());
 	
 						StagHuntRobot* robot = (StagHuntRobot*)(simu.robots()[num]);
-
+	
 						std::vector<float> action = robot->step_action();
 	
 						// We compute the movement of the robot
@@ -117,8 +110,22 @@ namespace sferes
 							
 							// v1 and v2 are between -4 and 4
 							simu.move_robot(v1, v2, num);
+
+#ifdef DIVERSITY
+							if (0 == num)
+								for(size_t l = 0; l < action.size(); ++l)
+									vec_sm_trial.push_back(action[l]);
+#endif
 						}
 					}
+
+#ifdef DIVERSITY
+					std::vector<float>& vec_inputs_rob = ((Hunter*)(simu.robots()[0]))->get_last_inputs();
+
+					for (size_t l = 0; l < vec_inputs_rob.size(); ++l)
+						vec_sm_trial.push_back(vec_inputs_rob[l]);
+#endif
+
 					update_simu(simu);
 
 					// And then we update their status : food gathered, prey dead
@@ -140,11 +147,14 @@ namespace sferes
 						bool alone = (nb_blocked > 1) ? false : true;
 
 #ifdef BEHAVIOUR_LOG
+   					// Is the first robot the first one on the target ?
+   					bool first_robot = (((Prey*)simu.robots()[index])->get_leader_first() == 1) == (((Hunter*)simu.robots()[0])->is_leader());
+
 						if(this->mode() == fit::mode::view)
 						{
-							std::string fileDump = _file_behaviour + boost::lexical_cast<std::string>(cpt_files + 1) + ".bmp";
-       				simu.add_dead_prey(index, fileDump, alone);
-       				cpt_files++;
+							// std::string fileDump = _file_behaviour + boost::lexical_cast<std::string>(cpt_files + 1) + ".bmp";
+       				simu.add_dead_prey(index, alone, first_robot);
+       				// cpt_files++;
 						}
 #endif
 
@@ -200,6 +210,9 @@ namespace sferes
 					}
 				}
 
+				// clock_t fin = clock();
+				// std::cout << "HE : " << (fin - deb)/(double) CLOCKS_PER_SEC << std::endl;
+
        	Hunter* h1 = (Hunter*)(simu.robots()[0]);
        	food1 += h1->get_food_gathered();
 		   	food_trial += h1->get_food_gathered();
@@ -221,10 +234,26 @@ namespace sferes
        	moy_sstags2_solo += h2->nb_small_stags_hunted_solo();
        	moy_bstags2_solo += h2->nb_big_stags_hunted_solo();
 
-       	
-#ifdef BEHAVIOUR_VIDEO
+#ifdef DIVERSITY
+	      for (size_t l = 0; l < vec_sm_trial.size(); ++l)
+	      	vec_sm.push_back(vec_sm_trial[l]);
+#endif
+
+
+#if defined(BEHAVIOUR_LOG)
+	 			if(this->mode() == fit::mode::view)
+	 			{
+					std::string fileDump = _file_behaviour + ".bmp";
+ 	 				simu.dump_behaviour_log(fileDump.c_str());
+	 			}
+#endif
+
+
+#if defined(BEHAVIOUR_VIDEO)
 				if(this->mode() == fit::mode::view)
+				{
 					return;
+				}
 #endif
 			}
 			
@@ -279,14 +308,22 @@ namespace sferes
 			ind2.add_nb_sstag(moy_sstags2, moy_sstags1_solo);
 			ind2.add_nb_bstag(moy_bstags2, moy_bstags1_solo);
 #endif
-     	
+
      	food2 /= nb_encounters;
      	food1 /= nb_encounters;
 
-			ind1.fit().add_fitness(food1);
+     	ind1.fit().add_fitness(food1);
 			
 #if !defined(NOT_AGAINST_ALL) && !defined(ALTRUISM)
 			ind2.fit().add_fitness(food2);
+#endif
+
+#ifdef DIVERSITY
+			for(size_t l = 0; l < vec_sm.size(); ++l)
+			{
+				vec_sm[l] /= nb_encounters;
+				ind1.add_vec_sm(vec_sm[l], l);
+			}
 #endif
     } // *** end of eval ***
 
@@ -302,7 +339,7 @@ namespace sferes
 			{
 			  simu.init_view(true);
 				
-#ifdef BEHAVIOUR_VIDEO
+#if defined(BEHAVIOUR_VIDEO)
 				simu.set_file_video(_file_video);
 #endif
 			}
@@ -328,11 +365,16 @@ namespace sferes
 			// First the robots for the two hunters
 			std::vector<Posture> pos_init;
 			
+#ifdef POS_CLOSE
+			pos_init.push_back(Posture(width/2 - 40, 80, M_PI/2));
+			pos_init.push_back(Posture(width/2 + 40, 80, M_PI/2));
+#else
 			pos_init.push_back(Posture(width/2, 80, M_PI/2));
 			pos_init.push_back(Posture(width/2, height - 80, -M_PI/2));
+#endif
 
 			invers_pos = false;
-			
+
 			for(int i = 0; i < 2; ++i)
 			{
 				Hunter* r;				
@@ -365,7 +407,7 @@ namespace sferes
 		
 				simu.add_robot(r);
 			}
-								
+					
 			// Then the hares std::vector<Posture> vec_pos;
 			int nb_big_stags = Params::simu::ratio_big_stags*Params::simu::nb_big_stags;
 			int nb_small_stags = Params::simu::nb_big_stags - nb_big_stags;
@@ -446,7 +488,7 @@ namespace sferes
    			if((dist - prey->get_radius() - hunter->get_radius()) <= CATCHING_DISTANCE)
    				hunters.push_back(hunter);
    		}
-   		
+
    		// We check if the prey is blocked
    		prey->blocked_by_hunters(hunters.size());
    	
@@ -536,14 +578,18 @@ int main(int argc, char **argv)
   typedef FitStagHunt<Params> fit_t;
 
 	// GENOTYPE
+#ifdef DIVERSITY
+  typedef gen::EvoFloat<Params::nn::genome_size, Params> gen_t;
+#else
 #ifdef CMAES
-  typedef gen::Cmaes<(Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs, Params> gen_t;
+  typedef gen::Cmaes<Params::nn::genome_size, Params> gen_t;
 //  typedef gen::Cmaes<90, Params> gen_t;
 #else
 #ifdef ELITIST
-  typedef gen::ElitistGen<(Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs, Params> gen_t;
+  typedef gen::ElitistGen<Params::nn::genome_size, Params> gen_t;
 #else
-  typedef gen::EvoFloat<(Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs, Params> gen_t;
+  typedef gen::EvoFloat<Params::nn::genome_size, Params> gen_t;
+#endif
 #endif
 #endif
   
@@ -551,16 +597,30 @@ int main(int argc, char **argv)
   typedef phen::PhenChasseur<gen_t, fit_t, Params> phen_t;
 
 	// EVALUATION
-	typedef eval::StagHuntEvalParallel<Params> eval_t;
+	#ifdef COEVO
+		typedef eval::StagHuntEvalParallelCoEvo<Params> eval_t;
+	#else
+		typedef eval::StagHuntEvalParallel<Params> eval_t;
+	#endif
 
   // STATS 
   typedef boost::fusion::vector<
+#ifdef COEVO
+		  sferes::stat::BestFitEvalCoEvo<phen_t, Params>,
+		  sferes::stat::AllFitEvalStatCoEvo<phen_t, Params>,
+#ifdef BEHAVIOUR_VIDEO
+		  sferes::stat::BestFitBehaviourVideoCoEvo<phen_t, Params>,
+#endif
+#else
 		  sferes::stat::BestFitEval<phen_t, Params>,
-		  sferes::stat::MeanFitEval<phen_t, Params>,
-		  sferes::stat::BestEverFitEval<phen_t, Params>,
 		  sferes::stat::AllFitEvalStat<phen_t, Params>,
 #ifdef BEHAVIOUR_VIDEO
 		  sferes::stat::BestFitBehaviourVideo<phen_t, Params>,
+#endif
+#endif
+#ifdef DIVERSITY
+		  sferes::stat::BestDiversityEval<phen_t, Params>,
+		  sferes::stat::AllDiversityEvalStat<phen_t, Params>,
 #endif
 		  sferes::stat::StopEval<Params>
     >  stat_t;
@@ -569,14 +629,26 @@ int main(int argc, char **argv)
   typedef modif::Dummy<Params> modifier_t;
 
 	// EVOLUTION ALGORITHM
+#ifdef DIVERSITY
+#ifdef COEVO
+	typedef ea::Nsga2CoEvo<phen_t, eval_t, stat_t, modifier_t, Params> ea_t; 
+#else
+	typedef ea::Nsga2<phen_t, eval_t, stat_t, modifier_t, Params> ea_t; 
+#endif
+#else
 #ifdef FITPROP
   typedef ea::FitnessProp<phen_t, eval_t, stat_t, modifier_t, Params> ea_t; 
 #elif defined(CMAES)
   typedef ea::Cmaes<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
 #elif defined(ELITIST)
+#ifdef COEVO
+  typedef ea::ElitistCoEvo<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
+#else
   typedef ea::Elitist<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
+#endif
 #else
   typedef ea::RankSimple<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
+#endif
 #endif
 
   ea_t ea;

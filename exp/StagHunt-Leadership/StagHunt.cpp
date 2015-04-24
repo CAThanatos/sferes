@@ -80,8 +80,6 @@ namespace sferes
 
 			float proportion_leader = 0;
 
-			// clock_t deb = clock();
-
 #ifdef DOUBLE_NN
 			float nb_nn1_chosen = 0;
 			float nb_bigger_nn1_chosen = 0;
@@ -94,6 +92,8 @@ namespace sferes
 
       for (size_t j = 0; j < Params::simu::nb_trials; ++j)
       {
+				// clock_t deb = clock();
+
       	// init
 				map_t map(Params::simu::map_name(), Params::simu::real_w);
 				simu_t simu(map, (this->mode() == fit::mode::view));
@@ -982,7 +982,7 @@ int main(int argc, char **argv)
   typedef boost::fusion::vector<
 #ifdef COEVO
 		  sferes::stat::BestFitEvalCoEvo<phen_t, Params>,
-		  sferes::stat::MeanFitEvalCoEvo<phen_t, Params>,
+		  // sferes::stat::MeanFitEvalCoEvo<phen_t, Params>,
 		  sferes::stat::AllFitEvalStatCoEvo<phen_t, Params>,
 		  sferes::stat::BestLeadershipEvalCoEvo<phen_t, Params>,
 		  sferes::stat::AllLeadershipEvalStatCoEvo<phen_t, Params>,
@@ -991,7 +991,7 @@ int main(int argc, char **argv)
 #endif
 #else
 		  sferes::stat::BestFitEval<phen_t, Params>,
-		  sferes::stat::MeanFitEval<phen_t, Params>,
+		  // sferes::stat::MeanFitEval<phen_t, Params>,
 		  sferes::stat::AllFitEvalStat<phen_t, Params>,
 		  sferes::stat::BestLeadershipEval<phen_t, Params>,
 		  sferes::stat::AllLeadershipEvalStat<phen_t, Params>,

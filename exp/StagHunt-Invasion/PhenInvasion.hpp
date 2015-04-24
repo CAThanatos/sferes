@@ -55,7 +55,7 @@ namespace sferes
 #ifdef EIGEN_CORE_H
 		    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 #endif
-		    PhenChasseur() : _params((*this)._gen.size()), _nb_hares(0), _nb_hares_solo(0), _nb_sstag(0), _nb_sstag_solo(0), _nb_bstag(0), _nb_bstag_solo(0), _fit_mov(0), _pop_pos(-1), _developed(false) 					{
+		    PhenChasseur() : _params((*this)._gen.size()), _nb_hares(0), _nb_hares_solo(0), _nb_sstag(0), _nb_sstag_solo(0), _nb_bstag(0), _nb_bstag_solo(0), _nb_leader_first(0), _nb_preys_killed_coop(0), _fit_mov(0), _developed(false) 					{
 		    }
 		    
 		    typedef float type_t;
@@ -73,6 +73,14 @@ namespace sferes
 					_nb_sstag_solo = 0;
 					_nb_bstag = 0;
 					_nb_bstag_solo = 0;
+					_nb_leader_first = 0;
+					_nb_preys_killed_coop = 0;
+					_proportion_leader = 0;
+#ifdef DOUBLE_NN
+					_nb_nn1_chosen = 0;
+					_nb_bigger_nn1_chosen = 0;
+					_nb_role_divisions = 0;
+#endif
 					_fit_mov = 0;
 					
 					this->fit().vec_fitness.clear();
@@ -84,17 +92,19 @@ namespace sferes
 					_nb_sstag_solo_at = 0;
 					_nb_bstag_at = 0;
 					_nb_bstag_solo_at = 0;
+					_nb_leader_first_at = 0;
+					_nb_preys_killed_coop_at = 0;
+					_proportion_leader_at = 0;
+#ifdef DOUBLE_NN
+					_nb_nn1_chosen_at = 0;
+					_nb_bigger_nn1_chosen_at = 0;
+					_nb_role_divisions_at = 0;
+#endif
 					this->fit().fitness_at = 0;
 
-#ifdef DIVERSITY
-					_vector_diversity_init = false;
-					_vector_diversity.clear();
-
-					_vec_sm_at.clear();
-					_vec_sm_at.resize((Params::nn::nb_inputs + Params::nn::nb_outputs)*Params::simu::nb_steps*Params::simu::nb_trials);
-					_vec_sm.clear();
-					_vec_sm.resize((Params::nn::nb_inputs + Params::nn::nb_outputs)*Params::simu::nb_steps*Params::simu::nb_trials);
-#endif
+					_freq = 0.0f;
+					_vec_payoffs.clear();
+					_vec_payoffs.resize(Params::simu::pop_size);
 				}
 
 				float data(size_t i) const { assert(i < size()); return _params[i]; }
@@ -154,86 +164,53 @@ namespace sferes
 		    float nb_bstag_solo_at() const { return _nb_bstag_solo_at; }
 		    void add_nb_bstag(float nb_bstag, float solo) { _nb_bstag_at.fetch_and_store(_nb_bstag_at + nb_bstag); _nb_bstag_solo_at.fetch_and_store(_nb_bstag_solo_at + solo); }
 
-#ifdef DIVERSITY
-		    const std::vector<float>& vector_diversity() const { return _vector_diversity; }
-				void set_vector_diversity(size_t index, float value)
-				{
-					assert(index < _vector_diversity.size());
-					_vector_diversity[index] = value;
-				}
+		    
+		    float proportion_leader() const { return _proportion_leader; }
+		    void set_proportion_leader(float proportion_leader) { _proportion_leader = proportion_leader; }
 
-				bool is_vector_diversity_init() { return _vector_diversity_init; }
+		    float proportion_leader_at() const { return _proportion_leader_at; }
+		    void add_proportion_leader(float proportion_leader) { _proportion_leader_at.fetch_and_store(_proportion_leader_at + proportion_leader); }
 
-				void create_vector_diversity()
-				{
-					_vector_diversity.resize(_vec_sm.size());
-					for (size_t i = 0; i < _vec_sm.size(); ++i)
-						_vector_diversity[i] = _vec_sm[i];
-				}
 
-				float dist_diversity(const PhenChasseur& chasseur)
-				{
-					float dist = 0.0f;
-					for (size_t i = 0; i < _vector_diversity.size(); ++i)
-					{
-						assert(0.0f <= _vector_diversity[i]);
-						assert(_vector_diversity[i] <= 1.0f);
+		    float nb_leader_first() const { return _nb_leader_first; }
+		    void set_nb_leader_first(float nb_leader_first) { _nb_leader_first = nb_leader_first; }
+		    
+		    float nb_leader_first_at() const { return _nb_leader_first_at; }
+		    void add_nb_leader_first(float nb_leader_first) { _nb_leader_first_at.fetch_and_store(_nb_leader_first_at + nb_leader_first); }
 
-						assert(0.0f <= chasseur.vector_diversity()[i]);
-						assert(chasseur.vector_diversity()[i] <= 1.0f);
 
-						float x = _vector_diversity[i] - chasseur.vector_diversity()[i];
-						dist += x * x;
-					}
+		    float nb_preys_killed_coop() const { return _nb_preys_killed_coop; }
+		    void set_nb_preys_killed_coop(float nb_preys_killed_coop) { _nb_preys_killed_coop = nb_preys_killed_coop; }
+		    
+		    float nb_preys_killed_coop_at() const { return _nb_preys_killed_coop_at; }
+		    void add_nb_preys_killed_coop(float nb_preys_killed_coop) { _nb_preys_killed_coop_at.fetch_and_store(_nb_preys_killed_coop_at + nb_preys_killed_coop); }
 
-					return sqrtf(dist)/sqrt(_vector_diversity.size());
-				}
 
-				float dist_hamming_diversity(const PhenChasseur& chasseur)
-				{
-					float dist = 0.0f;
-					for (size_t i = 0; i < _vector_diversity.size(); ++i)
-					{
-						assert(0.0f <= _vector_diversity[i]);
-						assert(_vector_diversity[i] <= 1.0f);
+#ifdef DOUBLE_NN
+		    float nb_nn1_chosen() const { return _nb_nn1_chosen; }
+		    void set_nb_nn1_chosen(float nb_nn1_chosen) { _nb_nn1_chosen = nb_nn1_chosen; }
+		    
+		    float nb_nn1_chosen_at() const { return _nb_nn1_chosen_at; }
+		    void add_nb_nn1_chosen(float nb_nn1_chosen) { _nb_nn1_chosen_at.fetch_and_store(_nb_nn1_chosen_at + nb_nn1_chosen); }
 
-						assert(0.0f <= chasseur.vector_diversity()[i]);
-						assert(chasseur.vector_diversity()[i] <= 1.0f);
 
-						dist += abs((int)_vector_diversity[i] - (int)chasseur.vector_diversity()[i]);
-					}
+		    float nb_bigger_nn1_chosen() const { return _nb_bigger_nn1_chosen; }
+		    void set_nb_bigger_nn1_chosen(float nb_bigger_nn1_chosen) { _nb_bigger_nn1_chosen = nb_bigger_nn1_chosen; }
+		    
+		    float nb_bigger_nn1_chosen_at() const { return _nb_bigger_nn1_chosen_at; }
+		    void add_nb_bigger_nn1_chosen(float nb_bigger_nn1_chosen) { _nb_bigger_nn1_chosen_at.fetch_and_store(_nb_bigger_nn1_chosen_at + nb_bigger_nn1_chosen); }
 
-					return dist/(float)_vector_diversity.size();
-				}
 
-				void add_vec_sm(float value, int index)
-				{
-					assert(index < _vec_sm_at.size());
-					_vec_sm_at[index].fetch_and_store(_vec_sm_at[index] + value);
-				}
-
-				void set_vec_sm()
-				{
-					_vec_sm.resize(_vec_sm_at.size());
-					for (size_t i = 0; i < _vec_sm_at.size(); ++i)
-					{
-						_vec_sm[i] = _vec_sm_at[i];
-						_vec_sm[i] = (_vec_sm[i] > Params::simu::threshold_hamming) ? 1 : 0;
-					}
-				}
-
-				float vec_sm(int index)
-				{
-					assert(index < _vec_sm_at.size());
-					return _vec_sm_at[index];
-				}
+		    float nb_role_divisions() const { return _nb_role_divisions; }
+		    void set_nb_role_divisions(float nb_role_divisions) { _nb_role_divisions = nb_role_divisions; }
+		    
+		    float nb_role_divisions_at() const { return _nb_role_divisions_at; }
+		    void add_nb_role_divisions(float nb_role_divisions) { _nb_role_divisions_at.fetch_and_store(_nb_role_divisions_at + nb_role_divisions); }
 #endif
 
 
 		    float fit_mov() const { return _fit_mov; }
 		    void set_fit_mov(float fit_mov) { _fit_mov = fit_mov; }
-		    int pop_pos() const { return _pop_pos; }
-		    void set_pop_pos(int pop_pos) { _pop_pos = pop_pos; }
 
 				bool developed() const { return _developed; }
 				void set_developed(bool developed) { _developed = developed; }
@@ -248,6 +225,24 @@ namespace sferes
 						
 					return new_indiv;
 				}
+
+		    int pop_pos() const { return _pop_pos; }
+		    void set_pop_pos(int pop_pos) { _pop_pos = pop_pos; }
+
+		    void reset_vec_payoffs() { _vec_payoffs.resize(Params::simu::pop_size); }
+		    void set_payoff(int opponent, float payoff) 
+		    {
+		    	assert(opponent < _vec_payoffs.size());
+		    	_vec_payoffs[opponent] = payoff;
+		    }
+		    float get_payoff(int opponent)
+		    {
+		    	assert(opponent < _vec_payoffs.size());
+		    	return _vec_payoffs[opponent];
+		    }
+
+		    void set_freq(float freq) { _freq = freq; }
+		    float get_freq() { return _freq; }
       
 		  protected:
 		    std::vector<float> _params;
@@ -272,6 +267,32 @@ namespace sferes
 
 		    tbb::atomic<float> _nb_bstag_at;
 		    tbb::atomic<float> _nb_bstag_solo_at;
+		    
+		    // Number of times the leader arrived first on a prey
+		    float _nb_leader_first;
+		    tbb::atomic<float> _nb_leader_first_at;
+		    
+		    // Total number of cooperative hunts
+		    float _nb_preys_killed_coop;
+		    tbb::atomic<float> _nb_preys_killed_coop_at;
+
+		    // Proportion of times the designated leader hunted first
+		    float _proportion_leader;
+		    tbb::atomic<float> _proportion_leader_at;
+
+#ifdef DOUBLE_NN
+		    // Total number of times the first nn was chosen
+		    float _nb_nn1_chosen;
+		    tbb::atomic<float> _nb_nn1_chosen_at;
+
+		    // Number of times the first nn was chosen when the random number was bigger
+		    float _nb_bigger_nn1_chosen;
+		    tbb::atomic<float> _nb_bigger_nn1_chosen_at;
+
+		    // Number of times the individuals chose a different nn
+		    float _nb_role_divisions;
+		    tbb::atomic<float> _nb_role_divisions_at;
+#endif
 
 #ifdef DIVERSITY
 		    std::vector<float> _vector_diversity;
@@ -283,10 +304,12 @@ namespace sferes
 		    
 		    float _fit_mov;
 		    
-		    int _pop_pos;
-		    
 		    bool _developed;
 		    tbb::atomic<bool> _developed_at;
+
+		    float _freq;
+		    int _pop_pos;
+		    std::vector<float> _vec_payoffs;
     };
     
     template<typename G, typename F, typename P, typename E> 

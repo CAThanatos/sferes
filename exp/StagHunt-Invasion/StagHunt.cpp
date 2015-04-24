@@ -33,6 +33,9 @@ namespace sferes
 #ifndef MLP_PERSO
       nn1.set_all_weights(ind1.data());
       nn2.set_all_weights(ind2.data());
+
+      nn1.init();
+      nn2.init();
 #endif
 
       typedef simu::FastsimMulti<Params> simu_t;
@@ -51,26 +54,14 @@ namespace sferes
       float moy_hares2_solo = 0, moy_sstags2_solo = 0, moy_bstags2_solo = 0;
      	int food2 = 0;
 
-     	float similarity = 0.0f;
+			// clock_t deb = clock();
 
-#ifdef COEVO
-     	_num_leader = num_leader;
+#ifdef DIVERSITY
+			std::vector<float> vec_sm;
 #endif
-
-			_nb_leader_preys_first = 0;
-			_nb_preys_killed = 0;
-			_nb_preys_killed_coop = 0;
-
-			_nb_leader_waypoints_first = 0;
-			_nb_waypoints_coop = 0;
-
-			float proportion_leader_preys = 0;
-			float proportion_leader_waypoints = 0;
 
       for (size_t j = 0; j < Params::simu::nb_trials; ++j)
       {
-				// clock_t deb = clock();
-
       	// init
 				map_t map(Params::simu::map_name(), Params::simu::real_w);
 				simu_t simu(map, (this->mode() == fit::mode::view));
@@ -83,20 +74,15 @@ namespace sferes
 #endif
 	
 #ifdef MLP_PERSO
-				StagHuntRobot* robot1 = (StagHuntRobot*)(simu.robots()[0]);
-				StagHuntRobot* robot2 = (StagHuntRobot*)(simu.robots()[1]);
-				Hunter* hunter1 = (Hunter*)robot1;
-				Hunter* hunter2 = (Hunter*)robot2;
-
 				hunter1->set_weights(ind1.data());
 				hunter2->set_weights(ind2.data());
 #endif
 	
 				float food_trial = 0;
 
-				_nb_leader_preys_first_trial = 0;
-				_nb_preys_killed_coop_trial = 0;
-
+#ifdef DIVERSITY
+				std::vector<float> vec_sm_trial;
+#endif
 
 				for (size_t i = 0; i < Params::simu::nb_steps && !stop_eval; ++i)
 				{
@@ -124,8 +110,22 @@ namespace sferes
 							
 							// v1 and v2 are between -4 and 4
 							simu.move_robot(v1, v2, num);
+
+#ifdef DIVERSITY
+							if (0 == num)
+								for(size_t l = 0; l < action.size(); ++l)
+									vec_sm_trial.push_back(action[l]);
+#endif
 						}
 					}
+
+#ifdef DIVERSITY
+					std::vector<float>& vec_inputs_rob = ((Hunter*)(simu.robots()[0]))->get_last_inputs();
+
+					for (size_t l = 0; l < vec_inputs_rob.size(); ++l)
+						vec_sm_trial.push_back(vec_inputs_rob[l]);
+#endif
+
 					update_simu(simu);
 
 					// And then we update their status : food gathered, prey dead
@@ -133,7 +133,7 @@ namespace sferes
 					std::vector<int> dead_preys;
 
 					for(int k = 2; k < simu.robots().size(); ++k)
-						check_preys_status(simu, (Prey*)(simu.robots()[k]), dead_preys, k);
+						check_status(simu, (Prey*)(simu.robots()[k]), dead_preys, k);
 					
 					// We remove the dead preys
 					while(!dead_preys.empty())
@@ -208,8 +208,6 @@ namespace sferes
 							}
 						}
 					}
-
-					check_waypoints_status(simu);
 				}
 
 				// clock_t fin = clock();
@@ -227,50 +225,20 @@ namespace sferes
        	moy_bstags1_solo += h1->nb_big_stags_hunted_solo();
        	
        	Hunter* h2 = (Hunter*)(simu.robots()[1]);
+       	food2 += h2->get_food_gathered();
+       	
+       	moy_hares2 += h2->nb_hares_hunted();
+       	moy_sstags2 += h2->nb_small_stags_hunted();
+       	moy_bstags2 += h2->nb_big_stags_hunted();
+				moy_hares2_solo += h2->nb_hares_hunted_solo();
+       	moy_sstags2_solo += h2->nb_small_stags_hunted_solo();
+       	moy_bstags2_solo += h2->nb_big_stags_hunted_solo();
 
-       	_nb_leader_preys_first += _nb_leader_preys_first_trial;
-       	_nb_preys_killed_coop += _nb_preys_killed_coop_trial;
+#ifdef DIVERSITY
+	      for (size_t l = 0; l < vec_sm_trial.size(); ++l)
+	      	vec_sm.push_back(vec_sm_trial[l]);
+#endif
 
-				float max_hunts = Params::simu::nb_steps/STAMINA;
-       	if(_nb_preys_killed_coop_trial > 0)
-	       	proportion_leader_preys += fabs(0.5 - (_nb_leader_preys_first_trial/_nb_preys_killed_coop_trial));//*(_nb_preys_killed_coop_trial/max_hunts);
-
-	 			int longest_sequence = 0, current_sequence = 0;
-	 			int k = 0, l = 0;
-
-	 			while(k < hunter1->get_waypoints_order().size())
-	 			{
-	 				if(l >= hunter2->get_waypoints_order().size())
-	 					break;
-
-	 				if(hunter2->get_waypoints_order()[l] != hunter1->get_waypoints_order()[k])
-	 				{
-	 					l++;
-	 					current_sequence = 0;
-	 				}
-	 				else
-	 				{
-	 					k++;
-	 					l++;
-
-	 					current_sequence++;
-	 					if(current_sequence > longest_sequence)
-	 						longest_sequence = current_sequence;
-	 				}
-	 			}
-
-	 			// Their fitness is the longest sequence they did divided by the longest sequence they could do
-	 			if(Params::simu::nb_waypoints > 0)
-		 			similarity += longest_sequence/(float)Params::simu::nb_waypoints;
-		 		else
-		 			similarity += 0.0f;
-
-	 			if(_nb_waypoints_coop_trial > 0)
-		 			proportion_leader_waypoints += fabs(0.5 - (_nb_leader_waypoints_first_trial/_nb_waypoints_coop_trial));
-		 			// proportion_leader += fabs(0.5 - (_nb_leader_first_trial/_nb_waypoints_coop_trial))*((float)_nb_waypoints_coop_trial/(float)Params::simu::nb_waypoints);
-
-	 			_nb_leader_waypoints_first += _nb_leader_waypoints_first_trial;
-	 			_nb_waypoints_coop += _nb_waypoints_coop_trial;
 
 #if defined(BEHAVIOUR_LOG)
 	 			if(this->mode() == fit::mode::view)
@@ -299,16 +267,20 @@ namespace sferes
 
 			food1 /= Params::simu::nb_trials;
 
-			_nb_leader_preys_first /= Params::simu::nb_trials;
-			_nb_preys_killed_coop /= Params::simu::nb_trials;
-			proportion_leader_preys /= Params::simu::nb_trials;
 
-			similarity /= Params::simu::nb_trials;
+     	moy_hares2 /= Params::simu::nb_trials;
+     	moy_sstags2 /= Params::simu::nb_trials;
+     	moy_bstags2 /= Params::simu::nb_trials;
+      moy_hares2_solo /= Params::simu::nb_trials;
+     	moy_sstags2_solo /= Params::simu::nb_trials;
+     	moy_bstags2_solo /= Params::simu::nb_trials;
 
-			_nb_leader_waypoints_first /= Params::simu::nb_trials;
-			_nb_waypoints_coop /= Params::simu::nb_trials;
-			proportion_leader_waypoints /= Params::simu::nb_trials;
+			food2 /= Params::simu::nb_trials;
 		
+#ifdef INVASION
+			ind1.set_payoff(ind2.get_pop_pos(), food1);
+#else
+
 #ifdef NOT_AGAINST_ALL	
 			int nb_encounters = Params::pop::nb_opponents*Params::pop::nb_eval;
 #elif defined(ALTRUISM)
@@ -328,39 +300,35 @@ namespace sferes
 			ind1.add_nb_sstag(moy_sstags1, moy_sstags1_solo);
 			ind1.add_nb_bstag(moy_bstags1, moy_bstags1_solo);
 
-			_nb_leader_preys_first /= nb_encounters;
-			_nb_preys_killed_coop /= nb_encounters;
-			proportion_leader_preys /= nb_encounters;
-			proportion_leader_preys /= 0.5f; 
-
-			_nb_leader_waypoints_first /= nb_encounters;
-			_nb_waypoints_coop /= nb_encounters;
-			proportion_leader_waypoints /= nb_encounters;
-			proportion_leader_waypoints /= 0.5f;
-
-			ind1.add_nb_leader_preys_first(_nb_leader_preys_first);
-			ind1.add_nb_waypoints_coop(_nb_waypoints_coop);
-			ind1.add_proportion_leader_preys(proportion_leader_preys);
-
-			ind1.add_nb_leader_waypoints_first(_nb_leader_waypoints_first);
-			ind1.add_nb_preys_killed_coop(_nb_preys_killed_coop);
-			ind1.add_proportion_leader_waypoints(proportion_leader_waypoints);
+     	moy_hares2 /= nb_encounters;
+     	moy_sstags2 /= nb_encounters;
+     	moy_bstags2 /= nb_encounters;
+      moy_hares2_solo /= nb_encounters;
+     	moy_sstags2_solo /= nb_encounters;
+     	moy_bstags2_solo /= nb_encounters;
      	
+#if !defined(NOT_AGAINST_ALL) && !defined(ALTRUISM)
+			ind2.add_nb_hares(moy_hares2, moy_hares1_solo);
+			ind2.add_nb_sstag(moy_sstags2, moy_sstags1_solo);
+			ind2.add_nb_bstag(moy_bstags2, moy_bstags1_solo);
+#endif
+
+     	food2 /= nb_encounters;
      	food1 /= nb_encounters;
-     	similarity /= nb_encounters;
 
-#ifdef MONO_OBJ
-     	float max_hunts = 15;
-     	float max_fitness = max_hunts*(float)FOOD_BIG_STAG_COOP;
-     	float fit1 = (float)food1/max_fitness;
+     	ind1.fit().add_fitness(food1);
+			
+#if !defined(NOT_AGAINST_ALL) && !defined(ALTRUISM)
+			ind2.fit().add_fitness(food2);
+#endif
 
-     	if (fit1 >= 1.0) fit1 = 1.0;
-
-     	float fitness = (Params::simu::coeff_hunting*fit1 + Params::simu::coeff_waypoints*similarity)/(Params::simu::coeff_hunting + Params::simu::coeff_waypoints);
-			ind1.fit().add_fitness(fitness);
-#else
-			ind1.fit().add_fitness(food1, 0);
-			ind1.fit().add_fitness(similarity, 1);
+#ifdef DIVERSITY
+			for(size_t l = 0; l < vec_sm.size(); ++l)
+			{
+				vec_sm[l] /= nb_encounters;
+				ind1.add_vec_sm(vec_sm[l], l);
+			}
+#endif
 #endif
     } // *** end of eval ***
 
@@ -411,25 +379,11 @@ namespace sferes
 #endif
 
 			invers_pos = false;
-			
-#ifdef COEVO
-			bool first_leader = (_num_leader == 1);
-#else
-			bool first_leader = misc::flip_coin();
-			_num_leader = first_leader?1:2;
-#endif
 
 			for(int i = 0; i < 2; ++i)
 			{
 				Hunter* r;				
 				Posture pos = (invers_pos) ? pos_init[(i + 1)%2] : pos_init[i];
-
-				// Simple NXOR : if first hunter is supposed to be leader and this is
-				// the first hunter we're creating -> true
-				//							 if first hunter isn't supposed to be leader and this is
-				// not the first hunter we're creating -> true
-				// 							 else -> false
-				bool leader = first_leader == (i == 0);
 		
 				if(0 == i)
 					r = new Hunter(Params::simu::hunter_radius, pos, HUNTER_COLOR, nn1);
@@ -454,8 +408,6 @@ namespace sferes
 		
 					// 1 linear camera
 					r->use_camera(LinearCamera(M_PI/2, Params::simu::nb_camera_pixels));
-
-					r->set_bool_leader(leader);
 				}
 		
 				simu.add_robot(r);
@@ -472,6 +424,12 @@ namespace sferes
 				if(simu.map()->get_random_initial_position(Params::simu::big_stag_radius + 5, pos))
 				{
 					Hare* r = new Hare(Params::simu::hare_radius, pos, HARE_COLOR);
+			
+#ifdef COOP_HARE
+					if(0 == i)
+						r->set_pred_on_it(true);
+#endif
+		
 					simu.add_robot(r);
 				}
 			}
@@ -488,21 +446,16 @@ namespace sferes
 				if(simu.map()->get_random_initial_position(Params::simu::big_stag_radius + 5, pos))
 				{
 					Stag* r = new Stag(Params::simu::big_stag_radius, pos, BIG_STAG_COLOR, Stag::big, fur_color);
+			
+#ifdef COOP_SSTAG
+					if(0 == i)
+						r->set_pred_on_it(true);
+#endif
+#ifdef COOP_BSTAG
+					if(nb_small_stags == i)
+						r->set_pred_on_it(true);
+#endif
 					simu.add_robot(r);
-				}
-			}
-					
-			// Then the waypoints
-			_vec_waypoints.clear();
-			for(int i = 0; i < Params::simu::nb_waypoints; ++i)
-			{
-				Posture pos;
-
-				if(simu.map()->get_random_initial_position(Params::simu::waypoint_radius + 5, pos, 0.0f, (float)width, 100.0f, (float)height))
-				{
-					boost::shared_ptr<Waypoint> w = boost::shared_ptr<Waypoint>(new Waypoint(SMALL_STAG_COLOR, Params::simu::waypoint_radius, pos.x(), pos.y(), i));
-					simu.add_illuminated_switch(w);
-					_vec_waypoints.push_back(w);
 				}
 			}
 		}
@@ -520,10 +473,10 @@ namespace sferes
     }
     
     template<typename Simu>
-    	void check_preys_status(Simu &simu, Prey* prey, std::vector<int>& dead_preys, int position)
+    	void check_status(Simu &simu, Prey* prey, std::vector<int>& dead_preys, int position)
    	{
    		using namespace fastsim;
-
+   		
    		// We compute the distance between this prey and each of its hunters
    		std::vector<Hunter*> hunters;
    		float px = prey->get_pos().x();
@@ -539,17 +492,6 @@ namespace sferes
    			// The radius must not be taken into account
    			if((dist - prey->get_radius() - hunter->get_radius()) <= CATCHING_DISTANCE)
    				hunters.push_back(hunter);
-   		}
-
-   		if(hunters.size() == 1)
-   		{
-   			if(prey->get_leader_first() == -1)
-   			{
-	   			if(hunters[0]->is_leader())
-	   				prey->set_leader_first(1);
-	   			else
-	   				prey->set_leader_first(0);
-	   		}
    		}
 
    		// We check if the prey is blocked
@@ -572,16 +514,6 @@ namespace sferes
 				else
 					alone = false;
 
-				_nb_preys_killed++;
-
-				if(!alone)
-				{
-					_nb_preys_killed_coop_trial++;
-
-					if(prey->get_leader_first() == 1)
-						_nb_leader_preys_first_trial++;
-				}
-
    			for(int i = 0; i < hunters.size(); ++i)
    			{
    				hunters[i]->add_food(food);
@@ -595,67 +527,6 @@ namespace sferes
    			}
    		}
    	}
-    
-    template<typename Simu>
-	   	void check_waypoints_status(Simu &simu)
-   	{
-   		using namespace fastsim;
-   		
-   		// We compute the distance between this waypoint and each of the hunters
-   		std::vector<Hunter*> hunters;
-
-   		for(int i = 0; i < _vec_waypoints.size(); ++i)
-   		{
-   			float wx = _vec_waypoints[i]->get_x();
-   			float wy = _vec_waypoints[i]->get_y();
-   			int id = _vec_waypoints[i]->get_id();
-
-   			for(int j = 0; j < 2; ++j)
-   			{
-	   			Hunter* hunter = (Hunter*)(simu.robots()[j]);
-
-	   			if(!hunter->get_waypoints()[id])
-	   			{
-		   			float hx = hunter->get_pos().x();
-		   			float hy = hunter->get_pos().y();
-		   			float dist = sqrt(pow(wx - hx, 2) + pow(wy - hy, 2));
-		   			
-		   			if(dist < _vec_waypoints[i]->get_radius())
-		   			{
-		   				hunter->add_waypoint(id);
-
-		   				// First time this waypoint is crossed by any hunter
-		   				if(_vec_waypoints[i]->get_leader_first() == -1)
-		   				{
-		   					if(hunter->is_leader())
-		   						_vec_waypoints[i]->set_leader_first(1);
-		   					else
-		   						_vec_waypoints[i]->set_leader_first(0);
-		   				}
-		   				else
-		   				{
-		   					// This waypoint has already been crossed by another hunter
-		   					_nb_waypoints_coop_trial++;
-
-#ifdef BEHAVIOUR_LOG
-		   					// Is the first robot the first one on the target ?
-		   					bool first_robot = (_vec_waypoints[i]->get_leader_first() == 1) == (((Hunter*)simu.robots()[0])->is_leader());
-								if(this->mode() == fit::mode::view)
-		       				simu.add_dead_prey(wx, wy, _vec_waypoints[i]->get_radius(), false, first_robot);
-#endif
-
-		   					if(_vec_waypoints[i]->get_leader_first() == 1)
-		   						_nb_leader_waypoints_first_trial++;
-		   				}
-		   			}
-	   			}
-   			}
-   		}
-
-   		// If the two hunters have crossed all the waypoints, we stop the trial
- 			Hunter* hunter1 = (Hunter*)(simu.robots()[0]);
- 			Hunter* hunter2 = (Hunter*)(simu.robots()[1]);
-   	}
    	    
 		
 		float width, height;
@@ -664,24 +535,6 @@ namespace sferes
 		bool invers_pos;
 		bool reinit;
 		int nb_invers_pos, nb_spawn;
-
-		std::vector<boost::shared_ptr<Waypoint> > _vec_waypoints;
-
-		int _num_leader;
-
-		float _nb_leader_preys_first;
-		float _nb_preys_killed;
-		float _nb_preys_killed_coop;
-
-		float _nb_leader_preys_first_trial;
-		float _nb_preys_killed_coop_trial;
-
-
-		float _nb_leader_waypoints_first_trial;
-		float _nb_waypoints_coop_trial;
-
-		float _nb_leader_waypoints_first;
-		float _nb_waypoints_coop;
 
 		std::string res_dir;
 		size_t gen;
@@ -710,22 +563,13 @@ namespace sferes
 		int cpt_files;
 #endif
 
-#ifdef MONO_OBJ
+		std::vector<float> vec_fitness;
 		tbb::atomic<float> fitness_at;
 		
 		void add_fitness(float fitness)
 		{
 			fitness_at.fetch_and_store(fitness_at + fitness);
 		}
-#else
-		std::vector<tbb::atomic<float> > vec_fitness_at;
-
-		void add_fitness(float fitness, int obj)
-		{
-			assert(obj < vec_fitness_at.size());
-			vec_fitness_at[obj].fetch_and_store(vec_fitness_at[obj] + fitness);
-		}
-#endif
   };
 }
 
@@ -739,61 +583,32 @@ int main(int argc, char **argv)
   typedef FitStagHunt<Params> fit_t;
 
 	// GENOTYPE
-#ifndef MONO_OBJ
-  typedef gen::EvoFloat<(Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs, Params> gen_t;
-#else
-#ifdef CMAES
-  typedef gen::Cmaes<(Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs, Params> gen_t;
-//  typedef gen::Cmaes<90, Params> gen_t;
-#else
-#ifdef ELITIST
-  typedef gen::ElitistGen<(Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs, Params> gen_t;
-#else
-  typedef gen::EvoFloat<(Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs, Params> gen_t;
-#endif
-#endif
-#endif
+	typedef gen::EvoFloat<Params::nn::genome_size, Params> gen_t;
   
   // PHENOTYPE
-  typedef phen::PhenChasseur<gen_t, fit_t, Params> phen_t;
+  typedef phen::PhenInvasion<gen_t, fit_t, Params> phen_t;
 
 	// EVALUATION
-	#ifdef COEVO
-		typedef eval::StagHuntEvalParallelCoEvo<Params> eval_t;
-	#else
-		typedef eval::StagHuntEvalParallel<Params> eval_t;
-	#endif
+	typedef eval::EvalInvasion<Params> eval_t;
 
   // STATS 
   typedef boost::fusion::vector<
 #ifdef COEVO
 		  sferes::stat::BestFitEvalCoEvo<phen_t, Params>,
-		  sferes::stat::MeanFitEvalCoEvo<phen_t, Params>,
-		  sferes::stat::BestEverFitEvalCoEvo<phen_t, Params>,
 		  sferes::stat::AllFitEvalStatCoEvo<phen_t, Params>,
-		  sferes::stat::BestLeadershipEvalCoEvo<phen_t, Params>,
-		  sferes::stat::AllLeadershipEvalStatCoEvo<phen_t, Params>,
-#ifndef MONO_OBJ
-		  sferes::stat::BestWaypointsEvalCoEvo<phen_t, Params>,
-		  sferes::stat::AllWaypointsEvalStatCoEvo<phen_t, Params>,
-#endif
 #ifdef BEHAVIOUR_VIDEO
 		  sferes::stat::BestFitBehaviourVideoCoEvo<phen_t, Params>,
 #endif
 #else
 		  sferes::stat::BestFitEval<phen_t, Params>,
-		  sferes::stat::MeanFitEval<phen_t, Params>,
-		  sferes::stat::BestEverFitEval<phen_t, Params>,
 		  sferes::stat::AllFitEvalStat<phen_t, Params>,
-		  sferes::stat::BestLeadershipEval<phen_t, Params>,
-		  sferes::stat::AllLeadershipEvalStat<phen_t, Params>,
-#ifndef MONO_OBJ
-		  sferes::stat::BestWaypointsEval<phen_t, Params>,
-		  sferes::stat::AllWaypointsEvalStat<phen_t, Params>,
-#endif
 #ifdef BEHAVIOUR_VIDEO
 		  sferes::stat::BestFitBehaviourVideo<phen_t, Params>,
 #endif
+#endif
+#ifdef DIVERSITY
+		  sferes::stat::BestDiversityEval<phen_t, Params>,
+		  sferes::stat::AllDiversityEvalStat<phen_t, Params>,
 #endif
 		  sferes::stat::StopEval<Params>
     >  stat_t;
@@ -802,27 +617,7 @@ int main(int argc, char **argv)
   typedef modif::Dummy<Params> modifier_t;
 
 	// EVOLUTION ALGORITHM
-#ifndef MONO_OBJ
-#ifdef COEVO
-	typedef ea::Nsga2CoEvo<phen_t, eval_t, stat_t, modifier_t, Params> ea_t; 
-#else
-	typedef ea::Nsga2<phen_t, eval_t, stat_t, modifier_t, Params> ea_t; 
-#endif
-#else
-#ifdef FITPROP
-  typedef ea::FitnessProp<phen_t, eval_t, stat_t, modifier_t, Params> ea_t; 
-#elif defined(CMAES)
-  typedef ea::Cmaes<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
-#elif defined(ELITIST)
-#ifdef COEVO
-  typedef ea::ElitistCoEvo<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
-#else
-  typedef ea::Elitist<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
-#endif
-#else
-  typedef ea::RankSimple<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
-#endif
-#endif
+	typedef ea:InvasionEa<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
 
   ea_t ea;
 
