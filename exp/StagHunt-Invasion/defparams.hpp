@@ -310,6 +310,8 @@ struct Params
 #endif
 
 		static const float invasion_frequency = 0.01f;
+
+		static const float min_threshold = 0.001f;
   };
   
   struct trajectory

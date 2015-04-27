@@ -50,15 +50,15 @@ namespace sferes
   namespace eval
   {
     template<typename Phen>
-    struct _parallel_ev
+    struct _parallel_ev_mutant
     {
       typedef std::vector<boost::shared_ptr<Phen> > pop_t;
       pop_t _pop;
       size_t _pos_mutant;
 
-      ~_parallel_ev() { }
-      _parallel_ev(const pop_t& pop, size_t pos_mutant) : _pop(pop), _pos_mutant(pos_mutant) {}
-      _parallel_ev(const _parallel_ev& ev) : _pop(ev._pop), _pos_mutant(ev._pos_mutant) {}
+      ~_parallel_ev_mutant() { }
+      _parallel_ev_mutant(const pop_t& pop, size_t pos_mutant) : _pop(pop), _pos_mutant(pos_mutant) {}
+      _parallel_ev_mutant(const _parallel_ev_mutant& ev) : _pop(ev._pop), _pos_mutant(ev._pos_mutant) {}
       void operator() (const parallel::range_t& r) const
       {
 				for (size_t i = r.begin(); i != r.end(); ++i)
@@ -66,13 +66,13 @@ namespace sferes
 					assert(i < _pop.size());
 					assert(_pos_mutant < _pop.size());
 
-					_pop[_pos_mutant]->fit().eval_compet(*_pos[_pos_mutant], *_pop[i]);
+					_pop[_pos_mutant]->fit().eval_compet(*_pop[_pos_mutant], *_pop[i]);
 				}
       }
     };
 
 
-    SFERES_CLASS(StagHuntEvalParallel)
+    SFERES_CLASS(EvalInvasion)
     {
     public:
 	    enum status_t { free = 0, obstacle = 255 };
@@ -98,8 +98,8 @@ namespace sferes
 					pop[pos_mutant]->fit().set_obj(k, 0);
 
 				parallel::init();
-				parallel::p_for(parallel::range_t(begin, end), _parallel_ev<Phen>(pop, pos_mutant));
-				_nb_eval += pos_mutant + 1;
+				parallel::p_for(parallel::range_t(begin, end), _parallel_ev_mutant<Phen>(pop, pos_mutant));
+				_nb_eval += end - begin;
 
 				pop[pos_mutant]->set_nb_hares(pop[pos_mutant]->nb_hares_at(), pop[pos_mutant]->nb_hares_solo_at());
 				pop[pos_mutant]->set_nb_sstag(pop[pos_mutant]->nb_sstag_at(), pop[pos_mutant]->nb_sstag_solo_at());

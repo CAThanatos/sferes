@@ -277,59 +277,8 @@ namespace sferes
 
 			food2 /= Params::simu::nb_trials;
 		
-#ifdef INVASION
-			ind1.set_payoff(ind2.get_pop_pos(), food1);
-#else
-
-#ifdef NOT_AGAINST_ALL	
-			int nb_encounters = Params::pop::nb_opponents*Params::pop::nb_eval;
-#elif defined(ALTRUISM)
-			int nb_encounters = 1;
-#else
-			int nb_encounters = Params::pop::size - 1;
-#endif
-
-     	moy_hares1 /= nb_encounters;
-     	moy_sstags1 /= nb_encounters;
-     	moy_bstags1 /= nb_encounters;
-      moy_hares1_solo /= nb_encounters;
-     	moy_sstags1_solo /= nb_encounters;
-     	moy_bstags1_solo /= nb_encounters;
-     	
-			ind1.add_nb_hares(moy_hares1, moy_hares1_solo);
-			ind1.add_nb_sstag(moy_sstags1, moy_sstags1_solo);
-			ind1.add_nb_bstag(moy_bstags1, moy_bstags1_solo);
-
-     	moy_hares2 /= nb_encounters;
-     	moy_sstags2 /= nb_encounters;
-     	moy_bstags2 /= nb_encounters;
-      moy_hares2_solo /= nb_encounters;
-     	moy_sstags2_solo /= nb_encounters;
-     	moy_bstags2_solo /= nb_encounters;
-     	
-#if !defined(NOT_AGAINST_ALL) && !defined(ALTRUISM)
-			ind2.add_nb_hares(moy_hares2, moy_hares1_solo);
-			ind2.add_nb_sstag(moy_sstags2, moy_sstags1_solo);
-			ind2.add_nb_bstag(moy_bstags2, moy_bstags1_solo);
-#endif
-
-     	food2 /= nb_encounters;
-     	food1 /= nb_encounters;
-
-     	ind1.fit().add_fitness(food1);
-			
-#if !defined(NOT_AGAINST_ALL) && !defined(ALTRUISM)
-			ind2.fit().add_fitness(food2);
-#endif
-
-#ifdef DIVERSITY
-			for(size_t l = 0; l < vec_sm.size(); ++l)
-			{
-				vec_sm[l] /= nb_encounters;
-				ind1.add_vec_sm(vec_sm[l], l);
-			}
-#endif
-#endif
+			ind1.set_payoff(ind2.pop_pos(), food1);
+			ind2.set_payoff(ind1.pop_pos(), food2);
     } // *** end of eval ***
 
     
@@ -617,7 +566,7 @@ int main(int argc, char **argv)
   typedef modif::Dummy<Params> modifier_t;
 
 	// EVOLUTION ALGORITHM
-	typedef ea:InvasionEa<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
+	typedef ea::InvasionEa<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
 
   ea_t ea;
 

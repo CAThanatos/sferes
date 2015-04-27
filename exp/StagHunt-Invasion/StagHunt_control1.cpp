@@ -1,6 +1,6 @@
 // THIS IS A GENERATED FILE - DO NOT EDIT
 #define CONTROL1
-#line 1 "/home/abernard/sferes2-0.99/exp/StagHunt/StagHunt.cpp"
+#line 1 "/home/arthur/sferes2-0.99/exp/StagHunt-Invasion/StagHunt.cpp"
 #include "includes.hpp"
 #include "defparams.hpp"
 
@@ -280,54 +280,8 @@ namespace sferes
 
 			food2 /= Params::simu::nb_trials;
 		
-#ifdef NOT_AGAINST_ALL	
-			int nb_encounters = Params::pop::nb_opponents*Params::pop::nb_eval;
-#elif defined(ALTRUISM)
-			int nb_encounters = 1;
-#else
-			int nb_encounters = Params::pop::size - 1;
-#endif
-
-     	moy_hares1 /= nb_encounters;
-     	moy_sstags1 /= nb_encounters;
-     	moy_bstags1 /= nb_encounters;
-      moy_hares1_solo /= nb_encounters;
-     	moy_sstags1_solo /= nb_encounters;
-     	moy_bstags1_solo /= nb_encounters;
-     	
-			ind1.add_nb_hares(moy_hares1, moy_hares1_solo);
-			ind1.add_nb_sstag(moy_sstags1, moy_sstags1_solo);
-			ind1.add_nb_bstag(moy_bstags1, moy_bstags1_solo);
-
-     	moy_hares2 /= nb_encounters;
-     	moy_sstags2 /= nb_encounters;
-     	moy_bstags2 /= nb_encounters;
-      moy_hares2_solo /= nb_encounters;
-     	moy_sstags2_solo /= nb_encounters;
-     	moy_bstags2_solo /= nb_encounters;
-     	
-#if !defined(NOT_AGAINST_ALL) && !defined(ALTRUISM)
-			ind2.add_nb_hares(moy_hares2, moy_hares1_solo);
-			ind2.add_nb_sstag(moy_sstags2, moy_sstags1_solo);
-			ind2.add_nb_bstag(moy_bstags2, moy_bstags1_solo);
-#endif
-
-     	food2 /= nb_encounters;
-     	food1 /= nb_encounters;
-
-     	ind1.fit().add_fitness(food1);
-			
-#if !defined(NOT_AGAINST_ALL) && !defined(ALTRUISM)
-			ind2.fit().add_fitness(food2);
-#endif
-
-#ifdef DIVERSITY
-			for(size_t l = 0; l < vec_sm.size(); ++l)
-			{
-				vec_sm[l] /= nb_encounters;
-				ind1.add_vec_sm(vec_sm[l], l);
-			}
-#endif
+			ind1.set_payoff(ind2.pop_pos(), food1);
+			ind2.set_payoff(ind1.pop_pos(), food2);
     } // *** end of eval ***
 
     
@@ -581,30 +535,13 @@ int main(int argc, char **argv)
   typedef FitStagHunt<Params> fit_t;
 
 	// GENOTYPE
-#ifdef DIVERSITY
-  typedef gen::EvoFloat<Params::nn::genome_size, Params> gen_t;
-#else
-#ifdef CMAES
-  typedef gen::Cmaes<Params::nn::genome_size, Params> gen_t;
-//  typedef gen::Cmaes<90, Params> gen_t;
-#else
-#ifdef ELITIST
-  typedef gen::ElitistGen<Params::nn::genome_size, Params> gen_t;
-#else
-  typedef gen::EvoFloat<Params::nn::genome_size, Params> gen_t;
-#endif
-#endif
-#endif
+	typedef gen::EvoFloat<Params::nn::genome_size, Params> gen_t;
   
   // PHENOTYPE
-  typedef phen::PhenChasseur<gen_t, fit_t, Params> phen_t;
+  typedef phen::PhenInvasion<gen_t, fit_t, Params> phen_t;
 
 	// EVALUATION
-	#ifdef COEVO
-		typedef eval::StagHuntEvalParallelCoEvo<Params> eval_t;
-	#else
-		typedef eval::StagHuntEvalParallel<Params> eval_t;
-	#endif
+	typedef eval::EvalInvasion<Params> eval_t;
 
   // STATS 
   typedef boost::fusion::vector<
@@ -632,27 +569,7 @@ int main(int argc, char **argv)
   typedef modif::Dummy<Params> modifier_t;
 
 	// EVOLUTION ALGORITHM
-#ifdef DIVERSITY
-#ifdef COEVO
-	typedef ea::Nsga2CoEvo<phen_t, eval_t, stat_t, modifier_t, Params> ea_t; 
-#else
-	typedef ea::Nsga2<phen_t, eval_t, stat_t, modifier_t, Params> ea_t; 
-#endif
-#else
-#ifdef FITPROP
-  typedef ea::FitnessProp<phen_t, eval_t, stat_t, modifier_t, Params> ea_t; 
-#elif defined(CMAES)
-  typedef ea::Cmaes<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
-#elif defined(ELITIST)
-#ifdef COEVO
-  typedef ea::ElitistCoEvo<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
-#else
-  typedef ea::Elitist<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
-#endif
-#else
-  typedef ea::RankSimple<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
-#endif
-#endif
+	typedef ea::InvasionEa<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
 
   ea_t ea;
 

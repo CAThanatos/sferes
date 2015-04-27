@@ -58,22 +58,24 @@ namespace sferes
       typedef typename std::vector<indiv_t> pop_t;
       typedef typename pop_t::iterator it_t;
 
-			ResidentMutant() : _step_size(1)
+			InvasionEa()
 			{ }
 
       void random_pop()
       {
-      	this->_pop.resize(Params::simu::pop_size);
-      	this->_vec_payoffs.resize(Params::simu::pop_size);
-      	this->_vec_freqs.resize(Params::simu::pop_size);
+      	this->_pop.clear();
+      	this->_vec_fitness.clear();
 
-      	this->_pop[0] = boost::shared_ptr<Phen>(new Phen());
+      	this->_pop.push_back(boost::shared_ptr<Phen>(new Phen()));
       	this->_pop[0]->random();
 
-      	_nb_genotypes = 1;
+				this->_eval.eval(this->_pop, _nb_genotypes, 0, _nb_genotypes + 1);
 
-				this->_eval.eval(this->_pop, _nb_genotypes, 0, _nb_genotypes);
+				this->_pop[0]->fit().set_value(this->_pop[0]->get_payoff(0));
+
+      	_nb_genotypes = 1;
 				this->_pop[0]->set_freq(1.0f);
+				this->_pop[0]->set_pop_pos(0);
       }
       
       void epoch()
@@ -81,71 +83,85 @@ namespace sferes
 				assert(this->_pop.size()); 
 
 				// A mutant invades
-				this->_pop[_nb_genotypes] = this->_pop[0]->clone();
-				this->_pop[_nb_genotypes]->gen().mutate(_step_size);
+				this->_pop.push_back(this->_pop[0]->clone());
+				this->_pop[_nb_genotypes]->gen().mutate();
+				this->_pop[_nb_genotypes]->set_pop_pos(_nb_genotypes);
 
-				// We evaluate this mutant's payoff against everyother residents
-				this->_eval.eval(this->_pop, _nb_genotypes, 0, _nb_genotypes);
+				// We evaluate this mutant's payoff against every other residents
+				this->_eval.eval(this->_pop, _nb_genotypes, 0, _nb_genotypes + 1);
 
 				// We set its frequency and update that of other individuals
-				this->_pop[_nb_genotypes].set_freq(Params::pop::invasion_frequency);
+				this->_pop[_nb_genotypes]->set_freq(Params::pop::invasion_frequency);
+				this->_pop[_nb_genotypes]->set_pop_pos(_nb_genotypes);
 				for(size_t i = 0; i < _nb_genotypes; ++i)
-					this->_pop[i].set_freq(this->_pop[i].get_freq() - Params::pop::invasion_frequency/(float)(_nb_genotypes + 1));
+					this->_pop[i]->set_freq(this->_pop[i]->get_freq() - Params::pop::invasion_frequency/(float)(_nb_genotypes));
 
 				_nb_genotypes++;
 
 				// We compute the equilibrium
 				int max_generations = 10000;
 				int generation = 0;
+				float proba;
+				float modif;
 				do
 				{
-					float modif = 0.0f;
-					float proba = misc::rand();
+					modif = 0.0f;
 
 					_vec_fitness.clear();
 					_vec_fitness.resize(_nb_genotypes);
+
 					float fitnessMean = 0.0f;
 					for(size_t i = 0; i < _nb_genotypes; ++i)
 					{
 						_vec_fitness[i] = 0.0f;
 						for(size_t j = 0; j < _nb_genotypes; ++j)
-							_vec_fitness[i] += this->_pop[i].get_payoff(j) * this->_pop[j].get_freq();
+							_vec_fitness[i] += this->_pop[i]->get_payoff(j) * this->_pop[j]->get_freq();
 
-						fitnessMean += _vec_fitness[i];
+						this->_pop[i]->fit().set_value(_vec_fitness[i]);
+						fitnessMean += this->_pop[i]->get_freq()*_vec_fitness[i];
 					}
-					fitnessMean /= (float)_nb_genotypes
+
+					if(fitnessMean <= 0.0f)
+						break;
 
 					for(size_t i = 0; i < _nb_genotypes; ++i)
 					{
-						float old_freq = this->_pop[i].get_freq();
-						this->_pop[i].set_freq(this->_pop[i].get_freq()*_vec_fitness[i]/fitnessMean);
-						float new_freq = this->_pop[i].get_freq();
+						float old_freq = this->_pop[i]->get_freq();
+						this->_pop[i]->set_freq(this->_pop[i]->get_freq()*_vec_fitness[i]/fitnessMean);
+						float new_freq = this->_pop[i]->get_freq();
 
-						modif += fabs(new_freq - old_freq);
+						// // We consider that when a genotype is below min_threshold (0.001 by default)
+						// // this genotype doesn't exist in the population anymore
+						// if(new_freq < Params::pop::min_threshold)
+						// 	this->_pop[i]->set_freq(0.0f);
+
+						modif += fabs(new_freq - old_freq)/old_freq;
 					}
 					modif /= _nb_genotypes;
 
 					generation++;
+					proba = misc::rand(1.0f);
 
 					// We continue while we still have computation time AND there has been more than 1% modification AND no new mutant appeared
-				}	while((generation < max_generations) && (modif > 0.01f) && (proba > Params::evo_float::mutation_rate));
+				}	while((generation < max_generations) && (proba > Params::evo_float::mutation_rate) && (modif > 0.01f));
 
 				// We update the population: we remove the genotypes with freq = 0
-				float min_threshold = 0.001f;
 				for(size_t i = 0; i < _nb_genotypes; ++i)
 				{
-					if(this->_pop[i].get_freq < min_threshold; ++i)
+					if(this->_pop[i]->get_freq() < Params::pop::min_threshold)
 					{
 						// We move the last genotype at this index
 						this->_pop[i] = this->_pop[_nb_genotypes - 1];
+						this->_pop[i]->set_pop_pos(i);
 
 						// We update all the payoffs
 						for(size_t j = 0; j < _nb_genotypes; ++j)
-							this->_pop[j].set_payoff(i, this->_pop[j].get_payoff(_nb_genotypes - 1));
+							this->_pop[j]->set_payoff(i, this->_pop[j]->get_payoff(_nb_genotypes - 1));
 
 						_nb_genotypes--;
 					}
 				}
+				this->_pop.resize(_nb_genotypes);
 
 				std::partial_sort(this->_pop.begin(), this->_pop.begin() + _nb_genotypes,
 							this->_pop.end(), fit::compare());
@@ -154,7 +170,6 @@ namespace sferes
       }
       
     protected:
-    	float _step_size;
     	size_t _nb_genotypes;
 
     	std::vector<float> _vec_fitness;

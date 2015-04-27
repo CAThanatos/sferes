@@ -35,8 +35,8 @@
 
 
 
-#ifndef PHEN_CHASSEUR_HPP_
-#define PHEN_CHASSEUR_HPP_
+#ifndef PHEN_INVASION_HPP_
+#define PHEN_INVASION_HPP_
 
 #include <vector>
 #include <sferes/phen/indiv.hpp>
@@ -47,15 +47,15 @@ namespace sferes
 {
   namespace phen
   {
-    SFERES_INDIV(PhenChasseur, Indiv)
+    SFERES_INDIV(PhenInvasion, Indiv)
     {
 		  template<typename G, typename F, typename P, typename E> 
-		    friend std::ostream& operator<<(std::ostream& output, const PhenChasseur< G, F, P, E >& e);
+		    friend std::ostream& operator<<(std::ostream& output, const PhenInvasion< G, F, P, E >& e);
 		  public:
 #ifdef EIGEN_CORE_H
 		    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 #endif
-		    PhenChasseur() : _params((*this)._gen.size()), _nb_hares(0), _nb_hares_solo(0), _nb_sstag(0), _nb_sstag_solo(0), _nb_bstag(0), _nb_bstag_solo(0), _nb_leader_first(0), _nb_preys_killed_coop(0), _fit_mov(0), _developed(false) 					{
+		    PhenInvasion() : _params((*this)._gen.size()), _nb_hares(0), _nb_hares_solo(0), _nb_sstag(0), _nb_sstag_solo(0), _nb_bstag(0), _nb_bstag_solo(0), _nb_leader_first(0), _nb_preys_killed_coop(0), _fit_mov(0), _developed(false) 					{
 		    }
 		    
 		    typedef float type_t;
@@ -104,7 +104,7 @@ namespace sferes
 
 					_freq = 0.0f;
 					_vec_payoffs.clear();
-					_vec_payoffs.resize(Params::simu::pop_size);
+					_vec_payoffs.resize(Params::pop::size);
 				}
 
 				float data(size_t i) const { assert(i < size()); return _params[i]; }
@@ -114,7 +114,7 @@ namespace sferes
 				const std::vector<float>& data() const { return _params; }
 
 				// squared Euclidean distance
-				float dist(const PhenChasseur& chasseur) const
+				float dist(const PhenInvasion& chasseur) const
 				{
 					assert(chasseur.size() == size());
 					float d = 0.0f;
@@ -217,9 +217,9 @@ namespace sferes
 				bool developed_at() const { return _developed_at; }
 				void set_developed_at(bool developed) { _developed_at = developed; }
 				
-				boost::shared_ptr<PhenChasseur> clone()
+				boost::shared_ptr<PhenInvasion> clone()
 				{
-					boost::shared_ptr<PhenChasseur> new_indiv = boost::shared_ptr<PhenChasseur>(new PhenChasseur());
+					boost::shared_ptr<PhenInvasion> new_indiv = boost::shared_ptr<PhenInvasion>(new PhenInvasion());
 					for(unsigned i = 0; i < this->_gen.size(); ++i)
 						new_indiv->_gen.data(i, this->_gen.data(i));
 						
@@ -229,7 +229,7 @@ namespace sferes
 		    int pop_pos() const { return _pop_pos; }
 		    void set_pop_pos(int pop_pos) { _pop_pos = pop_pos; }
 
-		    void reset_vec_payoffs() { _vec_payoffs.resize(Params::simu::pop_size); }
+		    void reset_vec_payoffs() { _vec_payoffs.resize(Params::pop::size); }
 		    void set_payoff(int opponent, float payoff) 
 		    {
 		    	assert(opponent < _vec_payoffs.size());
@@ -313,7 +313,7 @@ namespace sferes
     };
     
     template<typename G, typename F, typename P, typename E> 
-    std::ostream& operator<<(std::ostream& output, const PhenChasseur< G, F, P, E >& e) {
+    std::ostream& operator<<(std::ostream& output, const PhenInvasion< G, F, P, E >& e) {
       for (size_t i = 0; i < e.size();++i)
         output <<" "<<e.data(i) ;
 
