@@ -259,16 +259,19 @@ struct Params
   {
     // size of the population
     static const unsigned size = 20;
+
+    // size of the population
+    static const unsigned max_size = 20;
     
     // number of generations
-    static const unsigned nb_gen = 10000;
+    static const unsigned nb_gen = 50000;
     
     // how often should the result file be written (here, each 10
     // generation)
     static const int dump_period = 10;
     
     // how often should the video be done
-    static const int video_dump_period = 100;
+    static const int video_dump_period = 500;
     
     // how many individuals should be created during the random
     // generation process?
@@ -312,6 +315,14 @@ struct Params
 		static const float invasion_frequency = 0.01f;
 
 		static const float min_threshold = 0.001f;
+
+#ifdef POP_INIT10
+		static const int pop_init = 10;
+#elif defined(POP_INIT1)
+		static const int pop_init = 1;
+#else
+		static const int pop_init = 10;
+#endif
   };
   
   struct trajectory

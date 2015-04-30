@@ -65,7 +65,7 @@ namespace sferes
 #else
 						(*this->_log_file) << ea.nb_eval() << "," << ea.pop()[i]->fit().value();
 #endif
-						(*this->_log_file) << "," << ea.pop()[i]->nb_hares() << "," << ea.pop()[i]->nb_hares_solo() << "," << ea.pop()[i]->nb_sstag() << "," << ea.pop()[i]->nb_sstag_solo() << "," << ea.pop()[i]->nb_bstag() << "," << ea.pop()[i]->nb_bstag_solo() << std::endl;
+						(*this->_log_file) << "," << ea.pop()[i]->nb_hares() << "," << ea.pop()[i]->nb_hares_solo() << "," << ea.pop()[i]->nb_sstags() << "," << ea.pop()[i]->nb_sstags_solo() << "," << ea.pop()[i]->nb_bstags() << "," << ea.pop()[i]->nb_bstags_solo() << std::endl;
 					
 						(*this->_log_file_genome) << ea.nb_eval();
 						for(size_t j = 0; j < ea.pop()[i]->gen().size(); ++j)

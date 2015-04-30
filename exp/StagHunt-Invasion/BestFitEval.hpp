@@ -66,6 +66,16 @@ namespace sferes
             max = _best->fit().obj(0);
           }
         }
+#else
+        float max = ea.pop()[0]->fit().value();
+        for(size_t i = 0; i < ea.pop().size(); ++i)
+        {
+          if(ea.pop()[i]->fit().value() > max)
+          {
+            _best = ea.pop()[i];
+            max = _best->fit().value();
+          }
+        }
 #endif
 
 				this->_create_log_file(ea, "bestfit.dat");
@@ -77,7 +87,7 @@ namespace sferes
 #else
           (*this->_log_file) << ea.nb_eval() << "," << _best->fit().value();
 #endif
-					(*this->_log_file) << "," << _best->nb_hares() << "," << _best->nb_hares_solo() << "," << _best->nb_sstag() << "," << _best->nb_sstag_solo() << "," << _best->nb_bstag() << "," << _best->nb_bstag_solo() << std::endl;
+					(*this->_log_file) << "," << _best->nb_hares() << "," << _best->nb_hares_solo() << "," << _best->nb_sstags() << "," << _best->nb_sstags_solo() << "," << _best->nb_bstags() << "," << _best->nb_bstags_solo() << std::endl;
 					
 					(*this->_log_file_genome) << ea.nb_eval();
 					for(size_t i = 0; i < _best->gen().size(); ++i)

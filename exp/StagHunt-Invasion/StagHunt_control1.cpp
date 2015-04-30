@@ -1,6 +1,6 @@
 // THIS IS A GENERATED FILE - DO NOT EDIT
 #define CONTROL1
-#line 1 "/home/arthur/sferes2-0.99/exp/StagHunt-Invasion/StagHunt.cpp"
+#line 1 "/home/abernard/sferes2-0.99/exp/StagHunt-Invasion/StagHunt.cpp"
 #include "includes.hpp"
 #include "defparams.hpp"
 
@@ -268,8 +268,9 @@ namespace sferes
      	moy_sstags1_solo /= Params::simu::nb_trials;
      	moy_bstags1_solo /= Params::simu::nb_trials;
 
-			food1 /= Params::simu::nb_trials;
-
+     	ind1.set_nb_hares(ind2.pop_pos(), moy_hares1, moy_hares1_solo);
+     	ind1.set_nb_sstags(ind2.pop_pos(), moy_sstags1, moy_sstags1_solo);
+     	ind1.set_nb_bstags(ind2.pop_pos(), moy_bstags1, moy_bstags1_solo);
 
      	moy_hares2 /= Params::simu::nb_trials;
      	moy_sstags2 /= Params::simu::nb_trials;
@@ -278,6 +279,12 @@ namespace sferes
      	moy_sstags2_solo /= Params::simu::nb_trials;
      	moy_bstags2_solo /= Params::simu::nb_trials;
 
+     	ind2.set_nb_hares(ind1.pop_pos(), moy_hares2, moy_hares2_solo);
+     	ind2.set_nb_sstags(ind1.pop_pos(), moy_sstags2, moy_sstags2_solo);
+     	ind2.set_nb_bstags(ind1.pop_pos(), moy_bstags2, moy_bstags2_solo);
+
+
+			food1 /= Params::simu::nb_trials;
 			food2 /= Params::simu::nb_trials;
 		
 			ind1.set_payoff(ind2.pop_pos(), food1);
