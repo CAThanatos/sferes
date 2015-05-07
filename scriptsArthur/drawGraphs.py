@@ -49,6 +49,367 @@ precision = 10
 
 argsAnimation = {}
 
+def drawBestFitGeneration(dossier) :
+	if os.path.isdir(dossier) :
+		listBestFit = [f for f in os.listdir(dossier) if (os.path.isfile(dossier + "/" + f) and re.match(r"^bestfit(\d*)\.dat$", f))]
+
+		hashFitness = {}
+		hashNbHaresDuo = {}
+		hashNbHaresSolo = {}
+		hashNbHares = {}
+		hashNbSStagsDuo = {}
+		hashNbSStagsSolo = {}
+		hashNbSStags = {}
+		hashNbBStagsDuo = {}
+		hashNbBStagsSolo = {}
+		hashNbBStags = {}
+		hashRatio = {}
+		hashRatioSuccess = {}
+		hashRatioHares = {}
+
+		tabGeneration = []
+		maxFitness = 0
+		maxNbPreys = 0
+		for fileBest in listBestFit :
+			m = re.search(r'^bestfit(\d*)\.dat$', fileBest)
+			run = int(m.group(1))
+
+			testRun = None
+			if selection != None :
+				testRun = lambda run : run in selection
+			elif exclusion != None :
+				testRun = lambda run : run not in exclusion
+
+			if (testRun == None) or (testRun(run)) :
+				hashFitness[run] = {}
+				hashNbHaresDuo[run] = {}
+				hashNbHaresSolo[run] = {}
+				hashNbHares[run] = {}
+				hashNbSStagsDuo[run] = {}
+				hashNbSStagsSolo[run] = {}
+				hashNbSStags[run] = {}
+				hashNbBStagsDuo[run] = {}
+				hashNbBStagsSolo[run] = {}
+				hashNbBStags[run] = {}
+				hashRatio[run] = {}
+				hashRatioSuccess[run] = {}
+				hashRatioHares[run] = {}
+
+				dtypes = np.dtype({ 'names' : ('evaluation', 'fitness', 'nbHares', 'nbHaresSolo', 'nbSStags', 'nbSStagsSolo', 'nbBStags', 'nbBStagsSolo'), 'formats' : [np.int, np.float, np.float, np.float, np.float, np.float, np.float, np.float] })
+				data = np.loadtxt(dossier + "/" + fileBest, delimiter=',', usecols = (0, 1, 2, 3, 4, 5, 6, 7), dtype = dtypes)
+
+				cpt = 0
+				firstEval = True
+				lastEval = 0
+				generation = 1
+				for line in data :
+					generation += 1
+
+					if (generation % precision) == 0 or firstEval :
+						if generation < maxEval :
+							hashFitness[run][generation] = line['fitness']
+
+							hashNbHares[run][generation] = line['nbHares']
+							hashNbHaresSolo[run][generation] = line['nbHaresSolo']
+							hashNbHaresDuo[run][generation] = line['nbHares'] - line['nbHaresSolo']
+
+							hashNbSStags[run][generation] = line['nbSStags']
+							hashNbSStagsSolo[run][generation] = line['nbSStagsSolo']
+							hashNbSStagsDuo[run][generation] = line['nbSStags'] - line['nbSStagsSolo']
+
+							hashNbBStags[run][generation] = line['nbBStags']
+							hashNbBStagsSolo[run][generation] = line['nbBStagsSolo']
+							hashNbBStagsDuo[run][generation] = line['nbBStags'] - line['nbBStagsSolo']
+
+							hashRatio[run][generation] = line['nbBStags']*100/(line['nbHares'] + line['nbBStags'])
+							hashRatioSuccess[run][generation] = (line['nbBStags'] - line['nbBStagsSolo'])*100/(line['nbHares'] + (line['nbBStags'] - line['nbBStagsSolo'])) 
+							hashRatioHares[run][generation] = line['nbHares']*100/(line['nbHares'] + line['nbBStags'])
+
+							if generation not in tabGeneration :
+								tabGeneration.append(generation)
+
+							if line['fitness'] > maxFitness :
+								maxFitness = line['fitness']
+
+							if (line['nbHares'] + line['nbBStags'] + line['nbSStags']) > maxNbPreys :
+								maxNbPreys = (line['nbHares'] + line['nbBStags'] + line['nbSStags'])
+
+							cpt = 0
+
+					if firstEval :
+						firstEval = False
+
+		tabGeneration = sorted(tabGeneration)
+		lastGen = tabGeneration[-1]
+		diffGens = lastGen - tabGeneration[-2]
+
+		while lastGen <= maxEval :
+			lastGen += diffGens
+			tabGeneration.append(lastGen)
+
+
+		# SEABORN
+		sns.set()
+		sns.set_style('white')
+		sns.set_context('paper')
+		palette = sns.color_palette("husl", len(hashNbBStags.keys()))
+
+		matplotlib.rcParams['font.size'] = 15
+		matplotlib.rcParams['font.weight'] = 'bold'
+		matplotlib.rcParams['axes.labelsize'] = 15
+		matplotlib.rcParams['axes.labelweight'] = 'bold'
+		matplotlib.rcParams['xtick.labelsize'] = 15
+		matplotlib.rcParams['ytick.labelsize'] = 15
+		matplotlib.rcParams['legend.fontsize'] = 15
+
+		dpi = 96
+		size = (1280/dpi, 1024/dpi)
+
+		tabPlotGeneration = tabGeneration
+
+		# with open(os.path.join(dossier, "lastGenBest.dat"), "w") as fileWrite :
+		# 	for run in hashRatioSuccess.keys() :
+		# 		evalEnd = sorted(hashRatioSuccess[run].keys())[-1]
+		# 		lastValue = hashRatioSuccess[run][evalEnd]
+
+		# 		fileWrite.write(str(evalEnd) + "," + str(lastValue) + "\n")
+
+
+		# --- BOXPLOT FITNESS ---
+		dataBoxPlot = []
+		for generation in tabPlotGeneration :
+			listFitness = [hashFitness[run][generation] for run in hashFitness.keys() if generation in hashFitness[run].keys()]
+
+			if len(listFitness) > 0 :
+				dataBoxPlot.append(listFitness)
+
+		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+		bp = axe1.boxplot(dataBoxPlot)
+
+		axe1.set_xticks(range(0, len(tabPlotGeneration), int(len(tabPlotGeneration)/10)))
+		axe1.set_xticklabels([tabPlotGeneration[x] for x in range(0, len(tabPlotGeneration), int(len(tabPlotGeneration)/10))])
+		axe1.set_xlabel("Generation")
+
+		axe1.set_ylabel("Fitness")
+		axe1.set_ylim(0, maxFitness + 0.1*maxFitness)
+
+		axe1.set_title('Boxplot of best fitness')
+
+		for i in range(0, len(bp['boxes'])):
+		   bp['boxes'][i].set_color(palette[0])
+		   # we have two whiskers!
+		   bp['whiskers'][i*2].set_color(palette[0])
+		   bp['whiskers'][i*2 + 1].set_color(palette[0])
+		   bp['whiskers'][i*2].set_linewidth(2)
+		   bp['whiskers'][i*2 + 1].set_linewidth(2)
+
+		   # top and bottom fliers
+		   # (set allows us to set many parameters at once)
+		   # bp['fliers'][i * 2].set(markerfacecolor=palette[0],
+		   #                 marker='o', alpha=0.75, markersize=6,
+		   #                 markeredgecolor='none')
+		   # bp['fliers'][i * 2 + 1].set(markerfacecolor=palette[0],
+		   #                 marker='o', alpha=0.75, markersize=6,
+		   #                 markeredgecolor='none')
+
+		   bp['medians'][i].set_color('black')
+		   bp['medians'][i].set_linewidth(3)
+
+		   # and 4 caps to remove
+		   for c in bp['caps']:
+		       c.set_linewidth(0)
+
+		plt.savefig(dossier + "/boxplot.png", bbox_inches = 'tight')
+		plt.close()
+
+		# --- BOXPLOT HARES FITNESS ---
+		runHares = []
+		for run in hashNbHares.keys() :
+			lastGenRun = sorted(hashNbHares[run].keys())[-1]
+			if hashNbHares[run][lastGenRun] > hashNbBStags[run][lastGenRun] :
+				runHares.append(run)
+
+		dataBoxPlot = []
+		for generation in tabPlotGeneration :
+			listFitness = [hashFitness[run][generation] for run in runHares if generation in hashFitness[run].keys()]
+
+			if len(listFitness) > 0 :
+				dataBoxPlot.append(listFitness)
+
+		if len(dataBoxPlot) > 0 :
+			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+			axe1.boxplot(dataBoxPlot)
+
+			axe1.set_xticks(range(0, len(tabPlotGeneration), int(len(tabPlotGeneration)/10)))
+			axe1.set_xticklabels([tabPlotGeneration[x] for x in range(0, len(tabPlotGeneration), int(len(tabPlotGeneration)/10))])
+			axe1.set_xlabel("Generation")
+
+			axe1.set_ylabel("Fitness")
+			axe1.set_ylim(0, maxFitness + 0.1*maxFitness)
+
+			axe1.set_title('Boxplot of best fitness')
+
+			plt.savefig(dossier + "/boxplotRunHares.png", bbox_inches = 'tight')
+			plt.close()
+
+
+		# --- BOXPLOT STAGS FITNESS ---
+		runStags = []
+		for run in hashNbBStags.keys() :
+			lastGenRun = sorted(hashNbHares[run].keys())[-1]
+			if hashNbBStagsDuo[run][lastGenRun] > hashNbHares[run][lastGenRun] :
+				runStags.append(run)
+
+		dataBoxPlot = []
+		for generation in tabPlotGeneration :
+			listFitness = [hashFitness[run][generation] for run in runStags if generation in hashFitness[run].keys()]
+
+			if len(listFitness) > 0 :
+				dataBoxPlot.append(listFitness)
+
+		if len(dataBoxPlot) > 0 :
+			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+			axe1.boxplot(dataBoxPlot)
+
+			axe1.set_xticks(range(0, len(tabPlotGeneration), int(len(tabPlotGeneration)/10)))
+			axe1.set_xticklabels([tabPlotGeneration[x] for x in range(0, len(tabPlotGeneration), int(len(tabPlotGeneration)/10))])
+			axe1.set_xlabel("Generation")
+
+			axe1.set_ylabel("Fitness")
+			axe1.set_ylim(0, maxFitness + 0.1*maxFitness)
+
+			axe1.set_title('Boxplot of best fitness')
+
+			plt.savefig(dossier + "/boxplotRunStags.png", bbox_inches = 'tight')
+			plt.close()
+
+
+
+		# --- RUNS FITNESS ---
+		palette = sns.color_palette("husl", len(hashFitness.keys()))
+		for run in hashFitness.keys() :
+			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+
+			tabFitness = [hashFitness[run][generation] for generation in tabPlotGeneration if generation in hashFitness[run].keys()]
+
+			axe1.plot(range(len(tabFitness)), tabFitness)
+
+			# Divide the x axis by 10
+			# tabEvaluationTicks = [indice for indice in range(len(tabFitness)) if indice % (int(len(tabFitness)/10)) == 0]
+			tabGenerationTicks = [indice for indice in range(len(tabPlotGeneration)) if indice % (int(len(tabPlotGeneration)/10)) == 0]
+
+			axe1.set_xticks(tabGenerationTicks)
+			axe1.set_xticklabels([tabPlotGeneration[indice] for indice in tabGenerationTicks])
+			axe1.set_xlabel('Generation')
+
+			axe1.set_ylabel('Fitness')
+			axe1.set_ylim(0, maxFitness + 0.1*maxFitness)
+
+			axe1.set_title('Best fitness', fontsize = 10)
+
+			plt.savefig(dossier + "/fitnessRun" + str(run) + ".png", bbox_inches = 'tight')
+			plt.close()
+
+
+
+		# --- RUNS RATIO ---
+		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+
+		cpt = 0
+		lastVals = []
+		captions = []
+		for run in hashRatioSuccess.keys() :
+			tabRatio = [np.mean(hashRatioSuccess[run][generation]) for generation in tabPlotGeneration if generation in hashRatioSuccess[run].keys()]
+			axe1.plot(range(len(tabRatio)), tabRatio, color = palette[cpt])
+			lastVals.append(tabRatio[-1])
+			captions.append("Run " + str(run))
+
+			cpt += 1
+
+		axe1.set_ylim(0, 100)
+
+		sortedVals = zip(*(sorted(zip(lastVals, range(len(lastVals))), key = itemgetter(0))))
+		sortedLastVals = sortedVals[0]
+		sortedIndexes = sortedVals[1]
+
+		# Create new axes on the right containing captions
+		divider = make_axes_locatable(axe1)
+		rax = divider.append_axes("right", size="25%", pad=0.00)
+
+		# Add captions text on axis, and lines
+		yCaptionsCoords = np.linspace(0., 1., len(sortedIndexes))
+		connectionLinesCoords = []
+		for y, i in zip(yCaptionsCoords, sortedIndexes):
+			cap = captions[i]
+			lastVal = lastVals[i]
+			color = palette[i]
+			rax.text(1.10, y, cap,
+					horizontalalignment='left',
+					verticalalignment='center',
+					transform = rax.transAxes)
+
+			# Add lines
+			normalizedY = float(y) * float(axe1.get_ylim()[1])
+			rax.plot([lastVal, normalizedY], color=color)
+
+
+		rax.set_axis_off()
+		rax.set_ylim(0, 100)
+
+		# Divide the x axis by 10
+		# tabGeneration = [(evaluation+30)/40 for evaluation in tabPlotEvaluation]
+		# tabGeneration[-1] = 300
+
+		tabGenerationTicks = [indice for indice in range(len(tabPlotGeneration)) if indice % (int(len(tabPlotGeneration)/10)) == 0]
+		axe1.set_xticks(tabGenerationTicks)
+		axe1.set_xticklabels([tabGeneration[indice] for indice in tabGenerationTicks])
+		axe1.set_xlabel('Generation')
+
+		axe1.set_ylabel('Pourcentage of stags hunted')
+		# axe1.set_ylim(0, 100)
+
+		plt.savefig(dossier + "/figureRatioBStagsSuccess.png", bbox_inches = 'tight')
+
+
+		# --- BARS ---
+		for run in hashNbHaresSolo.keys() :
+			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+
+			width = 0.8
+
+			tabNbHaresSolo = [hashNbHaresSolo[run][generation] for generation in tabPlotGeneration if generation in hashNbHaresSolo[run].keys()]
+			tabNbHaresDuo = [hashNbHaresDuo[run][generation] for generation in tabPlotGeneration if generation in hashNbHaresDuo[run].keys()]
+			tabNbSStagsSolo = [hashNbSStagsSolo[run][generation] for generation in tabPlotGeneration if generation in hashNbSStagsSolo[run].keys()]
+			tabNbSStagsDuo = [hashNbSStagsDuo[run][generation] for generation in tabPlotGeneration if generation in hashNbSStagsDuo[run].keys()]
+			tabNbBStagsSolo = [hashNbBStagsSolo[run][generation] for generation in tabPlotGeneration if generation in hashNbBStagsSolo[run].keys()]
+			tabNbBStagsDuo = [hashNbBStagsDuo[run][generation] for generation in tabPlotGeneration if generation in hashNbBStagsDuo[run].keys()]
+
+			barNbHaresSolo = axe1.bar(range(len(tabNbHaresSolo)), tabNbHaresSolo, width = width, color = colorHaresSolo, alpha = alphaHares)
+			barNbHaresDuo = axe1.bar(range(len(tabNbHaresDuo)), tabNbHaresDuo, bottom = tabNbHaresSolo, width = width, color = colorHaresDuo, alpha = alphaHares)
+			barNbSStagsSolo = axe1.bar(range(len(tabNbSStagsSolo)), tabNbSStagsSolo, bottom = np.add(tabNbHaresDuo, tabNbHaresSolo), width = width, color = colorSStagsSolo, alpha = alphaSStags)
+			barNbSStagsDuo = axe1.bar(range(len(tabNbSStagsDuo)), tabNbSStagsDuo, bottom = np.add(tabNbSStagsSolo, np.add(tabNbHaresDuo, tabNbHaresSolo)), width = width, color = colorSStagsDuo, alpha = alphaSStags)
+			barNbBStagsSolo = axe1.bar(range(len(tabNbBStagsSolo)), tabNbBStagsSolo, bottom = np.add(tabNbSStagsDuo, np.add(tabNbSStagsSolo, np.add(tabNbHaresDuo, tabNbHaresSolo))), width = width, color = colorBStagsSolo, alpha = alphaBStags)
+			barNbBStagsDuo = axe1.bar(range(len(tabNbBStagsDuo)), tabNbBStagsDuo, bottom = np.add(tabNbBStagsSolo, np.add(tabNbSStagsDuo, np.add(tabNbSStagsSolo, np.add(tabNbHaresDuo, tabNbHaresSolo)))), width = width, color = colorBStagsDuo, alpha = alphaBStags)
+
+			tabGenerationTicks = [indice for indice in range(len(tabPlotGeneration)) if indice % (int(len(tabPlotGeneration)/10)) == 0]
+
+			axe1.set_xticks(tabGenerationTicks)
+			axe1.set_xticklabels([tabPlotGeneration[indice] for indice in tabGenerationTicks])
+			axe1.set_xlabel('Generation')
+			# axe1.set_xlim(0, len(tabGenerationTicks))
+
+			axe1.set_ylim(0, maxNbPreys + 0.1*maxNbPreys)
+			axe1.set_ylabel('Number of preys hunted')
+			
+			axe1.set_title('Repartition of preys hunted', fontsize = 10)
+
+			# plt.legend([barNbHaresSolo, barNbHaresDuo, barNbBStagsSolo,  barNbBStagsDuo], ['Hares solo', 'Hares coop.', 'Stags solo', 'Stags coop.'], bbox_to_anchor=(0., 1.05, 1., .102), loc=3, ncol=2, mode="expand", borderaxespad=0.)
+			# plt.legend([barNbHaresSolo, barNbHaresDuo, barNbSStagsSolo, barNbSStagsDuo, barNbBStagsSolo,  barNbBStagsDuo], ['Hares solo', 'Hares coop.', 'Small stags solo', 'Small stags coop.', 'Big stags solo', 'Big stags coop.'], bbox_to_anchor=(0., 1.05, 1., .102), loc=3, ncol=2, mode="expand", borderaxespad=0.)
+
+			plt.savefig(dossier + "/preysRun" + str(run) + ".png", bbox_inches = 'tight')
+			plt.close()
+
+
 def drawBestFit(dossier) :
 	if os.path.isdir(dossier) :
 		listBestFit = [f for f in os.listdir(dossier) if (os.path.isfile(dossier + "/" + f) and re.match(r"^bestfit(\d*)\.dat$", f))]
@@ -94,6 +455,7 @@ def drawBestFit(dossier) :
 				hashRatio[run] = {}
 				hashRatioSuccess[run] = {}
 				hashRatioHares[run] = {}
+				hashGeneration[run] = {}
 
 				dtypes = np.dtype({ 'names' : ('evaluation', 'fitness', 'nbHares', 'nbHaresSolo', 'nbSStags', 'nbSStagsSolo', 'nbBStags', 'nbBStagsSolo'), 'formats' : [np.int, np.float, np.float, np.float, np.float, np.float, np.float, np.float] })
 				data = np.loadtxt(dossier + "/" + fileBest, delimiter=',', usecols = (0, 1, 2, 3, 4, 5, 6, 7), dtype = dtypes)
@@ -101,11 +463,14 @@ def drawBestFit(dossier) :
 				cpt = 0
 				firstEval = True
 				lastEval = 0
+				generation = 0
 				for line in data :
 					evaluation = line['evaluation']
 
 					cpt += evaluation - lastEval
 					lastEval = evaluation
+
+					generation += 1
 
 					if cpt > precision or firstEval :
 						if evaluation < maxEval :
@@ -126,6 +491,8 @@ def drawBestFit(dossier) :
 							hashRatio[run][evaluation] = line['nbBStags']*100/(line['nbHares'] + line['nbBStags'])
 							hashRatioSuccess[run][evaluation] = (line['nbBStags'] - line['nbBStagsSolo'])*100/(line['nbHares'] + (line['nbBStags'] - line['nbBStagsSolo'])) 
 							hashRatioHares[run][evaluation] = line['nbHares']*100/(line['nbHares'] + line['nbBStags'])
+
+							hashGeneration[run][evaluation] = generation
 
 							if evaluation not in tabEvaluation :
 								tabEvaluation.append(evaluation)
@@ -150,7 +517,7 @@ def drawBestFit(dossier) :
 			tabEvaluation.append(lastEval)
 
 
-		tabGeneration = [int(math.floor((evaluation-nbPopFirstGen)/nbEvalByGen)) for evaluation in tabEvaluation]
+		# tabGeneration = [int(math.floor((evaluation-nbPopFirstGen)/nbEvalByGen)) for evaluation in tabEvaluation]
 
 		# SEABORN
 		sns.set()
@@ -2117,7 +2484,10 @@ def draw(**parametres) :
 			if parametres["argNoDrawFit"] != True :
 				if re.match(r'^BestFit$', curDir) and parametres["argAll"] != True :
 					print('\t -> Drawing bestfit directory : ' + curDir)
-					drawBestFit(dossier + '/' + curDir)
+					if parametres["argDrawGen"] == True :
+						drawBestFitGeneration(dossier + '/' + curDir)
+					else:
+						drawBestFit(dossier + '/' + curDir)
 				elif re.match(r'^AllFit$', curDir) and parametres["argBest"] != True :
 					print('\t -> Drawing allfit directory : ' + curDir)
 					drawAllFit(dossier + '/' + curDir)
@@ -2171,7 +2541,8 @@ def main(args) :
 									"argDiversity" : args.diversity,
 									"argLeadership" : args.leadership,
 									"argNN" : args.nn,
-									"argDrawRun" : args.drawRun
+									"argDrawRun" : args.drawRun,
+									"argDrawGen" : args.drawGen
 								}
 	draw(**parametres)
 
@@ -2193,6 +2564,7 @@ if __name__ == '__main__' :
 
 	parser.add_argument('-g', '--firstGen', help = "Size of population of first generation", default=10, type=int)
 	parser.add_argument('-E', '--EvalByGen', help = "Number of evaluations by generation", default=20, type=int)
+	parser.add_argument('-G', '--drawGen', help = "Draw generations", default=False, action="store_true")
 
 	parser.add_argument('-s', '--selection', help = "Selected runs", default=None, type=int, nargs='+')
 	parser.add_argument('-e', '--exclusion', help = "Excluded runs", default=None, type=int, nargs='+')

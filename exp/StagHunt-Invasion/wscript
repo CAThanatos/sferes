@@ -30,21 +30,36 @@ def build(bld):
 													 target = 'StagHunt',
 #                           json = 'StagHuntExp3.json',
 													 variants = [
-													 							'SETTING13 PREYS2',
-													 							'SETTING13 PREYS10',
-													 							'SETTING13',
+													 							# 'SETTING13 PREYS2',
+													 							# 'SETTING13 PREYS10',
+													 							# 'SETTING13',
 
-													 							'CONTROL1 BSTAG1000 BSTAG_SOLO1000 PREYS2',
-													 							'CONTROL1 BSTAG1000 BSTAG_SOLO1000 PREYS10',
-													 							'CONTROL1 BSTAG1000 BSTAG_SOLO1000',
+													 							# 'CONTROL1 BSTAG1000 BSTAG_SOLO1000 PREYS2',
+													 							# 'CONTROL1 BSTAG1000 BSTAG_SOLO1000 PREYS10',
+													 							# 'CONTROL1 BSTAG1000 BSTAG_SOLO1000',
 
-													 							'SETTING15 PREYS2',
-													 							'SETTING15 PREYS10',
-													 							'SETTING15',
+													 							'SETTING13 RATE01 INVASION01',
+													 							'SETTING13 RATE01 INVASION05',
+													 							'SETTING13 RATE01 INVASION001',
+													 							'SETTING13 RATE01 INVASION005',
+													 							'SETTING13 RATE03 INVASION01',
+													 							'SETTING13 RATE03 INVASION05',
+													 							'SETTING13 RATE05 INVASION01',
+													 							'SETTING13 RATE05 INVASION05',
+													 							'SETTING13 RATE001 INVASION01',
+													 							'SETTING13 RATE001 INVASION05',
+													 							'SETTING13 RATE003 INVASION01',
+													 							'SETTING13 RATE003 INVASION05',
+													 							'SETTING13 RATE005 INVASION01',
+													 							'SETTING13 RATE005 INVASION05',
 
-													 							'CONTROL1 PREYS2',
-													 							'CONTROL1 PREYS10',
-													 							'CONTROL1',
+													 							# 'SETTING15 PREYS2',
+													 							# 'SETTING15 PREYS10',
+													 							# 'SETTING15',
+
+													 							# 'CONTROL1 PREYS2',
+													 							# 'CONTROL1 PREYS10',
+													 							# 'CONTROL1',
 																			])
 
 																			 

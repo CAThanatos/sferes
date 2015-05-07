@@ -223,8 +223,28 @@ struct Params
 	
   struct evo_float
   {
+#ifdef RATE01
+    // the mutation rate of the real-valued vector
+    static const float mutation_rate = 0.01f;
+#elif defined(RATE03)
+    // the mutation rate of the real-valued vector
+    static const float mutation_rate = 0.03f;
+#elif defined(RATE05)
+    // the mutation rate of the real-valued vector
+    static const float mutation_rate = 0.05f;
+#elif defined(RATE001)
+    // the mutation rate of the real-valued vector
+    static const float mutation_rate = 0.001f;
+#elif defined(RATE003)
     // the mutation rate of the real-valued vector
     static const float mutation_rate = 0.003f;
+#elif defined(RATE005)
+    // the mutation rate of the real-valued vector
+    static const float mutation_rate = 0.005f;
+#else
+    // the mutation rate of the real-valued vector
+    static const float mutation_rate = 0.003f;
+#endif
 
 #ifndef GAUSSIAN_MUTATION
     // we choose the polynomial mutation type
@@ -264,7 +284,7 @@ struct Params
     static const unsigned max_size = 20;
     
     // number of generations
-    static const unsigned nb_gen = 50000;
+    static const unsigned nb_gen = 10000;
     
     // how often should the result file be written (here, each 10
     // generation)
@@ -312,7 +332,19 @@ struct Params
 		static const unsigned nb_eval = 1;
 #endif
 
+#ifdef INVASION1
+		static const float invasion_frequency = 0.1f;
+#elif defined(INVASION01)
 		static const float invasion_frequency = 0.01f;
+#elif defined(INVASION05)
+		static const float invasion_frequency = 0.05f;
+#elif defined(INVASION001)
+		static const float invasion_frequency = 0.001f;
+#elif defined(INVASION005)
+		static const float invasion_frequency = 0.005f;
+#else
+		static const float invasion_frequency = 0.01f;
+#endif
 
 		static const float min_threshold = 0.001f;
 

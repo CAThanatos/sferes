@@ -166,6 +166,7 @@ namespace sferes
 				while(to_divide > 0.0f)
 				{
 					float next_divide = 0.0f;
+					vec_remove_genotypes.clear();
 					for(size_t i = 0; i < _nb_genotypes; ++i)
 					{
 						if(i != pos_mutant)
