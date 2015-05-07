@@ -101,10 +101,6 @@ namespace sferes
 				parallel::p_for(parallel::range_t(begin, end), _parallel_ev_mutant<Phen>(pop, pos_mutant));
 				_nb_eval += end - begin;
 
-				pop[pos_mutant]->set_nb_hares(pop[pos_mutant]->nb_hares_at(), pop[pos_mutant]->nb_hares_solo_at());
-				pop[pos_mutant]->set_nb_sstag(pop[pos_mutant]->nb_sstag_at(), pop[pos_mutant]->nb_sstag_solo_at());
-				pop[pos_mutant]->set_nb_bstag(pop[pos_mutant]->nb_bstag_at(), pop[pos_mutant]->nb_bstag_solo_at());
-
 				pop[pos_mutant]->set_nb_leader_first(pop[pos_mutant]->nb_leader_first_at());
 				pop[pos_mutant]->set_nb_preys_killed_coop(pop[pos_mutant]->nb_preys_killed_coop_at());
 				pop[pos_mutant]->set_proportion_leader(pop[pos_mutant]->proportion_leader_at());

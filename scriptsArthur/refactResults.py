@@ -159,7 +159,8 @@ def main(args) :
 								"argLeadership" : args.leadership,
 								"argNN" : args.nn,
 								"argNoDrawFit" : args.noDrawFit,
-								"argDrawRun" : args.drawRun
+								"argDrawRun" : args.drawRun,
+								"argDrawGen" : args.drawGen
 							}
 			draw(**parametres)
 
@@ -186,6 +187,7 @@ if __name__ == "__main__" :
 
 	parser.add_argument('-g', '--firstGen', help = "Size of population of first generation", default=10, type=int)
 	parser.add_argument('-E', '--EvalByGen', help = "Number of evaluations by generation", default=20, type=int)
+	parser.add_argument('-G', '--drawGen', help = "Drawing generations", default=False, action="store_true")
 
 	parser.add_argument('-s', '--selection', help = "Selected runs", default=None, type=int, nargs='+')
 	parser.add_argument('-e', '--exclusion', help = "Excluded runs", default=None, type=int, nargs='+')

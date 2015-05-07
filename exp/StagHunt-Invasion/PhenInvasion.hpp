@@ -55,7 +55,7 @@ namespace sferes
 #ifdef EIGEN_CORE_H
 		    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 #endif
-		    PhenInvasion() : _params((*this)._gen.size()), _nb_hares(0), _nb_hares_solo(0), _nb_sstag(0), _nb_sstag_solo(0), _nb_bstag(0), _nb_bstag_solo(0), _nb_leader_first(0), _nb_preys_killed_coop(0), _fit_mov(0), _developed(false) 					{
+		    PhenInvasion() : _params((*this)._gen.size()), _nb_leader_first(0), _nb_preys_killed_coop(0), _developed(false) 					{
 		    }
 		    
 		    typedef float type_t;
@@ -67,12 +67,35 @@ namespace sferes
 					for (unsigned i = 0; i < _params.size(); ++i)
 						_params[i] = this->_gen.data(i) * (max_p - min_p) + min_p;
 						
+					_vec_nb_hares.clear();
+					_vec_nb_hares.resize(Params::pop::max_size);
+						
+					_vec_nb_hares_solo.clear();
+					_vec_nb_hares_solo.resize(Params::pop::max_size);
+
 					_nb_hares = 0;
 					_nb_hares_solo = 0;
-					_nb_sstag = 0;
-					_nb_sstag_solo = 0;
-					_nb_bstag = 0;
-					_nb_bstag_solo = 0;
+
+						
+					_vec_nb_sstags.clear();
+					_vec_nb_sstags.resize(Params::pop::max_size);
+						
+					_vec_nb_sstags_solo.clear();
+					_vec_nb_sstags_solo.resize(Params::pop::max_size);
+
+					_nb_sstags = 0;
+					_nb_sstags_solo = 0;
+
+						
+					_vec_nb_bstags.clear();
+					_vec_nb_bstags.resize(Params::pop::max_size);
+						
+					_vec_nb_bstags_solo.clear();
+					_vec_nb_bstags_solo.resize(Params::pop::max_size);
+
+					_nb_bstags = 0;
+					_nb_bstags_solo = 0;
+
 					_nb_leader_first = 0;
 					_nb_preys_killed_coop = 0;
 					_proportion_leader = 0;
@@ -81,17 +104,8 @@ namespace sferes
 					_nb_bigger_nn1_chosen = 0;
 					_nb_role_divisions = 0;
 #endif
-					_fit_mov = 0;
-					
-					this->fit().vec_fitness.clear();
 					_developed = true;
 
-					_nb_hares_at = 0;
-					_nb_hares_solo_at = 0;
-					_nb_sstag_at = 0;
-					_nb_sstag_solo_at = 0;
-					_nb_bstag_at = 0;
-					_nb_bstag_solo_at = 0;
 					_nb_leader_first_at = 0;
 					_nb_preys_killed_coop_at = 0;
 					_proportion_leader_at = 0;
@@ -100,11 +114,10 @@ namespace sferes
 					_nb_bigger_nn1_chosen_at = 0;
 					_nb_role_divisions_at = 0;
 #endif
-					this->fit().fitness_at = 0;
 
 					_freq = 0.0f;
 					_vec_payoffs.clear();
-					_vec_payoffs.resize(Params::pop::size);
+					_vec_payoffs.resize(Params::pop::max_size);
 				}
 
 				float data(size_t i) const { assert(i < size()); return _params[i]; }
@@ -137,32 +150,33 @@ namespace sferes
 						os<<p<<",";
 					os<<std::endl;
 		    }
-		    
-		    float nb_hares() const { return _nb_hares; }
-        float nb_hares_solo() const { return _nb_hares_solo; }
-		    void set_nb_hares(float nb_hares, float solo) { _nb_hares = nb_hares; _nb_hares_solo = solo; }
-
-		    float nb_hares_at() const { return _nb_hares_at; }
-        float nb_hares_solo_at() const {return _nb_hares_solo_at; }
-		    void add_nb_hares(float nb_hares, float solo) { _nb_hares_at.fetch_and_store(_nb_hares_at + nb_hares); _nb_hares_solo_at.fetch_and_store(_nb_hares_solo_at + solo); }
 
 		    
-		    float nb_sstag() const { return _nb_sstag; }
-		    float nb_sstag_solo() const { return _nb_sstag_solo; }
-		    void set_nb_sstag(float nb_sstag, float solo) { _nb_sstag = nb_sstag; _nb_sstag_solo = solo; }
-		    
-		    float nb_sstag_at() const { return _nb_sstag_at; }
-		    float nb_sstag_solo_at() const { return _nb_sstag_solo_at; }
-		    void add_nb_sstag(float nb_sstag, float solo) { _nb_sstag_at.fetch_and_store(_nb_sstag_at + nb_sstag); _nb_sstag_solo_at.fetch_and_store(_nb_sstag_solo_at + solo); }
+		    void set_nb_hares(int opponent, float nb_hares, float solo) { _vec_nb_hares[opponent] = nb_hares; _vec_nb_hares_solo[opponent] = solo; }
+		    void set_nb_hares(float nb_hares, float nb_hares_solo) { _nb_hares = nb_hares; _nb_hares_solo = nb_hares_solo; }
 
+		    float get_nb_hares(int opponent) { return _vec_nb_hares[opponent]; }
+		    float get_nb_hares_solo(int opponent) { return _vec_nb_hares_solo[opponent]; }
+		    float nb_hares() { return _nb_hares; }
+		    float nb_hares_solo() { return _nb_hares_solo; }
 
-		    float nb_bstag() const { return _nb_bstag; }
-		    float nb_bstag_solo() const { return _nb_bstag_solo; }
-		    void set_nb_bstag(float nb_bstag, float solo) { _nb_bstag = nb_bstag; _nb_bstag_solo = solo; }
 		    
-		    float nb_bstag_at() const { return _nb_bstag_at; }
-		    float nb_bstag_solo_at() const { return _nb_bstag_solo_at; }
-		    void add_nb_bstag(float nb_bstag, float solo) { _nb_bstag_at.fetch_and_store(_nb_bstag_at + nb_bstag); _nb_bstag_solo_at.fetch_and_store(_nb_bstag_solo_at + solo); }
+		    void set_nb_sstags(int opponent, float nb_sstags, float solo) { _vec_nb_sstags[opponent] = nb_sstags; _vec_nb_sstags_solo[opponent] = solo; }
+		    void set_nb_sstags(float nb_sstags, float nb_sstags_solo) { _nb_sstags = nb_sstags; _nb_sstags_solo = nb_sstags_solo; }
+
+		    float get_nb_sstags(int opponent) { return _vec_nb_sstags[opponent]; }
+		    float get_nb_sstags_solo(int opponent) { return _vec_nb_sstags_solo[opponent]; }
+		    float nb_sstags() { return _nb_sstags; }
+		    float nb_sstags_solo() { return _nb_sstags_solo; }
+
+		    
+		    void set_nb_bstags(int opponent, float nb_bstags, float solo) { _vec_nb_bstags[opponent] = nb_bstags; _vec_nb_bstags_solo[opponent] = solo; }
+		    void set_nb_bstags(float nb_bstags, float nb_bstags_solo) { _nb_bstags = nb_bstags; _nb_bstags_solo = nb_bstags_solo; }
+
+		    float get_nb_bstags(int opponent) { return _vec_nb_bstags[opponent]; }
+		    float get_nb_bstags_solo(int opponent) { return _vec_nb_bstags_solo[opponent]; }
+		    float nb_bstags() { return _nb_bstags; }
+		    float nb_bstags_solo() { return _nb_bstags_solo; }
 
 		    
 		    float proportion_leader() const { return _proportion_leader; }
@@ -208,10 +222,6 @@ namespace sferes
 		    void add_nb_role_divisions(float nb_role_divisions) { _nb_role_divisions_at.fetch_and_store(_nb_role_divisions_at + nb_role_divisions); }
 #endif
 
-
-		    float fit_mov() const { return _fit_mov; }
-		    void set_fit_mov(float fit_mov) { _fit_mov = fit_mov; }
-
 				bool developed() const { return _developed; }
 				void set_developed(bool developed) { _developed = developed; }
 				bool developed_at() const { return _developed_at; }
@@ -247,27 +257,6 @@ namespace sferes
 		  protected:
 		    std::vector<float> _params;
 		    
-		    // Number of hares caughted
-		    float _nb_hares;
-        float _nb_hares_solo;
-        
-		    tbb::atomic<float>  _nb_hares_at;
-        tbb::atomic<float>  _nb_hares_solo_at;
-		    
-		    // Number of small stags caughted
-		    float _nb_sstag;
-		    float _nb_sstag_solo;
-
-		    tbb::atomic<float> _nb_sstag_at;
-		    tbb::atomic<float> _nb_sstag_solo_at;
-		    
-		    // Number of big stags caughted
-		    float _nb_bstag;
-		    float _nb_bstag_solo;
-
-		    tbb::atomic<float> _nb_bstag_at;
-		    tbb::atomic<float> _nb_bstag_solo_at;
-		    
 		    // Number of times the leader arrived first on a prey
 		    float _nb_leader_first;
 		    tbb::atomic<float> _nb_leader_first_at;
@@ -302,14 +291,30 @@ namespace sferes
 		    std::vector<float> _vec_sm;
 #endif
 		    
-		    float _fit_mov;
-		    
 		    bool _developed;
 		    tbb::atomic<bool> _developed_at;
 
 		    float _freq;
 		    int _pop_pos;
 		    std::vector<float> _vec_payoffs;
+
+		    std::vector<float> _vec_nb_hares;
+		    std::vector<float> _vec_nb_hares_solo;
+
+		    float _nb_hares;
+		    float _nb_hares_solo;
+
+		    std::vector<float> _vec_nb_sstags;
+		    std::vector<float> _vec_nb_sstags_solo;
+
+		    float _nb_sstags;
+		    float _nb_sstags_solo;
+
+		    std::vector<float> _vec_nb_bstags;
+		    std::vector<float> _vec_nb_bstags_solo;
+
+		    float _nb_bstags;
+		    float _nb_bstags_solo;
     };
     
     template<typename G, typename F, typename P, typename E> 

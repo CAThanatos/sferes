@@ -223,8 +223,35 @@ struct Params
 	
   struct evo_float
   {
+#ifdef RATE01
+    // the mutation rate of the real-valued vector
+    static const float mutation_rate = 0.01f;
+    static const float big_mutation_rate = 0.1f;
+#elif defined(RATE03)
+    // the mutation rate of the real-valued vector
+    static const float mutation_rate = 0.03f;
+    static const float big_mutation_rate = 0.3f;
+#elif defined(RATE05)
+    // the mutation rate of the real-valued vector
+    static const float mutation_rate = 0.05f;
+    static const float big_mutation_rate = 0.5f;
+#elif defined(RATE001)
+    // the mutation rate of the real-valued vector
+    static const float mutation_rate = 0.001f;
+    static const float big_mutation_rate = 0.1f;
+#elif defined(RATE003)
     // the mutation rate of the real-valued vector
     static const float mutation_rate = 0.003f;
+    static const float big_mutation_rate = 0.3f;
+#elif defined(RATE005)
+    // the mutation rate of the real-valued vector
+    static const float mutation_rate = 0.005f;
+    static const float big_mutation_rate = 0.5f;
+#else
+    // the mutation rate of the real-valued vector
+    static const float mutation_rate = 0.003f;
+    static const float big_mutation_rate = 0.3f;
+#endif
 
 #ifndef GAUSSIAN_MUTATION
     // we choose the polynomial mutation type
@@ -259,6 +286,9 @@ struct Params
   {
     // size of the population
     static const unsigned size = 20;
+
+    // size of the population
+    static const unsigned max_size = 20;
     
     // number of generations
     static const unsigned nb_gen = 10000;
@@ -268,7 +298,7 @@ struct Params
     static const int dump_period = 10;
     
     // how often should the video be done
-    static const int video_dump_period = 100;
+    static const int video_dump_period = 500;
     
     // how many individuals should be created during the random
     // generation process?
@@ -309,9 +339,33 @@ struct Params
 		static const unsigned nb_eval = 1;
 #endif
 
+#ifdef INVASION1
+		static const float invasion_frequency = 0.1f;
+#elif defined(INVASION01)
 		static const float invasion_frequency = 0.01f;
+#elif defined(INVASION05)
+		static const float invasion_frequency = 0.05f;
+#elif defined(INVASION001)
+		static const float invasion_frequency = 0.001f;
+#elif defined(INVASION005)
+		static const float invasion_frequency = 0.005f;
+#else
+		static const float invasion_frequency = 0.01f;
+#endif
 
 		static const float min_threshold = 0.001f;
+
+#ifdef POP_INIT10
+		static const int pop_init = 10;
+#elif defined(POP_INIT1)
+		static const int pop_init = 1;
+#elif defined(POP_INIT50)
+		static const int pop_init = 50;
+#elif defined(POP_INIT100)
+		static const int pop_init = 100;
+#else
+		static const int pop_init = 10;
+#endif
   };
   
   struct trajectory
@@ -382,7 +436,7 @@ struct Params
 
 #ifdef BSTAG_SOLO50
 #define FOOD_BIG_STAG_SOLO 50
-#ifdef BSTAG_SOLO1000
+#elif defined(BSTAG_SOLO1000)
 #define FOOD_BIG_STAG_SOLO 1000
 #else
 #define FOOD_BIG_STAG_SOLO 0
