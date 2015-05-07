@@ -382,6 +382,8 @@ struct Params
 
 #ifdef BSTAG_SOLO50
 #define FOOD_BIG_STAG_SOLO 50
+#ifdef BSTAG_SOLO1000
+#define FOOD_BIG_STAG_SOLO 1000
 #else
 #define FOOD_BIG_STAG_SOLO 0
 #endif
