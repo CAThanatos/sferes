@@ -66,6 +66,7 @@ namespace sferes
       	this->_pop.clear();
       	this->_vec_fitness.clear();
 
+      	_nb_genotypes = 0;
       	for(size_t i = 0; i < Params::pop::pop_init; ++i)
       	{
 	      	this->_pop.push_back(boost::shared_ptr<Phen>(new Phen()));
