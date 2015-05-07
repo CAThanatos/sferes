@@ -288,7 +288,7 @@ struct Params
     static const unsigned size = 1000;
 
     // size of the population
-    static const unsigned max_size = 20;
+    static const unsigned max_size = 1000;
     
     // number of generations
     static const unsigned nb_gen = 10000;
