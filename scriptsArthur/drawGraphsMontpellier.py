@@ -57,7 +57,7 @@ alphaTotal = 1
 sns.set()
 sns.set_style('white')
 sns.set_context('paper')
-palette = sns.color_palette("husl", 30)
+palette = sns.color_palette("husl", 3)
 
 # MATPLOTLIB PARAMS
 matplotlib.rcParams['font.size'] = 15
@@ -290,8 +290,8 @@ def drawHuntingTask() :
 	axe1.set_ylabel("Proportion of Cooperative Runs")
 	axe1.set_ylim(-0.1, 1.1)
 
-	legend = plt.legend(['Control', 'Without Leadership', 'With Leadership'], loc = 4, frameon=True)
-	frame = legend.get_frame()
+	# legend = plt.legend(['Control', 'Without Leadership', 'With Leadership'], loc = 4, frameon=True)
+	# frame = legend.get_frame()
 	# frame.set_facecolor('0.9')
 	# frame.set_edgecolor('0.9')
 
