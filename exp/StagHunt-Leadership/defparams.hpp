@@ -255,6 +255,14 @@ struct Params
 #endif
 	};
 	
+#ifdef NOVELTY
+	struct novelty
+	{
+		static const float nov_min = 0.1;
+		static const float k = 5;
+	};
+#endif
+
 #ifdef CMAES
 	struct cmaes
 	{

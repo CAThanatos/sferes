@@ -43,8 +43,10 @@ colorBStagsSolo = 'magenta'
 colorBStagsDuo = 'purple'
 colorErrorBStags = 'black'
 alphaBStags = 1
-colorSStagsSolo = 'cyan'
-colorSStagsDuo = 'steelblue'
+# colorSStagsSolo = 'cyan'
+# colorSStagsDuo = 'steelblue'
+colorSStagsSolo = 'lime'
+colorSStagsDuo = 'green'
 colorErrorSStags = 'black'
 alphaSStags = 1
 colorTotal = 'grey'
@@ -57,7 +59,7 @@ alphaTotal = 1
 sns.set()
 sns.set_style('white')
 sns.set_context('paper')
-palette = sns.color_palette("husl", 3)
+palette = sns.color_palette("husl", 4)
 
 # MATPLOTLIB PARAMS
 matplotlib.rcParams['font.size'] = 15
@@ -71,8 +73,8 @@ matplotlib.rcParams['legend.fontsize'] = 15
 # GRAPHS GLOBAL VARIABLES
 linewidth = 2
 # linestyles = ['-', '--', '-.']
-linestyles = ['-', '-', '-']
-markers = [None, None, None] #['o', '+', '*']
+linestyles = ['-', '-', '-', '-']
+markers = [None, None, None, None] #['o', '+', '*']
 
 dpi = 96
 size = (1280/dpi, 1024/dpi)
@@ -290,7 +292,7 @@ def drawHuntingTask() :
 	axe1.set_ylabel("Proportion of Cooperative Runs")
 	axe1.set_ylim(-0.1, 1.1)
 
-	# legend = plt.legend(['Control', 'Without Leadership', 'With Leadership'], loc = 4, frameon=True)
+	# legend = plt.legend(['Control Without Leadership', 'Control With Leaderhip', 'Without Leadership', 'With Leadership'], loc = 4, frameon=True)
 	# frame = legend.get_frame()
 	# frame.set_facecolor('0.9')
 	# frame.set_edgecolor('0.9')
@@ -303,77 +305,77 @@ def drawHuntingTask() :
 
 	# --- BARS ---
 	cptData = 0
-	tabDirs = ['Control', 'WoLeadership', 'WLeadership']
-	# for data in dataHash :
-	# 	outputData = os.path.join(outputDir, tabDirs[cptData])
+	tabDirs = ['ControlWoLeadership','ControlWLeadership', 'WoLeadership', 'WLeadership']
+	for data in dataHash :
+		outputData = os.path.join(outputDir, tabDirs[cptData])
 
-	# 	if os.path.isdir(outputData) :
-	# 		if removeOutput :
-	# 			shutil.rmtree(outputData)
-	# 			os.makedirs(outputData)
-	# 	else :
-	# 		os.makedirs(outputData)
+		if os.path.isdir(outputData) :
+			if removeOutput :
+				shutil.rmtree(outputData)
+				os.makedirs(outputData)
+		else :
+			os.makedirs(outputData)
 
-	# 	hashNbHaresSolo = data['hashNbHaresSolo']
-	# 	hashNbHaresDuo = data['hashNbHaresDuo']
-	# 	hashNbSStagsSolo = data['hashNbSStagsSolo']
-	# 	hashNbSStagsDuo = data['hashNbSStagsDuo']
-	# 	hashNbBStagsSolo = data['hashNbBStagsSolo']
-	# 	hashNbBStagsDuo = data['hashNbBStagsDuo']
+		hashNbHaresSolo = data['hashNbHaresSolo']
+		hashNbHaresDuo = data['hashNbHaresDuo']
+		hashNbSStagsSolo = data['hashNbSStagsSolo']
+		hashNbSStagsDuo = data['hashNbSStagsDuo']
+		hashNbBStagsSolo = data['hashNbBStagsSolo']
+		hashNbBStagsDuo = data['hashNbBStagsDuo']
 
-	# 	for run in hashNbHaresSolo.keys() :
-	# 		if run in [2, 8, 22] :
-	# 			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
-	# 			plt.grid()
+		for run in hashNbHaresSolo.keys() :
+			if run in [2, 8, 22] :
+				fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+				plt.grid()
 
-	# 			width = 0.8
+				width = 0.8
 
-	# 			tabNbHaresSolo = [hashNbHaresSolo[run][generation] for generation in tabPlotGeneration if generation in hashNbHaresSolo[run].keys()]
-	# 			tabNbHaresDuo = [hashNbHaresDuo[run][generation] for generation in tabPlotGeneration if generation in hashNbHaresDuo[run].keys()]
-	# 			tabNbSStagsSolo = [hashNbSStagsSolo[run][generation] for generation in tabPlotGeneration if generation in hashNbSStagsSolo[run].keys()]
-	# 			tabNbSStagsDuo = [hashNbSStagsDuo[run][generation] for generation in tabPlotGeneration if generation in hashNbSStagsDuo[run].keys()]
-	# 			tabNbBStagsSolo = [hashNbBStagsSolo[run][generation] for generation in tabPlotGeneration if generation in hashNbBStagsSolo[run].keys()]
-	# 			tabNbBStagsDuo = [hashNbBStagsDuo[run][generation] for generation in tabPlotGeneration if generation in hashNbBStagsDuo[run].keys()]
+				tabNbHaresSolo = [hashNbHaresSolo[run][generation] for generation in tabPlotGeneration if generation in hashNbHaresSolo[run].keys()]
+				tabNbHaresDuo = [hashNbHaresDuo[run][generation] for generation in tabPlotGeneration if generation in hashNbHaresDuo[run].keys()]
+				tabNbSStagsSolo = [hashNbSStagsSolo[run][generation] for generation in tabPlotGeneration if generation in hashNbSStagsSolo[run].keys()]
+				tabNbSStagsDuo = [hashNbSStagsDuo[run][generation] for generation in tabPlotGeneration if generation in hashNbSStagsDuo[run].keys()]
+				tabNbBStagsSolo = [hashNbBStagsSolo[run][generation] for generation in tabPlotGeneration if generation in hashNbBStagsSolo[run].keys()]
+				tabNbBStagsDuo = [hashNbBStagsDuo[run][generation] for generation in tabPlotGeneration if generation in hashNbBStagsDuo[run].keys()]
 
-	# 			barNbHaresSolo = axe1.bar(range(len(tabNbHaresSolo)), tabNbHaresSolo, width = width, color = colorHaresSolo, alpha = alphaHares)
-	# 			barNbHaresDuo = axe1.bar(range(len(tabNbHaresDuo)), tabNbHaresDuo, bottom = tabNbHaresSolo, width = width, color = colorHaresDuo, alpha = alphaHares)
-	# 			barNbSStagsSolo = axe1.bar(range(len(tabNbSStagsSolo)), tabNbSStagsSolo, bottom = np.add(tabNbHaresDuo, tabNbHaresSolo), width = width, color = colorSStagsSolo, alpha = alphaSStags)
-	# 			barNbSStagsDuo = axe1.bar(range(len(tabNbSStagsDuo)), tabNbSStagsDuo, bottom = np.add(tabNbSStagsSolo, np.add(tabNbHaresDuo, tabNbHaresSolo)), width = width, color = colorSStagsDuo, alpha = alphaSStags)
-	# 			barNbBStagsSolo = axe1.bar(range(len(tabNbBStagsSolo)), tabNbBStagsSolo, bottom = np.add(tabNbSStagsDuo, np.add(tabNbSStagsSolo, np.add(tabNbHaresDuo, tabNbHaresSolo))), width = width, color = colorBStagsSolo, alpha = alphaBStags)
-	# 			barNbBStagsDuo = axe1.bar(range(len(tabNbBStagsDuo)), tabNbBStagsDuo, bottom = np.add(tabNbBStagsSolo, np.add(tabNbSStagsDuo, np.add(tabNbSStagsSolo, np.add(tabNbHaresDuo, tabNbHaresSolo)))), width = width, color = colorBStagsDuo, alpha = alphaBStags)
+				barNbHaresSolo = axe1.bar(range(len(tabNbHaresSolo)), tabNbHaresSolo, width = width, color = colorHaresSolo, alpha = alphaHares)
+				barNbHaresDuo = axe1.bar(range(len(tabNbHaresDuo)), tabNbHaresDuo, bottom = tabNbHaresSolo, width = width, color = colorHaresDuo, alpha = alphaHares)
+				barNbSStagsSolo = axe1.bar(range(len(tabNbSStagsSolo)), tabNbSStagsSolo, bottom = np.add(tabNbHaresDuo, tabNbHaresSolo), width = width, color = colorSStagsSolo, alpha = alphaSStags)
+				barNbSStagsDuo = axe1.bar(range(len(tabNbSStagsDuo)), tabNbSStagsDuo, bottom = np.add(tabNbSStagsSolo, np.add(tabNbHaresDuo, tabNbHaresSolo)), width = width, color = colorSStagsDuo, alpha = alphaSStags)
+				barNbBStagsSolo = axe1.bar(range(len(tabNbBStagsSolo)), tabNbBStagsSolo, bottom = np.add(tabNbSStagsDuo, np.add(tabNbSStagsSolo, np.add(tabNbHaresDuo, tabNbHaresSolo))), width = width, color = colorBStagsSolo, alpha = alphaBStags)
+				barNbBStagsDuo = axe1.bar(range(len(tabNbBStagsDuo)), tabNbBStagsDuo, bottom = np.add(tabNbBStagsSolo, np.add(tabNbSStagsDuo, np.add(tabNbSStagsSolo, np.add(tabNbHaresDuo, tabNbHaresSolo)))), width = width, color = colorBStagsDuo, alpha = alphaBStags)
 
-	# 			tabGenerationTicks = [indice for indice in range(len(tabPlotGeneration)) if indice % (int(len(tabPlotGeneration)/10)) == 0]
+				tabGenerationTicks = [indice for indice in range(len(tabPlotGeneration)) if indice % (int(len(tabPlotGeneration)/10)) == 0]
 
 
-	# 			tabPlotTicks = []
-	# 			for generation in tabPlotGeneration :
-	# 				if generation > maxGen :
-	# 					tabPlotTicks.append(maxGen)
-	# 				else :
-	# 					tabPlotTicks.append(generation)
+				tabPlotTicks = []
+				for generation in tabPlotGeneration :
+					if generation > maxGen :
+						tabPlotTicks.append(maxGen)
+					else :
+						tabPlotTicks.append(generation)
 
-	# 			ticks = range(0, len(tabPlotGeneration), int(len(tabPlotGeneration)/5))
-	# 			if len(tabPlotGeneration) - 1 not in ticks :
-	# 				ticks.append(len(tabPlotGeneration) - 1)
+				ticks = range(0, len(tabPlotGeneration), int(len(tabPlotGeneration)/5))
+				if len(tabPlotGeneration) - 1 not in ticks :
+					ticks.append(len(tabPlotGeneration) - 1)
 
-	# 			axe1.set_xticks(ticks)
-	# 			axe1.set_xticklabels([tabPlotTicks[x] for x in ticks])
-	# 			axe1.set_xlabel("Generation")
-	# 			axe1.set_xlim(0, len(tabPlotGeneration) - 1)
+				axe1.set_xticks(ticks)
+				axe1.set_xticklabels([tabPlotTicks[x] for x in ticks])
+				axe1.set_xlabel("Generation")
+				axe1.set_xlim(0, len(tabPlotGeneration) - 1)
 
-	# 			axe1.set_ylim(0, 20)
-	# 			axe1.set_ylabel('Number of preys hunted')
+				axe1.set_ylim(0, 20)
+				axe1.set_ylabel('Number of preys hunted')
 				
-	# 			# axe1.set_title('Repartition of preys hunted', fontsize = 10)
+				# axe1.set_title('Repartition of preys hunted', fontsize = 10)
 
-	# 			# plt.legend([barNbHaresSolo, barNbHaresDuo, barNbBStagsSolo,  barNbBStagsDuo], ['Hares solo', 'Hares coop.', 'Stags solo', 'Stags coop.'], bbox_to_anchor=(0., 1.05, 1., .102), loc=3, ncol=2, mode="expand", borderaxespad=0.)
-	# 			# plt.legend([barNbHaresSolo, barNbHaresDuo, barNbSStagsSolo, barNbSStagsDuo, barNbBStagsSolo,  barNbBStagsDuo], ['Hares solo', 'Hares coop.', 'Small stags solo', 'Small stags coop.', 'Big stags solo', 'Big stags coop.'], bbox_to_anchor=(0., 1.05, 1., .102), loc=3, ncol=2, mode="expand", borderaxespad=0.)
+				# plt.legend([barNbHaresSolo, barNbHaresDuo, barNbBStagsSolo,  barNbBStagsDuo], ['Hares solo', 'Hares coop.', 'Stags solo', 'Stags coop.'], bbox_to_anchor=(0., 1.05, 1., .102), loc=3, ncol=2, mode="expand", borderaxespad=0.)
+				# plt.legend([barNbHaresSolo, barNbHaresDuo, barNbSStagsSolo, barNbSStagsDuo, barNbBStagsSolo,  barNbBStagsDuo], ['Hares solo', 'Hares coop.', 'Small stags solo', 'Small stags coop.', 'Big stags solo', 'Big stags coop.'], bbox_to_anchor=(0., 1.05, 1., .102), loc=3, ncol=2, mode="expand", borderaxespad=0.)
 
-	# 			plt.savefig(outputData + "/preysRun" + str(run) + ".png", bbox_inches = 'tight')
-	# 			plt.savefig(outputData + "/preysRun" + str(run) + ".svg", bbox_inches = 'tight')
-	# 			plt.close()
+				plt.savefig(outputData + "/preysRun" + str(run) + ".png", bbox_inches = 'tight')
+				plt.savefig(outputData + "/preysRun" + str(run) + ".svg", bbox_inches = 'tight')
+				plt.close()
 
-	# 	cptData += 1
+		cptData += 1
 
 
 	# --- MEAN RATIO BSTAGS SUCCESS ---
@@ -457,383 +459,347 @@ def drawHuntingTask() :
 
 
 
-# def drawLeadership() :
-# 	if os.path.isdir(outputDir) :
-# 		if removeOutput :
-# 			shutil.rmtree(outputDir)
-# 			os.makedirs(outputDir)
-# 	else :
-# 		os.makedirs(outputDir)
+def drawLeadership() :
+	if os.path.isdir(outputDir) :
+		if removeOutput :
+			shutil.rmtree(outputDir)
+			os.makedirs(outputDir)
+	else :
+		os.makedirs(outputDir)
 
-# 	tabEvaluation = []
-# 	dataHash = []
+	tabGeneration = []
+	dataHash = []
 
-# 	for directory in directories :
-# 		if os.path.isdir(directory) :
-# 			listBestLeadership = [f for f in os.listdir(directory) if (os.path.isfile(directory + "/" + f) and re.match(r"^bestleadership(\d*)\.dat$", f))]
+	for directory in directories :
+		if os.path.isdir(directory) :
+			listBestLeadership = [f for f in os.listdir(directory) if (os.path.isfile(directory + "/" + f) and re.match(r"^bestleadership(\d*)\.dat$", f))]
 
-# 			hashProportion = {}
-# 			hashProportionAsym = {}
-# 			hashNbLeaderFirst = {}
-# 			hashNbTotalCoop = {}
+			hashProportion = {}
+			hashProportionAsym = {}
+			hashNbLeaderFirst = {}
+			hashNbTotalCoop = {}
 
-# 			for fileBest in listBestLeadership :
-# 				m = re.search(r'^bestleadership(\d*)\.dat$', fileBest)
-# 				run = int(m.group(1))
+			for fileBest in listBestLeadership :
+				m = re.search(r'^bestleadership(\d*)\.dat$', fileBest)
+				run = int(m.group(1))
 
-# 				testRun = None
-# 				if selection != None :
-# 					testRun = lambda run : run in selection
-# 				elif exclusion != None :
-# 					testRun = lambda run : run not in exclusion
+				testRun = None
+				if selection != None :
+					testRun = lambda run : run in selection
+				elif exclusion != None :
+					testRun = lambda run : run not in exclusion
 
-# 				if (testRun == None) or (testRun(run)) :
-# 					hashProportion[run] = {}
-# 					hashProportionAsym[run] = {}
-# 					hashNbLeaderFirst[run] = {}
-# 					hashNbTotalCoop[run] = {}
+				if (testRun == None) or (testRun(run)) :
+					hashProportion[run] = {}
+					hashProportionAsym[run] = {}
+					hashNbLeaderFirst[run] = {}
+					hashNbTotalCoop[run] = {}
 
-# 					# dtypes = np.dtype({ 'names' : ('evaluation', 'fitness', 'proportion', 'proportionAsym', 'nb_leader_first', 'nb_total_coop'), 'formats' : [np.int, np.float, np.float, np.float, np.float, np.float] })
-# 					# data = np.loadtxt(directory + "/" + fileBest, delimiter=',', usecols = (0, 1, 2, 3, 4, 5), dtype = dtypes)
-# 					dtypes = np.dtype({ 'names' : ('evaluation', 'fitness', 'proportion', 'proportionAsym'), 'formats' : [np.int, np.float, np.float, np.float] })
-# 					data = np.loadtxt(directory + "/" + fileBest, delimiter=',', usecols = (0, 1, 2, 3), dtype = dtypes)
+					# dtypes = np.dtype({ 'names' : ('evaluation', 'fitness', 'proportion', 'proportionAsym', 'nb_leader_first', 'nb_total_coop'), 'formats' : [np.int, np.float, np.float, np.float, np.float, np.float] })
+					# data = np.loadtxt(directory + "/" + fileBest, delimiter=',', usecols = (0, 1, 2, 3, 4, 5), dtype = dtypes)
+					dtypes = np.dtype({ 'names' : ('evaluation', 'fitness', 'proportion', 'proportionAsym'), 'formats' : [np.int, np.float, np.float, np.float] })
+					data = np.loadtxt(directory + "/" + fileBest, delimiter=',', usecols = (0, 1, 2, 3), dtype = dtypes)
 
-# 					cpt = 0
-# 					firstEval = True
-# 					lastEval = 0
-# 					maxEvalDone = False
-# 					for line in data :
-# 						evaluation = line['evaluation']
+					cpt = 0
+					firstEval = True
+					lastEval = 0
+					maxEvalDone = False
+					generation = 0 - startGen
+					for line in data :
+						evaluation = line['evaluation']
 
-# 						cpt += evaluation - lastEval
-# 						lastEval = evaluation
+						if generation % precision == 0 or firstEval :
+							if generation >= 0 and generation <= maxGen :
+								hashProportion[run][generation] = line['proportion']
+								hashProportionAsym[run][generation] = line['proportionAsym'] - 0.5
+								# hashNbLeaderFirst[run][evaluation] = line['nb_leader_first']
+								# hashNbTotalCoop[run][evaluation] = line['nb_total_coop']
 
-# 						if cpt > precision or firstEval :
-# 							if not maxEvalDone :
-# 								hashProportion[run][evaluation] = line['proportion']
-# 								hashProportionAsym[run][evaluation] = line['proportionAsym'] - 0.5
-# 								# hashNbLeaderFirst[run][evaluation] = line['nb_leader_first']
-# 								# hashNbTotalCoop[run][evaluation] = line['nb_total_coop']
+								if generation not in tabGeneration :
+									tabGeneration.append(generation)
 
-# 								if evaluation not in tabEvaluation :
-# 									tabEvaluation.append(evaluation)
+								cpt = 0
 
-# 								cpt = 0
 
-# 								if evaluation > maxEval :
-# 									maxEvalDone = True
+								if firstEval :
+									firstEval = False
 
-# 						if firstEval :
-# 							firstEval = False
+						generation += 1
 
 
-# 			hashData = {}
-# 			hashData["hashProportion"] = hashProportion
-# 			hashData["hashProportionAsym"] = hashProportionAsym
+			hashData = {}
+			hashData["hashProportion"] = hashProportion
+			hashData["hashProportionAsym"] = hashProportionAsym
 
-# 			dataHash.append(hashData)
+			dataHash.append(hashData)
 
 
-# 	tabEvaluation = sorted(tabEvaluation)
-# 	# lastEval = tabEvaluation[-1]
-# 	# diffEvals = lastEval - tabEvaluation[-2]
+	tabGeneration = sorted(tabGeneration)
+	# lastEval = tabEvaluation[-1]
+	# diffEvals = lastEval - tabEvaluation[-2]
 
-# 	# while lastEval <= maxEval :
-# 	# 	lastEval += diffEvals
-# 	# 	tabEvaluation.append(lastEval)
+	# while lastEval <= maxEval :
+	# 	lastEval += diffEvals
+	# 	tabEvaluation.append(lastEval)
 
-# 	hashRunSuccess = []
-# 	for data in dataHash :
-# 		hashProportion = data['hashProportion']
-# 		runSuccess = []
+	hashRunSuccess = []
+	for data in dataHash :
+		hashProportion = data['hashProportion']
+		runSuccess = []
 
-# 		for run in hashProportion.keys() :
-# 			lastEvalRun = sorted(hashProportion[run].keys())[-1]
+		for run in hashProportion.keys() :
+			lastGenerationRun = sorted(hashProportion[run].keys())[-1]
 
-# 			if hashProportion[run][lastEvalRun] > 0.75 :
-# 				runSuccess.append(run)
+			if hashProportion[run][lastGenerationRun] > 0.75 :
+				runSuccess.append(run)
 
-# 		hashRunSuccess.append(runSuccess)
+		hashRunSuccess.append(runSuccess)
 
 
-# 	# Statistical Analysis
-# 	if args.statAnalysis :
-# 		cpt = 0
-# 		while cpt < len(dataHash) :
-# 			minEvalSerie1 = None
-# 			hashProportion = dataHash[cpt]["hashProportion"]
+	tabPlotGeneration = tabGeneration
 
-# 			for run in hashRunSuccess[cpt] :
-# 				lastEval = sorted(hashProportion[run].keys())[-1]
 
-# 				if minEvalSerie1 == None or lastEval < minEvalSerie1 :
-# 					minEvalSerie1 = lastEval
+	# Fitness Boxplots
+	cptData = 0
+	tabDirs = ['ControlWoLeadership', 'ControlWLeadership', 'WoLeaderhip', 'WLeadership']
+	for data in dataHash :
+		outputData = os.path.join(outputDir, tabDirs[cptData])
 
-# 			serie1 = [hashProportion[run][minEvalSerie1] for run in hashRunSuccess[cpt]]
-			
-# 			cpt2 = cpt + 1
-# 			while cpt2 < len(dataHash) :
-# 				minEvalSerie2 = None
-# 				hashProportion = dataHash[cpt2]["hashProportion"]
+		if os.path.isdir(outputData) :
+			if removeOutput :
+				shutil.rmtree(outputData)
+				os.makedirs(outputData)
+		else :
+			os.makedirs(outputData)
 
-# 				for run in hashRunSuccess[cpt2] :
-# 					lastEval = sorted(hashProportion[run].keys())[-1]
+		hashProportion = data['hashProportion']
 
-# 					if minEvalSerie2 == None or lastEval < minEvalSerie2 :
-# 						minEvalSerie2 = lastEval
+		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+		plt.grid()
 
-# 				serie2 = [hashProportion[run][minEvalSerie2] for run in hashRunSuccess[cpt2]]
+		dataBoxPlot = []
 
-# 				U, P = stats.mannwhitneyu(serie1, serie2)
-# 				print("Min1 = " + str(minEvalSerie1) + ", Min2 = " + str(minEvalSerie2))
-# 				print("Mann-Whitney (" + directories[cpt] + ", " + directories[cpt2] + ")\n\t -> U = " + str(U) + "/P = " + str(P))
+		tabGens = []
+		for generation in tabPlotGeneration :
+			listProportion = [hashProportion[run][generation] for run in hashProportion.keys() if generation in hashProportion[run].keys()]
 
-# 				with open(os.path.join(outputDir, "statAnalysis.txt"), 'w') as fileWrite :
-# 					fileWrite.write("Min1 = " + str(minEvalSerie1) + ", Min2 = " + str(minEvalSerie2))
-# 					fileWrite.write("Mann-Whitney (" + directories[cpt] + ", " + directories[cpt2] + ")\n\t -> U = " + str(U) + "/P = " + str(P))
+			if len(listProportion) > 0 :
+				dataBoxPlot.append(listProportion)
+				tabGens.append(generation)
 
-# 				cpt2 += 1
-# 			cpt += 1
+		bp = axe1.boxplot(dataBoxPlot)
 
-# 	tabPlotEvaluation = tabEvaluation
+		for i in range(0, len(bp['boxes'])):
+			# We fill the boxes
+			box = bp['boxes'][i]
+			box.set_linewidth(0)
+			boxX = []
+			boxY = []
+
+			for j in range(5) :
+				boxX.append(box.get_xdata()[j])
+				boxY.append(box.get_ydata()[j])
+
+			boxCoords = zip(boxX, boxY)
+			boxPolygon = Polygon(boxCoords, facecolor = palette[2], linewidth = 0)
+			axe1.add_patch(boxPolygon)
+
+			bp['boxes'][i].set_color(palette[2])
+
+			# we have two whiskers!
+			bp['whiskers'][i*2].set_color(palette[2])
+			bp['whiskers'][i*2 + 1].set_color(palette[2])
+			bp['whiskers'][i*2].set_linewidth(2)
+			bp['whiskers'][i*2 + 1].set_linewidth(2)
+
+			# top and bottom fliers
+			# (set allows us to set many parameters at once)
+			# if (i * 2 + 1) < len(bp['fliers']) :
+			# 	bp['fliers'][i * 2].set(markerfacecolor=palette[2],
+			# 	                marker='o', alpha=0.75, markersize=6,
+			# 	                markeredgecolor='none')
+			# 	bp['fliers'][i * 2 + 1].set(markerfacecolor=palette[2],
+			# 	                marker='o', alpha=0.75, markersize=6,
+			# 	                markeredgecolor='none')
 
 
-# 	# Fitness Boxplots
-# 	cptData = 0
-# 	dataNames = ["Control", "Clonal", "Coevo"]
-# 	for data in dataHash :
-# 		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
-# 		plt.grid()
+			bp['medians'][i].set_color('black')
+			bp['medians'][i].set_linewidth(3)
 
-# 		dataBoxPlot = []
-# 		hashProportion = data['hashProportion']
+			# and 4 caps to remove
+			for c in bp['caps']:
+			   c.set_linewidth(0)
 
-# 		tabEvals = []
-# 		for evaluation in tabPlotEvaluation :
-# 			listProportion = [hashProportion[run][evaluation] for run in hashProportion.keys() if run in hashRunSuccess[cptData] and evaluation in hashProportion[run].keys()]
+		axe1.add_line(lines.Line2D([0, maxGen], [1, 1], color="red"))
 
-# 			if len(listProportion) > 0 :
-# 				dataBoxPlot.append(listProportion)
-# 				tabEvals.append(evaluation)
+		tabPlotTicks = []
+		for generation in tabPlotGeneration :
+			if generation > maxGen :
+				tabPlotTicks.append(maxGen)
+			else :
+				tabPlotTicks.append(generation)
 
-# 		bp = axe1.boxplot(dataBoxPlot)
+		ticks = range(0, len(tabPlotGeneration), int(len(tabPlotGeneration)/5))
+		if len(tabPlotGeneration) - 1 not in ticks :
+			ticks.append(len(tabPlotGeneration) - 1)
 
-# 		for i in range(0, len(bp['boxes'])):
-# 			# We fill the boxes
-# 			box = bp['boxes'][i]
-# 			box.set_linewidth(0)
-# 			boxX = []
-# 			boxY = []
+		axe1.set_xticks(ticks)
+		axe1.set_xticklabels([tabPlotTicks[x] for x in ticks])
+		axe1.set_xlabel("Generation")
+		axe1.set_xlim(0, len(tabPlotGeneration) - 1)
 
-# 			for j in range(5) :
-# 				boxX.append(box.get_xdata()[j])
-# 				boxY.append(box.get_ydata()[j])
+		axe1.set_ylabel("Proportion")
+		axe1.set_ylim(0, 1.1)
 
-# 			boxCoords = zip(boxX, boxY)
-# 			boxPolygon = Polygon(boxCoords, facecolor = palette[2], linewidth = 0)
-# 			axe1.add_patch(boxPolygon)
+		# axe1.set_title('Boxplot of best fitness')
+
+		plt.savefig(outputData + "/boxplotLeadership.png", bbox_inches = 'tight')
+		plt.savefig(outputData + "/boxplotLeadership.svg", bbox_inches = 'tight')
+		plt.close()
+
+		cptData += 1
 
-# 			bp['boxes'][i].set_color(palette[2])
-
-# 			# we have two whiskers!
-# 			bp['whiskers'][i*2].set_color(palette[2])
-# 			bp['whiskers'][i*2 + 1].set_color(palette[2])
-# 			bp['whiskers'][i*2].set_linewidth(2)
-# 			bp['whiskers'][i*2 + 1].set_linewidth(2)
 
-# 			# top and bottom fliers
-# 			# (set allows us to set many parameters at once)
-# 			# if (i * 2 + 1) < len(bp['fliers']) :
-# 			# 	bp['fliers'][i * 2].set(markerfacecolor=palette[2],
-# 			# 	                marker='o', alpha=0.75, markersize=6,
-# 			# 	                markeredgecolor='none')
-# 			# 	bp['fliers'][i * 2 + 1].set(markerfacecolor=palette[2],
-# 			# 	                marker='o', alpha=0.75, markersize=6,
-# 			# 	                markeredgecolor='none')
+
+
+	# # Fitness Boxplots
+	# fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+	# # plt.axes(frameon=0)
+	# plt.grid()
+
+	# cptData = 0
+	# for data in dataHash :
+	# 	dataPlot = []
+	# 	dataPerc25 = []
+	# 	dataPerc75 = []
+	# 	hashProportion = data['hashProportion']
+
+	# 	for evaluation in tabPlotGeneration :
+	# 		proportionEval = [hashProportion[run][evaluation] for run in hashProportion.keys() if run in hashRunSuccess[cptData] and evaluation in hashProportion[run].keys()]
+	# 		proportionMed = np.median(proportionEval)
+
+	# 		perc25 = proportionMed
+	# 		perc75 = proportionMed
+	# 		if len(proportionEval) > 1 :
+	# 			perc25 = np.percentile(proportionEval, 25)
+	# 			perc75 = np.percentile(proportionEval, 75)
 
+	# 		dataPlot.append(proportionMed)
+	# 		dataPerc25.append(perc25)
+	# 		dataPerc75.append(perc75)
 
-# 			bp['medians'][i].set_color('black')
-# 			bp['medians'][i].set_linewidth(3)
-
-# 			# and 4 caps to remove
-# 			for c in bp['caps']:
-# 			   c.set_linewidth(0)
-
-# 		axe1.add_line(lines.Line2D([0, maxEval], [1, 1], color="red"))
-
-
-# 		tabPlotTicks = []
-# 		for eval in tabEvals :
-# 			if eval > maxEval :
-# 				tabPlotTicks.append(maxEval)
-# 			else :
-# 				tabPlotTicks.append(eval)
-
-# 		ticks = range(0, len(tabEvals), int(len(tabEvals)/2))
-# 		if len(tabEvals) - 1 not in ticks :
-# 			ticks.append(len(tabEvals) - 1)
-
-# 		tabPlotTicks[ticks[0]] = 0
-# 		tabPlotTicks[ticks[1]] = 20000
-# 		tabPlotTicks[ticks[2]] = 40000
-
-# 		axe1.set_xticks(ticks)
-# 		axe1.set_xticklabels([tabPlotTicks[x] for x in ticks])
-# 		axe1.set_xlabel("Evaluation")
-# 		axe1.set_xlim(0, len(tabPlotTicks) - 1)
-
-# 		axe1.set_ylabel("Proportion")
-# 		axe1.set_ylim(0, 1.1)
-
-# 		# axe1.set_title('Boxplot of best fitness')
-
-# 		plt.savefig(outputDir + "/boxplotLeadership" + dataNames[cptData] + ".png", bbox_inches = 'tight')
-# 		plt.savefig(outputDir + "/boxplotLeadership" + dataNames[cptData] + ".svg", bbox_inches = 'tight')
-# 		plt.close()
-
-# 		cptData += 1
-
-
-
-
-# 	# Fitness Boxplots
-# 	fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
-# 	# plt.axes(frameon=0)
-# 	plt.grid()
-
-# 	cptData = 0
-# 	for data in dataHash :
-# 		dataPlot = []
-# 		dataPerc25 = []
-# 		dataPerc75 = []
-# 		hashProportion = data['hashProportion']
-
-# 		for evaluation in tabPlotEvaluation :
-# 			proportionEval = [hashProportion[run][evaluation] for run in hashProportion.keys() if run in hashRunSuccess[cptData] and evaluation in hashProportion[run].keys()]
-# 			proportionMed = np.median(proportionEval)
-
-# 			perc25 = proportionMed
-# 			perc75 = proportionMed
-# 			if len(proportionEval) > 1 :
-# 				perc25 = np.percentile(proportionEval, 25)
-# 				perc75 = np.percentile(proportionEval, 75)
-
-# 			dataPlot.append(proportionMed)
-# 			dataPerc25.append(perc25)
-# 			dataPerc75.append(perc75)
-
-# 		cpt = 0
-# 		while cpt < len(dataPlot) :
-# 			if math.isnan(dataPlot[cpt]) :
-# 				if cpt > 0 and cpt < len(dataPlot) - 1 :
-# 					dataPlot[cpt] = (dataPlot[cpt + 1] + dataPlot[cpt - 1])/2
-# 					dataPerc25[cpt] = (dataPerc25[cpt + 1] + dataPerc25[cpt - 1])/2
-# 					dataPerc75[cpt] = (dataPerc75[cpt + 1] + dataPerc75[cpt - 1])/2
-# 				elif cpt > 0 :
-# 					dataPlot[cpt] = dataPlot[cpt - 1]
-# 					dataPerc25[cpt] = dataPerc25[cpt - 1]
-# 					dataPerc75[cpt] = dataPerc75[cpt - 1]
-# 				else :
-# 					dataPlot[cpt] = dataPlot[cpt + 1]
-# 					dataPerc25[cpt] = dataPerc25[cpt + 1]
-# 					dataPerc75[cpt] = dataPerc75[cpt + 1]
-
-# 			cpt += 1
-
-# 		axe1.plot(range(len(dataPlot)), dataPlot, color=palette[cptData], linestyle=linestyles[cptData], linewidth=linewidth, marker=markers[cptData])
-
-# 		plt.fill_between(range(len(dataPlot)), dataPerc25, dataPerc75, alpha=0.25, linewidth=0, color=palette[cptData])
-
-# 		cptData += 1
-
-
-# 	axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
-# 	axe1.set_xticklabels([tabPlotEvaluation[x] for x in range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10))])
-# 	axe1.set_xlabel("Evaluation")
-
-# 	axe1.set_ylabel("Proportion")
-# 	# axe1.set_ylim(0, maxFitness + 0.1*maxFitness)
-
-# 	legend = plt.legend(['Control', 'Clonal', 'Coevolution'], loc = 4, frameon=True)
-# 	frame = legend.get_frame()
-# 	frame.set_facecolor('0.9')
-# 	frame.set_edgecolor('0.9')
-
-# 	# axe1.set_title('Boxplot of best proportion')
-
-# 	plt.savefig(outputDir + "/boxplotProportionSuccess.png", bbox_inches = 'tight')
-# 	plt.savefig(outputDir + "/boxplotProportionSuccess.svg", bbox_inches = 'tight')
-# 	plt.close()
-
-
-# 	# Fitness Boxplots Success
-# 	fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
-# 	# plt.axes(frameon=0)
-# 	plt.grid()
-
-# 	cptData = 0
-# 	for data in dataHash :
-# 		dataPlot = []
-# 		dataPerc25 = []
-# 		dataPerc75 = []
-# 		hashProportion = data['hashProportion']
-
-# 		for evaluation in tabPlotEvaluation :
-# 			proportionEval = [hashProportion[run][evaluation] for run in hashProportion.keys() if evaluation in hashProportion[run].keys()]
-# 			proportionMed = np.median(proportionEval)
-
-# 			perc25 = proportionMed
-# 			perc75 = proportionMed
-# 			if len(proportionEval) > 1 :
-# 				perc25 = np.percentile(proportionEval, 25)
-# 				perc75 = np.percentile(proportionEval, 75)
-
-# 			dataPlot.append(proportionMed)
-# 			dataPerc25.append(perc25)
-# 			dataPerc75.append(perc75)
-
-# 		cpt = 0
-# 		while cpt < len(dataPlot) :
-# 			if math.isnan(dataPlot[cpt]) :
-# 				if cpt > 0 and cpt < len(dataPlot) - 1 :
-# 					dataPlot[cpt] = (dataPlot[cpt + 1] + dataPlot[cpt - 1])/2
-# 					dataPerc25[cpt] = (dataPerc25[cpt + 1] + dataPerc25[cpt - 1])/2
-# 					dataPerc75[cpt] = (dataPerc75[cpt + 1] + dataPerc75[cpt - 1])/2
-# 				elif cpt > 0 :
-# 					dataPlot[cpt] = dataPlot[cpt - 1]
-# 					dataPerc25[cpt] = dataPerc25[cpt - 1]
-# 					dataPerc75[cpt] = dataPerc75[cpt - 1]
-# 				else :
-# 					dataPlot[cpt] = dataPlot[cpt + 1]
-# 					dataPerc25[cpt] = dataPerc25[cpt + 1]
-# 					dataPerc75[cpt] = dataPerc75[cpt + 1]
-
-# 			cpt += 1
-
-# 		axe1.plot(range(len(dataPlot)), dataPlot, color=palette[cptData], linestyle=linestyles[cptData], linewidth=linewidth, marker=markers[cptData])
-
-# 		plt.fill_between(range(len(dataPlot)), dataPerc25, dataPerc75, alpha=0.25, linewidth=0, color=palette[cptData])
-
-# 		cptData += 1
-
-
-# 	axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
-# 	axe1.set_xticklabels([tabPlotEvaluation[x] for x in range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10))])
-# 	axe1.set_xlabel("Generation")
-
-# 	axe1.set_ylabel("Proportion of Cooperative Runs")
-# 	axe1.set_ylim(-0.1, 1.1)
-
-# 	legend = plt.legend(['Control', 'Clonal', 'Coevolution'], loc = 4, frameon=True)
-# 	frame = legend.get_frame()
-# 	frame.set_facecolor('0.9')
-# 	frame.set_edgecolor('0.9')
-
-# 	# axe1.set_title('Boxplot of best proportion')
-
-# 	plt.savefig(outputDir + "/boxplotProportion.png", bbox_inches = 'tight')
-# 	plt.savefig(outputDir + "/boxplotProportion.svg", bbox_inches = 'tight')
-# 	plt.close()
+	# 	cpt = 0
+	# 	while cpt < len(dataPlot) :
+	# 		if math.isnan(dataPlot[cpt]) :
+	# 			if cpt > 0 and cpt < len(dataPlot) - 1 :
+	# 				dataPlot[cpt] = (dataPlot[cpt + 1] + dataPlot[cpt - 1])/2
+	# 				dataPerc25[cpt] = (dataPerc25[cpt + 1] + dataPerc25[cpt - 1])/2
+	# 				dataPerc75[cpt] = (dataPerc75[cpt + 1] + dataPerc75[cpt - 1])/2
+	# 			elif cpt > 0 :
+	# 				dataPlot[cpt] = dataPlot[cpt - 1]
+	# 				dataPerc25[cpt] = dataPerc25[cpt - 1]
+	# 				dataPerc75[cpt] = dataPerc75[cpt - 1]
+	# 			else :
+	# 				dataPlot[cpt] = dataPlot[cpt + 1]
+	# 				dataPerc25[cpt] = dataPerc25[cpt + 1]
+	# 				dataPerc75[cpt] = dataPerc75[cpt + 1]
+
+	# 		cpt += 1
+
+	# 	axe1.plot(range(len(dataPlot)), dataPlot, color=palette[cptData], linestyle=linestyles[cptData], linewidth=linewidth, marker=markers[cptData])
+
+	# 	plt.fill_between(range(len(dataPlot)), dataPerc25, dataPerc75, alpha=0.25, linewidth=0, color=palette[cptData])
+
+	# 	cptData += 1
+
+
+	# axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
+	# axe1.set_xticklabels([tabPlotEvaluation[x] for x in range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10))])
+	# axe1.set_xlabel("Evaluation")
+
+	# axe1.set_ylabel("Proportion")
+	# # axe1.set_ylim(0, maxFitness + 0.1*maxFitness)
+
+	# legend = plt.legend(['Control', 'Clonal', 'Coevolution'], loc = 4, frameon=True)
+	# frame = legend.get_frame()
+	# frame.set_facecolor('0.9')
+	# frame.set_edgecolor('0.9')
+
+	# # axe1.set_title('Boxplot of best proportion')
+
+	# plt.savefig(outputDir + "/boxplotProportionSuccess.png", bbox_inches = 'tight')
+	# plt.savefig(outputDir + "/boxplotProportionSuccess.svg", bbox_inches = 'tight')
+	# plt.close()
+
+
+	# # Fitness Boxplots Success
+	# fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+	# # plt.axes(frameon=0)
+	# plt.grid()
+
+	# cptData = 0
+	# for data in dataHash :
+	# 	dataPlot = []
+	# 	dataPerc25 = []
+	# 	dataPerc75 = []
+	# 	hashProportion = data['hashProportion']
+
+	# 	for evaluation in tabPlotEvaluation :
+	# 		proportionEval = [hashProportion[run][evaluation] for run in hashProportion.keys() if evaluation in hashProportion[run].keys()]
+	# 		proportionMed = np.median(proportionEval)
+
+	# 		perc25 = proportionMed
+	# 		perc75 = proportionMed
+	# 		if len(proportionEval) > 1 :
+	# 			perc25 = np.percentile(proportionEval, 25)
+	# 			perc75 = np.percentile(proportionEval, 75)
+
+	# 		dataPlot.append(proportionMed)
+	# 		dataPerc25.append(perc25)
+	# 		dataPerc75.append(perc75)
+
+	# 	cpt = 0
+	# 	while cpt < len(dataPlot) :
+	# 		if math.isnan(dataPlot[cpt]) :
+	# 			if cpt > 0 and cpt < len(dataPlot) - 1 :
+	# 				dataPlot[cpt] = (dataPlot[cpt + 1] + dataPlot[cpt - 1])/2
+	# 				dataPerc25[cpt] = (dataPerc25[cpt + 1] + dataPerc25[cpt - 1])/2
+	# 				dataPerc75[cpt] = (dataPerc75[cpt + 1] + dataPerc75[cpt - 1])/2
+	# 			elif cpt > 0 :
+	# 				dataPlot[cpt] = dataPlot[cpt - 1]
+	# 				dataPerc25[cpt] = dataPerc25[cpt - 1]
+	# 				dataPerc75[cpt] = dataPerc75[cpt - 1]
+	# 			else :
+	# 				dataPlot[cpt] = dataPlot[cpt + 1]
+	# 				dataPerc25[cpt] = dataPerc25[cpt + 1]
+	# 				dataPerc75[cpt] = dataPerc75[cpt + 1]
+
+	# 		cpt += 1
+
+	# 	axe1.plot(range(len(dataPlot)), dataPlot, color=palette[cptData], linestyle=linestyles[cptData], linewidth=linewidth, marker=markers[cptData])
+
+	# 	plt.fill_between(range(len(dataPlot)), dataPerc25, dataPerc75, alpha=0.25, linewidth=0, color=palette[cptData])
+
+	# 	cptData += 1
+
+
+	# axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
+	# axe1.set_xticklabels([tabPlotEvaluation[x] for x in range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10))])
+	# axe1.set_xlabel("Generation")
+
+	# axe1.set_ylabel("Proportion of Cooperative Runs")
+	# axe1.set_ylim(-0.1, 1.1)
+
+	# legend = plt.legend(['Control', 'Clonal', 'Coevolution'], loc = 4, frameon=True)
+	# frame = legend.get_frame()
+	# frame.set_facecolor('0.9')
+	# frame.set_edgecolor('0.9')
+
+	# # axe1.set_title('Boxplot of best proportion')
+
+	# plt.savefig(outputDir + "/boxplotProportion.png", bbox_inches = 'tight')
+	# plt.savefig(outputDir + "/boxplotProportion.svg", bbox_inches = 'tight')
+	# plt.close()
 
 
 
@@ -856,8 +822,12 @@ def main(args) :
 	global startGen
 	startGen = args.startGen
 
-	print("\t-> Drawing Hunting Task")
-	drawHuntingTask()
+	if not args.drawLeadership :
+		print("\t-> Drawing Hunting Task")
+		drawHuntingTask()
+	else :
+		print("\t-> Drawing Leadership")
+		drawLeadership()
 
 
 
@@ -870,6 +840,8 @@ if __name__ == "__main__" :
 	parser.add_argument('-m', '--max', help = "Max evaluation", default='20000', type=int)
 	parser.add_argument('-p', '--precision', help = "Precision", default='100', type=int)
 	parser.add_argument('-S', '--startGen', help = "Starting Generation", default='0', type=int)
+
+	parser.add_argument('-l', '--drawLeadership', help = "Drawing Leadership", default=False, action='store_true')
 
 	parser.add_argument('-o', '--output', help = "Output directory", default='GraphsResults')
 	parser.add_argument('-r', '--removeOutput', help = "Remove output directory if exists", default=False, action='store_true')

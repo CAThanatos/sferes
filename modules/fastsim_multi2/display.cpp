@@ -686,7 +686,7 @@ namespace fastsim
 			      		color_type = 5;
 			      }
 			    }
-					
+
 					Uint32 color = color_type == -1 ? 0xffffffff : _color_from_id(_screen, color_type);
 					SDL_Rect r; 
 					r.x = i*pw + bias + _w; 
@@ -780,6 +780,7 @@ namespace fastsim
 		  // draw the circle again (robot)
 //			unsigned int col=_robots[i]->color();
 			unsigned int col = _robots[i]->display_color();
+
 		  _disc(_screen, x, y, r, _color_from_id(_screen,col));
 		  
 		  // int color_rob = _robots[i]->color();

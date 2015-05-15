@@ -47,7 +47,7 @@ if __name__ == "__main__" :
 	parser.add_argument('-o', '--output', help = "Output directory", default='ResultatsArticle')
 	parser.add_argument('-f', '--prefix', help = "Run prefix", default='Dir')
 	parser.add_argument('-c', '--clean', help = "Clean output directory", default=False, action="store_true")
-	parser.add_argument('-e', '--exclusion', help = "Excluded files", default=["bestgenome.dat", "allgenomes.dat"], type=str, nargs='+')
+	parser.add_argument('-e', '--exclusion', help = "Excluded files", default=["bestgenome.dat", "bestgenome-co.dat", "allgenomes.dat", "allgenomes-co.dat"], type=str, nargs='+')
 	args = parser.parse_args()
 
 	main(args)
