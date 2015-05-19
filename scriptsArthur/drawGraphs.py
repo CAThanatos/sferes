@@ -742,6 +742,7 @@ def drawBestDiv(dossier) :
 
 		tabPlotEvaluation = tabEvaluation
 
+
 		# --- BOXPLOT FITNESS ---
 		dataBoxPlot = []
 		for evaluation in tabPlotEvaluation :
@@ -810,7 +811,10 @@ def drawBestDiv(dossier) :
 			barNbBStagsSolo = axe1.bar(range(len(tabNbBStagsSolo)), tabNbBStagsSolo, bottom = np.add(tabNbHaresDuo, tabNbHaresSolo), width = width, color = colorBStagsSolo, alpha = alphaBStags)
 			barNbBStagsDuo = axe1.bar(range(len(tabNbBStagsDuo)), tabNbBStagsDuo, bottom = np.add(tabNbBStagsSolo, np.add(tabNbHaresDuo, tabNbHaresSolo)), width = width, color = colorBStagsDuo, alpha = alphaBStags)
 
-			tabEvaluationTicks = [indice for indice in range(len(tabNbHaresSolo)) if indice % (int(len(tabNbHaresSolo)/10)) == 0]
+			if len(tabNbHaresSolo) >= 10 :
+				tabEvaluationTicks = [indice for indice in range(len(tabNbHaresSolo)) if indice % (int(len(tabNbHaresSolo)/10)) == 0]
+			else :
+				tabEvaluationTicks = [0]
 
 			axe1.set_xticks(tabEvaluationTicks)
 			axe1.set_xticklabels([tabPlotEvaluation[indice] for indice in tabEvaluationTicks])

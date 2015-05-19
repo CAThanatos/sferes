@@ -55,7 +55,15 @@ namespace sferes
 #ifdef EIGEN_CORE_H
 		    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 #endif
-		    PhenInvasion() : _params((*this)._gen.size()), _nb_leader_first(0), _nb_preys_killed_coop(0), _developed(false) 					{
+		    PhenInvasion() : _params((*this)._gen.size()), _nb_leader_first(0), _nb_preys_killed_coop(0), _developed(false), _evaluated(false) 
+		    {
+					_vec_payoffs.resize(Params::pop::max_size);
+		    	_vec_nb_hares.resize(Params::pop::max_size);
+		    	_vec_nb_hares_solo.resize(Params::pop::max_size);
+		    	_vec_nb_sstags.resize(Params::pop::max_size);
+		    	_vec_nb_sstags_solo.resize(Params::pop::max_size);
+		    	_vec_nb_bstags.resize(Params::pop::max_size);
+		    	_vec_nb_bstags_solo.resize(Params::pop::max_size);
 		    }
 		    
 		    typedef float type_t;
@@ -115,7 +123,7 @@ namespace sferes
 					_nb_role_divisions_at = 0;
 #endif
 
-					_freq = 0.0f;
+					// _freq = 0.0f;
 					_vec_payoffs.clear();
 					_vec_payoffs.resize(Params::pop::max_size);
 				}
@@ -254,6 +262,28 @@ namespace sferes
 				bool developed_at() const { return _developed_at; }
 				void set_developed_at(bool developed) { _developed_at = developed; }
 				
+				boost::shared_ptr<PhenInvasion> clonePhen()
+				{
+					boost::shared_ptr<PhenInvasion> new_indiv = boost::shared_ptr<PhenInvasion>(new PhenInvasion());
+					for(unsigned i = 0; i < this->_gen.size(); ++i)
+						new_indiv->_gen.data(i, this->_gen.data(i));
+						
+					new_indiv->_pop_pos = this->_pop_pos;
+					new_indiv->_vec_payoffs = this->_vec_payoffs;
+					new_indiv->_evaluated = this->_evaluated;
+
+					new_indiv->_vec_nb_hares = this->_vec_nb_hares;
+					new_indiv->_vec_nb_hares_solo = this->_vec_nb_hares_solo;
+
+					new_indiv->_vec_nb_sstags = this->_vec_nb_sstags;
+					new_indiv->_vec_nb_sstags_solo = this->_vec_nb_sstags_solo;
+
+					new_indiv->_vec_nb_bstags = this->_vec_nb_bstags;
+					new_indiv->_vec_nb_bstags_solo = this->_vec_nb_bstags_solo;
+
+					return new_indiv;
+				}
+
 				boost::shared_ptr<PhenInvasion> clone()
 				{
 					boost::shared_ptr<PhenInvasion> new_indiv = boost::shared_ptr<PhenInvasion>(new PhenInvasion());
@@ -283,6 +313,9 @@ namespace sferes
 
 		    void set_freq(float freq) { _freq = freq; }
 		    float get_freq() { return _freq; }
+
+		    void set_evaluated(bool evaluated) { _evaluated = evaluated; }
+		    bool is_evaluated() { return _evaluated; }
       
 		  protected:
 		    std::vector<float> _params;
@@ -327,6 +360,7 @@ namespace sferes
 		    float _freq;
 		    int _pop_pos;
 		    std::vector<float> _vec_payoffs;
+		    bool _evaluated;
 
 		    std::vector<float> _vec_nb_hares;
 		    std::vector<float> _vec_nb_hares_solo;

@@ -149,7 +149,18 @@ namespace sferes
 				this->_pop.push_back(this->_pop[random_child]->clone());
 #endif
 
+#ifdef RANDOM_MUTANT
+				// Probability that the mutation produces a totally random new individual
+				float proba_random_mutant = misc::rand<float>();
+
+				if(proba_random_mutant < Params::evo_float::random_mutant_probability)
+					this->_pop[_nb_genotypes]->gen().random();
+				else
+					this->_pop[_nb_genotypes]->gen().mutate();
+#else
 				this->_pop[_nb_genotypes]->gen().mutate();
+#endif
+
 				this->_pop[_nb_genotypes]->set_pop_pos(_nb_genotypes);
 
 				// We evaluate this mutant's payoff against every other residents
@@ -160,31 +171,37 @@ namespace sferes
 				this->_pop[_nb_genotypes]->set_pop_pos(_nb_genotypes);
 
 				int pos_mutant = _nb_genotypes;
+				std::vector<int> vec_remove_genotypes;
 				_nb_genotypes++;
 
-				float to_divide = Params::pop::invasion_frequency;
-				std::vector<int> vec_remove_genotypes;
-				while(to_divide > 0.0f)
-				{
-					float next_divide = 0.0f;
-					vec_remove_genotypes.clear();
-					for(size_t i = 0; i < _nb_genotypes; ++i)
-					{
-						if(i != pos_mutant)
-						{
-							this->_pop[i]->set_freq(this->_pop[i]->get_freq() - to_divide/(float)(_nb_genotypes - 1));
+				this->_pop[random_child]->set_freq(this->_pop[random_child]->get_freq() - Params::pop::invasion_frequency);
+				if(this->_pop[random_child]->get_freq() < 0.0f)
+					vec_remove_genotypes.push_back(random_child);
 
-							if(this->_pop[i]->get_freq() < 0.0f)
-							{
-								next_divide += 0.0f - this->_pop[i]->get_freq();
-								vec_remove_genotypes.push_back(i);
-							}
-						}
-					}
+				remove_genotypes(vec_remove_genotypes, pos_mutant);
 
-					remove_genotypes(vec_remove_genotypes, pos_mutant);
-					to_divide = next_divide;
-				}
+				// float to_divide = Params::pop::invasion_frequency;
+				// while(to_divide > 0.0f)
+				// {
+				// 	float next_divide = 0.0f;
+				// 	vec_remove_genotypes.clear();
+				// 	for(size_t i = 0; i < _nb_genotypes; ++i)
+				// 	{
+				// 		if(i != pos_mutant)
+				// 		{
+				// 			this->_pop[i]->set_freq(this->_pop[i]->get_freq() - to_divide/(float)(_nb_genotypes - 1));
+
+				// 			if(this->_pop[i]->get_freq() < 0.0f)
+				// 			{
+				// 				next_divide += 0.0f - this->_pop[i]->get_freq();
+				// 				vec_remove_genotypes.push_back(i);
+				// 			}
+				// 		}
+				// 	}
+
+				// 	remove_genotypes(vec_remove_genotypes, pos_mutant);
+				// 	to_divide = next_divide;
+				// }
 
 				// We compute the equilibrium
 				int max_generations = 10000;
@@ -231,7 +248,7 @@ namespace sferes
 					proba = misc::rand(1.0f);
 
 					// We continue while we still have computation time AND there has been more than 1% modification AND no new mutant appeared
-				}	while((generation < max_generations) && (proba > Params::evo_float::mutation_rate) && (modif > 0.01f));
+				}	while((generation < max_generations) && (proba > Params::evo_float::mutant_apparition_rate) && (modif > 0.01f));
 
 				// We update the population: we remove the genotypes with freq = 0
 				vec_remove_genotypes.clear();

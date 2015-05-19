@@ -66,24 +66,39 @@ namespace sferes
       InvasionGen() : _data(Size) {}
 
       //@{
-      void mutate() 
+      bool mutate() 
       { 
+      	bool mutation = false;
+
 #ifdef GAUSSIAN_MUTATION
       	float mutation_rate = Params::evo_float::mutation_rate;
-
-#ifdef BIG_MUTATION_RATE
-      	float rand_big_rate = misc::rand<float>();
-
-      	if(rand_big_rate < 0.01f)
-      		mutation_rate = Params::evo_float::big_mutation_rate;
-#endif
-
+    
       	float sigma = Params::evo_float::sigma;
 				for (size_t i = 0; i < Size; i++)
 					if (misc::rand<float>() < mutation_rate)
 					{
-						float f = _data[i] + misc::gaussian_rand<float>(0, sigma * sigma);
-						_data[i] = misc::put_in_range(f, 0.0f, 1.0f);
+				  	bool strong_mutation = false;
+
+#ifdef BIG_MUTATION_RATE
+				  	// Probabilty to get a stronger mutation: sampling in a uniform distribution
+		      	float rand_big_rate = misc::rand<float>();
+
+		      	if(rand_big_rate < Params::evo_float::strong_mutation_probability)
+		      		strong_mutation = true;
+#endif
+
+		      	if(strong_mutation)
+		      	{
+		      		float f = misc::rand<float>();
+		      		_data[i] = misc::put_in_range(f, 0.0f, 1.0f);
+		      	}
+		      	else
+						{
+							float f = _data[i] + misc::gaussian_rand<float>(0, sigma * sigma);
+							_data[i] = misc::put_in_range(f, 0.0f, 1.0f);
+						}
+
+						mutation = true;
 	  			}
 #else
 				static const float eta_m = Params::evo_float::eta_m;
@@ -99,10 +114,13 @@ namespace sferes
 						assert(!std::isinf(delta_i));
 						float f = _data[i] + delta_i;
 						_data[i] = misc::put_in_range(f, 0.0f, 1.0f);
+
+						mutation = true;
 					}
 #endif
 
 				_check_invariant();
+				return mutation;
       }
 
     //   void cross(const InvasionGen& o, InvasionGen& c1, InvasionGen& c2)

@@ -223,35 +223,40 @@ struct Params
 	
   struct evo_float
   {
+  	static const float mutant_apparition_rate = 0.003f;
+
 #ifdef RATE01
     // the mutation rate of the real-valued vector
     static const float mutation_rate = 0.01f;
-    static const float big_mutation_rate = 0.1f;
 #elif defined(RATE03)
     // the mutation rate of the real-valued vector
     static const float mutation_rate = 0.03f;
-    static const float big_mutation_rate = 0.3f;
 #elif defined(RATE05)
     // the mutation rate of the real-valued vector
     static const float mutation_rate = 0.05f;
-    static const float big_mutation_rate = 0.5f;
 #elif defined(RATE001)
     // the mutation rate of the real-valued vector
     static const float mutation_rate = 0.001f;
-    static const float big_mutation_rate = 0.1f;
 #elif defined(RATE003)
     // the mutation rate of the real-valued vector
     static const float mutation_rate = 0.003f;
-    static const float big_mutation_rate = 0.3f;
 #elif defined(RATE005)
     // the mutation rate of the real-valued vector
     static const float mutation_rate = 0.005f;
-    static const float big_mutation_rate = 0.5f;
+#elif defined(RATE0003)
+    // the mutation rate of the real-valued vector
+    static const float mutation_rate = 0.0003f;
+#elif defined(RATE0005)
+    // the mutation rate of the real-valued vector
+    static const float mutation_rate = 0.0005f;
 #else
     // the mutation rate of the real-valued vector
     static const float mutation_rate = 0.003f;
-    static const float big_mutation_rate = 0.3f;
 #endif
+
+    static const float strong_mutation_probability = 0.01f;
+
+    static const float random_mutant_probability = 0.001f;
 
 #ifndef GAUSSIAN_MUTATION
     // we choose the polynomial mutation type
@@ -260,6 +265,7 @@ struct Params
     // a parameter of the polynomial mutation
     static const float eta_m = 15.0f;
 #else
+
     // we choose the gaussian mutation type
     static const sferes::gen::evo_float::mutation_t mutation_type = sferes::gen::evo_float::gaussian;
     
@@ -285,7 +291,7 @@ struct Params
   struct pop
   {
     // size of the population
-    static const unsigned size = 1000;
+    static const unsigned size = 100;
 
     // size of the population
     static const unsigned max_size = 1000;
@@ -473,7 +479,7 @@ struct Params
 
 // #define BEHAVIOUR_LOG
 
-#define BEHAVIOUR_VIDEO
+// #define BEHAVIOUR_VIDEO
 
 #define TEST_VARIANCE_TRIALS
 

@@ -573,7 +573,11 @@ int main(int argc, char **argv)
   typedef modif::Dummy<Params> modifier_t;
 
 	// EVOLUTION ALGORITHM
+#ifdef FINITE
+	typedef ea::InvasionEaFinite<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
+#else
 	typedef ea::InvasionEa<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
+#endif
 
   ea_t ea;
 

@@ -40,16 +40,16 @@ then
 	#for i in rennes grenoble lille luxembourg lyon nancy reims sophia; do
 		echo "rsync on $i..."
 	
-		rsync -avz /home/abernard/sferes2-0.99/sferes $i.g5k:~/sferes2-0.99
-		rsync -avz /home/abernard/sferes2-0.99/modules $i.g5k:~/sferes2-0.99
-		rsync -avz /home/abernard/sferes2-0.99/exp/$exp $i.g5k:~/sferes2-0.99/exp
-		rsync -avz /home/abernard/sferes2-0.99/modules.conf $i.g5k:~/sferes2-0.99
+		rsync -avz /home/arthur/sferes2-0.99/sferes $i.g5k:~/sferes2-0.99
+		rsync -avz /home/arthur/sferes2-0.99/modules $i.g5k:~/sferes2-0.99
+		rsync -avz /home/arthur/sferes2-0.99/exp/$exp $i.g5k:~/sferes2-0.99/exp
+		rsync -avz /home/arthur/sferes2-0.99/modules.conf $i.g5k:~/sferes2-0.99
 	done
 else
 	echo "rsnyc on $site..."
 
-	rsync -avz /home/abernard/sferes2-0.99/sferes $site.g5k:~/sferes2-0.99
-	rsync -avz /home/abernard/sferes2-0.99/modules $site.g5k:~/sferes2-0.99
-	rsync -avz /home/abernard/sferes2-0.99/exp/$exp $site.g5k:~/sferes2-0.99/exp
-	rsync -avz /home/abernard/sferes2-0.99/modules.conf $site.g5k:~/sferes2-0.99
+	rsync -avz /home/arthur/sferes2-0.99/sferes $site.g5k:~/sferes2-0.99
+	rsync -avz /home/arthur/sferes2-0.99/modules $site.g5k:~/sferes2-0.99
+	rsync -avz /home/arthur/sferes2-0.99/exp/$exp $site.g5k:~/sferes2-0.99/exp
+	rsync -avz /home/arthur/sferes2-0.99/modules.conf $site.g5k:~/sferes2-0.99
 fi
