@@ -114,6 +114,7 @@ namespace sferes
 
 				// A mutant invades
 				// We choose which of the genotype is the parent
+				int parent = -1;
 #ifdef FITPROP
 				float fitness_tot = 0.0f;
 				for(size_t i = 0; i < _nb_genotypes; ++i)
@@ -131,6 +132,7 @@ namespace sferes
 						if((random_child <= fit_sum) || (i == _nb_genotypes - 1))
 						{
 							this->_pop.push_back(this->_pop[i]->clone());
+							parent = i;
 							break;
 						}
 					}
@@ -139,12 +141,14 @@ namespace sferes
 				{
 					int random_child = misc::rand((int)0, (int)_nb_genotypes);
 					assert(random_child >= 0 && random_child < _nb_genotypes);
+					parent = random_child;
 
 					this->_pop.push_back(this->_pop[random_child]->clone());
 				}
 #else
 				int random_child = misc::rand((int)0, (int)_nb_genotypes);
 				assert(random_child >= 0 && random_child < _nb_genotypes);
+				parent = random_child;
 
 				this->_pop.push_back(this->_pop[random_child]->clone());
 #endif
@@ -174,9 +178,9 @@ namespace sferes
 				std::vector<int> vec_remove_genotypes;
 				_nb_genotypes++;
 
-				this->_pop[random_child]->set_freq(this->_pop[random_child]->get_freq() - Params::pop::invasion_frequency);
-				if(this->_pop[random_child]->get_freq() < 0.0f)
-					vec_remove_genotypes.push_back(random_child);
+				this->_pop[parent]->set_freq(this->_pop[parent]->get_freq() - Params::pop::invasion_frequency);
+				if(this->_pop[parent]->get_freq() < 0.0f)
+					vec_remove_genotypes.push_back(parent);
 
 				remove_genotypes(vec_remove_genotypes, pos_mutant);
 
