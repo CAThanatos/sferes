@@ -196,12 +196,39 @@ namespace sferes
       }
     };
 
+		float dist(std::vector<float> v1, std::vector<float> v2)
+		{
+			assert(v1.size() == v2.size());
+
+			float dist = 0.0f;
+			for(size_t i = 0; i < v1.size(); ++i)
+			{
+				assert(v1[i] >= 0.0f);
+				assert(v2[i] >= 0.0f);
+				assert(v1[i] <= 1.0f);
+				assert(v2[i] <= 1.0f);
+
+				float x = v1[i] - v2[i];
+				dist += x * x;
+			}
+
+			return sqrtf(dist)/sqrt(v1.size());
+		}
+
     SFERES_CLASS(StagHuntEvalParallelCoEvo)
     {
     public:
 	    enum status_t { free = 0, obstacle = 255 };
 
-    	StagHuntEvalParallelCoEvo() : _nb_eval(0) { }
+    	StagHuntEvalParallel() : _nb_eval(0) 
+    	{ 
+#ifdef NOVELTY
+    		_nov_min = Params::novelty::nov_min;
+    		_k = Params::novelty::k;
+    		_nov_min_coevo = Params::novelty::nov_min;
+    		_k_coevo = Params::novelty::k;
+#endif 
+    	}
     
 			template<typename Phen>
 				void eval(std::vector<boost::shared_ptr<Phen> >& pop, size_t begin, size_t end)
@@ -287,9 +314,14 @@ namespace sferes
 #endif
 				}
 
-#ifdef DIVERSITY
+#ifdef NOVELTY
+				_compute_novelty(pop, begin, end);
+#endif
+
+#if defined(DIVERSITY) || defined(NOVELTY)
 				for (size_t i = begin; i != end; ++i)
 				{
+#if !defined(NOVELTY)
 					float diversity = 0.0f;
 
 					int first = 0, last = end/2;
@@ -313,6 +345,7 @@ namespace sferes
 
 					diversity /= (end - begin)/2 - 1;
 					pop[i]->fit().set_obj(1, diversity);
+#endif
 					pop[i]->set_developed_at(false);
 				}
 #endif
@@ -339,6 +372,137 @@ namespace sferes
     	std::vector<fastsim::Posture> _vec_pos;
     	std::string _res_dir;
     	size_t _gen;
+
+#ifdef NOVELTY
+    	std::vector<std::vector<float> > _archive_novelty;
+    	int _nb_eval_last_add;
+    	float _nov_min;
+    	int _k;
+
+    	std::vector<std::vector<float> > _archive_novelty_coevo;
+    	int _nb_eval_last_add_coevo;
+    	float _nov_min_coevo;
+    	int _k_coevo;
+
+			struct compare_dist_f
+			{
+			  compare_dist_f(const std::vector<float>& v) : _v(v) {}
+			  const std::vector<float> _v;
+
+			  bool operator()(const std::vector<float>& v1, const std::vector<float>& v2) const
+			  {
+			    assert(v1.size() == _v.size());
+			    assert(v2.size() == _v.size());
+
+			    return dist(v1, _v) < dist(v2, _v);
+			  }
+			};
+
+				template<typename Phen>
+    	void _compute_novelty(std::vector<boost::shared_ptr<Phen> >& pop, size_t begin, size_t end)
+    	{
+		    float max_n = 0;
+		    int added = 0;
+		    int added_coevo = 0;
+
+		    // std::vector<std::vector<float> > archive = _archive_novelty;
+
+		    int size = end - begin;
+
+#ifndef NOVELTY_NO_DIV 
+		    for (size_t i = 0; i < pop.size(); ++i)
+		    	if (i >= size/2)
+			      _archive_novelty_coevo.push_back(pop[i]->vector_diversity());
+		    	else
+			      _archive_novelty.push_back(pop[i]->vector_diversity());
+#endif
+
+		    for (size_t i = 0; i < pop.size(); ++i)
+		    {
+					const std::vector<float>& behavior = pop[i]->vector_diversity();
+					// assert(behavior.size() == 2);
+
+					if (i >= size/2)
+					{
+						tbb::parallel_sort(_archive_novelty_coevo.begin(), _archive_novelty_coevo.end(),
+								   compare_dist_f(behavior));
+
+						float n = 0;
+						if (_archive_novelty_coevo.size() > _k_coevo)
+						  for (size_t j = 1; j <= _k_coevo; ++j)
+						    n += dist(_archive_novelty_coevo[j], behavior);
+						else
+						  n += 1;
+
+						n /= _k_coevo;
+						max_n = std::max(n, max_n);
+
+#ifdef MONO_DIV
+						pop[i]->fit().set_obj(0, n);
+#else
+						pop[i]->fit().set_obj(1, n);
+#endif
+
+						if (_archive_novelty_coevo.size() < _k_coevo || n > _nov_min_coevo || misc::rand<float>() < 0.01 / 100.0f)
+					  {
+					    // assert(behavior.size() == 2);
+
+					    _archive_novelty_coevo.push_back(behavior);
+					    _nb_eval_last_add_coevo = 0;
+
+					    ++added_coevo;
+					  }
+						else
+						  ++_nb_eval_last_add_coevo;
+					}
+					else
+					{
+						tbb::parallel_sort(_archive_novelty.begin(), _archive_novelty.end(),
+								   compare_dist_f(behavior));
+
+						float n = 0;
+						if (_archive_novelty.size() > _k)
+						  for (size_t j = 1; j <= _k; ++j)
+						    n += dist(_archive_novelty[j], behavior);
+						else
+						  n += 1;
+
+						n /= _k;
+						max_n = std::max(n, max_n);
+
+#ifdef MONO_DIV
+						pop[i]->fit().set_obj(0, n);
+#else
+						pop[i]->fit().set_obj(1, n);
+#endif
+
+						if (_archive_novelty.size() < _k || n > _nov_min || misc::rand<float>() < 0.01 / 100.0f)
+					  {
+					    // assert(behavior.size() == 2);
+
+					    _archive_novelty.push_back(behavior);
+					    _nb_eval_last_add = 0;
+
+					    ++added;
+					  }
+						else
+						  ++_nb_eval_last_add;
+					}
+				}
+
+		    if (_nb_eval_last_add > 2500)
+		      _nov_min *= 0.95;
+
+		    if (_archive_novelty.size() > _k  && added > 4)
+		      _nov_min *= 1.05f;
+
+		    if (_nb_eval_last_add_coevo > 2500)
+		      _nov_min_coevo *= 0.95;
+
+		    if (_archive_novelty_coevo.size() > _k_coevo  && added > 4)
+		      _nov_min_coevo *= 1.05f;
+    	}
+#endif		
 		};
   }
 }
