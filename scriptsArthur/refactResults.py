@@ -7,7 +7,8 @@ import shutil
 import sys
 
 import Tools
-from drawGraphs import draw
+import drawGraphs
+import drawGraphsGeneration
 
 nbPopFirstGen = 10
 
@@ -159,10 +160,13 @@ def main(args) :
 								"argLeadership" : args.leadership,
 								"argNN" : args.nn,
 								"argNoDrawFit" : args.noDrawFit,
-								"argDrawRun" : args.drawRun,
-								"argDrawGen" : args.drawGen
+								"argDrawRun" : args.drawRun
 							}
-			draw(**parametres)
+
+			if args.drawGen :
+				drawGraphsGeneration.draw(**parametres)
+			else :
+				drawGraphs.draw(**parametres)
 
 
 

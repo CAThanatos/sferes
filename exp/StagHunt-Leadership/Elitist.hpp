@@ -85,8 +85,35 @@ namespace sferes
 
 				// We create the children
 				pop_t child_pop;
+
 				std::vector<int> parents_list(lambda);
 				int parent_rank = 0;
+
+#if defined(DOUBLE_NN) && defined(RECOMBINATION)
+				assert(lambda%2 == 0);
+				for(size_t i = 0; i < lambda - 1; i += 2)
+				{
+					// Recombination of parents
+					indiv_t new_indiv1 = indiv_t(new Phen());
+					indiv_t new_indiv2 = indiv_t(new Phen());
+					this->_pop[parent_rank%mu]->cross(this->_pop[(parent_rank + 1)%mu], new_indiv1, new_indiv2);
+
+					// Mutation
+					new_indiv1->gen().mutate(_step_size);
+					new_indiv2->gen().mutate(_step_size);
+
+					child_pop.push_back(new_indiv1);
+					child_pop.push_back(new_indiv2);
+
+					int worse_parent = parent_rank + 1;
+					if(this->_pop[parent_rank%mu]->fit().value() > this->_pop[(parent_rank + 1)%mu]->fit().value())
+						worse_parent = parent_rank;
+					
+					parents_list[i] = worse_parent%mu;
+
+					parent_rank = parent_rank + 2;
+				}
+#else
 				for(size_t i = 0; i < lambda; ++i)
 				{
 					// Cloning of a parent
@@ -97,6 +124,7 @@ namespace sferes
 					// Mutation
 					child_pop[i]->gen().mutate(_step_size);
 				}
+#endif
 				assert(child_pop.size() == lambda);
 
 				pop_t selection_pop;

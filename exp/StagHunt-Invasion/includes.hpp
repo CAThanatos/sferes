@@ -27,6 +27,8 @@
 #include "MeanFitEval.hpp"
 #include "BestEverFitEval.hpp"
 #include "AllFitEvalStat.hpp"
+#include "BestPayoffEval.hpp"
+#include "AllPayoffEvalStat.hpp"
 #include "PhenChasseur.hpp"
 #include "ElitistGen.hpp"
 #include "FitnessProp.hpp"

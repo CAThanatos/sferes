@@ -101,6 +101,40 @@ namespace sferes
 				_check_invariant();
 	    }
 
+	    void cross(const ElitistGen& o, ElitistGen& c1, ElitistGen& c2)
+	    {
+	    	if(misc::rand<float>() < Params::evo_float::cross_rate)
+	    	{
+					int nb_genes = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;
+
+					assert(this->size() == nb_genes * 2);
+					assert(o.size() == nb_genes * 2);
+					assert(c1.size() == nb_genes * 2);
+					assert(c2.size() == nb_genes * 2);
+
+					for(size_t i = 0; i < nb_genes; ++i)
+					{
+						c1.data(i, this->data(i));
+						c2.data(i, o.data(i));
+					}
+					for(size_t i = nb_genes; i < nb_genes*2; ++i)
+					{
+						c1.data(i, o.data(i));
+						c2.data(i, this->data(i));
+					}
+					c1.data(nb_genes * 2, this->data(nb_genes * 2));
+					c2.data(nb_genes * 2, o.data(nb_genes * 2));
+	    	}
+	    	else
+	    	{
+	    		for(size_t i = 0; i < Size; ++i)
+	    		{
+	    			c1.data(i, this->data(i));
+	    			c2.data(i, o.data(i));
+	    		}
+	    	}
+	    }
+
       float data(size_t i) const 
       { 
 				assert(_data.size());
