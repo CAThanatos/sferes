@@ -40,10 +40,10 @@ then
 	#for i in rennes grenoble lille luxembourg lyon nancy reims sophia; do
 		echo "rsync on $i:~/$dossier"
 	
-		rsync -avz $i.g5k:~/$dossier /home/abernard/sferes2-0.99
+		rsync -avz $i.g5k:~/$dossier /home/arthur/sferes2-0.99
 	done
 else
 	echo "rsync on $site:~/$dossier";
 	
-	rsync -avz $site.g5k:~/$dossier /home/abernard/sferes2-0.99
+	rsync -avz $site.g5k:~/$dossier /home/arthur/sferes2-0.99
 fi

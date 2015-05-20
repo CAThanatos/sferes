@@ -304,7 +304,7 @@ struct Params
     static const sferes::gen::evo_float::cross_over_t cross_over_type = sferes::gen::evo_float::sbx;
     
     // the cross rate of the real-valued vector
-    static const float cross_rate = 0.5f;
+    static const float cross_rate = 0.05f;
 
     // a parameter of the polynomial cross-over
     static const float eta_c = 10.0f;

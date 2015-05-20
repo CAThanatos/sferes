@@ -558,6 +558,8 @@ int main(int argc, char **argv)
 #else
 		  sferes::stat::BestFitEval<phen_t, Params>,
 		  sferes::stat::AllFitEvalStat<phen_t, Params>,
+		  sferes::stat::BestPayoffEval<phen_t, Params>,
+		  sferes::stat::AllPayoffEvalStat<phen_t, Params>,
 #ifdef BEHAVIOUR_VIDEO
 		  sferes::stat::BestFitBehaviourVideo<phen_t, Params>,
 #endif

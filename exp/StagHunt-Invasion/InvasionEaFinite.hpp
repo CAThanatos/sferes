@@ -67,7 +67,10 @@ namespace sferes
       	this->_vec_fitness.clear();
 
       	_nb_genotypes = 0;
-      	for(size_t i = 0; i < Params::pop::size; ++i)
+      	assert(Params::pop::pop_init <= Params::pop::size);
+      	assert(Params::pop::size%Params::pop::pop_init == 0);
+      	int nb_indiv = Params::pop::size/Params::pop::pop_init;
+      	for(size_t i = 0; i < Params::pop::pop_init; ++i)
       	{
 	      	this->_pop.push_back(boost::shared_ptr<Phen>(new Phen()));
 	      	this->_pop[i]->random();
@@ -75,7 +78,7 @@ namespace sferes
 
 					this->_eval.eval(this->_pop, _nb_genotypes, 0, _nb_genotypes + 1);
 
-					this->_pop[i]->set_freq(1.0f/(float)Params::pop::size);
+					this->_pop[i]->set_freq((float)nb_indiv/(float)Params::pop::size);
 					this->_pop[i]->set_evaluated(true);
 
 					_nb_genotypes++;
@@ -114,7 +117,7 @@ namespace sferes
 				assert(this->_pop.size()); 
 
 				// Generation of offsprings
-				pop_t pop_offsprings(Params::pop::size);
+				pop_t pop_offsprings(Params::pop::size + _nb_genotypes);
 				for(size_t i = 0; i < _nb_genotypes; ++i)
 				{
 					pop_offsprings[i] = this->_pop[i]->clonePhen();
@@ -177,6 +180,9 @@ namespace sferes
 
 				remove_genotypes(vec_remove_genotypes, pop_offsprings);
 
+				assert(_nb_genotypes > 0);
+				assert(_nb_genotypes <= Params::pop::size);
+
 				// We evaluate all new mutants
 				for(size_t i = 0; i < _nb_genotypes; ++i)
 					if(!pop_offsprings[i]->is_evaluated())
@@ -221,7 +227,7 @@ namespace sferes
 					this->_pop[i]->set_nb_sstags(nb_sstags, nb_sstags_solo);
 					this->_pop[i]->set_nb_bstags(nb_bstags, nb_bstags_solo);
 				}
-				assert(total_freq == 1.0f);
+				// assert(total_freq == 1.0f);
 
 				// std::partial_sort(this->_pop.begin(), this->_pop.begin() + _nb_genotypes,
 				// 			this->_pop.end(), fit::compare());
@@ -257,12 +263,9 @@ namespace sferes
 
 				if(mutation)
 				{
-					pop_offsprings.push_back(offspring);
+					pop_offsprings[_nb_genotypes] = offspring;
 					pop_offsprings[_nb_genotypes]->set_pop_pos(_nb_genotypes);
 					pop_offsprings[_nb_genotypes]->set_freq(1.0f/(float)Params::pop::size);
-
-					// We evaluate this mutant's payoff against every other residents
-					// this->_eval.eval(pop_offsprings, _nb_genotypes, 0, _nb_genotypes + 1);
 
 					_nb_genotypes++;
 				}
