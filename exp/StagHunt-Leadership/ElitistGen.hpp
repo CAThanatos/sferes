@@ -63,7 +63,7 @@ namespace sferes
       typedef Params params_t;
       typedef ElitistGen<Size, Params, Exact> this_t;
 
-      ElitistGen() : _data(Size) 
+      ElitistGen() : _data(Size), _size(Size)
       { }
 
       void random() 
@@ -76,7 +76,7 @@ namespace sferes
       {
 #ifdef GAUSSIAN_MUTATION
       	float sigma = Params::evo_float::sigma;
-				for (size_t i = 0; i < Size; i++)
+				for (size_t i = 0; i < _size; i++)
 					if (misc::rand<float>() < Params::evo_float::mutation_rate)
 					{
 						float f = _data[i] + step_size * misc::gaussian_rand<float>(0, sigma * sigma);
@@ -85,7 +85,7 @@ namespace sferes
 #else
 				static const float eta_m = Params::evo_float::eta_m;
 				assert(eta_m != -1.0f);
-				for (size_t i = 0; i < Size; i++)
+				for (size_t i = 0; i < _size; i++)
 					if (misc::rand<float>() < Params::evo_float::mutation_rate)
 					{
 						float ri = misc::rand<float>();
@@ -127,11 +127,85 @@ namespace sferes
 	    	}
 	    	else
 	    	{
-	    		for(size_t i = 0; i < Size; ++i)
+	    		for(size_t i = 0; i < _size; ++i)
 	    		{
 	    			c1.data(i, this->data(i));
 	    			c2.data(i, o.data(i));
 	    		}
+	    	}
+	    }
+
+	    void duplicate_nn()
+	    {
+				int nb_genes = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;
+
+	    	int start_duplication = 0;
+	    	int end_duplication = nb_genes;
+	    	int start_destination = nb_genes;
+	    	int end_destination = nb_genes*2;
+
+	    	// One neural network
+	    	if((nb_genes + 1) == _size)
+	    	{
+	    		_data.resize(nb_genes*2 + 1);
+	    		_data[2*nb_genes] = _data[nb_genes];
+	    		_size = nb_genes*2 + 1;
+	    	}
+	    	// Two neural networks
+	    	else if((2*nb_genes + 1) == _size)
+	    	{
+	    		if(misc::flip_coin())
+	    		{
+	    			start_duplication = start_destination;
+	    			end_duplication = end_destination;
+	    			start_destination = 0;
+	    			end_destination = nb_genes;
+	    		}
+	    	}
+	    	else
+	    	{
+	    		std::cout << "There is a problem in your genotype !" << std::endl;
+	    	}
+
+	    	size_t j = start_destination;
+	    	for(size_t i = start_duplication; i < end_duplication; ++i)
+	    	{
+	    		_data[j] = _data[i];
+	    		++j;
+	    	}
+
+	    	assert(j == end_destination);
+	    }
+
+	    void delete_nn()
+	    {
+				int nb_genes = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;
+
+	    	// We cannot lose our only neural network
+	    	if((2*nb_genes + 1) == _size)
+	    	{
+	    		// We lose one network or the other (50/50)
+	    		if(misc::flip_coin())
+	    		{
+	    			int start_duplication = nb_genes;
+	    			int end_duplication = nb_genes*2;
+	    			int start_destination = 0;
+	    			int end_destination = nb_genes;
+
+	    			int j = start_destination;
+	    			for(size_t i = start_duplication; i < end_duplication; ++i)
+	    			{
+	    				assert(i < _size);
+	    				assert(j < _size);
+	    				_data[j] = _data[i];
+	    				++j;
+	    			}
+	    			assert(j == end_destination);
+	    		}
+
+	    		_data[nb_genes] = _data[2*nb_genes];
+	    		_data.resize(nb_genes + 1);
+	    		_size = nb_genes + 1;
 	    	}
 	    }
 
@@ -151,7 +225,13 @@ namespace sferes
 				_check_invariant(); 
       }
       
-      size_t size() const { return Size; }
+      size_t size() const { return _size; }
+
+      void resize(size_t size)
+      {
+      	_data.resize(size);
+      	_size = size;
+      }
       
       template<class Archive>
       void serialize(Archive & ar, const unsigned int version)
@@ -161,6 +241,7 @@ namespace sferes
 
     protected:
       std::vector<float> _data;
+      int _size;
 
       void _check_invariant() const
       {

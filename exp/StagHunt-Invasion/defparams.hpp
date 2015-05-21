@@ -291,7 +291,7 @@ struct Params
   struct pop
   {
     // size of the population
-    static const unsigned size = 10;
+    static const unsigned size = 1000;
 
     // size of the population
     static const unsigned max_size = 1000;

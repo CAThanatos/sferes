@@ -247,7 +247,11 @@ struct Params
 		static const size_t nb_outputs = 2 + Params::nn::nb_outputs_scream;
 
 #ifdef DOUBLE_NN
+#ifdef DUPLICATION
+		static const size_t genome_size = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs + 1;
+#else
 		static const size_t genome_size = ((Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs) * 2 + 1;
+#endif
 #elif defined(ELMAN)
 		static const size_t genome_size = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + (Params::nn::nb_hidden + 3) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;
 #else
@@ -308,6 +312,19 @@ struct Params
 
     // a parameter of the polynomial cross-over
     static const float eta_c = 10.0f;
+
+#if defined(DOUBLE_NN) && defined(DUPLICATION)
+#ifdef DUP10
+    static const float duplication_rate = 0.1f;
+#elif defined(DUP5)
+    static const float duplication_rate = 0.05f;
+#elif defined(DUP1)
+    static const float duplication_rate = 0.01f;
+#else
+    static const float duplication_rate = 0.01f;
+#endif
+    static const float deletion_rate = 0.005f;
+#endif
   };
   
   struct pop

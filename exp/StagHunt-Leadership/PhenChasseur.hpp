@@ -64,6 +64,9 @@ namespace sferes
 
 		    void develop()
 		    {
+#if defined(DOUBLE_NN) && defined(DUPLICATION)
+		    	_params.resize((*this)._gen.size());
+#endif
 					for (unsigned i = 0; i < _params.size(); ++i)
 						_params[i] = this->_gen.data(i) * (max_p - min_p) + min_p;
 						
@@ -303,6 +306,12 @@ namespace sferes
 				boost::shared_ptr<PhenChasseur> clone()
 				{
 					boost::shared_ptr<PhenChasseur> new_indiv = boost::shared_ptr<PhenChasseur>(new PhenChasseur());
+
+#if defined(DOUBLE_NN) && defined(DUPLICATION)
+					if(this->_gen.size() > new_indiv->_gen.size())
+						new_indiv->_gen.resize(this->_gen.size());
+#endif
+
 					for(unsigned i = 0; i < this->_gen.size(); ++i)
 						new_indiv->_gen.data(i, this->_gen.data(i));
 						

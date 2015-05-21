@@ -121,6 +121,16 @@ namespace sferes
 					parents_list[i] = parent_rank%mu;
 					parent_rank++;
 					
+#if defined(DOUBLE_NN) && defined(DUPLICATION)
+					// Neural network duplication
+					if(misc::rand<float>() < Params::evo_float::duplication_rate)
+						child_pop[i]->gen().duplicate_nn();
+
+					// Neural network deletion
+					if(misc::rand<float>() < Params::evo_float::deletion_rate)
+						child_pop[i]->gen().delete_nn();
+#endif
+
 					// Mutation
 					child_pop[i]->gen().mutate(_step_size);
 				}

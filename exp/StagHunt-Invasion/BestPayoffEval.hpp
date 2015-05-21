@@ -78,7 +78,7 @@ namespace sferes
         }
 #endif
 
-				this->_create_log_file(ea, "bestfit.dat");
+				this->_create_log_file(ea, "bestpayoff.dat");
 				if (ea.dump_enabled())
 				{
 #ifdef DIVERSITY

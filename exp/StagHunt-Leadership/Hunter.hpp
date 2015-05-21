@@ -365,17 +365,20 @@ namespace sferes
 
 				int first_weight = 0;
 
+				if(data.size() > (nb_weights + 1))
+				{
 #ifdef DECISION_THRESHOLD
-				if(diff_hunters > (data[nb_weights * 2] + 1.0f)/2.0f)
-					first_weight = nb_weights;
+					if(diff_hunters > (data[nb_weights * 2] + 1.0f)/2.0f)
+						first_weight = nb_weights;
 #else
-				float lambda = 5.0f;
-				float out = diff_hunters*data[nb_weights * 2];
-				out = (1.0 / (exp(-out * lambda) + 1));
+					float lambda = 5.0f;
+					float out = diff_hunters*data[nb_weights * 2];
+					out = (1.0 / (exp(-out * lambda) + 1));
 
-				if(out > 0.5f)
-					first_weight = nb_weights;
+					if(out > 0.5f)
+						first_weight = nb_weights;
 #endif
+				}
 
 				if(first_weight == 0)
 					_bool_nn1 = true;
