@@ -388,10 +388,17 @@ struct Params
   
   struct parameters
   {
+#ifdef PARAMS10
+    // minimum value
+    static const float min = -10.0f;
+    // maximum value of parameters
+    static const float max = 10.0f;
+#else
     // minimum value
     static const float min = -1.0f;
     // maximum value of parameters
     static const float max = 1.0f;
+#endif
   };
   
   struct fitness
