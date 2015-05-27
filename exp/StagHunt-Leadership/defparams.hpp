@@ -250,7 +250,11 @@ struct Params
 #ifdef DUPLICATION
 		static const size_t genome_size = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs + 1;
 #else
+#ifdef DECISION_THRESHOLD
 		static const size_t genome_size = ((Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs) * 2 + 1;
+#else
+		static const size_t genome_size = ((Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs) * 2 + 2;
+#endif
 #endif
 #elif defined(ELMAN)
 		static const size_t genome_size = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + (Params::nn::nb_hidden + 3) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;

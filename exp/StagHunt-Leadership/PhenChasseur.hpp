@@ -118,6 +118,8 @@ namespace sferes
 
 				float data(size_t i) const { assert(i < size()); return _params[i]; }
 
+				size_t genome_size() const { return this->_gen.size(); }
+
 				size_t size() const { return _params.size(); }
 
 				const std::vector<float>& data() const { return _params; }

@@ -372,7 +372,7 @@ namespace sferes
 						first_weight = nb_weights;
 #else
 					float lambda = 5.0f;
-					float out = diff_hunters*data[nb_weights * 2];
+					float out = diff_hunters*data[nb_weights * 2] + data[nb_weights*2 + 1];
 					out = (1.0 / (exp(-out * lambda) + 1));
 
 					if(out > 0.5f)

@@ -1526,6 +1526,8 @@ def drawBestLeadership(dossier) :
 							if generation not in tabGeneration :
 								tabGeneration.append(generation)
 
+							lastGen = generation
+
 
 					if firstEval :
 						firstEval = False
@@ -1624,8 +1626,8 @@ def drawBestLeadership(dossier) :
 		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 		axe1.boxplot(dataBoxPlot)
 
-		axe1.add_line(lines.Line2D([0, lastEval], [0.5, 0.5], color="red"))
-		axe1.add_line(lines.Line2D([0, lastEval], [-0.5, -0.5], color="red"))
+		axe1.add_line(lines.Line2D([0, lastGen], [0.5, 0.5], color="red"))
+		axe1.add_line(lines.Line2D([0, lastGen], [-0.5, -0.5], color="red"))
 
 		axe1.set_xticks(range(0, len(tabPlotGeneration), int(len(tabPlotGeneration)/10)))
 		axe1.set_xticklabels([tabPlotGeneration[x] for x in range(0, len(tabPlotGeneration), int(len(tabPlotGeneration)/10))])
@@ -1649,8 +1651,8 @@ def drawBestLeadership(dossier) :
 
 			axe1.plot(range(len(tabProportionAsym)), tabProportionAsym)
 
-			axe1.add_line(lines.Line2D([0, lastEval], [0.5, 0.5], color="red"))
-			axe1.add_line(lines.Line2D([0, lastEval], [-0.5, -0.5], color="red"))
+			axe1.add_line(lines.Line2D([0, lastGen], [0.5, 0.5], color="red"))
+			axe1.add_line(lines.Line2D([0, lastGen], [-0.5, -0.5], color="red"))
 
 			# Divide the x axis by 10
 			tabGenerationTicks = [indice for indice in range(len(tabPlotGeneration)) if indice % (int(len(tabPlotGeneration)/10)) == 0]
@@ -1864,6 +1866,7 @@ def drawBestNN(dossier) :
 		hashNbBiggerNN1Chosen = {}
 		hashNbRoleDivisions = {}
 		hashProportionNN1 = {}
+		hashGenomeSize = {}
 
 		tabGeneration = []
 		for fileBest in listBestNN :
@@ -1881,9 +1884,10 @@ def drawBestNN(dossier) :
 				hashNbBiggerNN1Chosen[run] = {}
 				hashNbRoleDivisions[run] = {}
 				hashProportionNN1[run] = {}
+				hashGenomeSize[run] = {}
 
-				dtypes = np.dtype({ 'names' : ('evaluation', 'fitness', 'nb_nn1_chosen', 'nb_bigger_nn1_chosen', 'nb_role_divisions'), 'formats' : [np.int, np.float, np.float, np.float, np.float] })
-				data = np.loadtxt(dossier + "/" + fileBest, delimiter=',', usecols = (0, 1, 2, 3, 4), dtype = dtypes)
+				dtypes = np.dtype({ 'names' : ('evaluation', 'fitness', 'nb_nn1_chosen', 'nb_bigger_nn1_chosen', 'nb_role_divisions', 'genome_size'), 'formats' : [np.int, np.float, np.float, np.float, np.float, np.float] })
+				data = np.loadtxt(dossier + "/" + fileBest, delimiter=',', usecols = (0, 1, 2, 3, 4, 5), dtype = dtypes)
 
 				firstEval = True
 				lastGen = 0
@@ -1902,14 +1906,19 @@ def drawBestNN(dossier) :
 								hashProportionNN1[run][generation] = ((line['nb_bigger_nn1_chosen']/line['nb_nn1_chosen'])*2) - 1
 
 							hashNbRoleDivisions[run][generation] = line['nb_role_divisions']
+							hashGenomeSize[run][generation] = line['genome_size']
 
 							if generation not in tabGeneration :
 								tabGeneration.append(generation)
 
 							cpt = 0
+		
+							lastGen = generation
 
 					if firstEval :
 						firstEval = False
+
+					generation += 1
 
 		tabGeneration = sorted(tabGeneration)
 
@@ -2038,6 +2047,48 @@ def drawBestNN(dossier) :
 			plt.savefig(dossier + "/roleDivisionRun" + str(run) + ".png", bbox_inches = 'tight')
 			plt.close()
 
+
+
+		# --- GENOME SIZE ---
+		palette = sns.color_palette("husl", 3)
+		for run in hashGenomeSize.keys() :
+			fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+
+			tabGenomeSize = [hashGenomeSize[run][generation] for generation in tabPlotGeneration if generation in hashGenomeSize[run].keys()]
+			tabNNChoice = [hashNbNN1Chosen[run][generation] for generation in tabPlotGeneration if generation in hashNbNN1Chosen[run].keys()]
+
+			axe1.plot(range(len(tabGenomeSize)), tabGenomeSize, color = palette[0])
+
+			axe1.set_ylabel("Genome size", color = palette[0])
+			axe1.set_ylim(0, 2000)
+			for tl in axe1.get_yticklabels():
+			    tl.set_color(palette[0])
+
+			axe2 = axe1.twinx()
+
+			axe2.plot(range(len(tabNNChoice)), tabNNChoice, color = palette[1])
+
+			axe2.set_ylabel("Neural network choice", color = palette[1])
+			axe2.set_ylim(-0.1, 1.1)
+			for tl in axe2.get_yticklabels():
+			    tl.set_color(palette[1])
+
+			# Divide the x axis by 10
+			# tabGenerationTicks = [indice for indice in range(len(tabFitness)) if indice % (int(len(tabFitness)/10)) == 0]
+			tabGenerationTicks = [indice for indice in range(len(tabPlotGeneration)) if indice % (int(len(tabPlotGeneration)/10)) == 0]
+
+			axe1.set_xticks(tabGenerationTicks)
+			axe1.set_xticklabels([tabPlotGeneration[indice] for indice in tabGenerationTicks])
+			axe1.set_xlabel('Generation')
+
+			axe2.set_xticks(tabGenerationTicks)
+			axe2.set_xticklabels([tabPlotGeneration[indice] for indice in tabGenerationTicks])
+			axe2.set_xlabel('Generation')
+
+			# axe1.set_title('Best role', fontsize = 10)
+
+			plt.savefig(dossier + "/genomeSizeRun" + str(run) + ".png", bbox_inches = 'tight')
+			plt.close()
 
 
 
