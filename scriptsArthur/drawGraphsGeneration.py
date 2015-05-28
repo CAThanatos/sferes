@@ -70,6 +70,7 @@ def drawBestFit(dossier) :
 		maxFitness = 0
 		maxNbPreys = 0
 		tabGeneration = []
+		lastGen = 0
 		for fileBest in listBestFit :
 			m = re.search(r'^bestfit(\d*)\.dat$', fileBest)
 			run = int(m.group(1))
@@ -100,7 +101,6 @@ def drawBestFit(dossier) :
 
 				cpt = 0
 				firstEval = True
-				lastGen = 0
 				generation = 0
 				for line in data :
 					evaluation = line['evaluation']
@@ -134,7 +134,8 @@ def drawBestFit(dossier) :
 							if (line['nbHares'] + line['nbBStags'] + line['nbSStags']) > maxNbPreys :
 								maxNbPreys = (line['nbHares'] + line['nbBStags'] + line['nbSStags'])
 
-							lastGen = generation
+							if lastGen < generation :
+								lastGen = generation
 
 					if firstEval :
 						firstEval = False
@@ -171,7 +172,6 @@ def drawBestFit(dossier) :
 		# 		lastValue = hashRatioSuccess[run][evalEnd]
 
 		# 		fileWrite.write(str(evalEnd) + "," + str(lastValue) + "\n")
-
 
 		# --- BOXPLOT FITNESS ---
 		dataBoxPlot = []
@@ -428,6 +428,7 @@ def drawAllFit(dossier) :
 		hashFitnessGlob = {}
 		maxFitness = 0
 		tabGeneration = []
+		lastGen = 0
 		for fileAll in listAllFit :
 			m = re.search(r'^allfitevalstat(\d*)\.dat$', fileAll)
 			run = int(m.group(1))
@@ -458,7 +459,6 @@ def drawAllFit(dossier) :
 				genDone = []
 				cpt = 0
 				lastEval = None
-				lastGen = None
 				generation = 0
 				for line in data :
 					evaluation = line['evaluation']
@@ -515,7 +515,8 @@ def drawAllFit(dossier) :
 							if line['fitness'] > maxFitness :
 								maxFitness = line['fitness']
 
-							lastGen = generation
+							if lastGen < generation :
+								lastGen = generation
 
 
 		tabGeneration = sorted(tabGeneration)
@@ -636,6 +637,7 @@ def drawBestDiv(dossier) :
 
 		maxDiversity = 0
 		tabGeneration = []
+		lastGen = 0
 		for fileBest in listBestDiv :
 			m = re.search(r'^bestdiv(\d*)\.dat$', fileBest)
 			run = int(m.group(1))
@@ -664,7 +666,6 @@ def drawBestDiv(dossier) :
 				data = np.loadtxt(dossier + "/" + fileBest, delimiter=',', usecols = (0, 1, 2, 3, 4, 5, 6, 7), dtype = dtypes)
 
 				firstEval = True
-				lastGen = 0
 				generation = 0
 				for line in data :
 					evaluation = line['evaluation']
@@ -696,7 +697,8 @@ def drawBestDiv(dossier) :
 
 							cpt = 0
 
-							lastGen = generation
+							if lastGen < generation :
+								lastGen = generation
 
 					if firstEval :
 						firstEval = False
@@ -837,6 +839,7 @@ def drawAllDiv(dossier) :
 		hashDiversityGlob = {}
 		maxDiversity = 0
 		tabGeneration = []
+		lastGen = 0
 		for fileAll in listAllDiv :
 			m = re.search(r'^alldivevalstat(\d*)\.dat$', fileAll)
 			run = int(m.group(1))
@@ -865,7 +868,6 @@ def drawAllDiv(dossier) :
 				data = np.loadtxt(dossier + "/" + fileAll, delimiter=',', skiprows = 1, usecols = (0, 1, 2, 3, 4, 5, 6, 7), dtype = dtypes)
 
 				genDone = []
-				lastGen = None
 				lastEval = None
 				generation = 0
 				for line in data :
@@ -923,7 +925,8 @@ def drawAllDiv(dossier) :
 							if line['diversity'] > maxDiversity :
 								maxDiversity = line['diversity']
 
-							lastGen = generation
+							if lastGen < generation :
+								lastGen = generation
 
 
 		tabGeneration = sorted(tabGeneration)
@@ -1076,6 +1079,7 @@ def drawPareto(dossier) :
 		maxDiversity = 0
 		maxFitness = 0
 		tabGeneration = []
+		lastGen = 0
 		for fileAll in listAllDiv :
 			m = re.search(r'^alldivevalstat(\d*)\.dat$', fileAll)
 			run = int(m.group(1))
@@ -1112,7 +1116,6 @@ def drawPareto(dossier) :
 				genDone = []
 				cpt = 0
 				lastEval = None
-				lastGen = None
 				generation = 0
 				for line in data :
 					evaluation = line['evaluation']
@@ -1172,7 +1175,8 @@ def drawPareto(dossier) :
 							if line['diversity'] > maxDiversity :
 								maxDiversity = line['diversity']
 
-							lastGen = generation	
+							if lastGen < generation :
+								lastGen = generation
 
 
 		for fileAll in listAllFit :
@@ -1191,7 +1195,6 @@ def drawPareto(dossier) :
 
 				genDone = []
 				lastEval = None
-				lastGen = None
 				generation = 0
 				for line in data :
 					evaluation = line['evaluation']
@@ -1213,7 +1216,8 @@ def drawPareto(dossier) :
 							if line['fitness'] > maxFitness :
 								maxFitness = line['fitness']
 
-							lastGen = generation
+							if lastGen < generation :
+								lastGen = generation
 
 
 		tabGeneration = sorted(tabGeneration)
@@ -1306,6 +1310,8 @@ def drawParetoRun(dossier, run) :
 		maxDiversity = 0
 		maxFitness = 0
 
+		lastGen = 0
+
 		testRun = None
 		if selection != None :
 			testRun = lambda run : run in selection
@@ -1319,7 +1325,6 @@ def drawParetoRun(dossier, run) :
 			genDone = []
 			cpt = 0
 			lastEval = None
-			lastGen = None
 			generation = 0
 			for line in data :
 				evaluation = line['evaluation']
@@ -1379,7 +1384,9 @@ def drawParetoRun(dossier, run) :
 						if line['diversity'] > maxDiversity :
 							maxDiversity = line['diversity']
 
-						lastGen = generation
+
+						if lastGen < generation :
+							lastGen = generation
 
 
 			dtypes = np.dtype({ 'names' : ('evaluation', 'fitness', 'nbHares', 'nbHaresSolo', 'nbSStags', 'nbSStagsSolo', 'nbBStags', 'nbBStagsSolo'), 'formats' : [np.int, np.float, np.float, np.float, np.float, np.float, np.float, np.float] })
@@ -1488,6 +1495,8 @@ def drawBestLeadership(dossier) :
 		hashNbLeaderFirst = {}
 		hashNbTotalCoop = {}
 
+		lastGen = 0
+
 		tabGeneration = []
 		for fileBest in listBestLeadership :
 			m = re.search(r'^bestleadership(\d*)\.dat$', fileBest)
@@ -1511,7 +1520,6 @@ def drawBestLeadership(dossier) :
 				data = np.loadtxt(dossier + "/" + fileBest, delimiter=',', usecols = (0, 1, 2, 3), dtype = dtypes)
 
 				firstEval = True
-				lastGen = 0
 				generation = 0
 				for line in data :
 					evaluation = line['evaluation']
@@ -1526,7 +1534,8 @@ def drawBestLeadership(dossier) :
 							if generation not in tabGeneration :
 								tabGeneration.append(generation)
 
-							lastGen = generation
+							if lastGen < generation :
+								lastGen = generation
 
 
 					if firstEval :
@@ -1680,6 +1689,8 @@ def drawAllLeadership(dossier) :
 		hashNbLeaderFirst = {}
 		hashNbTotalCoop = {}
 
+		lastGen = 0
+
 		maxFitness = 0
 		tabGeneration = []
 		for fileAll in listAllFit :
@@ -1705,7 +1716,6 @@ def drawAllLeadership(dossier) :
 
 				genDone = []
 				lastEval = None
-				lastGen = None
 				generation = 0
 				for line in data :
 					evaluation = line['evaluation']
@@ -1868,6 +1878,8 @@ def drawBestNN(dossier) :
 		hashProportionNN1 = {}
 		hashGenomeSize = {}
 
+		lastGen = 0
+
 		tabGeneration = []
 		for fileBest in listBestNN :
 			m = re.search(r'^bestnn(\d*)\.dat$', fileBest)
@@ -1913,7 +1925,8 @@ def drawBestNN(dossier) :
 
 							cpt = 0
 		
-							lastGen = generation
+							if lastGen < generation :
+								lastGen = generation
 
 					if firstEval :
 						firstEval = False

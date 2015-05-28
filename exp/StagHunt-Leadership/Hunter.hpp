@@ -368,8 +368,21 @@ namespace sferes
 				if(data.size() > (nb_weights + 1))
 				{
 #ifdef DECISION_THRESHOLD
-					if(diff_hunters > (data[nb_weights * 2] + 1.0f)/2.0f)
+					float threshold = ((data[nb_weights * 2]/Params::parameters::max) + 1.0f)/2.0f;
+					if(diff_hunters > threshold)
 						first_weight = nb_weights;
+#elif defined(DECISION_MAPPING)
+					float mean_params = (Params::parameters::min + Params::parameters::max)/2.0f;
+					if(diff_hunters < 0.5f)
+					{
+						if(data[nb_weights*2] > mean_params)
+							first_weight = nb_weights;
+					}
+					else
+					{
+						if(data[nb_weights*2 + 1] > mean_params)
+							first_weight = nb_weights;
+					}
 #else
 					float lambda = 5.0f;
 					float out = diff_hunters*data[nb_weights * 2] + data[nb_weights*2 + 1];
@@ -382,6 +395,11 @@ namespace sferes
 
 				if(first_weight == 0)
 					_bool_nn1 = true;
+
+				if(_bool_nn1)
+					std::cout << "1" << std::endl;
+				else
+					std::cout << "2" << std::endl;
 
 				for(size_t i = first_weight; i < first_weight + nb_weights; ++i)
 					_weights[i - first_weight] = data[i];
