@@ -354,6 +354,22 @@ namespace sferes
           ia >> BOOST_SERIALIZATION_NVP(_pop_co);
 #endif
 
+#ifdef DUPLOAD
+          int nb_genes = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;
+          for(size_t i = 0; i < _pop.size(); ++i)
+          {
+            _pop[i]->gen().resize(nb_genes + 2);
+#ifdef DIFFLOAD
+            _pop[i]->gen().data(nb_genes, misc::rand<float>(0.0f, 0.5f));
+            _pop[i]->gen().data(nb_genes + 1, misc::rand<float>(0.5f, 1.0f));
+#else
+            _pop[i]->gen().data(nb_genes, misc::rand<float>());
+            _pop[i]->gen().data(nb_genes + 1, misc::rand<float>());
+#endif
+            _pop[i]->gen().duplicate_nn();
+          }
+#endif
+
 	        
 //	        srand(_seed);
 

@@ -86,7 +86,7 @@ namespace sferes
 #else
           (*this->_log_file) << ea.nb_eval() << "," << _best->fit().value();
 #endif
-          (*this->_log_file) << _best->get_freq() << "," << _best->pop_pos();
+          (*this->_log_file) << "," << _best->get_freq() << "," << _best->pop_pos();
 
           for(size_t i = 0; i < ea.pop().size(); ++i)
             (*this->_log_file) << ",(" << _best->get_payoff(i) << ";" << ea.pop()[i]->pop_pos() << ")";

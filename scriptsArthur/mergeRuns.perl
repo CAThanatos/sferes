@@ -102,33 +102,42 @@ foreach my $dirOrig (@dirsOrig)
 
 							close FILEIN;
 
-							open FILEIN, "<$dossierOrig/$dirOrig/$subDir/$file" or die $!;
-							open FILEOUT, ">$dossierOrig/$dirOrig/$subDir/${file}2" or die $!;
-
-							my $stop = 0;
-							while ((my $ligne = <FILEIN>) && ($stop == 0))
+							if(-f "$dossierOrig/$dirOrig/$subDir/$file")
 							{
-								if($ligne =~ /^(\d*),/)
-								{
-									my $eval = $1;
+								open FILEIN, "<$dossierOrig/$dirOrig/$subDir/$file" or die $!;
+								open FILEOUT, ">$dossierOrig/$dirOrig/$subDir/${file}2" or die $!;
 
-									if($eval < $firstEval)
+								my $stop = 0;
+								while ((my $ligne = <FILEIN>) && ($stop == 0))
+								{
+									if($ligne =~ /^(\d*),/)
 									{
-										print FILEOUT "$ligne";
-									}
-									else
-									{
-										$stop = 1;
+										my $eval = $1;
+
+										if($eval < $firstEval)
+										{
+											print FILEOUT "$ligne";
+										}
+										else
+										{
+											$stop = 1;
+										}
 									}
 								}
+
+								print FILEOUT "$contenu";
+
+								close FILEOUT;
+								close FILEIN;
+
+								system "mv $dossierOrig/$dirOrig/$subDir/${file}2 $dossierOrig/$dirOrig/$subDir/$file";
 							}
-
-							print FILEOUT "$contenu";
-
-							close FILEOUT;
-							close FILEIN;
-
-							system "mv $dossierOrig/$dirOrig/$subDir/${file}2 $dossierOrig/$dirOrig/$subDir/$file";
+							else
+							{
+								open FILEOUT, ">$dossierOrig/$dirOrig/$subDir/$file" or die $!;
+								print FILEOUT "$contenu";
+								close FILEOUT;
+							}
 						}
 						else
 						{

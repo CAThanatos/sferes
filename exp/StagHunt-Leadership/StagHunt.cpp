@@ -141,8 +141,7 @@ namespace sferes
 					hunter1->choose_nn(2, ind1.data());
 					hunter2->choose_nn(1, ind1.data());
 				}
-#else
-#ifdef BINARY_DIFF
+#elif defined(BINARY_DIFF)
 				if(rand1 > rand2)
 				{
 					hunter1->choose_nn(ind1.data(), 1);
@@ -153,10 +152,20 @@ namespace sferes
 					hunter1->choose_nn(ind1.data(), 0);
 					hunter2->choose_nn(ind2.data(), 1);
 				}
+#elif defined(CHOICE_ORDERED)
+				if(hunter1->is_leader())
+				{
+					int choice_leader = hunter1->choose_nn(ind1.data(), -1);
+					hunter2->choose_nn(ind2.data(), choice_leader);
+				}
+				else
+				{
+					int choice_leader = hunter2->choose_nn(ind2.data(), -1);
+					hunter1->choose_nn(ind1.data(), choice_leader);
+				}
 #else
 				hunter1->choose_nn(ind1.data(), diff_hunters);
 				hunter2->choose_nn(ind2.data(), 1 - diff_hunters);
-#endif
 #endif
 
 				// Is the nn chosen because of the two random numbers ?

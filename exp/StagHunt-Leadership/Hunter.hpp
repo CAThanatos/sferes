@@ -356,7 +356,7 @@ namespace sferes
 				}
 			}
 
-			void choose_nn(const std::vector<float>& data, float diff_hunters)
+			int choose_nn(const std::vector<float>& data, float diff_hunters)
 			{
 				int nb_weights = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;
 
@@ -373,6 +373,35 @@ namespace sferes
 						first_weight = nb_weights;
 #elif defined(DECISION_MAPPING)
 					float mean_params = (Params::parameters::min + Params::parameters::max)/2.0f;
+
+#ifdef CHOICE_ORDERED
+					if(diff_hunters == -1)
+					{
+						float threshold = ((data[nb_weights*2 + 2]/Params::parameters::max) + 1.0f)/2.0f;
+						if(threshold >= 0.5f)
+							first_weight = nb_weights;
+					}
+					else
+#endif
+#ifdef NOISE_CHOICE
+					{
+						float sigma = 0.1f;
+						float f = misc::gaussian_rand<float>(0, sigma * sigma);
+						mean_params += f;
+						mean_params = misc::put_in_range(mean_params, -1.0f, 1.0f);
+
+						if(diff_hunters < 0.5f)
+						{
+							if(data[nb_weights*2] > mean_params)
+								first_weight = nb_weights;
+						}
+						else
+						{
+							if(data[nb_weights*2 + 1] > mean_params)
+								first_weight = nb_weights;
+						}
+					}
+#else
 					if(diff_hunters < 0.5f)
 					{
 						if(data[nb_weights*2] > mean_params)
@@ -383,6 +412,7 @@ namespace sferes
 						if(data[nb_weights*2 + 1] > mean_params)
 							first_weight = nb_weights;
 					}
+#endif
 #else
 					float lambda = 5.0f;
 					float out = diff_hunters*data[nb_weights * 2] + data[nb_weights*2 + 1];
@@ -393,16 +423,23 @@ namespace sferes
 #endif
 				}
 
+#ifdef ERROR_CHOICE
+				if(misc::rand<float>() < Params::nn::proba_error_choice)
+				{
+					if(first_weight == 0)
+						first_weight = nb_weights;
+					else
+						first_weight = 0;
+				}
+#endif
+
 				if(first_weight == 0)
 					_bool_nn1 = true;
 
-				if(_bool_nn1)
-					std::cout << "1" << std::endl;
-				else
-					std::cout << "2" << std::endl;
-
 				for(size_t i = first_weight; i < first_weight + nb_weights; ++i)
 					_weights[i - first_weight] = data[i];
+
+				return _bool_nn1?0:1;
 			}
 
 			void choose_nn(int nn_chosen, const std::vector<float>& data)

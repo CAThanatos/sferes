@@ -69,6 +69,17 @@ namespace sferes
       void random() 
       {
 				BOOST_FOREACH(float &v, _data) v = misc::rand<float>(); 
+
+#ifdef DIFFSTART
+        int nb_genes = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;
+				_data[nb_genes*2] = misc::rand<float>(0.0f, 0.5f);
+				_data[nb_genes*2 + 1] = misc::rand<float>(0.5f, 1.0f);
+#elif defined(NOISE_CHOICE)
+        int nb_genes = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;
+				_data[nb_genes*2] = 0.5f;
+				_data[nb_genes*2 + 1] = 0.5f;
+#endif
+
 				_check_invariant(); 
       }
       
@@ -77,11 +88,22 @@ namespace sferes
 #ifdef GAUSSIAN_MUTATION
       	float sigma = Params::evo_float::sigma;
 				for (size_t i = 0; i < _size; i++)
-					if (misc::rand<float>() < Params::evo_float::mutation_rate)
+				{
+					float randMutation = misc::rand<float>();
+#ifdef STRONG_MUTATION
+					if (randMutation < Params::evo_float::strong_mutation_rate)
+					{
+						float f = misc::rand<float>(0.0f, 1.0f);
+						_data[i] = misc::put_in_range(f, 0.0f, 1.0f);
+						continue;
+					}
+#endif
+					if (randMutation < Params::evo_float::mutation_rate)
 					{
 						float f = _data[i] + step_size * misc::gaussian_rand<float>(0, sigma * sigma);
 						_data[i] = misc::put_in_range(f, 0.0f, 1.0f);
 	  			}
+	  		}
 #else
 				static const float eta_m = Params::evo_float::eta_m;
 				assert(eta_m != -1.0f);
@@ -145,14 +167,17 @@ namespace sferes
 	    	int end_destination = nb_genes*2;
 
 	    	// One neural network
-	    	if((nb_genes + 1) == _size)
+	    	if(Params::nn::genome_size == _size)
 	    	{
-	    		_data.resize(nb_genes*2 + 1);
+	    		_data.resize(Params::nn::genome_size + nb_genes);
 	    		_data[2*nb_genes] = _data[nb_genes];
-	    		_size = nb_genes*2 + 1;
+#ifndef DECISION_THRESHOLD
+	    		_data[2*nb_genes + 1] = _data[nb_genes + 1];
+#endif
+	    		_size = Params::nn::genome_size + nb_genes;
 	    	}
 	    	// Two neural networks
-	    	else if((2*nb_genes + 1) == _size)
+	    	else if((Params::nn::genome_size + nb_genes) == _size)
 	    	{
 	    		if(misc::flip_coin())
 	    		{
@@ -164,7 +189,16 @@ namespace sferes
 	    	}
 	    	else
 	    	{
+#ifdef DUPLOAD
+	    		_data.resize(Params::nn::genome_size);
+	    		_data[2*nb_genes] = _data[nb_genes];
+#ifndef DECISION_THRESHOLD
+	    		_data[2*nb_genes + 1] = _data[nb_genes + 1];
+#endif
+	    		_size = Params::nn::genome_size;
+#else
 	    		std::cout << "There is a problem in your genotype !" << std::endl;
+#endif
 	    	}
 
 	    	size_t j = start_destination;
@@ -182,7 +216,7 @@ namespace sferes
 				int nb_genes = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;
 
 	    	// We cannot lose our only neural network
-	    	if((2*nb_genes + 1) == _size)
+	    	if((Params::nn::genome_size + nb_genes) == _size)
 	    	{
 	    		// We lose one network or the other (50/50)
 	    		if(misc::flip_coin())
@@ -204,8 +238,11 @@ namespace sferes
 	    		}
 
 	    		_data[nb_genes] = _data[2*nb_genes];
-	    		_data.resize(nb_genes + 1);
-	    		_size = nb_genes + 1;
+#ifndef DECISION_THRESHOLD
+	    		_data[nb_genes + 1] = _data[2*nb_genes + 1];
+#endif
+	    		_data.resize(Params::nn::genome_size);
+	    		_size = Params::nn::genome_size;
 	    	}
 	    }
 

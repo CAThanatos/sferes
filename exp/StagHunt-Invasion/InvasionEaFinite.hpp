@@ -124,13 +124,7 @@ namespace sferes
 					pop_offsprings[i]->set_freq(0.0f);
 				}
 
-
 				int old_nb_genotypes = _nb_genotypes;
-
-				std::cout << "--------" << std::endl;
-				std::cout << "POPULATION :" << std::endl;
-				for(size_t i = 0; i < _nb_genotypes; ++i)
-					std::cout << "Genotype " << i << " : (" << this->_pop[i]->get_freq() << "," << this->_pop[i]->is_evaluated() << ")" << std::endl; 
 
 #ifdef FITPROP
 				float fitness_tot = 0.0f;
@@ -188,11 +182,6 @@ namespace sferes
 				assert(_nb_genotypes > 0);
 				assert(_nb_genotypes <= Params::pop::size);
 
-				std::cout << "////////" << std::endl;
-				std::cout << "OFFSPRINGS :" << std::endl;
-				for(size_t i = 0; i < _nb_genotypes; ++i)
-					std::cout << "Genotype " << i << " : (" << pop_offsprings[i]->get_freq() << "," << pop_offsprings[i]->is_evaluated() << ")" << std::endl; 
-
 				// We evaluate all new mutants
 				for(size_t i = 0; i < _nb_genotypes; ++i)
 					if(!pop_offsprings[i]->is_evaluated())
@@ -200,6 +189,9 @@ namespace sferes
 						this->_eval.eval(pop_offsprings, i, 0, _nb_genotypes);
 						pop_offsprings[i]->set_evaluated(true);
 					}
+
+				this->_pop.clear();
+				this->_pop.resize(_nb_genotypes);
 
 				for(size_t i = 0; i < _nb_genotypes; ++i)
 					this->_pop[i] = pop_offsprings[i];
@@ -238,12 +230,6 @@ namespace sferes
 					this->_pop[i]->set_nb_bstags(nb_bstags, nb_bstags_solo);
 				}
 				// assert(total_freq == 1.0f);
-
-				std::cout << "////////" << std::endl;
-				std::cout << "NEW POPULATION :" << std::endl;
-				for(size_t i = 0; i < _nb_genotypes; ++i)
-					std::cout << "Genotype " << i << " : (" << this->_pop[i]->get_freq() << "," << this->_pop[i]->is_evaluated() << ")" << std::endl; 
-				std::cout << "--------" << std::endl;
 
 				// std::partial_sort(this->_pop.begin(), this->_pop.begin() + _nb_genotypes,
 				// 			this->_pop.end(), fit::compare());

@@ -225,36 +225,58 @@ struct Params
   {
   	static const float mutant_apparition_rate = 0.003f;
 
-#ifdef RATE01
+#ifdef RATE1
     // the mutation rate of the real-valued vector
     static const float mutation_rate = 0.01f;
-#elif defined(RATE03)
+#elif defined(RATE3)
     // the mutation rate of the real-valued vector
     static const float mutation_rate = 0.03f;
-#elif defined(RATE05)
+#elif defined(RATE5)
     // the mutation rate of the real-valued vector
     static const float mutation_rate = 0.05f;
-#elif defined(RATE001)
+#elif defined(RATE01)
     // the mutation rate of the real-valued vector
     static const float mutation_rate = 0.001f;
-#elif defined(RATE003)
+#elif defined(RATE03)
     // the mutation rate of the real-valued vector
     static const float mutation_rate = 0.003f;
-#elif defined(RATE005)
+#elif defined(RATE05)
     // the mutation rate of the real-valued vector
     static const float mutation_rate = 0.005f;
-#elif defined(RATE0003)
+#elif defined(RATE003)
     // the mutation rate of the real-valued vector
     static const float mutation_rate = 0.0003f;
-#elif defined(RATE0005)
+#elif defined(RATE005)
     // the mutation rate of the real-valued vector
     static const float mutation_rate = 0.0005f;
+#elif defined(RATE0001)
+    // the mutation rate of the real-valued vector
+    static const float mutation_rate = 0.00001f;
+#elif defined(RATE0003)
+    // the mutation rate of the real-valued vector
+    static const float mutation_rate = 0.00003f;
+#elif defined(RATE0005)
+    // the mutation rate of the real-valued vector
+    static const float mutation_rate = 0.00005f;
+#elif defined(RATE00001)
+    // the mutation rate of the real-valued vector
+    static const float mutation_rate = 0.000001f;
+#elif defined(RATE00003)
+    // the mutation rate of the real-valued vector
+    static const float mutation_rate = 0.000003f;
+#elif defined(RATE00005)
+    // the mutation rate of the real-valued vector
+    static const float mutation_rate = 0.000005f;
 #else
     // the mutation rate of the real-valued vector
     static const float mutation_rate = 0.003f;
 #endif
 
+#ifdef STRONG25
+    static const float strong_mutation_probability = 0.25f;
+#else
     static const float strong_mutation_probability = 0.01f;
+#endif
 
     static const float random_mutant_probability = 0.001f;
 
@@ -291,7 +313,7 @@ struct Params
   struct pop
   {
     // size of the population
-    static const unsigned size = 1000;
+    static const unsigned size = 100;
 
     // size of the population
     static const unsigned max_size = 1000;

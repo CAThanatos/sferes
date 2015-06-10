@@ -30,33 +30,15 @@ def build(bld):
 													 target = 'StagHunt',
 #                           json = 'StagHuntExp3.json',
 													 variants = [
-													 							# 'SETTING13 PREYS2',
-													 							# 'SETTING13 PREYS10',
-													 							# 'SETTING13',
-
-													 							# 'CONTROL1 BSTAG1000 BSTAG_SOLO1000 PREYS2',
-													 							# 'CONTROL1 BSTAG1000 BSTAG_SOLO1000 PREYS10',
-													 							# 'CONTROL1 BSTAG1000 BSTAG_SOLO1000',
-
-													 							# 'SETTING13 FITPROP FINITE RATE0005 BIG_MUTATION_RATE',
-
-													 							# 'SETTING13 FITPROP RATE003 INVASION01 BIG_MUTATION_RATE',
-													 							# 'SETTING13 FITPROP RATE005 INVASION01 BIG_MUTATION_RATE',
-													 							# 'SETTING13 FITPROP RATE003 INVASION01 BIG_MUTATION_RATE RANDOM_MUTANT',
-													 							# 'SETTING13 FITPROP RATE005 INVASION01 BIG_MUTATION_RATE RANDOM_MUTANT',
-
-													 							'SETTING13 FITPROP FINITE RATE0003 BIG_MUTATION_RATE',
-													 							# 'SETTING13 FITPROP FINITE RATE0005 BIG_MUTATION_RATE',
-													 							# 'SETTING13 FITPROP FINITE RATE0005 BIG_MUTATION_RATE POP_INIT50',
-													 							# 'SETTING13 FITPROP FINITE RATE0005 BIG_MUTATION_RATE POP_INIT100',
-
-													 							# 'SETTING15 PREYS2',
-													 							# 'SETTING15 PREYS10',
-													 							# 'SETTING15',
-
-													 							# 'CONTROL1 PREYS2',
-													 							# 'CONTROL1 PREYS10',
-													 							# 'CONTROL1',
+													 							'SETTING13 FITPROP FINITE RATE0005 BIG_MUTATION_RATE',
+													 							'SETTING13 FITPROP FINITE RATE0001 BIG_MUTATION_RATE',
+													 							'SETTING13 FITPROP FINITE RATE00005 BIG_MUTATION_RATE',
+													 							'SETTING13 FITPROP FINITE RATE00001 BIG_MUTATION_RATE',
+													 							'SETTING13 FITPROP FINITE RATE0005 BIG_MUTATION_RATE POP_INIT50',
+													 							'SETTING13 FITPROP FINITE RATE0001 BIG_MUTATION_RATE POP_INIT50',
+													 							'SETTING13 FITPROP FINITE RATE00005 BIG_MUTATION_RATE POP_INIT50',
+													 							'SETTING13 FITPROP FINITE RATE00005 BIG_MUTATION_RATE STRONG25 POP_INIT50',
+													 							'SETTING13 FITPROP FINITE RATE00001 BIG_MUTATION_RATE POP_INIT50',
 																			])
 
 																			 

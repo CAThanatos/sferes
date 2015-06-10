@@ -248,10 +248,16 @@ struct Params
 
 #ifdef DOUBLE_NN
 #ifdef DUPLICATION
+#ifdef DECISION_MAPPING
+		static const size_t genome_size = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs + 2;
+#else
 		static const size_t genome_size = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs + 1;
+#endif
 #else
 #ifdef DECISION_THRESHOLD
 		static const size_t genome_size = ((Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs) * 2 + 1;
+#elif defined(CHOICE_ORDERED)
+		static const size_t genome_size = ((Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs) * 2 + 3;
 #else
 		static const size_t genome_size = ((Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs) * 2 + 2;
 #endif
@@ -260,6 +266,18 @@ struct Params
 		static const size_t genome_size = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + (Params::nn::nb_hidden + 3) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;
 #else
 		static const size_t genome_size = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;
+#endif
+
+#ifdef ERROR_CHOICE
+#ifdef ERROR10
+		static const float proba_error_choice = 0.1f;
+#elif defined(ERROR1)
+		static const float proba_error_choice = 0.01f;
+#elif defined(ERROR5)
+		static const float proba_error_choice = 0.05f;
+#else
+		static const float proba_error_choice = 0.1f;
+#endif
 #endif
 	};
 	
@@ -288,6 +306,10 @@ struct Params
   {
     // the mutation rate of the real-valued vector
     static const float mutation_rate = 0.003f;
+
+#ifdef STRONG_MUTATION
+    static const float strong_mutation_rate = 0.001f;
+#endif
 
 #ifndef GAUSSIAN_MUTATION
     // we choose the polynomial mutation type
