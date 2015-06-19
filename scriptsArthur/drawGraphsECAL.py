@@ -351,6 +351,81 @@ def drawHuntingTask() :
 	plt.close()
 
 
+	# Proportion of cooperation
+	fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+	# plt.axes(frameon=0)
+	plt.grid()
+
+	cptData = 0
+	for data in dataHash :
+		dataPlot = []
+		hashFitness = data['hashFitness']
+		hashNbBStags = data['hashNbBStags']
+		hashNbBStagsDuo = data['hashNbBStagsDuo']
+		hashNbHares = data['hashNbHares']
+
+		for evaluation in tabPlotEvaluation :
+			proportionEval = float(len([run for run in hashFitness.keys() if hashNbBStagsDuo[run][evaluation] > hashNbHares[run][evaluation] and hashNbBStagsDuo[run][evaluation] > 1]))/float(len(hashFitness.keys()))
+
+			dataPlot.append(proportionEval)
+
+		axe1.plot(range(len(dataPlot)), dataPlot, color=palette[cptData], linestyle=linestyles[cptData], linewidth=linewidth, marker=markers[cptData])
+
+		cptData += 1
+
+
+	# tabPlotTicks = []
+	# for generation in tabPlotGeneration :
+	# 	if generation > maxGen :
+	# 		tabPlotTicks.append(maxGen)
+	# 	else :
+	# 		tabPlotTicks.append(generation)
+
+	# ticks = range(0, len(tabPlotGeneration), int(len(tabPlotGeneration)/5))
+	# if len(tabPlotGeneration) - 1 not in ticks :
+	# 	ticks.append(len(tabPlotGeneration) - 1)
+
+	# axe1.set_xticks(ticks)
+	# axe1.set_xticklabels([tabPlotTicks[x] for x in ticks])
+	# axe1.set_xlabel("Generation")
+	# axe1.set_xlim(0, len(tabPlotGeneration) - 1)
+
+	# axe1.set_ylabel("Proportion of Cooperative Runs")
+	# axe1.set_ylim(-0.1, 1.1)
+
+	tabPlotTicks = []
+	for eval in tabPlotEvaluation :
+		if eval > maxEval :
+			tabPlotTicks.append(maxEval)
+		else :
+			tabPlotTicks.append(eval)
+
+	ticks = range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/2))
+	if len(tabPlotEvaluation) - 1 not in ticks :
+		ticks.append(len(tabPlotEvaluation) - 1)
+
+	tabPlotTicks[ticks[0]] = 0
+	tabPlotTicks[ticks[1]] = 20000
+	tabPlotTicks[ticks[2]] = 40000
+
+	axe1.set_xticks(ticks)
+	axe1.set_xticklabels([tabPlotTicks[x] for x in ticks])
+	axe1.set_xlabel("Evaluation")
+	axe1.set_xlim(0, len(tabPlotEvaluation) - 1)
+
+	axe1.set_ylabel("Proportion of Cooperative Runs")
+	axe1.set_ylim(-0.1, 1.1)
+
+	# legend = plt.legend(['Control Without Leadership', 'Control With Leaderhip', 'Without Leadership', 'With Leadership'], loc = 4, frameon=True)
+	# frame = legend.get_frame()
+	# frame.set_facecolor('0.9')
+	# frame.set_edgecolor('0.9')
+
+	plt.savefig(outputDir + "/proportionCooperation.png", bbox_inches = 'tight')
+	plt.savefig(outputDir + "/proportionCooperation.svg", bbox_inches = 'tight')
+	plt.close()
+
+
 
 def drawWaypointsTask() :
 	if os.path.isdir(outputDir) :
