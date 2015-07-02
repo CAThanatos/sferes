@@ -185,9 +185,9 @@ namespace sferes
 #endif
 							
 				// We modify the step_size
-				float ps = successful_offsprings/(float)lambda;
-				float factor = (1.0f/3.0f) * (ps - 0.2f) / (1.0f - 0.2f);
-				_step_size = _step_size * exp(factor);
+				// float ps = successful_offsprings/(float)lambda;
+				// float factor = (1.0f/3.0f) * (ps - 0.2f) / (1.0f - 0.2f);
+				// _step_size = _step_size * exp(factor);
 
 				assert(this->_pop.size() == mu);
 

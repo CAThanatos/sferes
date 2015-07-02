@@ -3,10 +3,6 @@
 
 #include <sferes/gen/evo_float.hpp>
 
-#ifndef FITPROP
-#define ELITIST
-#endif
-
 #define GAUSSIAN_MUTATION
 
 #define NO_BOOLEAN
@@ -250,8 +246,12 @@ struct Params
   	static const float mutation_rate = 0.00005f;
 #elif defined(RATE0001)
   	static const float mutation_rate = 0.00001f;
-#elif defined(RATEONEPLUSONE)
+#elif defined(RATE100)
+  	static const float mutation_rate = 1.0f;
+#elif defined(RATE150)
   	static const float mutation_rate = 1.518f;
+#elif defined(RATE300)
+  	static const float mutation_rate = 3.0f;
 #else
     // the mutation rate of the real-valued vector
     static const float mutation_rate = 0.001f;
@@ -525,7 +525,10 @@ struct Params
 #define CMAES_BOUNDARIES
 
 #ifdef ELITIST
+#ifndef NEVAL_PARENTS
 #define EVAL_PARENTS
+#endif
+
 #define N_PLUS_N_REPLACEMENT
 #endif
 

@@ -237,13 +237,13 @@ namespace sferes
 					assert(_nb_genotypes == 2);
 					if(_vec_fitness[1] > _vec_fitness[0])
 					{
-						this->_pop[1]->set_freq(1.0f)
-						this->_pop[0]->set_freq(0.0f)
+						this->_pop[1]->set_freq(1.0f);
+						this->_pop[0]->set_freq(0.0f);
 					}
 					else
 					{
-						this->_pop[1]->set_freq(0.0f)
-						this->_pop[0]->set_freq(1.0f)
+						this->_pop[1]->set_freq(0.0f);
+						this->_pop[0]->set_freq(1.0f);
 					}
 					break;
 #endif

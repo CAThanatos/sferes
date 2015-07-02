@@ -35,6 +35,19 @@ drawStatAnalysis = False
 removeOutput = False
 
 
+colorHaresSolo = 'lime'
+colorHaresDuo = 'green'
+colorErrorHares = 'black'
+alphaHares = 1
+colorBStagsSolo = 'magenta'
+colorBStagsDuo = 'purple'
+colorErrorBStags = 'black'
+alphaBStags = 1
+colorTotal = 'grey'
+colorErrorTotal = 'black'
+alphaTotal = 1
+
+
 
 # SEABORN
 sns.set()
@@ -54,6 +67,7 @@ matplotlib.rcParams['legend.fontsize'] = 25
 # GRAPHS GLOBAL VARIABLES
 linewidth = 2
 linestyles = ['-', '--', '-.']
+linestylesOff = ['-', '-', '-']
 markers = [None, None, None] #['o', '+', '*']
 
 dpi = 96
@@ -130,7 +144,7 @@ def drawHuntingTask() :
 					for line in data :
 						evaluation = line['evaluation']
 
-						# MERGE COEVO						
+						# # MERGE COEVO						
 						# if directoryCoevo :
 						# 	evaluation += 10
 
@@ -339,10 +353,10 @@ def drawHuntingTask() :
 	axe1.set_ylabel("Fitness")
 	# axe1.set_ylim(0, maxFitness + 0.1*maxFitness)
 
-	legend = plt.legend(['Control', 'Clonal', 'Coevolution'], loc = 4, frameon=True)
-	frame = legend.get_frame()
-	frame.set_facecolor('0.9')
-	frame.set_edgecolor('0.9')
+	# legend = plt.legend(['Control', 'Clonal', 'Coevolution'], loc = 4, frameon=True)
+	# frame = legend.get_frame()
+	# frame.set_facecolor('0.9')
+	# frame.set_edgecolor('0.9')
 
 	# axe1.set_title('Boxplot of best fitness')
 
@@ -365,11 +379,23 @@ def drawHuntingTask() :
 		hashNbHares = data['hashNbHares']
 
 		for evaluation in tabPlotEvaluation :
-			proportionEval = float(len([run for run in hashFitness.keys() if hashNbBStagsDuo[run][evaluation] > hashNbHares[run][evaluation] and hashNbBStagsDuo[run][evaluation] > 1]))/float(len(hashFitness.keys()))
+			proportionEval = float(len([run for run in hashFitness.keys() if evaluation in hashFitness[run] and hashNbBStagsDuo[run][evaluation] > hashNbHares[run][evaluation] and hashNbBStagsDuo[run][evaluation] > 1]))/float(len(hashFitness.keys()))
 
 			dataPlot.append(proportionEval)
 
-		axe1.plot(range(len(dataPlot)), dataPlot, color=palette[cptData], linestyle=linestyles[cptData], linewidth=linewidth, marker=markers[cptData])
+		cpt = 0
+		while cpt < len(dataPlot) :
+			if dataPlot[cpt] == 0 :
+				if cpt > 0 and cpt < len(dataPlot) - 1 :
+					dataPlot[cpt] = (dataPlot[cpt + 1] + dataPlot[cpt - 1])/2
+				elif cpt > 0 :
+					dataPlot[cpt] = dataPlot[cpt - 1]
+				else :
+					dataPlot[cpt] = dataPlot[cpt + 1]
+
+			cpt += 1
+
+		axe1.plot(range(len(dataPlot)), dataPlot, color=palette[cptData], linestyle=linestylesOff[cptData], linewidth=linewidth, marker=markers[cptData])
 
 		cptData += 1
 
@@ -414,9 +440,9 @@ def drawHuntingTask() :
 	axe1.set_xlim(0, len(tabPlotEvaluation) - 1)
 
 	axe1.set_ylabel("Proportion of Cooperative Runs")
-	axe1.set_ylim(-0.1, 1.1)
+	axe1.set_ylim(0.0, 1.0)
 
-	# legend = plt.legend(['Control Without Leadership', 'Control With Leaderhip', 'Without Leadership', 'With Leadership'], loc = 4, frameon=True)
+	# legend = plt.legend(['Control', 'Clonal', 'Coevolution'], loc = 4, frameon=True)
 	# frame = legend.get_frame()
 	# frame.set_facecolor('0.9')
 	# frame.set_edgecolor('0.9')
@@ -424,6 +450,79 @@ def drawHuntingTask() :
 	plt.savefig(outputDir + "/proportionCooperation.png", bbox_inches = 'tight')
 	plt.savefig(outputDir + "/proportionCooperation.svg", bbox_inches = 'tight')
 	plt.close()
+
+
+	# --- BARS ---
+	cptData = 0
+	tabDirs = ['Control','Clonal', 'Coevolution']
+	for data in dataHash :
+		outputData = os.path.join(outputDir, tabDirs[cptData])
+
+		if os.path.isdir(outputData) :
+			if removeOutput :
+				shutil.rmtree(outputData)
+				os.makedirs(outputData)
+		else :
+			os.makedirs(outputData)
+
+		hashNbHaresSolo = data['hashNbHaresSolo']
+		hashNbHaresDuo = data['hashNbHaresDuo']
+		hashNbBStagsSolo = data['hashNbBStagsSolo']
+		hashNbBStagsDuo = data['hashNbBStagsDuo']
+
+		for run in hashNbHaresSolo.keys() :
+			if run in [24, 8, 47, 41, 57] :
+				fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+				plt.grid()
+
+				width = 0.8
+
+				tabNbHaresSolo = [hashNbHaresSolo[run][evaluation] for evaluation in tabPlotEvaluation if evaluation in hashNbHaresSolo[run].keys()]
+				tabNbHaresDuo = [hashNbHaresDuo[run][evaluation] for evaluation in tabPlotEvaluation if evaluation in hashNbHaresDuo[run].keys()]
+				tabNbBStagsSolo = [hashNbBStagsSolo[run][evaluation] for evaluation in tabPlotEvaluation if evaluation in hashNbBStagsSolo[run].keys()]
+				tabNbBStagsDuo = [hashNbBStagsDuo[run][evaluation] for evaluation in tabPlotEvaluation if evaluation in hashNbBStagsDuo[run].keys()]
+
+				barNbHaresSolo = axe1.bar(range(len(tabNbHaresSolo)), tabNbHaresSolo, width = width, color = colorHaresSolo, alpha = alphaHares)
+				barNbHaresDuo = axe1.bar(range(len(tabNbHaresDuo)), tabNbHaresDuo, bottom = tabNbHaresSolo, width = width, color = colorHaresDuo, alpha = alphaHares)
+				barNbBStagsSolo = axe1.bar(range(len(tabNbBStagsSolo)), tabNbBStagsSolo, bottom = np.add(tabNbHaresDuo, tabNbHaresSolo), width = width, color = colorBStagsSolo, alpha = alphaBStags)
+				barNbBStagsDuo = axe1.bar(range(len(tabNbBStagsDuo)), tabNbBStagsDuo, bottom = np.add(tabNbBStagsSolo, np.add(tabNbHaresDuo, tabNbHaresSolo)), width = width, color = colorBStagsDuo, alpha = alphaBStags)
+
+				tabPlotTicks = []
+
+				ticks = range(0, len(tabNbHaresSolo), int(len(tabNbHaresSolo)/2))
+				if len(tabNbHaresSolo) - 1 not in ticks :
+					ticks.append(len(tabNbHaresSolo) - 1)
+
+				for eval in tabPlotEvaluation :
+					if eval > maxEval :
+						tabPlotTicks.append(maxEval)
+					else :
+						tabPlotTicks.append(eval)
+
+				# ticks = range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/2))
+				# if len(tabPlotEvaluation) - 1 not in ticks :
+				# 	ticks.append(len(tabPlotEvaluation) - 1)
+
+				tabPlotTicks[ticks[0]] = 0
+				tabPlotTicks[ticks[1]] = 20000
+				tabPlotTicks[ticks[2]] = 40000
+
+				axe1.set_xticks(ticks)
+				axe1.set_xticklabels([tabPlotTicks[x] for x in ticks])
+				axe1.set_xlabel("Evaluation")
+				axe1.set_xlim(0, len(tabNbHaresSolo) - 1)
+
+				axe1.set_ylabel("Number of targets collected")
+				axe1.set_ylim(0, 20)
+
+				# plt.legend([barNbHaresSolo, barNbHaresDuo, barNbBStagsSolo,  barNbBStagsDuo], ['Green solo', 'Green coop.', 'Purple solo', 'Purple coop.'], bbox_to_anchor=(0., 1.05, 1., .102), loc=3, ncol=2, mode="expand", borderaxespad=0.)
+				# plt.legend([barNbHaresSolo, barNbHaresDuo, barNbSStagsSolo, barNbSStagsDuo, barNbBStagsSolo,  barNbBStagsDuo], ['Hares solo', 'Hares coop.', 'Small stags solo', 'Small stags coop.', 'Big stags solo', 'Big stags coop.'], bbox_to_anchor=(0., 1.05, 1., .102), loc=3, ncol=2, mode="expand", borderaxespad=0.)
+
+				plt.savefig(outputData + "/preysRun" + str(run) + ".png", bbox_inches = 'tight')
+				plt.savefig(outputData + "/preysRun" + str(run) + ".svg", bbox_inches = 'tight')
+				plt.close()
+
+		cptData += 1
 
 
 
@@ -620,10 +719,10 @@ def drawWaypointsTask() :
 	axe1.set_ylabel("Fitness")
 	# axe1.set_ylim(0, maxFitness + 0.1*maxFitness)
 
-	legend = plt.legend(['Control', 'Clonal', 'Coevolution'], loc = 4, frameon=True)
-	frame = legend.get_frame()
-	frame.set_facecolor('0.9')
-	frame.set_edgecolor('0.9')
+	# legend = plt.legend(['Control', 'Clonal', 'Coevolution'], loc = 4, frameon=True)
+	# frame = legend.get_frame()
+	# frame.set_facecolor('0.9')
+	# frame.set_edgecolor('0.9')
 
 	# axe1.set_title('Boxplot of best fitness')
 
