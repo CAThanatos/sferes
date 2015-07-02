@@ -66,12 +66,12 @@ namespace sferes
       InvasionGen() : _data(Size) {}
 
       //@{
-      bool mutate() 
+      bool mutate(float step_size = 1.0f) 
       { 
       	bool mutation = false;
 
 #ifdef GAUSSIAN_MUTATION
-      	float mutation_rate = Params::evo_float::mutation_rate;
+      	float mutation_rate = Params::evo_float::mutation_rate/Params::nn::genome_size;
     
       	float sigma = Params::evo_float::sigma;
 				for (size_t i = 0; i < Size; i++)
@@ -94,7 +94,7 @@ namespace sferes
 		      	}
 		      	else
 						{
-							float f = _data[i] + misc::gaussian_rand<float>(0, sigma * sigma);
+							float f = _data[i] + step_size * misc::gaussian_rand<float>(0, sigma * sigma);
 							_data[i] = misc::put_in_range(f, 0.0f, 1.0f);
 						}
 
@@ -112,7 +112,7 @@ namespace sferes
 							1 - pow(2.0 * (1.0 - ri), 1.0 / (eta_m + 1.0));
 						assert(!std::isnan(delta_i));
 						assert(!std::isinf(delta_i));
-						float f = _data[i] + delta_i;
+						float f = _data[i] + step_size * delta_i;
 						_data[i] = misc::put_in_range(f, 0.0f, 1.0f);
 
 						mutation = true;

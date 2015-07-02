@@ -66,17 +66,30 @@ namespace sferes
       void random_pop()
       {
 				this->_pop.resize(mu);
+				int nb_indiv = 0;
 				BOOST_FOREACH(boost::shared_ptr<Phen>& indiv, this->_pop)
 				{
 					indiv = boost::shared_ptr<Phen>(new Phen());
 					indiv->random();
+					indiv->set_pop_pos(nb_indiv);
+
+					this->_eval.eval(this->_pop, nb_indiv, 0, nb_indiv + 1);
+					nb_indiv++;
 				}
 
-				this->_eval.eval(this->_pop, 0, this->_pop.size());
 				this->apply_modifier();
 				std::partial_sort(this->_pop.begin(), this->_pop.begin() + mu,
 							this->_pop.end(), fit::compare());
 				this->_pop.resize(mu);
+
+				for(size_t i = 0; i < this->_pop.size(); ++i)
+				{
+					float fitness = 0.0f;
+					for(size_t j = 0; j < this->_pop.size(); ++j)
+						fitness += this->_pop[i]->get_payoff(j);
+
+					this->_pop[i]->fit().set_value(fitness/(float)this->_pop.size());
+				}
       }
       
       void epoch()
@@ -106,16 +119,28 @@ namespace sferes
 				}
 				for(size_t i = 0; i < lambda; ++i)
 				{
+					child_pop[i]->set_pop_pos(mu + i);
 					selection_pop.push_back(child_pop[i]);
 				}
 				assert(selection_pop.size() == (mu + lambda));
-				
+
 				// Evaluation of the children and the parents if need be
 #ifdef EVAL_PARENTS
-				this->_eval.eval(selection_pop, 0, selection_pop.size());
+				for(size_t i = 0; i < selection_pop.size(); ++i)
+					this->_eval.eval(selection_pop, i, 0, selection_pop.size());
 #else
-				this->_eval.eval(selection_pop, mu, selection_pop.size());
+				for(size_t i = mu; i < selection_pop.size(); ++i)
+					this->_eval.eval(selection_pop, i, 0, selection_pop.size());
 #endif
+
+				for(size_t i = 0; i < selection_pop.size(); ++i)
+				{
+					float fitness = 0.0f;
+					for(size_t j = 0; j < selection_pop.size(); ++j)
+						fitness += selection_pop[i]->get_payoff(j);
+
+					selection_pop[i]->fit().set_value(fitness/(float)selection_pop.size());
+				}
 								
 				int successful_offsprings = 0;
 

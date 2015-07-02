@@ -31,7 +31,9 @@ namespace sferes
             (*this->_log_file) << "," << ea.pop()[i]->nb_nn1_chosen();
             (*this->_log_file) << "," << ea.pop()[i]->nb_bigger_nn1_chosen();
             (*this->_log_file) << "," << ea.pop()[i]->nb_role_divisions();
-            (*this->_log_file) << "," << ea.pop()[i]->genome_size() << std::endl;
+            (*this->_log_file) << "," << ea.pop()[i]->genome_size();
+            (*this->_log_file) << "," << ea.pop()[i]->fit_nn1();
+            (*this->_log_file) << "," << ea.pop()[i]->fit_nn2() << std::endl;;
           }
 				}
       }

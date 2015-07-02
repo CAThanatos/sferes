@@ -175,7 +175,13 @@ struct Params
 #ifdef TRACE_ONLY
 		static const int nb_trials = 20;
 #else
+#ifdef TRIALS25
+		static const int nb_trials = 25;
+#elif defined(TRIALS15)
+		static const int nb_trials = 15;
+#else
 		static const int nb_trials = 5;
+#endif
 #endif
 		
 		static const int nb_lasers = 12;
@@ -223,59 +229,39 @@ struct Params
 	
   struct evo_float
   {
-  	static const float mutant_apparition_rate = 0.003f;
+#ifdef NO_MUT_APP
+  	static const float mutant_apparition_rate = 0.0f;
+#else
+  	static const float mutant_apparition_rate = 0.001f;
+#endif
 
+    // the mutation rate of the real-valued vector
 #ifdef RATE1
-    // the mutation rate of the real-valued vector
-    static const float mutation_rate = 0.01f;
-#elif defined(RATE3)
-    // the mutation rate of the real-valued vector
-    static const float mutation_rate = 0.03f;
-#elif defined(RATE5)
-    // the mutation rate of the real-valued vector
-    static const float mutation_rate = 0.05f;
-#elif defined(RATE01)
-    // the mutation rate of the real-valued vector
-    static const float mutation_rate = 0.001f;
-#elif defined(RATE03)
-    // the mutation rate of the real-valued vector
-    static const float mutation_rate = 0.003f;
+  	static const float mutation_rate = 0.01f;
 #elif defined(RATE05)
-    // the mutation rate of the real-valued vector
-    static const float mutation_rate = 0.005f;
-#elif defined(RATE003)
-    // the mutation rate of the real-valued vector
-    static const float mutation_rate = 0.0003f;
+  	static const float mutation_rate = 0.005f;
+#elif defined(RATE01)
+  	static const float mutation_rate = 0.001f;
 #elif defined(RATE005)
-    // the mutation rate of the real-valued vector
-    static const float mutation_rate = 0.0005f;
-#elif defined(RATE0001)
-    // the mutation rate of the real-valued vector
-    static const float mutation_rate = 0.00001f;
-#elif defined(RATE0003)
-    // the mutation rate of the real-valued vector
-    static const float mutation_rate = 0.00003f;
+  	static const float mutation_rate = 0.0005f;
+#elif defined(RATE001)
+  	static const float mutation_rate = 0.0001f;
 #elif defined(RATE0005)
-    // the mutation rate of the real-valued vector
-    static const float mutation_rate = 0.00005f;
-#elif defined(RATE00001)
-    // the mutation rate of the real-valued vector
-    static const float mutation_rate = 0.000001f;
-#elif defined(RATE00003)
-    // the mutation rate of the real-valued vector
-    static const float mutation_rate = 0.000003f;
-#elif defined(RATE00005)
-    // the mutation rate of the real-valued vector
-    static const float mutation_rate = 0.000005f;
+  	static const float mutation_rate = 0.00005f;
+#elif defined(RATE0001)
+  	static const float mutation_rate = 0.00001f;
+#elif defined(RATEONEPLUSONE)
+  	static const float mutation_rate = 1.518f;
 #else
     // the mutation rate of the real-valued vector
-    static const float mutation_rate = 0.003f;
+    static const float mutation_rate = 0.001f;
 #endif
+
 
 #ifdef STRONG25
     static const float strong_mutation_probability = 0.25f;
 #else
-    static const float strong_mutation_probability = 0.01f;
+    static const float strong_mutation_probability = 0.1f;
 #endif
 
     static const float random_mutant_probability = 0.001f;
@@ -313,17 +299,29 @@ struct Params
   struct pop
   {
     // size of the population
+#ifdef ONEPLUSONE
+  	static const unsigned size = 2;
+#else
+#ifdef POP100
     static const unsigned size = 100;
+#elif defined(POP500)
+    static const unsigned size = 500;
+#elif defined(POP1000)
+    static const unsigned size = 1000;
+#else
+    static const unsigned size = 100;
+#endif
+#endif
 
     // size of the population
     static const unsigned max_size = 1000;
     
     // number of generations
-    static const unsigned nb_gen = 10000;
+    static const unsigned nb_gen = 100000;
     
     // how often should the result file be written (here, each 10
     // generation)
-    static const int dump_period = 10;
+    static const int dump_period = 100;
     
     // how often should the video be done
     static const int video_dump_period = 500;
@@ -343,8 +341,13 @@ struct Params
     static const int budget = 50000; //Params::pop::size * 850;
 
 #ifdef ELITIST
+#ifdef ONEPLUSONE
+		static const unsigned mu = 1;
+		static const unsigned lambda = 1;
+#else
 		static const unsigned mu = Params::pop::size/2;
 		static const unsigned lambda = Params::pop::size/2;
+#endif
 #endif
 
 #ifdef OPPONENTS1
@@ -392,7 +395,19 @@ struct Params
 #elif defined(POP_INIT100)
 		static const int pop_init = 100;
 #else
-		static const int pop_init = 10;
+		static const int pop_init = 1;
+#endif
+
+#ifdef MULTIPLE_OFFSPRINGS
+#ifdef OFF5
+		static const int nb_offsprings = Params::pop::size/20;
+#elif defined(OFF1)
+		static const int nb_offsprings = Params::pop::size/100;
+#else
+		static const int nb_offsprings = Params::pop::size/100;
+#endif
+#else
+		static const int nb_offsprings = 1;
 #endif
   };
   
@@ -464,6 +479,8 @@ struct Params
 
 #ifdef BSTAG_SOLO50
 #define FOOD_BIG_STAG_SOLO 50
+#elif defined(BSTAG_SOLO500)
+#define FOOD_BIG_STAG_SOLO 500
 #elif defined(BSTAG_SOLO1000)
 #define FOOD_BIG_STAG_SOLO 1000
 #else

@@ -286,6 +286,8 @@ namespace sferes
 					pop[i]->set_nb_nn1_chosen(pop[i]->nb_nn1_chosen_at());
 					pop[i]->set_nb_bigger_nn1_chosen(pop[i]->nb_bigger_nn1_chosen_at());
 					pop[i]->set_nb_role_divisions(pop[i]->nb_role_divisions_at());
+					pop[i]->set_fit_nn1(pop[i]->fit_nn1_at());
+					pop[i]->set_fit_nn2(pop[i]->fit_nn2_at());
 #endif
 
 #ifdef DIVERSITY

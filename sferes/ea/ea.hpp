@@ -344,6 +344,7 @@ namespace sferes
             exit(1);
           }
           
+          std::cout << "gaga" << std::endl;
 					_gen = atof(fname.substr(fname.find_last_of("_") + 1, fname.length() - 1).c_str());
           
           typedef boost::archive::binary_iarchive ia_t;

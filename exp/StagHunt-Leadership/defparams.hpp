@@ -256,7 +256,7 @@ struct Params
 #else
 #ifdef DECISION_THRESHOLD
 		static const size_t genome_size = ((Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs) * 2 + 1;
-#elif defined(CHOICE_ORDERED)
+#elif defined(CHOICE_ORDERED) && !defined(FORCE_LEADER)
 		static const size_t genome_size = ((Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs) * 2 + 3;
 #else
 		static const size_t genome_size = ((Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs) * 2 + 2;
@@ -276,7 +276,7 @@ struct Params
 #elif defined(ERROR5)
 		static const float proba_error_choice = 0.05f;
 #else
-		static const float proba_error_choice = 0.1f;
+		static const float proba_error_choice = 0.2f;
 #endif
 #endif
 	};

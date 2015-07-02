@@ -43,7 +43,9 @@ namespace sferes
           (*this->_log_file) << "," << _best->nb_nn1_chosen();
           (*this->_log_file) << "," << _best->nb_bigger_nn1_chosen();
           (*this->_log_file) << "," << _best->nb_role_divisions();
-          (*this->_log_file) << "," << _best->genome_size() << std::endl;
+          (*this->_log_file) << "," << _best->genome_size();
+          (*this->_log_file) << "," << _best->fit_nn1();
+          (*this->_log_file) << "," << _best->fit_nn2() << std::endl;
         }
       }
       void show(std::ostream& os, size_t k)

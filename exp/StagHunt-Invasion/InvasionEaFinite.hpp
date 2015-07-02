@@ -133,7 +133,7 @@ namespace sferes
 
 				if(fitness_tot > 0.0f)
 				{
-					for(size_t j = 0; j < Params::pop::size; ++j)
+					for(size_t j = 0; j < Params::pop::size; j += Params::pop::nb_offsprings)
 					{
 						float random_child = misc::rand(1.0f);
 						float fit_sum = 0.0f;
@@ -152,7 +152,7 @@ namespace sferes
 				}
 				else
 				{
-					for(size_t i = 0; i < Params::pop::size; ++i)
+					for(size_t i = 0; i < Params::pop::size; i += Params::pop::nb_offsprings)
 					{
 						int random_child = misc::rand((int)0, (int)old_nb_genotypes);
 						assert(random_child >= 0 && random_child < old_nb_genotypes);
@@ -263,17 +263,19 @@ namespace sferes
 				mutation = offspring->gen().mutate();
 #endif
 
+				float freq_offsprings = (float)Params::pop::nb_offsprings/(float)Params::pop::size;
+
 				if(mutation)
 				{
 					pop_offsprings[_nb_genotypes] = offspring;
 					pop_offsprings[_nb_genotypes]->set_pop_pos(_nb_genotypes);
-					pop_offsprings[_nb_genotypes]->set_freq(1.0f/(float)Params::pop::size);
+					pop_offsprings[_nb_genotypes]->set_freq(freq_offsprings);
 
 					_nb_genotypes++;
 				}
 				else
 				{
-					pop_offsprings[pos_parent]->set_freq(pop_offsprings[pos_parent]->get_freq() + 1.0f/(float)Params::pop::size);
+					pop_offsprings[pos_parent]->set_freq(pop_offsprings[pos_parent]->get_freq() + freq_offsprings);
 				}
     	}
 

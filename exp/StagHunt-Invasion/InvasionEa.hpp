@@ -208,8 +208,8 @@ namespace sferes
 				// }
 
 				// We compute the equilibrium
-				int max_generations = 10000;
-				int generation = 0;
+				int max_iterations = 10000;
+				int iteration = 0;
 				float proba;
 				float modif;
 				do
@@ -233,6 +233,21 @@ namespace sferes
 					if(fitnessMean <= 0.0f)
 						break;
 
+#ifdef NO_FREQ_DEP
+					assert(_nb_genotypes == 2);
+					if(_vec_fitness[1] > _vec_fitness[0])
+					{
+						this->_pop[1]->set_freq(1.0f)
+						this->_pop[0]->set_freq(0.0f)
+					}
+					else
+					{
+						this->_pop[1]->set_freq(0.0f)
+						this->_pop[0]->set_freq(1.0f)
+					}
+					break;
+#endif
+
 					for(size_t i = 0; i < _nb_genotypes; ++i)
 					{
 						float old_freq = this->_pop[i]->get_freq();
@@ -248,11 +263,11 @@ namespace sferes
 					}
 					modif /= _nb_genotypes;
 
-					generation++;
+					iteration++;
 					proba = misc::rand(1.0f);
 
 					// We continue while we still have computation time AND there has been more than 1% modification AND no new mutant appeared
-				}	while((generation < max_generations) && (proba > Params::evo_float::mutant_apparition_rate) && (modif > 0.01f));
+				}	while((iteration < max_iterations) && (proba < Params::evo_float::mutant_apparition_rate) && (modif > 0.01f));
 
 				// We update the population: we remove the genotypes with freq = 0
 				vec_remove_genotypes.clear();

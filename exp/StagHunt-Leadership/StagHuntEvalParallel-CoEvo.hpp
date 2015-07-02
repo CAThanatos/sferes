@@ -196,6 +196,7 @@ namespace sferes
       }
     };
 
+#ifdef NOVELTY
 		float dist(std::vector<float> v1, std::vector<float> v2)
 		{
 			assert(v1.size() == v2.size());
@@ -214,13 +215,14 @@ namespace sferes
 
 			return sqrtf(dist)/sqrt(v1.size());
 		}
+#endif
 
     SFERES_CLASS(StagHuntEvalParallelCoEvo)
     {
     public:
 	    enum status_t { free = 0, obstacle = 255 };
 
-    	StagHuntEvalParallel() : _nb_eval(0) 
+    	StagHuntEvalParallelCoEvo() : _nb_eval(0) 
     	{ 
 #ifdef NOVELTY
     		_nov_min = Params::novelty::nov_min;

@@ -368,7 +368,12 @@ namespace sferes
 				if(data.size() > (nb_weights + 1))
 				{
 #ifdef DECISION_THRESHOLD
+#ifdef CHOICE_ORDERED
+					float threshold = ((data[nb_weights * 2] - Params::parameters::min)/(Params::parameters::max - Params::parameters::min) * 3.0f) - 1.0f;
+#else
 					float threshold = ((data[nb_weights * 2]/Params::parameters::max) + 1.0f)/2.0f;
+#endif
+
 					if(diff_hunters > threshold)
 						first_weight = nb_weights;
 #elif defined(DECISION_MAPPING)

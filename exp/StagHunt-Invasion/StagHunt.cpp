@@ -577,6 +577,10 @@ int main(int argc, char **argv)
 	// EVOLUTION ALGORITHM
 #ifdef FINITE
 	typedef ea::InvasionEaFinite<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
+#elif defined(ELITIST)
+	typedef ea::Elitist<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
+#elif defined(INFINITE)
+	typedef ea::InvasionEa<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
 #else
 	typedef ea::InvasionEa<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
 #endif

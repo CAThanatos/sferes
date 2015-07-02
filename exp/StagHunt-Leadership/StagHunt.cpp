@@ -84,6 +84,8 @@ namespace sferes
 			float nb_nn1_chosen = 0;
 			float nb_bigger_nn1_chosen = 0;
 			float nb_role_divisions = 0;
+			float fit_nn1 = 0;
+			float fit_nn2 = 0;
 #endif
 
 #ifdef DIVERSITY
@@ -153,14 +155,41 @@ namespace sferes
 					hunter2->choose_nn(ind2.data(), 1);
 				}
 #elif defined(CHOICE_ORDERED)
+				int choice_leader;
 				if(hunter1->is_leader())
 				{
-					int choice_leader = hunter1->choose_nn(ind1.data(), -1);
+#ifdef FORCE_LEADER
+					if(misc::rand<float>() < 0.5f)
+					{
+						choice_leader = 0;
+						hunter1->choose_nn(1, ind1.data());
+					}
+					else
+					{
+						choice_leader = 1;
+						hunter1->choose_nn(2, ind1.data());
+					}
+#else
+					choice_leader = hunter1->choose_nn(ind1.data(), -1);
+#endif
 					hunter2->choose_nn(ind2.data(), choice_leader);
 				}
 				else
 				{
-					int choice_leader = hunter2->choose_nn(ind2.data(), -1);
+#ifdef FORCE_LEADER
+					if(misc::rand<float>() < 0.5f)
+					{
+						choice_leader = 0;
+						hunter2->choose_nn(1, ind2.data());
+					}
+					else
+					{
+						choice_leader = 1;
+						hunter2->choose_nn(2, ind2.data());
+					}
+#else
+					choice_leader = hunter2->choose_nn(ind2.data(), -1);
+#endif
 					hunter1->choose_nn(ind1.data(), choice_leader);
 				}
 #else
@@ -435,6 +464,13 @@ namespace sferes
        	if(_nb_preys_killed_coop_trial > 0)
 	       	proportion_leader += fabs(0.5 - (_nb_leader_first_trial/_nb_preys_killed_coop_trial));//*(_nb_preys_killed_coop_trial/max_hunts);
 
+#ifdef DOUBLE_NN
+				if(hunter1->nn1_chosen())
+					fit_nn1 += food_trial;
+				else
+					fit_nn2 += food_trial;
+#endif
+
 #ifdef DIVERSITY
 	      for (size_t l = 0; l < vec_sm_trial.size(); ++l)
 	      	vec_sm.push_back(vec_sm_trial[l]);
@@ -486,6 +522,8 @@ namespace sferes
 			nb_nn1_chosen /= Params::simu::nb_trials;
 			nb_bigger_nn1_chosen /= Params::simu::nb_trials;
 			nb_role_divisions /= Params::simu::nb_trials;
+			fit_nn1 /= Params::simu::nb_trials;
+			fit_nn2 /= Params::simu::nb_trials;
 #endif
 		
 #ifdef NOT_AGAINST_ALL	
@@ -533,10 +571,14 @@ namespace sferes
 			nb_nn1_chosen /= nb_encounters;
 			nb_bigger_nn1_chosen /= nb_encounters;
 			nb_role_divisions /= nb_encounters;
+			fit_nn1 /= nb_encounters;
+			fit_nn2 /= nb_encounters;
 
 			ind1.add_nb_nn1_chosen(nb_nn1_chosen);
 			ind1.add_nb_bigger_nn1_chosen(nb_bigger_nn1_chosen);
 			ind1.add_nb_role_divisions(nb_role_divisions);
+			ind1.add_fit_nn1(fit_nn1);
+			ind1.add_fit_nn2(fit_nn2);
 #endif
      	
      	food2 /= nb_encounters;
@@ -1004,7 +1046,8 @@ int main(int argc, char **argv)
   typedef boost::fusion::vector<
 #ifdef COEVO
 		  sferes::stat::BestFitEvalCoEvo<phen_t, Params>,
-		  // sferes::stat::MeanFitEvalCoEvo<phen_t, Params>,
+		  sferes::stat::MeanFitEvalCoEvo<phen_t, Params>,
+		  sferes::stat::BestEverFitEvalCoEvo<phen_t, Params>,
 		  sferes::stat::AllFitEvalStatCoEvo<phen_t, Params>,
 		  sferes::stat::BestLeadershipEvalCoEvo<phen_t, Params>,
 		  sferes::stat::AllLeadershipEvalStatCoEvo<phen_t, Params>,
@@ -1013,7 +1056,8 @@ int main(int argc, char **argv)
 #endif
 #else
 		  sferes::stat::BestFitEval<phen_t, Params>,
-		  // sferes::stat::MeanFitEval<phen_t, Params>,
+		  sferes::stat::MeanFitEval<phen_t, Params>,
+		  sferes::stat::BestEverFitEval<phen_t, Params>,
 		  sferes::stat::AllFitEvalStat<phen_t, Params>,
 		  sferes::stat::BestLeadershipEval<phen_t, Params>,
 		  sferes::stat::AllLeadershipEvalStat<phen_t, Params>,

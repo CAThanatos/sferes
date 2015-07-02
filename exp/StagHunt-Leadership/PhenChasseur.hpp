@@ -83,6 +83,8 @@ namespace sferes
 					_nb_nn1_chosen = 0;
 					_nb_bigger_nn1_chosen = 0;
 					_nb_role_divisions = 0;
+					_fit_nn1 = 0;
+					_fit_nn2 = 0;
 #endif
 					_fit_mov = 0;
 					
@@ -102,6 +104,8 @@ namespace sferes
 					_nb_nn1_chosen_at = 0;
 					_nb_bigger_nn1_chosen_at = 0;
 					_nb_role_divisions_at = 0;
+					_fit_nn1_at = 0;
+					_fit_nn2_at = 0;
 #endif
 					this->fit().fitness_at = 0;
 
@@ -198,6 +202,20 @@ namespace sferes
 
 
 #ifdef DOUBLE_NN
+		    float fit_nn1() const { return _fit_nn1; }
+		    void set_fit_nn1(float fit_nn1) { _fit_nn1 = fit_nn1; }
+		    
+		    float fit_nn1_at() const { return _fit_nn1_at; }
+		    void add_fit_nn1(float fit_nn1) { _fit_nn1_at.fetch_and_store(_fit_nn1_at + fit_nn1); }
+
+
+		    float fit_nn2() const { return _fit_nn2; }
+		    void set_fit_nn2(float fit_nn2) { _fit_nn2 = fit_nn2; }
+		    
+		    float fit_nn2_at() const { return _fit_nn2_at; }
+		    void add_fit_nn2(float fit_nn2) { _fit_nn2_at.fetch_and_store(_fit_nn2_at + fit_nn2); }
+
+
 		    float nb_nn1_chosen() const { return _nb_nn1_chosen; }
 		    void set_nb_nn1_chosen(float nb_nn1_chosen) { _nb_nn1_chosen = nb_nn1_chosen; }
 		    
@@ -360,6 +378,14 @@ namespace sferes
 		    // Total number of times the first nn was chosen
 		    float _nb_nn1_chosen;
 		    tbb::atomic<float> _nb_nn1_chosen_at;
+
+		    // Fitness of the first NN
+		    float _fit_nn1;
+		    tbb::atomic<float> _fit_nn1_at;
+
+		    // Fitness of the second NN
+		    float _fit_nn2;
+		    tbb::atomic<float> _fit_nn2_at;
 
 		    // Number of times the first nn was chosen when the random number was bigger
 		    float _nb_bigger_nn1_chosen;
