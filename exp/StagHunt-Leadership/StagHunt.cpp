@@ -135,13 +135,50 @@ namespace sferes
 #ifdef NN_LEADER
 				if(hunter1->is_leader())
 				{
-					hunter1->choose_nn(1, ind1.data());
-					hunter2->choose_nn(2, ind1.data());
+					hunter1->choose_nn(0, ind1.data());
+					hunter2->choose_nn(1, ind1.data());
 				}
 				else
 				{
-					hunter1->choose_nn(2, ind1.data());
-					hunter2->choose_nn(1, ind1.data());
+					hunter1->choose_nn(1, ind1.data());
+					hunter2->choose_nn(0, ind1.data());
+				}
+#elif defined(NO_CHOICE_DUP)
+				int nb_weights = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;
+
+				if(ind1.data().size() == (nb_weights + 1))
+				{
+					hunter1->choose_nn(0, ind1.data());
+
+					if((ind2.data().size() == (nb_weights + 1)) || (misc::rand<float>() < 0.5f))
+						hunter2->choose_nn(0, ind2.data());
+					else
+						hunter2->choose_nn(1, ind2.data());
+				}	
+				else
+				{
+					if(ind2.data().size() == (nb_weights + 1))
+					{
+						if(misc::rand<float>() < 0.5f)
+							hunter1->choose_nn(0, ind1.data());
+						else
+							hunter1->choose_nn(1, ind1.data());
+
+						hunter2->choose_nn(0, ind2.data());
+					}
+					else
+					{
+						if(rand1 > rand2)
+						{
+							hunter1->choose_nn(0, ind1.data());
+							hunter2->choose_nn(1, ind2.data());
+						}
+						else
+						{
+							hunter1->choose_nn(1, ind1.data());
+							hunter2->choose_nn(0, ind2.data());
+						}
+					}
 				}
 #elif defined(BINARY_DIFF)
 				if(rand1 > rand2)
@@ -162,12 +199,12 @@ namespace sferes
 					if(misc::rand<float>() < 0.5f)
 					{
 						choice_leader = 0;
-						hunter1->choose_nn(1, ind1.data());
+						hunter1->choose_nn(0, ind1.data());
 					}
 					else
 					{
 						choice_leader = 1;
-						hunter1->choose_nn(2, ind1.data());
+						hunter1->choose_nn(1, ind1.data());
 					}
 #else
 					choice_leader = hunter1->choose_nn(ind1.data(), -1);
@@ -180,12 +217,12 @@ namespace sferes
 					if(misc::rand<float>() < 0.5f)
 					{
 						choice_leader = 0;
-						hunter2->choose_nn(1, ind2.data());
+						hunter2->choose_nn(0, ind2.data());
 					}
 					else
 					{
 						choice_leader = 1;
-						hunter2->choose_nn(2, ind2.data());
+						hunter2->choose_nn(1, ind2.data());
 					}
 #else
 					choice_leader = hunter2->choose_nn(ind2.data(), -1);

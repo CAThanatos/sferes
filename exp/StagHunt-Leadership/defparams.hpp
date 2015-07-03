@@ -347,7 +347,7 @@ struct Params
 #elif defined(DUP1)
     static const float duplication_rate = 0.01f;
 #else
-    static const float duplication_rate = 0.01f;
+    static const float duplication_rate = 0.05f;
 #endif
     static const float deletion_rate = 0.005f;
 #endif

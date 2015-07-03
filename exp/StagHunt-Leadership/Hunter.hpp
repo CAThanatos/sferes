@@ -455,7 +455,7 @@ namespace sferes
 				_weights.resize(nb_weights);
 
 				int first_weight = 0;
-				if(nn_chosen > 1)
+				if(nn_chosen >= 1)
 					first_weight = nb_weights;
 
 				if(first_weight == 0)
