@@ -85,10 +85,28 @@ namespace sferes
 				for(size_t i = 0; i < this->_pop.size(); ++i)
 				{
 					float fitness = 0.0f;
+					float nb_hares = 0, nb_hares_solo = 0;
+					float nb_sstags = 0, nb_sstags_solo = 0;
+					float nb_bstags = 0, nb_bstags_solo = 0;
+
 					for(size_t j = 0; j < this->_pop.size(); ++j)
+					{
 						fitness += this->_pop[i]->get_payoff(j);
 
+						nb_hares += this->_pop[i]->get_nb_hares(j);
+						nb_hares_solo += this->_pop[i]->get_nb_hares_solo(j);
+
+						nb_sstags += this->_pop[i]->get_nb_sstags(j);
+						nb_sstags_solo += this->_pop[i]->get_nb_sstags_solo(j);
+
+						nb_bstags += this->_pop[i]->get_nb_bstags(j);
+						nb_bstags_solo += this->_pop[i]->get_nb_bstags_solo(j);
+					}
+
 					this->_pop[i]->fit().set_value(fitness/(float)this->_pop.size());
+					this->_pop[i]->set_nb_hares(nb_hares/(float)this->_pop.size(), nb_hares_solo/(float)this->_pop.size());
+					this->_pop[i]->set_nb_sstags(nb_sstags/(float)this->_pop.size(), nb_sstags_solo/(float)this->_pop.size());
+					this->_pop[i]->set_nb_bstags(nb_bstags/(float)this->_pop.size(), nb_bstags_solo/(float)this->_pop.size());
 				}
       }
       
@@ -136,10 +154,28 @@ namespace sferes
 				for(size_t i = 0; i < selection_pop.size(); ++i)
 				{
 					float fitness = 0.0f;
+					float nb_hares = 0, nb_hares_solo = 0;
+					float nb_sstags = 0, nb_sstags_solo = 0;
+					float nb_bstags = 0, nb_bstags_solo = 0;
+
 					for(size_t j = 0; j < selection_pop.size(); ++j)
+					{
 						fitness += selection_pop[i]->get_payoff(j);
 
+						nb_hares += selection_pop[i]->get_nb_hares(j);
+						nb_hares_solo += selection_pop[i]->get_nb_hares_solo(j);
+
+						nb_sstags += selection_pop[i]->get_nb_sstags(j);
+						nb_sstags_solo += selection_pop[i]->get_nb_sstags_solo(j);
+
+						nb_bstags += selection_pop[i]->get_nb_bstags(j);
+						nb_bstags_solo += selection_pop[i]->get_nb_bstags_solo(j);
+					}
+
 					selection_pop[i]->fit().set_value(fitness/(float)selection_pop.size());
+					selection_pop[i]->set_nb_hares(nb_hares/(float)selection_pop.size(), nb_hares_solo/(float)selection_pop.size());
+					selection_pop[i]->set_nb_sstags(nb_sstags/(float)selection_pop.size(), nb_sstags_solo/(float)selection_pop.size());
+					selection_pop[i]->set_nb_bstags(nb_bstags/(float)selection_pop.size(), nb_bstags_solo/(float)selection_pop.size());
 				}
 								
 				int successful_offsprings = 0;
@@ -185,9 +221,9 @@ namespace sferes
 #endif
 							
 				// We modify the step_size
-				// float ps = successful_offsprings/(float)lambda;
-				// float factor = (1.0f/3.0f) * (ps - 0.2f) / (1.0f - 0.2f);
-				// _step_size = _step_size * exp(factor);
+				float ps = successful_offsprings/(float)lambda;
+				float factor = (1.0f/3.0f) * (ps - 0.2f) / (1.0f - 0.2f);
+				_step_size = _step_size * exp(factor);
 
 				assert(this->_pop.size() == mu);
 

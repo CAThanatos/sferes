@@ -30,38 +30,47 @@ do
 done
 
 
-if [[ -z $site ]]
-then
-	for i in rennes grenoble lille luxembourg lyon nancy reims sophia toulouse nantes; do
-		checkSite=
+for i in rennes grenoble lille luxembourg lyon nancy reims sophia toulouse nantes; do
+	submitSite=
 
-		while true; do
-			read -p "Submit on $i ? (Y/N)" yn
-			case $yn in
-				[Yy]* ) checkSite=true; break;;
-				[Nn]* ) checkSite=false; break;;
-				* ) echo "'No' considered."; checkSite=false; break;;
-			esac
-		done
-
-		if [ $checkSite = true ]
-		then
-			read -p "Number of nodes : " nodes
-
-			read -p
-			echo "Number of nodes : "
-			ssh $i.g5k ./count.sh
-
-			echo "Nodes : "
-			ssh $i.g5k ls -ald *.grid5000.fr_*
-		fi
+	while true; do
+		read -p "Submit on $i ? (Y/N)" yn
+		case $yn in
+			[Yy]* ) submitSite=true; break;;
+			[Nn]* ) submitSite=false; break;;
+			* ) echo "'No' considered."; submitSite=false; break;;
+		esac
 	done
-else
-	echo "Checking on $site..."
 
-	echo "Number of runs : "
-	ssh $site.g5k ./count.sh
+	if [ $submitSite = true ]
+	then
+		nodes=
+		read -p "Number of nodes : " nodes
 
-	echo "Nodes : "
-	ssh $site.g5k ls -ald *.grid5000.fr_*
-fi
+		day=
+		read -p "Day of submit : " day
+
+		dayInt=
+		case $day in
+			tomorrow | t ) dayInt=-2; break;;
+			today | R ) dayInt=-1; break;;
+			lundi | monday | l ) dayInt=0; break;;
+			mardi | tuesday | m ) dayInt=1; break;;
+			mercredi | wednesday | M ) dayInt=2; break;;
+			jeudi | thursday | j ) dayInt=3; break;;
+			vendredi | friday | v | w ) dayInt=4; break;;
+			* ) dayInt=-1; break;;
+		esac
+
+		case $dayInt in
+			-2 ) ssh $i.g5k ./runExpe.sh -n $nodes -t; break;;
+			-1 ) ssh $i.g5k ./runExpe.sh -n $nodes -R; break;;
+			0 ) ssh $i.g5k ./runExpe.sh -n $nodes -M; break;;
+			1 ) ssh $i.g5k ./runExpe.sh -n $nodes -T; break;;
+			2 ) ssh $i.g5k ./runExpe.sh -n $nodes -E; break;;
+			3 ) ssh $i.g5k ./runExpe.sh -n $nodes -H; break;;
+			4 ) ssh $i.g5k ./runExpe.sh -n $nodes -W; break;;
+			* ) ssh $i.g5k ./runExpe.sh -n $nodes -R; break;;
+		esac
+	fi
+done
