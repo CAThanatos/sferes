@@ -196,9 +196,10 @@ namespace fastsim
 
     // Draws a rectangle with (x,y) the upper left point and (lx,ly) the size
     void draw_rect(int x, int y, int lx, int ly);
-    
+
     bool check_collision(float x, float y, float radius);
 	  bool get_random_initial_position(float radius, Posture &pos, int max_tries = 1000);
+    bool get_random_initial_position(float radius, Posture &pos, int max_tries = 1000, bool avoid_start_pos = false);
     bool get_random_initial_position(float radius, fastsim::Posture &pos, float x_min_lim, float x_max_lim, float y_min_lim, float y_max_lim, int max_tries = 1000);
 	  bool get_random_initial_position_circle(float radius, Posture &pos, float circle_radius, int max_tries = 1000);
 #ifdef LOG_BEHAVIOR

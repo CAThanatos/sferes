@@ -501,13 +501,19 @@ namespace fastsim
     return false;
   }
 			  
-  bool Map::get_random_initial_position(float radius, fastsim::Posture &pos, int max_tries)
+  bool Map::get_random_initial_position(float radius, fastsim::Posture &pos, int max_tries, bool avoid_start_pos)
   {
 		// We don't want robots to appear outside of the map
 		float x_min = radius + 1;
 		float x_max = _real_w - radius - 1;
 		float y_min = x_min;
 		float y_max = _real_h - radius - 1;
+
+		float lim_x_min = _real_w/2.0f - 4.0f*radius;
+		float lim_x_max = _real_w/2.0f + 4.0f*radius;
+		float lim_y_min = y_min + 4.0f*radius;
+		float lim_y_max = y_max - 4.0f*radius;
+		std::cout << "(" << lim_x_min << "," << lim_x_max << "/" << "(" << lim_y_min << "," << lim_y_max << ")" << std::endl;
 
 		bool found = false;
 		float rand_x = 0;
@@ -516,6 +522,17 @@ namespace fastsim
 		{
 			rand_x = sferes::misc::rand(x_min, x_max);
 			rand_y = sferes::misc::rand(y_min, y_max);
+
+			if(avoid_start_pos)
+			{
+				std::cout << "-> " << rand_x << "/" << rand_y << std::endl;
+				if(rand_y >= lim_y_max || rand_y <= lim_y_min)
+					if(rand_x <= lim_x_max && rand_x >= lim_x_min)
+					{
+						std::cout << "BOOM" << std::endl;
+						continue;
+					}
+			}
 	
 			// We don't want this robot to collide with anything
 			if(!check_collision(rand_x, rand_y, radius))

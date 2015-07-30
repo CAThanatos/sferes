@@ -141,9 +141,9 @@ namespace sferes
         // Used to get a random initial position in the map for a robot. Not a very smart function so it's encouraged
         // to use your own list of initial positions in a map with a lot of obstacles and/or robots as is
         // could take a pretty long time for this function to get a valid position
-        bool get_random_initial_position(float radius, fastsim::Posture &pos, int max_tries = 1000)
+        bool get_random_initial_position(float radius, fastsim::Posture &pos, int max_tries = 1000, bool avoid_start_pos = false)
         {
-            return _map->get_random_initial_position(radius, pos, max_tries);
+            return _map->get_random_initial_position(radius, pos, max_tries, avoid_start_pos);
         }
 
         				

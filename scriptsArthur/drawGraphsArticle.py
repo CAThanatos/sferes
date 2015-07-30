@@ -258,35 +258,36 @@ def drawAllFit(dossier) :
 
 			cpt += 1
 
-		axe1.set_ylim(-5, 105)
+		# axe1.set_ylim(-5, 105)
+		axe1.set_ylim(0, 100)
 
 		sortedVals = zip(*(sorted(zip(lastVals, range(len(lastVals))), key = itemgetter(0))))
 		sortedLastVals = sortedVals[0]
 		sortedIndexes = sortedVals[1]
 
 		# Create new axes on the right containing captions
-		# divider = make_axes_locatable(axe1)
-		# rax = divider.append_axes("right", size="25%", pad=0.00)
+		divider = make_axes_locatable(axe1)
+		rax = divider.append_axes("right", size="25%", pad=0.00)
 
-		# # Add captions text on axis, and lines
-		# yCaptionsCoords = np.linspace(0., 1., len(sortedIndexes))
-		# connectionLinesCoords = []
-		# for y, i in zip(yCaptionsCoords, sortedIndexes):
-		# 	cap = captions[i]
-		# 	lastVal = lastVals[i]
-		# 	color = palette[i]
-		# 	rax.text(1.10, y, cap,
-		# 			horizontalalignment='left',
-		# 			verticalalignment='center',
-		# 			transform = rax.transAxes)
+		# Add captions text on axis, and lines
+		yCaptionsCoords = np.linspace(0., 1., len(sortedIndexes))
+		connectionLinesCoords = []
+		for y, i in zip(yCaptionsCoords, sortedIndexes):
+			cap = captions[i]
+			lastVal = lastVals[i]
+			color = palette[i]
+			rax.text(1.10, y, cap,
+					horizontalalignment='left',
+					verticalalignment='center',
+					transform = rax.transAxes)
 
-		# 	# Add lines
-		# 	normalizedY = float(y) * float(axe1.get_ylim()[1])
-		# 	rax.plot([lastVal, normalizedY], color=color)
+			# Add lines
+			normalizedY = float(y) * float(axe1.get_ylim()[1])
+			rax.plot([lastVal, normalizedY], color=color)
 
 
-		# rax.set_axis_off()
-		# rax.set_ylim(0, 100)
+		rax.set_axis_off()
+		rax.set_ylim(0, 100)
 
 		# Divide the x axis by 10
 		tabEvaluationTicks = [indice for indice in range(len(tabPlotEvaluation)) if indice % (int(len(tabPlotEvaluation)/10)) == 0]
@@ -931,8 +932,8 @@ def draw(**parametres) :
 
 def main(args) :
 	parametres =  { 
-									"argMax" : int(arg.max),
-									"argMaxGen" : int(arg.maxGen),
+									"argMax" : int(args.max),
+									"argMaxGen" : int(args.maxGen),
 									"argPrecision" : int(args.precision),
 									"argSelection" : args.selection,
 									"argExclusion" : argExclusion,
