@@ -810,7 +810,7 @@ namespace sferes
 			{
 				Posture pos;
 
-				if(simu.map()->get_random_initial_position(Params::simu::big_stag_radius + 5, pos))
+				if(simu.map()->get_random_initial_position(Params::simu::big_stag_radius + 5, pos, 1000, false))
 				{
 					Hare* r = new Hare(Params::simu::hare_radius, pos, HARE_COLOR);
 			
@@ -832,7 +832,7 @@ namespace sferes
 			
 				Posture pos;
 
-				if(simu.map()->get_random_initial_position(Params::simu::big_stag_radius + 5, pos))
+				if(simu.map()->get_random_initial_position(Params::simu::big_stag_radius + 5, pos, 1000, false))
 				{
 					Stag* r = new Stag(Params::simu::big_stag_radius, pos, BIG_STAG_COLOR, Stag::big, fur_color);
 			
