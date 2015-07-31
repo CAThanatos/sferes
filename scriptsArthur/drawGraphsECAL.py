@@ -439,7 +439,7 @@ def drawHuntingTask() :
 	axe1.set_xlabel("Evaluation")
 	axe1.set_xlim(0, len(tabPlotEvaluation) - 1)
 
-	axe1.set_ylabel("Proportion of Cooperative Runs")
+	axe1.set_ylabel("Proportion of Cooperative Runs (/60)")
 	axe1.set_ylim(0.0, 1.0)
 
 	# legend = plt.legend(['Control', 'Clonal', 'Coevolution'], loc = 4, frameon=True)
@@ -475,7 +475,7 @@ def drawHuntingTask() :
 				fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 				plt.grid()
 
-				width = 0.8
+				width = 1.0 # 0.8
 
 				tabNbHaresSolo = [hashNbHaresSolo[run][evaluation] for evaluation in tabPlotEvaluation if evaluation in hashNbHaresSolo[run].keys()]
 				tabNbHaresDuo = [hashNbHaresDuo[run][evaluation] for evaluation in tabPlotEvaluation if evaluation in hashNbHaresDuo[run].keys()]
