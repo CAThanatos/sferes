@@ -509,10 +509,10 @@ namespace fastsim
 		float y_min = x_min;
 		float y_max = _real_h - radius - 1;
 
-		float lim_x_min = _real_w/2.0f - 4.0f*radius;
-		float lim_x_max = _real_w/2.0f + 4.0f*radius;
-		float lim_y_min = y_min + 4.0f*radius;
-		float lim_y_max = y_max - 4.0f*radius;
+		float lim_x_min = _real_w/2.0f - 32.0f*radius;
+		float lim_x_max = _real_w/2.0f + 32.0f*radius;
+		float lim_y_min = y_min + 32.0f*radius;
+		float lim_y_max = y_max - 32.0f*radius;
 
 
 		bool found = false;

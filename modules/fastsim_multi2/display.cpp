@@ -767,6 +767,28 @@ namespace fastsim
     // lasers
     _disp_lasers();
 
+		// float x_min = _robots[0]->get_radius() + 1;
+		// float x_max = _map->get_real_w() - _robots[0]->get_radius() - 1;
+		// float y_min = x_min;
+		// float y_max = _map->get_real_h() - _robots[0]->get_radius() - 1;
+
+		// float lim_x_min = _map->real_to_pixel(_map->get_real_w()/2.0f - 32.0f*_robots[0]->get_radius());
+		// float lim_x_max = _map->real_to_pixel(_map->get_real_w()/2.0f + 32.0f*_robots[0]->get_radius());
+		// float lim_y_min = _map->real_to_pixel(y_min + 32.0f*_robots[0]->get_radius());
+		// float lim_y_max = _map->real_to_pixel(y_max - 32.0f*_robots[0]->get_radius());
+		// float y_min_pixel = _map->real_to_pixel(y_min);
+		// float x_min_pixel = _map->real_to_pixel(x_min);
+
+	 //  Uint32 color = SDL_MapRGB(_screen->format, 255, 0, 0);
+	 //  _line(_screen, lim_x_min, y_min, lim_x_min, lim_y_min, color);
+	 //  _line(_screen, lim_x_min, lim_y_min, lim_x_max, lim_y_min, color);
+	 //  _line(_screen, lim_x_max, lim_y_min, lim_x_max, y_min, color);
+
+	 //  _line(_screen, lim_x_min, y_max, lim_x_min, lim_y_max, color);
+	 //  _line(_screen, lim_x_min, lim_y_max, lim_x_max, lim_y_max, color);
+	 //  _line(_screen, lim_x_max, lim_y_max, lim_x_max, y_max, color);
+
+
 		//for(std::vector<fastsim::Robot>::const_iterator it = _robots.begin(); it != _robots.end(); ++it) 
   	bool first_hunter = true;
 		for(int i = 0; i < _robots.size(); ++i)
