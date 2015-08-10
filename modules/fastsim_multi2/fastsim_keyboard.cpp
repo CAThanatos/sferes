@@ -22,11 +22,10 @@ int main(int argc, char *argv[])
 	Robot* r1 = new Robot(20.0f, Posture(250, 250, -M_PI/2), 2);  
   r1->use_camera();
 	r1->add_laser(Laser(0, 50));
-  r1->add_laser(Laser(M_PI / 3, 50));
-	r1->add_laser(Laser(-M_PI / 3, 50));
-  r1->add_laser(Laser(2 * M_PI / 3, 50));
-	r1->add_laser(Laser(M_PI, 50));
-	r1->add_laser(Laser(-2 * M_PI / 3, 50));
+  r1->add_laser(Laser(M_PI/6, 50));
+  r1->add_laser(Laser(M_PI/3, 50));
+  r1->add_laser(Laser(-M_PI/6, 50));
+  r1->add_laser(Laser(-M_PI/3, 50));
 	s.add_robot(r1);
 
 /*	Robot* r2 = new Robot(20.0f, Posture(100, 100, -M_PI/2), 4, 2);  
