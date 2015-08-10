@@ -513,7 +513,7 @@ namespace fastsim
 		float lim_x_max = _real_w/2.0f + 4.0f*radius;
 		float lim_y_min = y_min + 4.0f*radius;
 		float lim_y_max = y_max - 4.0f*radius;
-		std::cout << "(" << lim_x_min << "," << lim_x_max << "/" << "(" << lim_y_min << "," << lim_y_max << ")" << std::endl;
+
 
 		bool found = false;
 		float rand_x = 0;
@@ -525,13 +525,9 @@ namespace fastsim
 
 			if(avoid_start_pos)
 			{
-				std::cout << "-> " << rand_x << "/" << rand_y << std::endl;
 				if(rand_y >= lim_y_max || rand_y <= lim_y_min)
 					if(rand_x <= lim_x_max && rand_x >= lim_x_min)
-					{
-						std::cout << "BOOM" << std::endl;
 						continue;
-					}
 			}
 	
 			// We don't want this robot to collide with anything
