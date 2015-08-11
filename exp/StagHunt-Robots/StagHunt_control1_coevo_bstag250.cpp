@@ -565,7 +565,8 @@ namespace sferes
 					r->add_laser(Laser(-M_PI / 6, 50));
 		
 					// 1 linear camera
-					r->use_camera(LinearCamera(M_PI/2, Params::simu::nb_camera_pixels));
+					// r->use_camera(LinearCamera(M_PI/2, Params::simu::nb_camera_pixels));
+					r->use_camera(LinearCamera(M_PI/3.6, Params::simu::nb_camera_pixels));
 
 					r->set_bool_leader(leader);
 				}
