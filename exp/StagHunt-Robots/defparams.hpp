@@ -300,7 +300,7 @@ struct Params
     
     // how often should the result file be written (here, each 10
     // generation)
-    static const int dump_period = 10;
+    static const int dump_period = 100;
     
     // how often should the video be done
     static const int video_dump_period = 100;
