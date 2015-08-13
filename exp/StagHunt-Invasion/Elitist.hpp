@@ -65,7 +65,15 @@ namespace sferes
 
       void random_pop()
       {
+#ifdef POP_INIT100
+				this->_pop.resize(100);
+#elif defined(POP_INIT50)
+				this->_pop.resize(50);
+#elif defined(POP_INIT20)
+				this->_pop.resize(20);
+#else
 				this->_pop.resize(mu);
+#endif
 				int nb_indiv = 0;
 				BOOST_FOREACH(boost::shared_ptr<Phen>& indiv, this->_pop)
 				{
@@ -76,11 +84,6 @@ namespace sferes
 					this->_eval.eval(this->_pop, nb_indiv, 0, nb_indiv + 1);
 					nb_indiv++;
 				}
-
-				this->apply_modifier();
-				std::partial_sort(this->_pop.begin(), this->_pop.begin() + mu,
-							this->_pop.end(), fit::compare());
-				this->_pop.resize(mu);
 
 				for(size_t i = 0; i < this->_pop.size(); ++i)
 				{
@@ -108,6 +111,14 @@ namespace sferes
 					this->_pop[i]->set_nb_sstags(nb_sstags/(float)this->_pop.size(), nb_sstags_solo/(float)this->_pop.size());
 					this->_pop[i]->set_nb_bstags(nb_bstags/(float)this->_pop.size(), nb_bstags_solo/(float)this->_pop.size());
 				}
+
+				this->apply_modifier();
+				std::partial_sort(this->_pop.begin(), this->_pop.begin() + mu,
+							this->_pop.end(), fit::compare());
+
+#if defined(POP_INIT100) || defined(POP_INIT20) || defined(POP_INIT50)
+				this->_pop.resize(mu);
+#endif
       }
       
       void epoch()

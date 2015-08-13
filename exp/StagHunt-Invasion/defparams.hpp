@@ -301,8 +301,9 @@ struct Params
     // size of the population
 #ifdef ONEPLUSONE
   	static const unsigned size = 2;
-#else
-#ifdef POP100
+#elif defined(POP20)
+    static const unsigned size = 20;
+#elif defined(POP100)
     static const unsigned size = 100;
 #elif defined(POP500)
     static const unsigned size = 500;
@@ -310,7 +311,6 @@ struct Params
     static const unsigned size = 1000;
 #else
     static const unsigned size = 100;
-#endif
 #endif
 
     // size of the population
@@ -344,6 +344,12 @@ struct Params
 #ifdef ONEPLUSONE
 		static const unsigned mu = 1;
 		static const unsigned lambda = 1;
+#elif defined(LAMBDA20)
+		static const unsigned mu = 1;
+		static const unsigned lambda = 20;
+#elif defined(LAMBDA50)
+		static const unsigned mu = 1;
+		static const unsigned lambda = 50;
 #else
 		static const unsigned mu = Params::pop::size/2;
 		static const unsigned lambda = Params::pop::size/2;
@@ -518,7 +524,7 @@ struct Params
 
 // #define BEHAVIOUR_LOG
 
-#define BEHAVIOUR_VIDEO
+// #define BEHAVIOUR_VIDEO
 
 #define TEST_VARIANCE_TRIALS
 

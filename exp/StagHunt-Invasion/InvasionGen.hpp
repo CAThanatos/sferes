@@ -100,6 +100,17 @@ namespace sferes
 
 						mutation = true;
 	  			}
+#elif defined(UNIFORM_MUT)
+      	float mutation_rate = Params::evo_float::mutation_rate/Params::nn::genome_size;
+    
+				for (size_t i = 0; i < Size; i++)
+					if (misc::rand<float>() < mutation_rate)
+					{
+
+	      		float f = misc::rand<float>();
+	      		_data[i] = misc::put_in_range(f, 0.0f, 1.0f);
+						mutation = true;
+	  			}
 #else
 				static const float eta_m = Params::evo_float::eta_m;
 				assert(eta_m != -1.0f);
