@@ -116,7 +116,7 @@ namespace sferes
 				std::partial_sort(this->_pop.begin(), this->_pop.begin() + mu,
 							this->_pop.end(), fit::compare());
 
-#if defined(POP_INIT100) || defined(POP_INIT20) || defined(POP_INIT50)
+#if defined(POP_INIT100) || defined(POP_INIT50) || defined(POP_INIT20)
 				this->_pop.resize(mu);
 #endif
       }
