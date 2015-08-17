@@ -106,10 +106,17 @@ namespace sferes
 						nb_bstags_solo += this->_pop[i]->get_nb_bstags_solo(j);
 					}
 
+#ifdef NOT_AGAINST_ALL
+					this->_pop[i]->fit().set_value(fitness/(float)Params::pop::nb_opponents);
+					this->_pop[i]->set_nb_hares(nb_hares/(float)Params::pop::nb_opponents, nb_hares_solo/(float)Params::pop::nb_opponents);
+					this->_pop[i]->set_nb_sstags(nb_sstags/(float)Params::pop::nb_opponents, nb_sstags_solo/(float)Params::pop::nb_opponents);
+					this->_pop[i]->set_nb_bstags(nb_bstags/(float)Params::pop::nb_opponents, nb_bstags_solo/(float)Params::pop::nb_opponents);
+#else
 					this->_pop[i]->fit().set_value(fitness/(float)this->_pop.size());
 					this->_pop[i]->set_nb_hares(nb_hares/(float)this->_pop.size(), nb_hares_solo/(float)this->_pop.size());
 					this->_pop[i]->set_nb_sstags(nb_sstags/(float)this->_pop.size(), nb_sstags_solo/(float)this->_pop.size());
 					this->_pop[i]->set_nb_bstags(nb_bstags/(float)this->_pop.size(), nb_bstags_solo/(float)this->_pop.size());
+#endif
 				}
 
 				this->apply_modifier();
@@ -183,10 +190,17 @@ namespace sferes
 						nb_bstags_solo += selection_pop[i]->get_nb_bstags_solo(j);
 					}
 
+#ifdef NOT_AGAINST_ALL
+					selection_pop[i]->fit().set_value(fitness/(float)Params::pop::nb_opponents);
+					selection_pop[i]->set_nb_hares(nb_hares/(float)Params::pop::nb_opponents, nb_hares_solo/(float)Params::pop::nb_opponents);
+					selection_pop[i]->set_nb_sstags(nb_sstags/(float)Params::pop::nb_opponents, nb_sstags_solo/(float)Params::pop::nb_opponents);
+					selection_pop[i]->set_nb_bstags(nb_bstags/(float)Params::pop::nb_opponents, nb_bstags_solo/(float)Params::pop::nb_opponents);
+#else
 					selection_pop[i]->fit().set_value(fitness/(float)selection_pop.size());
 					selection_pop[i]->set_nb_hares(nb_hares/(float)selection_pop.size(), nb_hares_solo/(float)selection_pop.size());
 					selection_pop[i]->set_nb_sstags(nb_sstags/(float)selection_pop.size(), nb_sstags_solo/(float)selection_pop.size());
 					selection_pop[i]->set_nb_bstags(nb_bstags/(float)selection_pop.size(), nb_bstags_solo/(float)selection_pop.size());
+#endif
 				}
 								
 				int successful_offsprings = 0;

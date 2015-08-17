@@ -707,6 +707,25 @@ namespace sferes
 #endif
 
 			invers_pos = false;
+
+#ifdef FIXED_POS
+			std::vector<Posture> vec_pos_preys(Params::simu::nb_big_stags + Params::simu::nb_hares);
+
+			if(Params::simu::nb_big_stags + Params::simu::nb_hares == 2)
+			{
+				float pos_arr[Params::simu::nb_big_stags + Params::simu::nb_hares][2] =
+				{
+					{width/2 - 200, height/2},
+					{width/2 + 200, height/2}
+				};
+
+				for(size_t i = 0; i < vec_pos_preys.size(); ++i)
+					vec_pos_preys[i] = Posture(pos_arr[i][0], pos_arr[i][1], M_PI/2);
+			}
+
+			std::vector<size_t> ord_vect;
+			misc::rand_ind(ord_vect, vec_pos_preys.size());
+#endif
 			
 #ifdef COEVO
 			bool first_leader = (_num_leader == 1);
@@ -812,7 +831,11 @@ namespace sferes
 
 				if(simu.map()->get_random_initial_position(Params::simu::big_stag_radius + 5, pos, 1000, false))
 				{
+#ifdef FIXED_POS
+					Hare* r = new Hare(Params::simu::hare_radius, vec_pos_preys[ord_vect[i]], HARE_COLOR);
+#else
 					Hare* r = new Hare(Params::simu::hare_radius, pos, HARE_COLOR);
+#endif
 			
 #ifdef COOP_HARE
 					if(0 == i)
@@ -834,7 +857,11 @@ namespace sferes
 
 				if(simu.map()->get_random_initial_position(Params::simu::big_stag_radius + 5, pos, 1000, false))
 				{
+#ifdef FIXED_POS
+					Stag* r = new Stag(Params::simu::big_stag_radius, vec_pos_preys[ord_vect[Params::simu::nb_hares + i]], BIG_STAG_COLOR, Stag::big, fur_color);
+#else
 					Stag* r = new Stag(Params::simu::big_stag_radius, pos, BIG_STAG_COLOR, Stag::big, fur_color);
+#endif
 			
 #ifdef COOP_SSTAG
 					if(0 == i)
@@ -982,6 +1009,10 @@ namespace sferes
    						hunters[i]->kill_hunter();
 #endif
    				}
+
+#ifdef EASY_SIMU
+   			stop_eval = true;
+#endif
    			}
    		}
    	}

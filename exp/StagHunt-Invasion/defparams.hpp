@@ -40,9 +40,9 @@
 #define NESTED
 #endif
 
-#ifndef ALTRUISM
-#define NOT_AGAINST_ALL
-#endif
+// #ifndef ALTRUISM
+// #define NOT_AGAINST_ALL
+// #endif
 
 #ifdef NOT_AGAINST_ALL
 #define OPPONENTS5

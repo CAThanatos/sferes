@@ -49,6 +49,39 @@ namespace sferes
 {
   namespace eval
   {
+        
+    template<typename Phen>
+    struct _parallel_ev_select
+    {
+      typedef std::vector<boost::shared_ptr<Phen> > pop_t;
+      pop_t _pop;
+      size_t _pos_mutant;
+      std::vector<int> _select;
+
+      ~_parallel_ev_select() { }
+      _parallel_ev_select(const pop_t& pop, size_t pos_mutant, const std::vector<int>& select) : _pop(pop), _pos_mutant(pos_mutant), _select(select)
+      {
+      }
+      _parallel_ev_select(const _parallel_ev_select& ev) : _pop(ev._pop), _pos_mutant(ev._pos_mutant), _select(ev._select)
+      {
+      }
+      void operator() (const parallel::range_t& r) const
+      {
+				for (size_t i = r.begin(); i != r.end(); ++i)
+				{
+					assert(i < _pop.size());
+					assert(_pos_mutant < _pop.size());
+
+					int count = _select[i];
+					while(count > 0)
+					{
+						_pop[i]->fit().eval_compet(*_pop[_pos_mutant], *_pop[i]);
+						count--;
+					}
+				}
+      }
+    };
+
     template<typename Phen>
     struct _parallel_ev_mutant
     {
@@ -97,9 +130,30 @@ namespace sferes
 				for(int k = 0; k < pop[pos_mutant]->fit().objs().size(); ++k)
 					pop[pos_mutant]->fit().set_obj(k, 0);
 
+#ifdef NOT_AGAINST_ALL
+				std::vector<int> select(end - begin, 0);
+
+				for(size_t k = 0; k < Params::pop::nb_opponents; ++k)
+				{
+					int opponent = -1;
+					do
+					{
+						opponent = misc::rand(0, (int)(end - begin));
+					} while((opponent < 0) || (opponent >= end - begin));
+					
+					assert(opponent != -1);
+					select[opponent]++;
+				}
+#endif
+
 				parallel::init();
+#ifdef NOT_AGAINST_ALL
+				parallel::p_for(parallel::range_t(begin, end), _parallel_ev_select<Phen>(pop, pos_mutant, select));
+				_nb_eval += 1;
+#else
 				parallel::p_for(parallel::range_t(begin, end), _parallel_ev_mutant<Phen>(pop, pos_mutant));
 				_nb_eval += end - begin;
+#endif
 
 				pop[pos_mutant]->set_nb_leader_first(pop[pos_mutant]->nb_leader_first_at());
 				pop[pos_mutant]->set_nb_preys_killed_coop(pop[pos_mutant]->nb_preys_killed_coop_at());

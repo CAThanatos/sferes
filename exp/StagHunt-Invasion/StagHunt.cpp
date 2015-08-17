@@ -265,10 +265,6 @@ namespace sferes
      	moy_sstags1_solo /= Params::simu::nb_trials;
      	moy_bstags1_solo /= Params::simu::nb_trials;
 
-     	ind1.set_nb_hares(ind2.pop_pos(), moy_hares1, moy_hares1_solo);
-     	ind1.set_nb_sstags(ind2.pop_pos(), moy_sstags1, moy_sstags1_solo);
-     	ind1.set_nb_bstags(ind2.pop_pos(), moy_bstags1, moy_bstags1_solo);
-
      	moy_hares2 /= Params::simu::nb_trials;
      	moy_sstags2 /= Params::simu::nb_trials;
      	moy_bstags2 /= Params::simu::nb_trials;
@@ -276,16 +272,22 @@ namespace sferes
      	moy_sstags2_solo /= Params::simu::nb_trials;
      	moy_bstags2_solo /= Params::simu::nb_trials;
 
+			food1 /= Params::simu::nb_trials;
+			food2 /= Params::simu::nb_trials;
+
+     	ind1.set_nb_hares(ind2.pop_pos(), moy_hares1, moy_hares1_solo);
+     	ind1.set_nb_sstags(ind2.pop_pos(), moy_sstags1, moy_sstags1_solo);
+     	ind1.set_nb_bstags(ind2.pop_pos(), moy_bstags1, moy_bstags1_solo);
+
+			ind1.set_payoff(ind2.pop_pos(), food1);
+
+#ifndef NOT_AGAINST_ALL
      	ind2.set_nb_hares(ind1.pop_pos(), moy_hares2, moy_hares2_solo);
      	ind2.set_nb_sstags(ind1.pop_pos(), moy_sstags2, moy_sstags2_solo);
      	ind2.set_nb_bstags(ind1.pop_pos(), moy_bstags2, moy_bstags2_solo);
 
-
-			food1 /= Params::simu::nb_trials;
-			food2 /= Params::simu::nb_trials;
-		
-			ind1.set_payoff(ind2.pop_pos(), food1);
 			ind2.set_payoff(ind1.pop_pos(), food2);
+#endif
     } // *** end of eval ***
 
     
@@ -393,6 +395,9 @@ namespace sferes
 				for(size_t i = 0; i < vec_pos_preys.size(); ++i)
 					vec_pos_preys[i] = Posture(pos_arr[i][0], pos_arr[i][1], M_PI/2);
 			}
+
+			std::vector<size_t> ord_vect;
+			misc::rand_ind(ord_vect, vec_pos_preys.size());
 #endif
 
 #ifdef LINE_POS
@@ -414,6 +419,8 @@ namespace sferes
 
 				for(size_t i = 0; i < vec_pos_preys.size(); ++i)
 					vec_pos_preys[i] = Posture(pos_arr[i][0], pos_arr[i][1], M_PI/2);
+
+				std::vector<P
 			}
 #endif
 
@@ -424,7 +431,7 @@ namespace sferes
 				if(simu.map()->get_random_initial_position(Params::simu::big_stag_radius + 5, pos, 1000, avoid_start_pos))
 				{
 #if defined(FIXED_POS) || defined(LINE_POS)
-					Hare* r = new Hare(Params::simu::hare_radius, vec_pos_preys[i], HARE_COLOR);
+					Hare* r = new Hare(Params::simu::hare_radius, vec_pos_preys[ord_vect[i]], HARE_COLOR);
 #else
 					Hare* r = new Hare(Params::simu::hare_radius, pos, HARE_COLOR);
 #endif
@@ -450,7 +457,7 @@ namespace sferes
 				if(simu.map()->get_random_initial_position(Params::simu::big_stag_radius + 5, pos, 1000, avoid_start_pos))
 				{
 #if defined(FIXED_POS) || defined(LINE_POS)
-					Stag* r = new Stag(Params::simu::big_stag_radius, vec_pos_preys[Params::simu::nb_hares + i], BIG_STAG_COLOR, Stag::big, fur_color);
+					Stag* r = new Stag(Params::simu::big_stag_radius, vec_pos_preys[ord_vect[Params::simu::nb_hares + i]], BIG_STAG_COLOR, Stag::big, fur_color);
 #else
 					Stag* r = new Stag(Params::simu::big_stag_radius, pos, BIG_STAG_COLOR, Stag::big, fur_color);
 #endif

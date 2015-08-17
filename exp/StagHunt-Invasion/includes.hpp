@@ -33,7 +33,7 @@
 #include "ElitistGen.hpp"
 #include "FitnessProp.hpp"
 #include "Elitist.hpp"
-#include "StagHuntEvalParallel.hpp"
+// #include "StagHuntEvalParallel.hpp"
 #include "InvasionEa.hpp"
 #include "InvasionEaFinite.hpp"
 #include "EvalInvasion.hpp"

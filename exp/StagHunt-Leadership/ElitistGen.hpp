@@ -274,6 +274,7 @@ namespace sferes
       void serialize(Archive & ar, const unsigned int version)
       {
         ar & BOOST_SERIALIZATION_NVP(_data);
+        ar & BOOST_SERIALIZATION_NVP(_size);
       }
 
     protected:
