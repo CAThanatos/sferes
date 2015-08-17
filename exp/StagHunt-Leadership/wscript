@@ -30,10 +30,10 @@ def build(bld):
 													 target = 'StagHunt',
 #                           json = 'StagHuntExp3.json',
 													 variants = [
-													 							'CONTROL3 DOUBLE_NN DUPLICATION NO_CHOICE_DUP BSTAG0 SSTAG50 POS_CLOSE',
-													 							'CONTROL3 DOUBLE_NN DUPLICATION NO_CHOICE_DUP BSTAG0 SSTAG125 POS_CLOSE',
-													 							'CONTROL3 BSTAG0 SSTAG50 POS_CLOSE',
-													 							'CONTROL3 BSTAG0 SSTAG125 POS_CLOSE',
+													 							# 'CONTROL3 DOUBLE_NN DUPLICATION NO_CHOICE_DUP BSTAG0 SSTAG50 POS_CLOSE',
+													 							# 'CONTROL3 DOUBLE_NN DUPLICATION NO_CHOICE_DUP BSTAG0 SSTAG125 POS_CLOSE',
+													 							# 'CONTROL3 BSTAG0 SSTAG50 POS_CLOSE',
+													 							# 'CONTROL3 BSTAG0 SSTAG125 POS_CLOSE',
 
 													 							'CONTROL1 PREYS2 FIXED_POS EASY_SIMU BSTAG500 BSTAG_SOLO500',
 																			])

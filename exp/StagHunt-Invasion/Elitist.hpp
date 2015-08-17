@@ -163,10 +163,10 @@ namespace sferes
 				// Evaluation of the children and the parents if need be
 #ifdef EVAL_PARENTS
 				for(size_t i = 0; i < selection_pop.size(); ++i)
-					this->_eval.eval(selection_pop, i, 0, selection_pop.size());
+					this->_eval.eval(selection_pop, i, i, selection_pop.size());
 #else
 				for(size_t i = mu; i < selection_pop.size(); ++i)
-					this->_eval.eval(selection_pop, i, 0, selection_pop.size());
+					this->_eval.eval(selection_pop, i, i, selection_pop.size());
 #endif
 
 				for(size_t i = 0; i < selection_pop.size(); ++i)
