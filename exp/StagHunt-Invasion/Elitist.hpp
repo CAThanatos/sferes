@@ -81,6 +81,7 @@ namespace sferes
 					indiv->random();
 					indiv->set_pop_pos(nb_indiv);
 
+					indiv->develop();
 					this->_eval.eval(this->_pop, nb_indiv, 0, nb_indiv + 1);
 					nb_indiv++;
 				}
@@ -125,6 +126,9 @@ namespace sferes
 
 #if defined(POP_INIT100) || defined(POP_INIT50) || defined(POP_INIT20)
 				this->_pop.resize(mu);
+
+				for(size_t i = 0; i < mu; ++i)
+					this->_pop[i]->set_pop_pos(i);
 #endif
       }
       
@@ -138,13 +142,33 @@ namespace sferes
 				int parent_rank = 0;
 				for(size_t i = 0; i < lambda; ++i)
 				{
+#ifdef RANDOM_MUTANT
+					// Probability that the mutation produces a totally random new individual
+					float proba_random_mutant = misc::rand<float>();
+
+					if(proba_random_mutant < Params::evo_float::random_mutant_probability)
+					{
+						child_pop.push_back(boost::shared_ptr<Phen>(new Phen()));
+						child_pop[i]->random();
+					}
+					else
+					{
+						// Cloning of a parent
+						child_pop.push_back(this->_pop[parent_rank%mu]->clone());
+						
+						// Mutation
+						child_pop[i]->gen().mutate(_step_size);
+					}
+#else
 					// Cloning of a parent
 					child_pop.push_back(this->_pop[parent_rank%mu]->clone());
-					parents_list[i] = parent_rank%mu;
-					parent_rank++;
 					
 					// Mutation
 					child_pop[i]->gen().mutate(_step_size);
+#endif
+
+					parents_list[i] = parent_rank%mu;
+					parent_rank++;
 				}
 				assert(child_pop.size() == lambda);
 
@@ -163,8 +187,14 @@ namespace sferes
 				// Evaluation of the children and the parents if need be
 #ifdef EVAL_PARENTS
 				for(size_t i = 0; i < selection_pop.size(); ++i)
+					selection_pop[i]->develop();
+
+				for(size_t i = 0; i < selection_pop.size(); ++i)
 					this->_eval.eval(selection_pop, i, i, selection_pop.size());
 #else
+				for(size_t i = mu; i < selection_pop.size(); ++i)
+					selection_pop[i]->develop();
+
 				for(size_t i = mu; i < selection_pop.size(); ++i)
 					this->_eval.eval(selection_pop, i, i, selection_pop.size());
 #endif
@@ -254,6 +284,9 @@ namespace sferes
 
 				std::partial_sort(this->_pop.begin(), this->_pop.begin() + mu,
 							this->_pop.end(), fit::compare());
+
+				for(size_t i = 0; i < mu; ++i)
+					this->_pop[i]->set_pop_pos(i);
 							
 				dbg::out(dbg::info, "ea")<<"best fitness: " << this->_pop[0]->fit().value() << std::endl;
       }

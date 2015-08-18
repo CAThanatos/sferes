@@ -124,7 +124,6 @@ namespace sferes
 				int duration = time(NULL);
 #endif
 		
-				pop[pos_mutant]->develop();
 				pop[pos_mutant]->fit().set_value(0);
 				pop[pos_mutant]->fit().resize_objs(1);
 				for(int k = 0; k < pop[pos_mutant]->fit().objs().size(); ++k)

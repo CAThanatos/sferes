@@ -74,6 +74,11 @@ namespace sferes
 #endif
 	
 #ifdef MLP_PERSO
+				StagHuntRobot* robot1 = (StagHuntRobot*)(simu.robots()[0]);
+				StagHuntRobot* robot2 = (StagHuntRobot*)(simu.robots()[1]);
+				Hunter* hunter1 = (Hunter*)robot1;
+				Hunter* hunter2 = (Hunter*)robot2;
+
 				hunter1->set_weights(ind1.data());
 				hunter2->set_weights(ind2.data());
 #endif
@@ -101,7 +106,7 @@ namespace sferes
 						StagHuntRobot* robot = (StagHuntRobot*)(simu.robots()[num]);
 	
 						std::vector<float> action = robot->step_action();
-	
+
 						// We compute the movement of the robot
 						if(action[0] >= 0 || action[1] >= 0)
 						{
@@ -516,6 +521,7 @@ namespace sferes
    		// have a glorious feast on its corpse. Yay !
    		if(prey->is_dead())
    		{
+   			std::cout << "KILLED" << std::endl;
    			float food = 0;
    			
 	   		food = prey->feast();

@@ -284,9 +284,7 @@ namespace sferes
 				assert(weights.size() == _weights.size());
 				
 				for(size_t i = 0; i < weights.size(); ++i)
-				{
 					_weights[i] = weights[i];
-				}
 			}
 #endif
   	

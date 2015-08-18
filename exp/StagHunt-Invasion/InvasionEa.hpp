@@ -72,6 +72,7 @@ namespace sferes
 	      	this->_pop.push_back(boost::shared_ptr<Phen>(new Phen()));
 	      	this->_pop[i]->random();
 					this->_pop[i]->set_pop_pos(i);
+					this->_pop[i]->develop();
 
 					this->_eval.eval(this->_pop, _nb_genotypes, 0, _nb_genotypes + 1);
 
@@ -166,6 +167,7 @@ namespace sferes
 #endif
 
 				this->_pop[_nb_genotypes]->set_pop_pos(_nb_genotypes);
+				this->_pop[_nb_genotypes]->develop();
 
 				// We evaluate this mutant's payoff against every other residents
 				this->_eval.eval(this->_pop, _nb_genotypes, 0, _nb_genotypes + 1);

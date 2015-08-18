@@ -549,6 +549,11 @@ namespace sferes
 				else
 					r = new Hunter(Params::simu::hunter_radius, pos, HUNTER_COLOR, nn2);
 
+#ifdef SOLO
+				if(i > 0)
+					r->set_deactivated(true);
+#endif
+
 				if(!r->is_deactivated())
 				{	
 					// 12 lasers range sensors 
@@ -565,7 +570,7 @@ namespace sferes
 
 					r->set_bool_leader(leader);
 				}
-		
+
 				simu.add_robot(r);
 			}
 					

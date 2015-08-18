@@ -75,6 +75,7 @@ namespace sferes
 	      	this->_pop.push_back(boost::shared_ptr<Phen>(new Phen()));
 	      	this->_pop[i]->random();
 					this->_pop[i]->set_pop_pos(i);
+					this->_pop[i]->develop();
 
 					this->_eval.eval(this->_pop, _nb_genotypes, 0, _nb_genotypes + 1);
 
@@ -183,6 +184,10 @@ namespace sferes
 				assert(_nb_genotypes <= Params::pop::size);
 
 				// We evaluate all new mutants
+				for(size_t i = 0; i < _nb_genotypes; ++i)
+					if(!pop_offsprings[i]->is_evaluated())
+						pop_offsprings[i]->develop();
+
 				for(size_t i = 0; i < _nb_genotypes; ++i)
 					if(!pop_offsprings[i]->is_evaluated())
 					{

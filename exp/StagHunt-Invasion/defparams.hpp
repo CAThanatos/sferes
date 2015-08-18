@@ -5,6 +5,8 @@
 
 #define GAUSSIAN_MUTATION
 
+#define MLP_PERSO
+
 #define NO_BOOLEAN
 
 #if defined(SETTING1) || defined(SETTING2) || defined(SETTING3) || defined(SETTING4) || defined(SETTING5) || defined(SETTING6) || defined(SETTING7) || defined(SETTING8) || defined(SETTING13)
@@ -264,7 +266,7 @@ struct Params
     static const float strong_mutation_probability = 0.1f;
 #endif
 
-    static const float random_mutant_probability = 0.001f;
+    static const float random_mutant_probability = 0.1f;
 
 #ifndef GAUSSIAN_MUTATION
     // we choose the polynomial mutation type
