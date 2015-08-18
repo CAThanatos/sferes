@@ -521,7 +521,6 @@ namespace sferes
    		// have a glorious feast on its corpse. Yay !
    		if(prey->is_dead())
    		{
-   			std::cout << "KILLED" << std::endl;
    			float food = 0;
    			
 	   		food = prey->feast();
