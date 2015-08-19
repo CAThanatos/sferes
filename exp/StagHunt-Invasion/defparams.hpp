@@ -178,7 +178,7 @@ struct Params
 #elif defined(TRIALS15)
 		static const int nb_trials = 15;
 #else
-		static const int nb_trials = 10;
+		static const int nb_trials = 1;
 #endif
 #endif
 		

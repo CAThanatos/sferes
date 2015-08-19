@@ -706,7 +706,11 @@ namespace sferes
 			pos_init.push_back(Posture(width/2, height - 80, -M_PI/2));
 #endif
 
+#ifdef INVERS_POS
+			invers_pos = misc::flip_coin();
+#else
 			invers_pos = false;
+#endif
 
 #ifdef FIXED_POS
 			std::vector<Posture> vec_pos_preys(Params::simu::nb_big_stags + Params::simu::nb_hares);

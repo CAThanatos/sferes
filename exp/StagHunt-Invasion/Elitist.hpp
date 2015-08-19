@@ -126,15 +126,17 @@ namespace sferes
 
 #if defined(POP_INIT100) || defined(POP_INIT50) || defined(POP_INIT20)
 				this->_pop.resize(mu);
-
-				for(size_t i = 0; i < mu; ++i)
-					this->_pop[i]->set_pop_pos(i);
 #endif
       }
       
       void epoch()
       {
-				assert(this->_pop.size()); 
+				assert(this->_pop.size());
+
+#ifdef EVAL_PARENTS
+				for(size_t i = 0; i < mu; ++i)
+					this->_pop[i]->set_pop_pos(i);
+#endif
 
 				// We create the children
 				pop_t child_pop;
@@ -284,9 +286,6 @@ namespace sferes
 
 				std::partial_sort(this->_pop.begin(), this->_pop.begin() + mu,
 							this->_pop.end(), fit::compare());
-
-				for(size_t i = 0; i < mu; ++i)
-					this->_pop[i]->set_pop_pos(i);
 							
 				dbg::out(dbg::info, "ea")<<"best fitness: " << this->_pop[0]->fit().value() << std::endl;
       }

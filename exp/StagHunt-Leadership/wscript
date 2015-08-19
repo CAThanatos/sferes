@@ -35,7 +35,7 @@ def build(bld):
 													 							# 'CONTROL3 BSTAG0 SSTAG50 POS_CLOSE',
 													 							# 'CONTROL3 BSTAG0 SSTAG125 POS_CLOSE',
 
-													 							'CONTROL1 PREYS2 FIXED_POS EASY_SIMU BSTAG500 BSTAG_SOLO500',
+													 							'CONTROL1 PREYS2 FIXED_POS EASY_SIMU INVERS_POS BSTAG500 BSTAG_SOLO500',
 																			])
 
 																			 
