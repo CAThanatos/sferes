@@ -99,7 +99,8 @@ namespace sferes
 					assert(i < _pop.size());
 					assert(_pos_mutant < _pop.size());
 
-					_pop[_pos_mutant]->fit().eval_compet(*_pop[_pos_mutant], *_pop[i]);
+					// _pop[_pos_mutant]->fit().eval_compet(*_pop[_pos_mutant], *_pop[i]);
+					_pop[i]->fit().eval_compet(*_pop[_pos_mutant], *_pop[i]);
 				}
       }
     };

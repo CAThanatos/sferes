@@ -168,10 +168,10 @@ namespace sferes
 
 		    	assert(opponent < _vec_nb_hares.size());
 
-		    	_vec_nb_hares[opponent].fetch_and_store(_vec_nb_hares[opponent] + nb_hares);
-		    	_vec_nb_hares_solo[opponent].fetch_and_store(_vec_nb_hares_solo[opponent] + solo);
-		    	// _vec_nb_hares[opponent] = nb_hares; 
-		    	// _vec_nb_hares_solo[opponent] = solo; 
+		    	// _vec_nb_hares[opponent].fetch_and_store(_vec_nb_hares[opponent] + nb_hares);
+		    	// _vec_nb_hares_solo[opponent].fetch_and_store(_vec_nb_hares_solo[opponent] + solo);
+		    	_vec_nb_hares[opponent] = nb_hares; 
+		    	_vec_nb_hares_solo[opponent] = solo; 
 		    }
 		    void set_nb_hares(float nb_hares, float nb_hares_solo) { _nb_hares = nb_hares; _nb_hares_solo = nb_hares_solo; }
 
@@ -188,10 +188,10 @@ namespace sferes
 
 		    	assert(opponent < _vec_nb_sstags.size());
 
-		    	_vec_nb_sstags[opponent].fetch_and_store(_vec_nb_sstags[opponent] + nb_sstags);
-		    	_vec_nb_sstags_solo[opponent].fetch_and_store(_vec_nb_sstags_solo[opponent] + solo);
-		    	// _vec_nb_sstags[opponent] = nb_sstags; 
-		    	// _vec_nb_sstags_solo[opponent] = solo; 
+		    	// _vec_nb_sstags[opponent].fetch_and_store(_vec_nb_sstags[opponent] + nb_sstags);
+		    	// _vec_nb_sstags_solo[opponent].fetch_and_store(_vec_nb_sstags_solo[opponent] + solo);
+		    	_vec_nb_sstags[opponent] = nb_sstags; 
+		    	_vec_nb_sstags_solo[opponent] = solo; 
 		    }
 		    void set_nb_sstags(float nb_sstags, float nb_sstags_solo) { _nb_sstags = nb_sstags; _nb_sstags_solo = nb_sstags_solo; }
 
@@ -208,10 +208,10 @@ namespace sferes
 
 		    	assert(opponent < _vec_nb_bstags.size());
 
-		    	_vec_nb_bstags[opponent].fetch_and_store(_vec_nb_bstags[opponent] + nb_bstags);
-		    	_vec_nb_bstags_solo[opponent].fetch_and_store(_vec_nb_bstags_solo[opponent] + solo);
-		    	// _vec_nb_bstags[opponent] = nb_bstags; 
-		    	// _vec_nb_bstags_solo[opponent] = solo; 
+		    	// _vec_nb_bstags[opponent].fetch_and_store(_vec_nb_bstags[opponent] + nb_bstags);
+		    	// _vec_nb_bstags_solo[opponent].fetch_and_store(_vec_nb_bstags_solo[opponent] + solo);
+		    	_vec_nb_bstags[opponent] = nb_bstags; 
+		    	_vec_nb_bstags_solo[opponent] = solo; 
 		    }
 		    void set_nb_bstags(float nb_bstags, float nb_bstags_solo) { _nb_bstags = nb_bstags; _nb_bstags_solo = nb_bstags_solo; }
 
@@ -310,8 +310,8 @@ namespace sferes
 		    		_vec_payoffs.resize(_vec_payoffs.size() + 100);
 
 		    	assert(opponent < _vec_payoffs.size());
-		    	_vec_payoffs[opponent].fetch_and_store(_vec_payoffs[opponent] + payoff);
-		    	// _vec_payoffs[opponent] = payoff;
+		    	// _vec_payoffs[opponent].fetch_and_store(_vec_payoffs[opponent] + payoff);
+		    	_vec_payoffs[opponent] = payoff;
 		    }
 		    float get_payoff(int opponent)
 		    {
@@ -369,23 +369,23 @@ namespace sferes
 
 		    float _freq;
 		    int _pop_pos;
-		    std::vector<tbb::atomic<float> > _vec_payoffs;
+		    std::vector<float> _vec_payoffs;
 		    bool _evaluated;
 
-		    std::vector<tbb::atomic<float> > _vec_nb_hares;
-		    std::vector<tbb::atomic<float> > _vec_nb_hares_solo;
+		    std::vector<float> _vec_nb_hares;
+		    std::vector<float> _vec_nb_hares_solo;
 
 		    float _nb_hares;
 		    float _nb_hares_solo;
 
-		    std::vector<tbb::atomic<float> > _vec_nb_sstags;
-		    std::vector<tbb::atomic<float> > _vec_nb_sstags_solo;
+		    std::vector<float> _vec_nb_sstags;
+		    std::vector<float> _vec_nb_sstags_solo;
 
 		    float _nb_sstags;
 		    float _nb_sstags_solo;
 
-		    std::vector<tbb::atomic<float> > _vec_nb_bstags;
-		    std::vector<tbb::atomic<float> > _vec_nb_bstags_solo;
+		    std::vector<float> _vec_nb_bstags;
+		    std::vector<float> _vec_nb_bstags_solo;
 
 		    float _nb_bstags;
 		    float _nb_bstags_solo;

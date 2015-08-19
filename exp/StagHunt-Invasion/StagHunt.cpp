@@ -280,10 +280,6 @@ namespace sferes
 			food1 /= Params::simu::nb_trials;
 			food2 /= Params::simu::nb_trials;
 
-			ind1.mutex_vectors.lock();
-			std::cout << moy_hares1 << "/" << moy_bstags1 << " -- " << moy_hares2 << "/" << moy_bstags2 << std::endl;
-			ind1.mutex_vectors.unlock();
-
      	ind1.set_nb_hares(ind2.pop_pos(), moy_hares1, moy_hares1_solo);
      	ind1.set_nb_sstags(ind2.pop_pos(), moy_sstags1, moy_sstags1_solo);
      	ind1.set_nb_bstags(ind2.pop_pos(), moy_bstags1, moy_bstags1_solo);
