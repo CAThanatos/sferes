@@ -89,7 +89,7 @@ namespace sferes
           (*this->_log_file) << "," << _best->get_freq() << "," << _best->pop_pos();
 
           for(size_t i = 0; i < ea.pop().size(); ++i)
-            (*this->_log_file) << ",(" << _best->get_payoff(i) << ";" << ea.pop()[i]->pop_pos() << ")";
+            (*this->_log_file) << ",(" << _best->get_payoff(ea.pop()[i]->pop_pos()) << ";" << ea.pop()[i]->pop_pos() << ")";
 
           (*this->_log_file) << std::endl;
 				}

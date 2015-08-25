@@ -287,11 +287,14 @@ namespace sferes
 			ind1.set_payoff(ind2.pop_pos(), food1);
 
 #ifndef NOT_AGAINST_ALL
-     	ind2.set_nb_hares(ind1.pop_pos(), moy_hares2, moy_hares2_solo);
-     	ind2.set_nb_sstags(ind1.pop_pos(), moy_sstags2, moy_sstags2_solo);
-     	ind2.set_nb_bstags(ind1.pop_pos(), moy_bstags2, moy_bstags2_solo);
+			if(ind1.pop_pos() != ind2.pop_pos())
+			{
+	     	ind2.set_nb_hares(ind1.pop_pos(), moy_hares2, moy_hares2_solo);
+	     	ind2.set_nb_sstags(ind1.pop_pos(), moy_sstags2, moy_sstags2_solo);
+	     	ind2.set_nb_bstags(ind1.pop_pos(), moy_bstags2, moy_bstags2_solo);
 
-			ind2.set_payoff(ind1.pop_pos(), food2);
+				ind2.set_payoff(ind1.pop_pos(), food2);
+			}
 #endif
     } // *** end of eval ***
 
@@ -341,13 +344,13 @@ namespace sferes
 			pos_init.push_back(Posture(width/2, height - 80, -M_PI/2));
 #endif
 
-			invers_pos = misc::flip_coin();
-			// invers_pos = false;
+			bool invers = misc::flip_coin();
+			// bool invers = false;
 
 			for(int i = 0; i < 2; ++i)
 			{
 				Hunter* r;				
-				Posture pos = (invers_pos) ? pos_init[(i + 1)%2] : pos_init[i];
+				Posture pos = (invers) ? pos_init[(i + 1)%2] : pos_init[i];
 		
 				if(0 == i)
 					r = new Hunter(Params::simu::hunter_radius, pos, HUNTER_COLOR, nn1);
