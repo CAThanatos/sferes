@@ -46,7 +46,7 @@
 #include <tbb/parallel_sort.h>
 #endif
 
-#define NB_THREADS 1
+// #define NB_THREADS 1
 
 // parallel for can be desactived by defining NO_PARALLEL
 // maximum of threads can be specified by defining NB_THREADS
