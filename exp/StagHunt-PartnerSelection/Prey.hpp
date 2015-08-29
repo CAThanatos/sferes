@@ -49,7 +49,8 @@ namespace sferes
 			{
 				HARE,
 				SMALL_STAG,
-				BIG_STAG
+				BIG_STAG,
+				FOOD
 			};
 			
 			type_prey get_type() { return _type_prey; }

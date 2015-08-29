@@ -16,7 +16,7 @@ namespace sferes
 	class Hunter : public StagHuntRobot
 	{
 		public :
-			Hunter(float radius, const fastsim::Posture& pos, unsigned int color, bool deactivated = false) : StagHuntRobot(radius, pos, color, color/100), _deactivated(deactivated) 
+			Hunter(float radius, const fastsim::Posture& pos, unsigned int color, int id, bool deactivated = false) : StagHuntRobot(radius, pos, color, color/100), _deactivated(deactivated), _food_gathered(0), _id(id)
 			{	
 			}
 	
@@ -27,13 +27,13 @@ namespace sferes
 				using namespace fastsim;
 
 				std::vector<float> inputs;
-				std::vector<float> outf(Params::nn::nb_outputs);
+				std::vector<float> outf(Params::nn_move::nb_outputs);
 				
 				// std::cout << " --- " << _bool_leader << " --- " << std::endl;
 
 				if(!_deactivated)
 				{
-					inputs.resize(Params::nn::nb_inputs);
+					inputs.resize(Params::nn_move::nb_inputs);
 	
 					// We compute the inputs of the nn  
 					// Update of the sensors
@@ -70,7 +70,7 @@ namespace sferes
 					for(int i = 0; i < Params::simu::nb_camera_pixels; ++i)
 					{
 						assert(current_index < inputs.size());
-						assert((current_index + Params::nn::nb_info_by_pixel) <= inputs.size());
+						assert((current_index + Params::nn_move::nb_info_by_pixel) <= inputs.size());
 						assert(i < this->get_camera().pixels().size());
 				
 
@@ -94,29 +94,11 @@ namespace sferes
 						if(HUNTER_COLOR == type) 
 						{
 							type1 = 1;
-							type2 = 1;
 						}
 						// HARE
-						else if(HARE_COLOR == type)
+						else if(FOOD_COLOR == type)
 						{
 							type1 = 0;
-							type2 = 1;
-						}
-						// STAG
-						else if(BIG_STAG_COLOR == type)
-						{
-							if(fur_color > 0)
-							{
-								type1 = 1;
-								type2 = 0;
-								color = 0;
-							}
-							else
-							{
-								type1 = 0;
-								type2 = 0;
-								color = 1;
-							}
 						}
 
 						float max_dist = sqrtf(2.0f*pow(Params::simu::real_w, 2));
@@ -126,24 +108,24 @@ namespace sferes
 							inputs[current_index] = type1;
 							inputs[current_index + 1] = type2;
 							inputs[current_index + 2] = color;
-							// inputs[current_index + 3] = (max_dist - dist)/max_dist;
+							inputs[current_index + 3] = (max_dist - dist)/max_dist;
 						}
 						else
 						{
 							inputs[current_index] = 0;
 							inputs[current_index + 1] = 0;
 							inputs[current_index + 2] = 0;
-							// inputs[current_index + 3] = 0;
+							inputs[current_index + 3] = 0;
 						}
 
 						// std::cout << inputs[current_index] << "/" << inputs[current_index+1] << "/" << inputs[current_index+2] << "/" << inputs[current_index+3] << "/";
 
-						current_index += Params::nn::nb_info_by_pixel;
+						current_index += Params::nn_move::nb_info_by_pixel;
  					}
 
 					// std::cout << std::endl;
 	
-					std::vector<float> hidden(Params::nn::nb_hidden);
+					std::vector<float> hidden(Params::nn_move::nb_hidden);
 					
 					size_t cpt_weights = 0;
 					float lambda = 5.0f;
@@ -152,12 +134,12 @@ namespace sferes
 						hidden[i] = 0.0f;
 						for(size_t j = 0; j < inputs.size(); ++j)
 						{
-							hidden[i] += inputs[j]*_weights[cpt_weights];
+							hidden[i] += inputs[j]*_weights_nn_move[cpt_weights];
 							cpt_weights++;
 						}
 
 						// Bias neuron
-						hidden[i] += 1.0f*_weights[cpt_weights];
+						hidden[i] += 1.0f*_weights_nn_move[cpt_weights];
 						cpt_weights++;
 
 						hidden[i] = (1.0 / (exp(-hidden[i] * lambda) + 1));
@@ -168,17 +150,17 @@ namespace sferes
 						outf[i] = 0.0f;
 						for(size_t j = 0; j < hidden.size(); ++j)
 						{
-							outf[i] += hidden[j]*_weights[cpt_weights];
+							outf[i] += hidden[j]*_weights_nn_move[cpt_weights];
 							cpt_weights++;
 						}
 
 						// Bias neuron
-						outf[i] += 1.0f*_weights[cpt_weights];
+						outf[i] += 1.0f*_weights_nn_move[cpt_weights];
 						
 						outf[i] = (1.0 / (exp(-outf[i] * lambda) + 1));
 					}
 					
-					assert(outf.size() == Params::nn::nb_outputs);
+					assert(outf.size() == Params::nn_move::nb_outputs);
 
 					for(size_t j = 0; j < outf.size(); j++)
 						if(isnan(outf[j]))
@@ -197,14 +179,34 @@ namespace sferes
 			
 			void set_weights(const std::vector<float>& weights)
 			{
-				_weights.clear();
-				_weights.resize((Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_hidden * Params::nn::nb_outputs + Params::nn::nb_outputs);
-				assert(weights.size() == _weights.size());
+				_weights_nn_move.clear();
+				_weights_nn_move.resize(Params::nn_move::nn_size);
+				assert(weights.size() > _weights_nn_move.size());
 				
-				for(size_t i = 0; i < weights.size(); ++i)
-				{
-					_weights[i] = weights[i];
-				}
+				for(size_t i = 0; i < Params::nn_move::nn_size; ++i)
+					_weights_nn_move[i] = weights[i];
+
+				_weights_nn_reputation.clear();
+				_weights_nn_reputation.resize(Params::nn_reputation::nn_size);
+				assert(weights.size() > _weights_nn_reputation.size());
+				
+				for(size_t i = 0; i < Params::nn_reputation::nn_size; ++i)
+					_weights_nn_reputation[i] = weights[i + Params::nn_move::nn_size];
+
+				_weight_sharing_decision = weights[Params::nn_move::nn_size + Params::nn_reputation::nn_size];
+			}
+
+			bool decide_sharing()
+			{
+				float lambda = 5.0f;
+				out = (1.0 / (exp(-_weight_sharing_decision * lambda) + 1));
+
+				if(out < 0.5f)
+					// No sharing
+					return false;
+				else
+					// Sharing
+					return true;
 			}
   	
       int get_color_type(int pixel)
@@ -230,22 +232,46 @@ namespace sferes
         return fur_color;
       }
 			
+      void add_interaction(float food, Hunter* sharer) 
+      {
+      	interaction_t interaction;
+      	interaction.sharer = sharer->get_id();
+      	interaction.reward = food;
+      	_vec_interactions.push_back(interaction);
+
+      	add_food(food);
+      }
+
 			float get_food_gathered() { return _food_gathered; }
 			void add_food(float food) { _food_gathered += food; }
 
 			bool is_deactivated() { return _deactivated; }
-			void set_deactivated(bool deactivated) { _deactivated = deactivated; }		
+			void set_deactivated(bool deactivated) { _deactivated = deactivated; }
+
+			int get_id() { return _id; }
 
 			std::vector<float>& get_last_inputs() { return _last_inputs; }
 
 		private :
-			std::vector<float> _weights;
+			std::vector<float> _weights_nn_move;
+			std::vector<flat> _weights_nn_reputation;
+			float _weight_sharing_decision;
 
 			float _food_gathered;
 
 			bool _deactivated;
 
+			int _id;
+
 			std::vector<float> _last_inputs;
+
+			struct Interaction
+			{
+				int sharer;
+				int reward;
+			};
+			typedef struct Interaction interaction_t;
+			std::vector<interaction_t> _vec_interactions;
 	};
 }
 

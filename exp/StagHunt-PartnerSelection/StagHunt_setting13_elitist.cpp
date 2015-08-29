@@ -31,6 +31,7 @@ namespace sferes
       using namespace fastsim;	
       
       //this->set_mode(fit::mode::eval);
+      // this->set_mode(fit::mode::view);
 
       // *** Main Loop *** 
 
@@ -47,6 +48,7 @@ namespace sferes
 			cpt_files = 0;
 #endif
 
+			clock_t deb = clock();
 			for (size_t i = 0; i < Params::simu::nb_steps && !stop_eval; ++i)
 			{
 				// Number of steps the robots are evaluated
@@ -78,6 +80,8 @@ namespace sferes
 
 				update_simu(simu);
 			} // *** end of step ***
+			clock_t fin = clock();
+			std::cout << "HE : " << (fin - deb)/(double) CLOCKS_PER_SEC << std::endl;
 
 #if defined(BEHAVIOUR_LOG)
  			if(this->mode() == fit::mode::view)
@@ -164,7 +168,7 @@ namespace sferes
 					simu.add_robot(r);
 				}
 			}
-					
+
 			// Then the hares std::vector<Posture> vec_pos;
 			int nb_big_stags = Params::simu::ratio_big_stags*Params::simu::nb_big_stags;
 			int nb_small_stags = Params::simu::nb_big_stags - nb_big_stags;
@@ -177,23 +181,6 @@ namespace sferes
 				{
 					Hare* r = new Hare(Params::simu::hare_radius, pos, HARE_COLOR);
 		
-					simu.add_robot(r);
-				}
-			}
-	
-			// And finally the big stags
-			for(int i = 0; i < Params::simu::nb_big_stags; ++i)
-			{
-				int fur_color = 0;
-				if(i >= nb_small_stags)
-					fur_color = 50;
-			
-				Posture pos;
-
-				if(simu.map()->get_random_initial_position(Params::simu::big_stag_radius + 5, pos, 1000, false))
-				{
-					Stag* r = new Stag(Params::simu::big_stag_radius, pos, BIG_STAG_COLOR, Stag::big, fur_color);
-			
 					simu.add_robot(r);
 				}
 			}

@@ -154,17 +154,24 @@ namespace sferes
 				this->_pop.push_back(this->_pop[random_child]->clone());
 #endif
 
-#ifdef RANDOM_MUTANT
-				// Probability that the mutation produces a totally random new individual
-				float proba_random_mutant = misc::rand<float>();
+				bool mutation = false;
 
-				if(proba_random_mutant < Params::evo_float::random_mutant_probability)
-					this->_pop[_nb_genotypes]->gen().random();
-				else
-					this->_pop[_nb_genotypes]->gen().mutate();
+				do
+				{
+#ifdef RANDOM_MUTANT
+					// Probability that the mutation produces a totally random new individual
+					float proba_random_mutant = misc::rand<float>();
+
+					if(proba_random_mutant < Params::evo_float::random_mutant_probability) {
+						this->_pop[_nb_genotypes]->gen().random();
+						mutation = true;
+					}
+					else
+						mutation = this->_pop[_nb_genotypes]->gen().mutate();
 #else
-				this->_pop[_nb_genotypes]->gen().mutate();
+					mutation = this->_pop[_nb_genotypes]->gen().mutate();
 #endif
+				} while(!mutation);
 
 				this->_pop[_nb_genotypes]->set_pop_pos(_nb_genotypes);
 				this->_pop[_nb_genotypes]->develop();
@@ -174,7 +181,6 @@ namespace sferes
 
 				// We set its frequency and update that of other individuals
 				this->_pop[_nb_genotypes]->set_freq(Params::pop::invasion_frequency);
-				this->_pop[_nb_genotypes]->set_pop_pos(_nb_genotypes);
 
 				int pos_mutant = _nb_genotypes;
 				std::vector<int> vec_remove_genotypes;
@@ -216,7 +222,6 @@ namespace sferes
 				float modif;
 				do
 				{
-					// std::cout << "nieh ?" << std::endl;
 					modif = 0.0f;
 
 					_vec_fitness.clear();
@@ -269,7 +274,7 @@ namespace sferes
 					proba = misc::rand(1.0f);
 
 					// We continue while we still have computation time AND there has been more than 1% modification AND no new mutant appeared
-				}	while((iteration < max_iterations) && (proba < Params::evo_float::mutant_apparition_rate) && (modif > 0.01f));
+				}	while((iteration < max_iterations) && (proba > Params::evo_float::mutant_apparition_rate) && (modif > 0.01f));
 
 				// We update the population: we remove the genotypes with freq = 0
 				vec_remove_genotypes.clear();

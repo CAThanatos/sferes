@@ -18,9 +18,8 @@
 #include <modules/fastsim_multi2/simu_fastsim_multi.hpp>
 #include <modules/nn2/mlp.hpp>
 
-#include "Hare.hpp"
 #include "Hunter.hpp"
-#include "Stag.hpp"
+#include "Food.hpp"
 #include "StagHuntRobot.hpp"
 #include "BestFitEval.hpp"
 #include "MeanFitEval.hpp"

@@ -27,6 +27,7 @@ namespace sferes
       using namespace fastsim;	
       
       //this->set_mode(fit::mode::eval);
+      // this->set_mode(fit::mode::view);
 
       // *** Main Loop *** 
 
@@ -73,6 +74,42 @@ namespace sferes
 				}
 
 				update_simu(simu);
+
+				std::vector<int> dead_preys;
+
+				for(int k = pop.size(); k < simu.robots().size(); ++k)
+					check_status(simu, (Prey*)(simu.robots()[k]), dead_preys, k, pop.size());
+				
+				// We remove the dead preys
+				while(!dead_preys.empty())
+				{
+					int index = dead_preys.back();
+
+					Prey::type_prey type = ((Prey*)simu.robots()[index])->get_type();
+					Posture pos;
+
+					int nb_blocked = ((Prey*)simu.robots()[index])->get_nb_blocked();
+					bool alone = (nb_blocked > 1) ? false : true;
+
+#ifdef BEHAVIOUR_LOG
+					if(this->mode() == fit::mode::view)
+     				simu.add_dead_prey(index, alone);
+#endif
+
+					dead_preys.pop_back();
+					simu.remove_robot(index);
+
+					if(type == Prey::FOOD)
+					{
+						Posture pos;
+	
+						if(simu.get_random_initial_position(Params::simu::food_radius, pos))
+						{
+							Food* r = new Food(Params::simu::food_radius, pos, FOOD_COLOR);							
+							simu.add_robot(r);
+						}
+					}
+				}
 			} // *** end of step ***
 
 #if defined(BEHAVIOUR_LOG)
@@ -135,11 +172,11 @@ namespace sferes
 			{
 				Posture pos;
 
-				if(simu.map()->get_random_initial_position(Params::simu::big_stag_radius + 5, pos, 1000, false))
+				if(simu.map()->get_random_initial_position(Params::simu::hunter_radius + 5, pos, 1000, false))
 				{
 						Hunter* r;
 
-					r = new Hunter(Params::simu::hunter_radius, pos, HUNTER_COLOR);
+					r = new Hunter(Params::simu::hunter_radius, pos, HUNTER_COLOR, i);
 					r->set_weights(pop[i]->data());
 
 					if(!r->is_deactivated())
@@ -153,43 +190,24 @@ namespace sferes
 						r->add_laser(Laser(-M_PI / 6, 50));
 			
 						// 1 linear camera
-						// r->use_camera(LinearCamera(M_PI/2, Params::simu::nb_camera_pixels));
-						r->use_camera(LinearCamera(M_PI/3.6, Params::simu::nb_camera_pixels));
+						r->use_camera(LinearCamera(M_PI/2, Params::simu::nb_camera_pixels));
+						// r->use_camera(LinearCamera(M_PI/3.6, Params::simu::nb_camera_pixels));
 					}
 
 					simu.add_robot(r);
 				}
 			}
-					
-			// Then the hares std::vector<Posture> vec_pos;
-			int nb_big_stags = Params::simu::ratio_big_stags*Params::simu::nb_big_stags;
-			int nb_small_stags = Params::simu::nb_big_stags - nb_big_stags;
 
-			for(int i = 0; i < Params::simu::nb_hares; ++i)
+			// Then the food
+
+			for(int i = 0; i < Params::simu::total_food; ++i)
 			{
 				Posture pos;
 
-				if(simu.map()->get_random_initial_position(Params::simu::big_stag_radius + 5, pos, 1000, false))
+				if(simu.map()->get_random_initial_position(Params::simu::food_radius + 5, pos, 1000, false))
 				{
-					Hare* r = new Hare(Params::simu::hare_radius, pos, HARE_COLOR);
+					Food* r = new Food(Params::simu::hare_radius, pos, FOOD_COLOR);
 		
-					simu.add_robot(r);
-				}
-			}
-	
-			// And finally the big stags
-			for(int i = 0; i < Params::simu::nb_big_stags; ++i)
-			{
-				int fur_color = 0;
-				if(i >= nb_small_stags)
-					fur_color = 50;
-			
-				Posture pos;
-
-				if(simu.map()->get_random_initial_position(Params::simu::big_stag_radius + 5, pos, 1000, false))
-				{
-					Stag* r = new Stag(Params::simu::big_stag_radius, pos, BIG_STAG_COLOR, Stag::big, fur_color);
-			
 					simu.add_robot(r);
 				}
 			}
@@ -206,7 +224,69 @@ namespace sferes
 			if (this->mode() == fit::mode::view)
 			  simu.refresh_view();
     }
-  	    
+
+    
+    template<typename Simu>
+    	void check_status(Simu &simu, Prey* prey, std::vector<int>& dead_preys, int position, int pop_size)
+   	{
+   		using namespace fastsim;
+   		
+   		// We compute the distance between this prey and each of its hunters
+   		std::vector<Hunter*> hunters;
+   		float px = prey->get_pos().x();
+   		float py = prey->get_pos().y();
+   		
+   		for(int i = 0; i < pop_size; ++i)
+   		{
+   			Hunter* hunter = (Hunter*)(simu.robots()[i]);
+   			float hx = hunter->get_pos().x();
+   			float hy = hunter->get_pos().y();
+   			float dist = sqrt(pow(px - hx, 2) + pow(py - hy, 2));
+   			
+   			// The radius must not be taken into account
+   			if((dist - prey->get_radius() - hunter->get_radius()) <= CATCHING_DISTANCE)
+   				hunters.push_back(hunter);
+   		}
+
+   		prey->blocked_by_hunters(hunters.size());
+   	
+   		// And then we check if the prey is dead and let the hunters
+   		// have a glorious feast on its corpse. Yay !
+   		if(prey->is_dead())
+   		{
+   			float food = 0;
+
+   			dead_preys.push_back(position)
+   			
+   			// We chose the individual responsible for the sharing among the hunters
+   			int sharer_index = misc::rand<int>(0, hunters.size());
+   			Hunter* sharer = hunters[sharer_index];
+
+   			bool decision = sharer->decide_sharing();
+
+   			if(decision)
+   			{
+   				// The hunter has decided to share, everybody gets the lesser reward
+   				food = REWARD_COOP;
+
+   				for(int i = 0; i < hunters.size(); ++i)
+   					hunters[i]->add_interaction(food, sharer);
+   			}
+   			else
+   			{
+   				// The hunter keeps it for itself, he gets the bigger reward and the others get nothing
+   				food = REWARD_DEFECT;
+
+   				for(int i = 0; i < hunters.size(); ++i)
+   					if(i != sharer_index)
+   						hunters[i]->add_interaction(0, sharer);
+   					else
+   						hunters[i]->add_interaction(food, sharer);
+   			}
+   		}
+   	}
+
+
 		float width, height;
 		bool stop_eval;                                  // Stops the evaluation
 		int _nb_eval;                                    // Number of evaluation (until the robot stands still)
@@ -259,9 +339,9 @@ int main(int argc, char **argv)
 
 	// GENOTYPE
 #ifdef ELITIST
-  typedef gen::ElitistGen<Params::nn::genome_size, Params> gen_t;
+  typedef gen::ElitistGen<Params::evo_float::genome_size, Params> gen_t;
 #else
-  typedef gen::EvoFloat<Params::nn::genome_size, Params> gen_t;
+  typedef gen::EvoFloat<Params::evo_float::genome_size, Params> gen_t;
 #endif
   
   // PHENOTYPE

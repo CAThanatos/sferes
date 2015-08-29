@@ -389,7 +389,7 @@ struct Params
 #elif defined(INVASION005)
 		static const float invasion_frequency = 0.005f;
 #else
-		static const float invasion_frequency = 0.01f;
+		static const float invasion_frequency = 0.05f;
 #endif
 
 		static const float min_threshold = 0.001f;

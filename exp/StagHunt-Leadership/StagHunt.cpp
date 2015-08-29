@@ -470,9 +470,6 @@ namespace sferes
 					}
 				}
 
-				// clock_t fin = clock();
-				// std::cout << "HE : " << (fin - deb)/(double) CLOCKS_PER_SEC << std::endl;
-
        	Hunter* h1 = (Hunter*)(simu.robots()[0]);
        	food1 += h1->get_food_gathered();
 		   	food_trial += h1->get_food_gathered();
