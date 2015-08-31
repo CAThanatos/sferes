@@ -70,6 +70,12 @@ namespace sferes
 					_developed = true;
 
 					this->fit().fitness_at = 0;
+
+					_nb_cooperate = 0;
+					_nb_cooperate_at = 0;
+
+					_nb_defect = 0;
+					_nb_defect_at = 0;
 				}
 
 				float data(size_t i) const { assert(i < size()); return _params[i]; }
@@ -109,6 +115,16 @@ namespace sferes
 				void set_developed(bool developed) { _developed = developed; }
 				bool developed_at() const { return _developed_at; }
 				void set_developed_at(bool developed) { _developed_at = developed; }
+
+				void add_nb_cooperate(float nb_cooperate) { _nb_cooperate_at.fetch_and_store(_nb_cooperate_at + nb_cooperate); }
+				void set_nb_cooperate(float nb_cooperate) { _nb_cooperate = nb_cooperate; }
+				float nb_cooperate() { return _nb_cooperate; }
+				float nb_cooperate_at() { return _nb_cooperate_at; }
+
+				void add_nb_defect(float nb_defect) { _nb_defect_at.fetch_and_store(_nb_defect_at + nb_defect); }
+				void set_nb_defect(float nb_defect) { _nb_defect = nb_defect; }
+				float nb_defect() { return _nb_defect; }
+				float nb_defect_at() { return _nb_defect_at; }
 				
 				boost::shared_ptr<PhenChasseur> clone()
 				{
@@ -125,6 +141,12 @@ namespace sferes
 		    
 		    bool _developed;
 		    tbb::atomic<bool> _developed_at;
+
+		    float _nb_cooperate;
+		    tbb::atomic<float> _nb_cooperate_at;
+
+		    float _nb_defect;
+		    tbb::atomic<float> _nb_defect_at;
     };
     
     template<typename G, typename F, typename P, typename E> 

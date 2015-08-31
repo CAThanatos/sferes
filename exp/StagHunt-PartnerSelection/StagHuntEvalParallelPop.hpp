@@ -115,8 +115,11 @@ namespace sferes
 
 					pop[i]->fit().set_obj(0, pop[i]->fit().fitness_at);
 					pop[i]->fit().set_value(pop[i]->fit().fitness_at);
-				}
 
+					pop[i]->set_nb_cooperate(pop[i]->nb_cooperate_at());
+					pop[i]->set_nb_defect(pop[i]->nb_defect_at());
+					pop[i]->set_developed_at(false);
+				}
 
 #ifndef NDEBUG
 				os << "GEN : " << time(NULL) - duration << std::endl;

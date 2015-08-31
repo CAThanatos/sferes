@@ -25,17 +25,14 @@
 #include "MeanFitEval.hpp"
 #include "BestEverFitEval.hpp"
 #include "AllFitEvalStat.hpp"
+#include "AllFitBehaviourVideo.hpp"
 #include "PhenChasseur.hpp"
 #include "ElitistGen.hpp"
 #include "FitnessProp.hpp"
 #include "Elitist.hpp"
 #include "StagHuntEvalParallelPop.hpp"
-#include "BestLeadershipEval.hpp"
-#include "AllLeadershipEvalStat.hpp"
 
 #include "StopEval.hpp"
-#include "BestFitBehaviour.hpp"
-#include "BestFitBehaviourVideo.hpp"
 
 using namespace sferes;
 using namespace sferes::gen::evo_float;

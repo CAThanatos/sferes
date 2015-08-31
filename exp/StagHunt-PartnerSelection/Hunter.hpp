@@ -16,8 +16,14 @@ namespace sferes
 	class Hunter : public StagHuntRobot
 	{
 		public :
-			Hunter(float radius, const fastsim::Posture& pos, unsigned int color, int id, bool deactivated = false) : StagHuntRobot(radius, pos, color, color/100), _deactivated(deactivated), _food_gathered(0), _id(id)
-			{	
+			Hunter(float radius, const fastsim::Posture& pos, unsigned int color, int id, bool deactivated = false) : StagHuntRobot(radius, pos, color + id, color/100), _deactivated(deactivated), _food_gathered(0), _id(id)
+			{
+				_vec_reputation.resize(Params::pop::size);
+				for(size_t i = 0; i < _vec_reputation.size(); ++i)
+					_vec_reputation[i] = -1.0f;
+
+				_nb_cooperate = 0;
+				_nb_defect = 0;
 			}
 	
 			~Hunter() {	}
@@ -27,7 +33,7 @@ namespace sferes
 				using namespace fastsim;
 
 				std::vector<float> inputs;
-				std::vector<float> outf(Params::nn_move::nb_outputs);
+				std::vector<float> outf;
 				
 				// std::cout << " --- " << _bool_leader << " --- " << std::endl;
 
@@ -79,21 +85,60 @@ namespace sferes
 						float dist = this->get_camera().dist()[i];
 
 						int type = -1;
-						int fur_color = -1;
+						int id = -1;
 						if(pixel != -1)
 						{
 							type = get_color_type(pixel);
-							fur_color = get_fur_color(pixel);
+							id = get_id(pixel);
 						}
 
 						int type1 = 0;
-						int type2 = 0;
-						float color = 0.0f;
+						float reputation = 0;
 
 						// HUNTER
 						if(HUNTER_COLOR == type) 
 						{
 							type1 = 1;
+
+#ifdef NO_REPUTATION
+							reputation = 0;
+#else
+							if(id != -1)
+							{
+								if(_vec_reputation[id] < 0.0f)
+								{
+									// The reputation needs to be computed
+									std::vector<float> inputs_reputation(Params::nn_reputation::nb_inputs, 0.0f);
+
+									int max_interactions = Params::simu::nb_steps/STAMINA;
+									int max_reward = REWARD_COOP*max_interactions;
+
+#ifdef INTERACTION_MEMORY
+									std::vector<float> interactions = find_interactions(id, Params::nn_reputation::interactions_memory);
+
+									assert(interactions.size()*2 <= Params::nn_reputation::nb_inputs);
+									for(size_t i = 0; i < interactions.size(); ++i)
+									{
+										inputs_reputation[i] = 1.0f;
+										inputs_reputation[i + 1] = interactions[i]/max_reward;
+									}
+#else
+									float mean_reward = 0.0f;
+									int nb_interactions = compress_interactions(id, mean_reward);
+
+									inputs_reputation[0] = mean_reward/(float)max_reward;
+									inputs_reputation[1] = nb_interactions/(float)max_interactions;
+#endif
+
+									std::vector<float> out_rep = compute_nn(inputs_reputation, 1);
+
+									assert(out_rep.size() == 1);
+									_vec_reputation[id] = out_rep[0];
+								}
+
+								reputation = _vec_reputation[id];
+							}
+#endif
 						}
 						// HARE
 						else if(FOOD_COLOR == type)
@@ -106,61 +151,24 @@ namespace sferes
 						if(pixel != -1)
 						{
 							inputs[current_index] = type1;
-							inputs[current_index + 1] = type2;
-							inputs[current_index + 2] = color;
-							inputs[current_index + 3] = (max_dist - dist)/max_dist;
+							inputs[current_index + 1] = reputation;
+							inputs[current_index + 2] = (max_dist - dist)/max_dist;
 						}
 						else
 						{
 							inputs[current_index] = 0;
 							inputs[current_index + 1] = 0;
 							inputs[current_index + 2] = 0;
-							inputs[current_index + 3] = 0;
 						}
 
-						// std::cout << inputs[current_index] << "/" << inputs[current_index+1] << "/" << inputs[current_index+2] << "/" << inputs[current_index+3] << "/";
+						// std::cout << inputs[current_index] << "/" << inputs[current_index+1] << "/" << inputs[current_index+2] << "/";
 
 						current_index += Params::nn_move::nb_info_by_pixel;
  					}
 
 					// std::cout << std::endl;
 	
-					std::vector<float> hidden(Params::nn_move::nb_hidden);
-					
-					size_t cpt_weights = 0;
-					float lambda = 5.0f;
-					for(size_t i = 0; i < hidden.size(); ++i)
-					{
-						hidden[i] = 0.0f;
-						for(size_t j = 0; j < inputs.size(); ++j)
-						{
-							hidden[i] += inputs[j]*_weights_nn_move[cpt_weights];
-							cpt_weights++;
-						}
-
-						// Bias neuron
-						hidden[i] += 1.0f*_weights_nn_move[cpt_weights];
-						cpt_weights++;
-
-						hidden[i] = (1.0 / (exp(-hidden[i] * lambda) + 1));
-					}
-					
-					for(size_t i = 0; i < outf.size(); ++i)
-					{
-						outf[i] = 0.0f;
-						for(size_t j = 0; j < hidden.size(); ++j)
-						{
-							outf[i] += hidden[j]*_weights_nn_move[cpt_weights];
-							cpt_weights++;
-						}
-
-						// Bias neuron
-						outf[i] += 1.0f*_weights_nn_move[cpt_weights];
-						
-						outf[i] = (1.0 / (exp(-outf[i] * lambda) + 1));
-					}
-					
-					assert(outf.size() == Params::nn_move::nb_outputs);
+					outf = compute_nn(inputs, 0);
 
 					for(size_t j = 0; j < outf.size(); j++)
 						if(isnan(outf[j]))
@@ -170,8 +178,8 @@ namespace sferes
 				}
 				else
 				{
-					outf[0] = -1.0f;
-					outf[1] = -1.0f;
+					outf.push_back(-1.0f);
+					outf.push_back(-1.0f);
 				}
 
 				return outf;
@@ -196,10 +204,127 @@ namespace sferes
 				_weight_sharing_decision = weights[Params::nn_move::nn_size + Params::nn_reputation::nn_size];
 			}
 
+			// nn: 0 for nn_move
+			//		 1 for nn_reputation
+			std::vector<float> compute_nn(const std::vector<float>& inputs, bool nn)
+			{
+				size_t cpt_weights = 0;
+				float lambda = 5.0f;
+
+				int nb_hidden = 0;
+				int nb_outputs = 0;
+				std::vector<float> weights;
+
+				if(nn == 0)
+				{
+					nb_hidden = Params::nn_move::nb_hidden;
+					nb_outputs = Params::nn_move::nb_outputs;
+					weights = _weights_nn_move;
+				}
+				else
+				{
+					nb_hidden = Params::nn_reputation::nb_hidden;
+					nb_outputs = Params::nn_reputation::nb_outputs;
+					weights = _weights_nn_reputation;
+				}
+
+				std::vector<float> outputs(nb_outputs);
+				std::vector<float> hidden(nb_hidden);
+
+				if(nb_hidden > 0)
+				{
+					for(size_t i = 0; i < hidden.size(); ++i)
+					{
+						hidden[i] = 0.0f;
+						for(size_t j = 0; j < inputs.size(); ++j)
+						{
+							hidden[i] += inputs[j]*weights[cpt_weights];
+							cpt_weights++;
+						}
+
+						// Bias neuron
+						hidden[i] += 1.0f*weights[cpt_weights];
+						cpt_weights++;
+
+						hidden[i] = (1.0 / (exp(-hidden[i] * lambda) + 1));
+					}
+					
+					for(size_t i = 0; i < outputs.size(); ++i)
+					{
+						outputs[i] = 0.0f;
+						for(size_t j = 0; j < hidden.size(); ++j)
+						{
+							outputs[i] += hidden[j]*weights[cpt_weights];
+							cpt_weights++;
+						}
+
+						// Bias neuron
+						outputs[i] += 1.0f*weights[cpt_weights];
+						
+						outputs[i] = (1.0 / (exp(-outputs[i] * lambda) + 1));
+					}
+				}
+				else
+				{
+					for(size_t i = 0; i < outputs.size(); ++i)
+					{
+						outputs[i] = 0.0f;
+						for(size_t j = 0; j < inputs.size(); ++j)
+						{
+							outputs[i] += inputs[j]*weights[cpt_weights];
+							cpt_weights++;
+						}
+
+						// Bias neuron
+						outputs[i] += 1.0f*weights[cpt_weights];
+						
+						outputs[i] = (1.0 / (exp(-outputs[i] * lambda) + 1));
+					}
+				}
+
+				return outputs;		
+			}
+
+			int compress_interactions(int id, float& mean_reward)
+			{
+				mean_reward = 0.0f;
+				int nb_interactions = 0;
+				for(size_t i = 0; i < _vec_interactions.size(); ++i)
+				{
+					if(_vec_interactions[i].sharer == id)
+					{
+						mean_reward += _vec_interactions[i].reward;
+						nb_interactions++;
+					}
+				}
+
+				if(nb_interactions > 0)
+					mean_reward /= (float)nb_interactions;
+
+				return nb_interactions;
+			}
+
+			std::vector<float> find_interactions(int id, int memory_size)
+			{
+				std::vector<float> vec_rewards;
+				int cpt = 0;
+				for(size_t i = _vec_interactions.size() - 1; (i >= 0) && (cpt < memory_size); i--)
+				{
+					if(_vec_interactions[i].sharer == id)
+					{
+						vec_rewards.push_back(_vec_interactions[i].reward);
+						cpt++;
+					}
+				}
+
+				return vec_rewards;
+			}
+
+
 			bool decide_sharing()
 			{
 				float lambda = 5.0f;
-				out = (1.0 / (exp(-_weight_sharing_decision * lambda) + 1));
+				float out = (1.0 / (exp(-_weight_sharing_decision * lambda) + 1));
 
 				if(out < 0.5f)
 					// No sharing
@@ -225,11 +350,11 @@ namespace sferes
         }
       }
 
-      int get_fur_color(int pixel)
+      int get_id(int pixel)
       {
         int color_type = get_color_type(pixel);
-        int fur_color = abs(pixel) - color_type;
-        return fur_color;
+        int id = abs(pixel) - color_type;
+        return id;
       }
 			
       void add_interaction(float food, Hunter* sharer) 
@@ -239,8 +364,23 @@ namespace sferes
       	interaction.reward = food;
       	_vec_interactions.push_back(interaction);
 
+      	// The reputation of this sharer needs to be updated
+      	_vec_reputation[sharer->get_id()] = -1.0f;
+
       	add_food(food);
       }
+
+      void add_cooperation()
+      {
+      	_nb_cooperate++;
+      }
+      float nb_cooperate() { return _nb_cooperate; }
+
+      void add_defection()
+      {
+      	_nb_defect++;
+      }
+      float nb_defect() { return _nb_defect; }
 
 			float get_food_gathered() { return _food_gathered; }
 			void add_food(float food) { _food_gathered += food; }
@@ -254,14 +394,16 @@ namespace sferes
 
 		private :
 			std::vector<float> _weights_nn_move;
-			std::vector<flat> _weights_nn_reputation;
+			std::vector<float> _weights_nn_reputation;
 			float _weight_sharing_decision;
-
-			float _food_gathered;
 
 			bool _deactivated;
 
+			float _food_gathered;
+
 			int _id;
+
+			int _nb_cooperate, _nb_defect;
 
 			std::vector<float> _last_inputs;
 
@@ -272,6 +414,8 @@ namespace sferes
 			};
 			typedef struct Interaction interaction_t;
 			std::vector<interaction_t> _vec_interactions;
+
+			std::vector<float> _vec_reputation;
 	};
 }
 

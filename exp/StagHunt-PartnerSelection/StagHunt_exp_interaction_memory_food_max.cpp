@@ -1,3 +1,8 @@
+// THIS IS A GENERATED FILE - DO NOT EDIT
+#define EXP
+#define INTERACTION_MEMORY
+#define FOOD_MAX
+#line 1 "/home/abernard/sferes2-0.99/exp/StagHunt-PartnerSelection/StagHunt.cpp"
 #include "includes.hpp"
 #include "defparams.hpp"
 

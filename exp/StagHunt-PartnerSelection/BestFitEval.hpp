@@ -60,7 +60,7 @@ namespace sferes
 				this->_create_log_file_genome(ea, "bestgenome.dat");
 				if (ea.dump_enabled())
 				{
-          (*this->_log_file) << ea.nb_eval() << "," << _best->fit().value() << std::endl;;
+          (*this->_log_file) << ea.nb_eval() << "," << _best->fit().value() << "," << _best->nb_cooperate() << "," << _best->nb_defect() << std::endl;;
 					
 					(*this->_log_file_genome) << ea.nb_eval();
 					for(size_t i = 0; i < _best->gen().size(); ++i)
@@ -72,10 +72,6 @@ namespace sferes
       }
       void show(std::ostream& os, size_t k)
       {
-				_best->develop();
-				_best->show(os);
-				_best->fit().set_mode(fit::mode::view);
-				_best->fit().eval_compet(*_best, *_best);
       }
       const boost::shared_ptr<Phen> best() const { return _best; }
       template<class Archive>

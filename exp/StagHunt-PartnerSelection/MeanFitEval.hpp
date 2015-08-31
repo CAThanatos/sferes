@@ -52,18 +52,23 @@ namespace sferes
       template<typename E>
 	      void refresh(const E& ea)
       {
-				float s = 0;
+				_mean_fitness = 0;
+        _mean_cooperate = 0;
+        _mean_defect = 0;
 				BOOST_FOREACH(boost::shared_ptr<typename E::phen_t> i, ea.pop())
-#ifdef MULTI
-					s += i->fit().obj(0);
-#else
-					s += i->fit().value();
-#endif
-				_mean = s / ea.pop().size();
+        {
+          _mean_fitness += i->fit().value();
+          _mean_cooperate += i->nb_cooperate();
+          _mean_defect += i->nb_defect();
+        }
+
+        _mean_fitness /= (float)ea.pop().size();
+        _mean_cooperate /= (float)ea.pop().size();
+        _mean_defect /= (float)ea.pop().size();
 
 				this->_create_log_file(ea, "meanfit.dat");
 				if (ea.dump_enabled())
-				  (*this->_log_file) << ea.nb_eval() << "," << _mean << std::endl;
+				  (*this->_log_file) << ea.nb_eval() << "," << _mean_fitness << "," << _mean_cooperate << "," << _mean_defect << std::endl;
       }
 
       void show(std::ostream& os, size_t k) const
@@ -71,15 +76,21 @@ namespace sferes
       	std::cout << "No sense in showing this stat !" << std::endl;
       }
 
-      float mean() const { return _mean; }
+      float mean_fitness() const { return _mean_fitness; }
+      float mean_cooperate() const { return _mean_cooperate; }
+      float mean_defect() const { return _mean_defect; }
 
       template<class Archive>
 				void serialize(Archive & ar, const unsigned int version)
       {
-        ar & BOOST_SERIALIZATION_NVP(_mean);
+        ar & BOOST_SERIALIZATION_NVP(_mean_fitness);
+        ar & BOOST_SERIALIZATION_NVP(_mean_cooperate);
+        ar & BOOST_SERIALIZATION_NVP(_mean_defect);
       }
     protected:
-      float _mean;
+      float _mean_fitness;
+      float _mean_cooperate;
+      float _mean_defect;
     };
   }
 }

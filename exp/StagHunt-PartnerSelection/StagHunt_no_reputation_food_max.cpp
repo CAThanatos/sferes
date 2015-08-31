@@ -1,3 +1,7 @@
+// THIS IS A GENERATED FILE - DO NOT EDIT
+#define NO_REPUTATION
+#define FOOD_MAX
+#line 1 "/home/abernard/sferes2-0.99/exp/StagHunt-PartnerSelection/StagHunt.cpp"
 #include "includes.hpp"
 #include "defparams.hpp"
 
@@ -271,8 +275,7 @@ namespace sferes
    			Hunter* sharer = hunters[sharer_index];
 
 #ifdef NO_SHARING
- 				for(int i = 0; i < hunters.size(); ++i)
-	   			hunters[i]->add_interaction(REWARD_COOP, sharer);
+   			hunters[i]->add_interaction(REWARD_COOP, sharer);
 #else
    			bool decision = sharer->decide_sharing();
 

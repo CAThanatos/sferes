@@ -13,7 +13,42 @@
 
 struct Params
 {
-	struct simu
+  struct pop
+  {
+    // size of the population
+    static const unsigned size = 20;
+    
+    // number of generations
+    static const unsigned nb_gen = 10000;
+    
+    // how often should the result file be written (here, each 10
+    // generation)
+    static const int dump_period = 100;
+    
+    // how often should the video be done
+    static const int video_dump_period = 100;
+    
+    // how many individuals should be created during the random
+    // generation process?
+    static const int initial_aleat = 1;
+    
+    // used by RankSimple to select the pressure
+    static const float coeff = 1.1f;
+    
+    // the number of individuals that are kept from on generation to
+    // another (elitism) (but are still mutated)
+    static const float keep_rate = 1.0f;
+    
+    // The budget in a number of evaluations for the simulation
+    static const int budget = 50000; //Params::pop::size * 850;
+
+#ifdef ELITIST
+    static const unsigned mu = Params::pop::size/2;
+    static const unsigned lambda = Params::pop::size/2;
+#endif
+  };
+
+  struct simu
 	{
 #ifdef MAP800
 		SFERES_STRING(map_name, SFERES_ROOT "/exp/StagHunt-PartnerSelection/map800x800.pbm");
@@ -33,9 +68,13 @@ struct Params
 		
 		static const float food_radius = 20.0f;
 
-		static const int total_food = 10;
+#ifdef FOOD_MAX
+    static const int total_food = Params::pop::size;
+#else
+		static const int total_food = Params::pop::size/2;
+#endif
 
-		static const float nb_steps = 20000;
+		static const float nb_steps = 100000;
 		
 #ifdef TRACE_ONLY
 		static const int nb_trials = 20;
@@ -51,12 +90,12 @@ struct Params
 
 		static const int threshold_hamming = 0.5f;
 
-		static const int nb_hunters_needed = 2;
+		static const int nb_hunters_blocking = 2;
 	};
 	
 	struct nn_move
 	{
-		static const size_t nb_info_by_pixel = 4;
+		static const size_t nb_info_by_pixel = 3;
 
 #ifdef SCREAM
 		static const size_t nb_inputs_scream = 1;
@@ -78,9 +117,21 @@ struct Params
 
   struct nn_reputation
   {
-    static const size_t nb_inputs = 2;
+#ifdef INTERACTION_MEMORY
+    static const size_t interactions_memory = 5;
+#endif
 
+#ifdef INTERACTION_MEMORY
+    static const size_t nb_inputs = Params::nn_reputation::interactions_memory * 2;
+#else
+    static const size_t nb_inputs = 2;
+#endif
+
+#ifdef INTERACTION_MEMORY
+    static const size_t nb_hidden = 2;
+#else
     static const size_t nb_hidden = 0;
+#endif
 
     static const size_t nb_outputs = 1;
 
@@ -147,41 +198,6 @@ struct Params
 #endif
   };
   
-  struct pop
-  {
-    // size of the population
-    static const unsigned size = 20;
-    
-    // number of generations
-    static const unsigned nb_gen = 10000;
-    
-    // how often should the result file be written (here, each 10
-    // generation)
-    static const int dump_period = 100;
-    
-    // how often should the video be done
-    static const int video_dump_period = 100;
-    
-    // how many individuals should be created during the random
-    // generation process?
-    static const int initial_aleat = 1;
-    
-    // used by RankSimple to select the pressure
-    static const float coeff = 1.1f;
-    
-    // the number of individuals that are kept from on generation to
-    // another (elitism) (but are still mutated)
-    static const float keep_rate = 1.0f;
-    
-    // The budget in a number of evaluations for the simulation
-    static const int budget = 50000; //Params::pop::size * 850;
-
-#ifdef ELITIST
-		static const unsigned mu = Params::pop::size/2;
-		static const unsigned lambda = Params::pop::size/2;
-#endif
-  };
-  
   struct trajectory
   {  	
   };
@@ -206,7 +222,7 @@ struct Params
 #define HUNTER_COLOR 100
 #define FOOD_COLOR 200
 
-#define STAMINA 800
+#define STAMINA 1600
 
 #define REWARD_COOP 50
 #define REWARD_DEFECT 500
@@ -232,7 +248,7 @@ struct Params
 
 // #define BEHAVIOUR_LOG
 
-#define BEHAVIOUR_VIDEO
+// #define BEHAVIOUR_VIDEO
 
 #define TEST_VARIANCE_TRIALS
 
