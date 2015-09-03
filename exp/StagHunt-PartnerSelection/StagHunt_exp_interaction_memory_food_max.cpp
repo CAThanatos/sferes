@@ -277,7 +277,12 @@ namespace sferes
 
 #ifdef NO_SHARING
  				for(int i = 0; i < hunters.size(); ++i)
+ 				{
 	   			hunters[i]->add_interaction(REWARD_COOP, sharer);
+
+	   			if(i == sharer_index)
+		   			hunters[i]->add_cooperation();
+ 				}
 #else
    			bool decision = sharer->decide_sharing();
 

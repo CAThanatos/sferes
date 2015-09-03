@@ -113,6 +113,16 @@ namespace sferes
 									int max_interactions = Params::simu::nb_steps/STAMINA;
 									int max_reward = REWARD_COOP*max_interactions;
 
+#ifdef FIXED_REPUTATION
+									std::vector<float> interactions = find_interactions(id, -1);
+
+									float rep = 0.0f;
+									for(size_t i = 0; i < interactions.size(); ++i)
+										rep += interactions[i];
+
+									rep /= (float)(REWARD_COOP*interactions.size());
+									_vec_reputation[id] = rep;
+#else
 #ifdef INTERACTION_MEMORY
 									std::vector<float> interactions = find_interactions(id, Params::nn_reputation::interactions_memory);
 
@@ -132,8 +142,10 @@ namespace sferes
 
 									std::vector<float> out_rep = compute_nn(inputs_reputation, 1);
 
+
 									assert(out_rep.size() == 1);
 									_vec_reputation[id] = out_rep[0];
+#endif
 								}
 
 								reputation = _vec_reputation[id];
@@ -308,7 +320,7 @@ namespace sferes
 			{
 				std::vector<float> vec_rewards;
 				int cpt = 0;
-				for(size_t i = _vec_interactions.size() - 1; (i >= 0) && (cpt < memory_size); i--)
+				for(int i = (_vec_interactions.size() - 1); (i >= 0) && ((memory_size < 0) || (cpt < memory_size)); i--)
 				{
 					if(_vec_interactions[i].sharer == id)
 					{
@@ -345,9 +357,7 @@ namespace sferes
         if(pixel > 0)
           return false;
         else
-        {
           return true;
-        }
       }
 
       int get_id(int pixel)
@@ -359,13 +369,16 @@ namespace sferes
 			
       void add_interaction(float food, Hunter* sharer) 
       {
-      	interaction_t interaction;
-      	interaction.sharer = sharer->get_id();
-      	interaction.reward = food;
-      	_vec_interactions.push_back(interaction);
+      	if(sharer->get_id() != _id)
+      	{
+	      	interaction_t interaction;
+	      	interaction.sharer = sharer->get_id();
+	      	interaction.reward = food;
+	      	_vec_interactions.push_back(interaction);
 
-      	// The reputation of this sharer needs to be updated
-      	_vec_reputation[sharer->get_id()] = -1.0f;
+	      	// The reputation of this sharer needs to be updated
+	      	_vec_reputation[sharer->get_id()] = -1.0f;
+	      }
 
       	add_food(food);
       }

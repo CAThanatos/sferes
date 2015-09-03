@@ -33,8 +33,15 @@ def build(bld):
 													 							# 'NO_SHARING',
 													 							# 'NO_SHARING FOOD_MAX',
 													 							
+<<<<<<< HEAD
 													 							# 'NO_REPUTATION',
 													 							# 'NO_REPUTATION FOOD_MAX',
+=======
+													 							'NO_REPUTATION',
+													 							'NO_REPUTATION FOOD_MAX',
+
+													 							'FIXED_REPUTATION',
+>>>>>>> f9a67a025d9fda96409d4dfe59ea54034897dc65
 													 							
 													 							'EXP',
 													 							# 'EXP FOOD_MAX',

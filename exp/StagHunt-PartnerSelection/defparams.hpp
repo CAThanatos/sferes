@@ -66,7 +66,7 @@ struct Params
 		
 		static const float hunter_radius = 20.0f;
 		
-		static const float food_radius = 20.0f;
+		static const float food_radius = 40.0f;
 
 #ifdef FOOD_MAX
     static const int total_food = Params::pop::size;
@@ -246,9 +246,9 @@ struct Params
 
 //#define PRED_CONF
 
-// #define BEHAVIOUR_LOG
+#define BEHAVIOUR_LOG
 
-// #define BEHAVIOUR_VIDEO
+#define BEHAVIOUR_VIDEO
 
 #define TEST_VARIANCE_TRIALS
 
