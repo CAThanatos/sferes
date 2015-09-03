@@ -69,6 +69,13 @@ int main(int argc, char *argv[])
      	s.move_robot(-1.0, 1.0, num_robot);
     s.refresh();
     s.refresh_view();
+
+    float distance = r1->get_pos().dist_to(s1->get_x(), s1->get_y());
+    distance = distance - r1->get_radius() - s1->get_radius();
+    float angle12 = normalize_angle(atan2(s1->get_y() - r1->get_pos().y(), s1->get_x() - r1->get_pos().x()));
+    angle12 = normalize_angle(angle12 - r1->get_pos().theta());
+
+    std::cout << distance << "/" << angle12 << std::endl;
     
 		// for (size_t j = 0; j < 6; ++j)
 		// {

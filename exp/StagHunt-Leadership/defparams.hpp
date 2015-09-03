@@ -226,7 +226,11 @@ struct Params
 #endif
 
 #ifdef SCREAM
+#ifdef COM_COMPAS
+		static const size_t nb_inputs_scream = 0;
+#else
 		static const size_t nb_inputs_scream = 1;
+#endif
 		static const size_t nb_outputs_scream = 1;
 #else
 		static const size_t nb_inputs_scream = 0;
@@ -234,6 +238,8 @@ struct Params
 #endif
 
 #ifdef COMPAS_FOLLOWER
+		static const size_t nb_inputs_compas = 2;
+#elif defined(COM_COMPAS)
 		static const size_t nb_inputs_compas = 2;
 #else
 		static const size_t nb_inputs_compas = 0;
