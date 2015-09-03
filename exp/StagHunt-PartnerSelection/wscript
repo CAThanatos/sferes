@@ -35,6 +35,8 @@ def build(bld):
 													 							
 													 							'NO_REPUTATION',
 													 							'NO_REPUTATION FOOD_MAX',
+
+													 							'FIXED_REPUTATION',
 													 							
 													 							'EXP',
 													 							'EXP FOOD_MAX',

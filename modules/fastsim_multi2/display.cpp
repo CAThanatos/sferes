@@ -100,7 +100,7 @@ namespace fastsim
   }
 
   Display :: Display(const boost::shared_ptr<Map>& m, const std::vector<Robot*>& r) : 
-    _map(m), _robots(r), _selected(0), _record_video(false), _display_sensors(true), _num_frame(0), _cpt_frame(0), _first_refresh(true)
+    _map(m), _robots(r), _selected(0), _record_video(false), _display_sensors(false), _num_frame(0), _cpt_frame(0), _first_refresh(true)
   {
     _w = _map->get_pixel_w();
     _h = _map->get_pixel_h();
