@@ -120,7 +120,15 @@ namespace sferes
 									for(size_t i = 0; i < interactions.size(); ++i)
 										rep += interactions[i];
 
-									rep /= (float)(REWARD_COOP*interactions.size());
+									if(interactions.size() > 0)
+										rep /= (float)(REWARD_COOP*interactions.size());
+									else
+#ifdef UNKNOWN_MEAN
+										rep = 0.5f;
+#elif defined(UNKNOWN_BEST)
+										rep = 1.0f;
+#endif
+
 									_vec_reputation[id] = rep;
 #else
 #ifdef INTERACTION_MEMORY
