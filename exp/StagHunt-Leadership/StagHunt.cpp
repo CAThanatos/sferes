@@ -229,6 +229,9 @@ namespace sferes
 #endif
 					hunter1->choose_nn(ind1.data(), choice_leader);
 				}
+#elif defined(COM_NN)
+				hunter1->choose_nn(0, ind1.data());
+				hunter2->choose_nn(0, ind2.data());
 #else
 				hunter1->choose_nn(ind1.data(), diff_hunters);
 				hunter2->choose_nn(ind2.data(), 1 - diff_hunters);
@@ -302,6 +305,26 @@ namespace sferes
 #endif
 #endif
 
+#ifdef COM_COMPAS
+					StagHuntRobot *rob1 = (StagHuntRobot*)(simu.robots()[0]);
+					StagHuntRobot *rob2 = (StagHuntRobot*)(simu.robots()[1]);
+
+					Hunter* hunter1 = (Hunter*)rob1;
+					Hunter* hunter2 = (Hunter*)rob2;
+
+					float distance = rob1->get_pos().dist_to(rob2->get_pos().x(), rob2->get_pos().y());
+					distance = distance - rob1->get_radius() - rob2->get_radius();
+					hunter1->set_distance_hunter(distance);
+
+					float angle12 = normalize_angle(atan2(rob2->get_pos().y() - rob1->get_pos().y(), rob2->get_pos().x() - rob1->get_pos().x()));
+					angle12 = normalize_angle(angle12 - rob1->get_pos().theta());
+					hunter1->set_angle_hunter(angle12);
+
+					float angle21 = normalize_angle(atan2(rob1->get_pos().y() - rob2->get_pos().y(), rob1->get_pos().x() - rob2->get_pos().x()));
+					angle21 = normalize_angle(angle21 - rob2->get_pos().theta());
+					hunter2->set_angle_hunter(angle21);
+#endif
+
 					// Number of steps the robots are evaluated
 					_nb_eval = i + 1;
 
@@ -321,7 +344,7 @@ namespace sferes
 						StagHuntRobot* robot = (StagHuntRobot*)(simu.robots()[num]);
 	
 						std::vector<float> action = robot->step_action();
-	
+
 						// We compute the movement of the robot
 						if(action[0] >= 0 || action[1] >= 0)
 						{
@@ -346,17 +369,17 @@ namespace sferes
 								for(size_t l = 0; l < action.size(); ++l)
 									vec_sm_trial.push_back(action[l]);
 #endif
-						}
 
-#ifdef SCREAM
-						if(action[2] >= 0.5)
-						{
-							if(0 == num)
-								hunter2->hear_scream();
-							else
-								hunter1->hear_scream();
-						}
+#if defined(SCREAM) && !defined(SCREAM_PREY)
+							if(action[2] >= 0.5)
+							{
+								if(0 == num)
+									hunter2->hear_scream();
+								else
+									hunter1->hear_scream();
+							}
 #endif
+						}
 					}
 
 #ifdef DIVERSITY
@@ -926,6 +949,27 @@ namespace sferes
 
    		if(hunters.size() == 1)
    		{
+#ifdef COM_NN
+   			// If the individual got first on the prey, we change the nn of the other one
+   			for(int i = 0; i < 2; ++i)
+   			{
+	   			Hunter* hunter = (Hunter*)(simu.robots()[i]);
+	   			if(hunter != hunters[0])
+	   			{
+	   				if(hunter->nn1_chosen())
+	   					hunter->change_nn(1);
+	   			}
+   			}
+#elif defined(SCREAM_PREY)
+   			// If the individual got first on the prey, we alert the other one
+   			for(int i = 0; i < 2; ++i)
+   			{
+	   			Hunter* hunter = (Hunter*)(simu.robots()[i]);
+	   			if(hunter != hunters[0])
+	   				hunter->hear_scream();
+   			}
+#endif
+
    			if(prey->get_leader_first() == -1)
    			{
 	   			if(hunters[0]->is_leader())
@@ -1015,6 +1059,14 @@ namespace sferes
    			stop_eval = true;
 #endif
    			}
+
+#ifdef COM_NN
+   			for(int i = 0; i < 2; ++i)
+	   			((Hunter*)(simu.robots()[i]))->change_nn(0);
+#elif defined(SCREAM_PREY)
+   			for(int i = 0; i < 2; ++i)
+	   			((Hunter*)(simu.robots()[i]))->set_scream(0.0f);
+#endif
    		}
    	}
    	    

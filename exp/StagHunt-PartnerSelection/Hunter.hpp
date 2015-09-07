@@ -157,6 +157,7 @@ namespace sferes
 								}
 
 								reputation = _vec_reputation[id];
+								// std::cout << "Reputation of " << id << " by " << _id << " : " << reputation << std::endl;
 							}
 #endif
 						}
@@ -379,6 +380,7 @@ namespace sferes
       {
       	if(sharer->get_id() != _id)
       	{
+      		// std::cout << "Add interaction : " << _id << " against " << sharer << " -> " << food << std::endl;
 	      	interaction_t interaction;
 	      	interaction.sharer = sharer->get_id();
 	      	interaction.reward = food;

@@ -220,12 +220,14 @@ namespace sferes
 						current_index += Params::nn::nb_info_by_pixel;
  					}
 
-#ifdef SCREAM
+#if defined(SCREAM)
+#ifndef COM_COMPAS
  					inputs[current_index] = _scream_value;
 
  					// std::cout << inputs[current_index] << "/";
 
  					current_index++;
+#endif
 
  					decay_scream();
 #endif
@@ -236,6 +238,36 @@ namespace sferes
  					// std::cout << inputs[current_index] << "/";
 
  					current_index++;
+#endif
+
+#ifdef COM_COMPAS
+#ifdef COM_NN
+ 					if(!_bool_nn1)
+ 					{
+	 					inputs[current_index] = (3400.0f - _distance_hunter)/3400.0f;
+	 					inputs[current_index + 1] = (_angle_hunter + M_PI)/(2.0f*M_PI);
+ 					}
+ 					else
+ 					{
+	 					inputs[current_index]  = 0.0f;
+	 					inputs[current_index + 1]  = 0.0f;
+ 					}
+#else
+ 					if(_scream_value > 0.0f)
+ 					{
+	 					inputs[current_index] = (3400.0f - _distance_hunter)/3400.0f;
+	 					inputs[current_index + 1] = (_angle_hunter + M_PI)/(2.0f*M_PI);
+ 					}
+ 					else
+ 					{
+	 					inputs[current_index]  = 0.0f;
+	 					inputs[current_index + 1]  = 0.0f;
+ 					}
+#endif
+
+ 					// std::cout << inputs[current_index] << "/" << inputs[current_index + 1] << "/";
+
+ 					current_index += 2;
 #endif
 
 #ifdef COMPAS_FOLLOWER
@@ -290,7 +322,7 @@ namespace sferes
 						
 						outf[i] = (1.0 / (exp(-outf[i] * lambda) + 1));
 					}
-					
+
 					assert(outf.size() == Params::nn::nb_outputs);
 #else	
 					// Step check of the inputs
@@ -305,13 +337,6 @@ namespace sferes
 					outf[1] = outf2[1];
 
 					assert(outf.size() == Params::nn::nb_outputs);
-#endif
-
-#ifdef SCREAM
-					if(!is_leader())
-						outf[2] = 0.0f;
-
-					// std::cout << "--> " << outf[2] << std::endl;
 #endif
 
 					assert(outf.size() == Params::nn::nb_outputs);
@@ -331,7 +356,7 @@ namespace sferes
 					outf[1] = -1.0f;
 #endif
 
-#ifdef SCREAM
+#if defined(SCREAM) && !defined(SCREAM_PREY)
 					outf[2] = -1.0f;
 #endif
 
@@ -463,6 +488,28 @@ namespace sferes
 
 				for(size_t i = first_weight; i < first_weight + nb_weights; ++i)
 					_weights[i - first_weight] = data[i];
+
+				_data = data;
+			}
+
+			void change_nn(int nn_chosen)
+			{
+				int nb_weights = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;
+
+				_weights.clear();
+				_weights.resize(nb_weights);
+
+				int first_weight = 0;
+				if(nn_chosen >= 1)
+					first_weight = nb_weights;
+
+				if(first_weight == 0)
+					_bool_nn1 = true;
+				else
+					_bool_nn1 = false;
+
+				for(size_t i = first_weight; i < first_weight + nb_weights; ++i)
+					_weights[i - first_weight] = _data[i];
 			}
 #endif
 
@@ -530,6 +577,7 @@ namespace sferes
 #ifdef SCREAM
 			void hear_scream() { _scream_value = SCREAM_MAX; }
 			void decay_scream() { if(_scream_value > 0) _scream_value = std::max(0.0f, _scream_value - SCREAM_DECAY); }
+			void set_scream(float value) { _scream_value = value; }
 #endif
 
 #ifdef STAG_STUN
@@ -563,6 +611,8 @@ namespace sferes
 			bool _bool_leader;
 
 			bool _bool_nn1;
+
+			std::vector<float> _data;
 
 			std::vector<float> _last_inputs;
 

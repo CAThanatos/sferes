@@ -1,7 +1,7 @@
 // THIS IS A GENERATED FILE - DO NOT EDIT
 #define EXP
 #define INTERACTION_MEMORY
-#line 1 "/home/abernard/sferes2-0.99/exp/StagHunt-PartnerSelection/StagHunt.cpp"
+#line 1 "/home/arthur/sferes2-0.99/exp/StagHunt-PartnerSelection/StagHunt.cpp"
 #include "includes.hpp"
 #include "defparams.hpp"
 
@@ -276,12 +276,16 @@ namespace sferes
 
 #ifdef NO_SHARING
  				for(int i = 0; i < hunters.size(); ++i)
+<<<<<<< HEAD
+	   			hunters[i]->add_interaction(REWARD_COOP, sharer);
+=======
  				{
 	   			hunters[i]->add_interaction(REWARD_COOP, sharer);
 
 	   			if(i == sharer_index)
 		   			hunters[i]->add_cooperation();
  				}
+>>>>>>> f9a67a025d9fda96409d4dfe59ea54034897dc65
 #else
    			bool decision = sharer->decide_sharing();
 

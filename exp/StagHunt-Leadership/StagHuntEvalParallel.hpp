@@ -143,7 +143,7 @@ namespace sferes
 				for (size_t i = r.begin(); i != r.end(); ++i)
 				{
 					assert(i < _pop.size());
-					
+
 					for(size_t j = 0; j < nb_eval; ++j)
 					{
 #ifdef NESTED

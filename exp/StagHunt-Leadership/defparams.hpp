@@ -226,7 +226,11 @@ struct Params
 #endif
 
 #ifdef SCREAM
+#ifdef COM_COMPAS
+		static const size_t nb_inputs_scream = 0;
+#else
 		static const size_t nb_inputs_scream = 1;
+#endif
 		static const size_t nb_outputs_scream = 1;
 #else
 		static const size_t nb_inputs_scream = 0;
@@ -234,6 +238,8 @@ struct Params
 #endif
 
 #ifdef COMPAS_FOLLOWER
+		static const size_t nb_inputs_compas = 2;
+#elif defined(COM_COMPAS)
 		static const size_t nb_inputs_compas = 2;
 #else
 		static const size_t nb_inputs_compas = 0;
@@ -250,7 +256,7 @@ struct Params
 #ifdef DUPLICATION
 #ifdef DECISION_MAPPING
 		static const size_t genome_size = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs + 2;
-#elif defined(NO_CHOICE_DUP)
+#elif defined(NO_CHOICE_DUP) || defined(COM_NN)
 		static const size_t genome_size = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;
 #else
 		static const size_t genome_size = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs + 1;
@@ -533,7 +539,7 @@ struct Params
 
 // #define BEHAVIOUR_LOG
 
-#define BEHAVIOUR_VIDEO
+// #define BEHAVIOUR_VIDEO
 
 #define TEST_VARIANCE_TRIALS
 

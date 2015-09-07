@@ -30,18 +30,18 @@ def build(bld):
 													 target = 'StagHunt',
 #                           json = 'StagHuntExp3.json',
 													 variants = [
-#													 							'NO_SHARING',
-#													 							'NO_SHARING FOOD_MAX',
-													 							
-#													 							'NO_REPUTATION',
-#													 							'NO_REPUTATION FOOD_MAX',
+													 							# 'NO_SHARING',
+													 							# 'NO_SHARING FOOD_MAX',
+													 							# 'NO_REPUTATION',
+													 							# 'NO_REPUTATION FOOD_MAX',
 
-													 							'FIXED_REPUTATION',
+													 							# 'FIXED_REPUTATION UNKNOWN_MEAN',
+													 							# 'FIXED_REPUTATION UNKNOWN_BEST',
 													 							
-#													 							'EXP',
-#													 							'EXP FOOD_MAX',
-#													 							'EXP INTERACTION_MEMORY',
-#													 							'EXP INTERACTION_MEMORY FOOD_MAX',
+													 							# 'EXP',
+													 							'EXP FOOD_MAX',
+													 							# 'EXP INTERACTION_MEMORY',
+													 							# 'EXP INTERACTION_MEMORY FOOD_MAX',
 																			])
 
 																			 

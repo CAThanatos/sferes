@@ -32,6 +32,7 @@ def build(bld):
 													 variants = [
 													 							"CONTROL1 COEVO BSTAG250",
 													 							"CONTROL1 PREYS2 SOLO BSTAG250 BSTAG_SOLO250",
+													 							"CONTROL1 COEVO NO_PREYS FOLLOW",
 													 							"SETTING15 COEVO BSTAG250",
 													 							"SETTING15 PREYS1 SOLO BSTAG250 BSTAG_SOLO250",
 																			])
