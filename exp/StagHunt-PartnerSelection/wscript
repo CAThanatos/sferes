@@ -35,11 +35,14 @@ def build(bld):
 													 							# 'NO_REPUTATION',
 													 							# 'NO_REPUTATION FOOD_MAX',
 
+													 							'NO_REPUTATION DEFECT0',
+													 							'NO_REPUTATION COOP0',
+
 													 							# 'FIXED_REPUTATION UNKNOWN_MEAN',
 													 							# 'FIXED_REPUTATION UNKNOWN_BEST',
 													 							
 													 							# 'EXP',
-													 							'EXP FOOD_MAX',
+													 							# 'EXP FOOD_MAX',
 													 							# 'EXP INTERACTION_MEMORY',
 													 							# 'EXP INTERACTION_MEMORY FOOD_MAX',
 																			])

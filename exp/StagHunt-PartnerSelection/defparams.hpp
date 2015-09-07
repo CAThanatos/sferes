@@ -224,8 +224,17 @@ struct Params
 
 #define STAMINA 1600
 
+#ifdef COOP0
+#define REWARD_COOP 0
+#else
 #define REWARD_COOP 50
+#endif
+
+#ifdef DEFECT0
+#define REWARD_DEFECT 0
+#else
 #define REWARD_DEFECT 500
+#endif
 
 #define FOOD_SMALL_STAG_SOLO 50
 
