@@ -193,6 +193,7 @@ namespace sferes
 	{
 	  static const float sigma = Ev::params_t::evo_float::sigma;
 	  float mut = misc::gaussian_rand<float>(0, sigma * sigma);
+	  std::cout << mut << std::endl;
 	  float f = ev.data(i) + mut;
 	  ev.data(i, misc::put_in_range(f, 0.0f, 1.0f));
 

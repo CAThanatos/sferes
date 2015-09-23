@@ -12,6 +12,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('directory', help = "Experiment's directory")
 parser.add_argument('-f', '--file', help = "Exp to continue file", default='expToContinu.txt')
 parser.add_argument('-r', '--remove', help = "Remove the previous output directory", default=False, action="store_true")
+parser.add_argument('-g', '--genome', help = "Copy genome file", default=False, action="store_true")
 args = parser.parse_args()
 
 directory = args.directory
@@ -86,6 +87,8 @@ for dir in listDirs :
 				os.makedirs(dirOut)
 				shutil.copy(os.path.join(curDir, fileGenMax), dirOut)
 
+				if args.genome and os.path.isfile(os.path.join(curDir, 'genome.dat')) :
+					shutil.copy(os.path.join(curDir, 'genome.dat'), dirOut)
 
 				# And we then update the string which will be written in the experiment file
 				r = reDir.search(subDir)

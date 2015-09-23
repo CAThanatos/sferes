@@ -7,7 +7,9 @@
 #define ELITIST
 #endif
 
+#ifndef POLYNOMIAL
 #define GAUSSIAN_MUTATION
+#endif
 
 #ifndef ELMAN
 #define MLP_PERSO
@@ -312,8 +314,16 @@ struct Params
 	
   struct evo_float
   {
+#ifdef RATE1
+    // the mutation rate of the real-valued vector
+    static const float mutation_rate = 0.002f;
+#elif defined RATE10
+    // the mutation rate of the real-valued vector
+    static const float mutation_rate = 0.02f;
+#else
     // the mutation rate of the real-valued vector
     static const float mutation_rate = 0.003f;
+#endif
 
 #ifdef STRONG_MUTATION
     static const float strong_mutation_rate = 0.001f;
@@ -333,6 +343,34 @@ struct Params
     static const float sigma = 0.1f;
 #elif defined(STD05)
     static const float sigma = 0.05f;
+#elif defined(STD06)
+    static const float sigma = 0.06f;
+#elif defined(STD07)
+    static const float sigma = 0.07f;
+#elif defined(STD08)
+    static const float sigma = 0.08f;
+#elif defined(STD09)
+    static const float sigma = 0.09f;
+#elif defined(STD11)
+    static const float sigma = 0.11f;
+#elif defined(STD12)
+    static const float sigma = 0.12f;
+#elif defined(STD13)
+    static const float sigma = 0.13f;
+#elif defined(STD14)
+    static const float sigma = 0.14f;
+#elif defined(STD15)
+    static const float sigma = 0.15f;
+#elif defined(STD16)
+    static const float sigma = 0.16f;
+#elif defined(STD17)
+    static const float sigma = 0.17f;
+#elif defined(STD18)
+    static const float sigma = 0.18f;
+#elif defined(STD19)
+    static const float sigma = 0.19f;
+#elif defined(STD2)
+    static const float sigma = 0.2f;
 #else
     static const float sigma = 0.01f;
 #endif
@@ -367,7 +405,7 @@ struct Params
     static const unsigned size = 20;
     
     // number of generations
-    static const unsigned nb_gen = 10000;
+    static const unsigned nb_gen = 20000;
     
     // how often should the result file be written (here, each 10
     // generation)
@@ -383,7 +421,7 @@ struct Params
     // used by RankSimple to select the pressure
     static const float coeff = 1.1f;
     
-    // the number of individuals that are kept from on generation to
+    // the number of individuals that are kept from one generation to
     // another (elitism) (but are still mutated)
     static const float keep_rate = 1.0f;
     
@@ -483,6 +521,8 @@ struct Params
 #define FOOD_SMALL_STAG_COOP 250
 #elif defined(SSTAG125)
 #define FOOD_SMALL_STAG_COOP 125
+#elif defined(SSTAG500)
+#define FOOD_SMALL_STAG_COOP 500
 #elif defined(SSTAG50)
 #define FOOD_SMALL_STAG_COOP 50
 #else
@@ -539,7 +579,7 @@ struct Params
 
 // #define BEHAVIOUR_LOG
 
-// #define BEHAVIOUR_VIDEO
+#define BEHAVIOUR_VIDEO
 
 #define TEST_VARIANCE_TRIALS
 

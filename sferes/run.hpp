@@ -65,6 +65,7 @@ namespace sferes
       ("out,o", po::value<std::string>(), "output file")
       ("number,n", po::value<int>(), "number in stat")
       ("load,l", po::value<std::string>(), "load a result file")
+      ("play,p", po::value<std::string>(), "plays a simulation")
       ("verbose,v", po::value<std::vector<std::string> >()->multitoken(),
        "verbose output, available default streams : all, ea, fit, phen, trace")
       ("continue,c", po::value<std::string>(), "continue a previous computation")
@@ -129,6 +130,10 @@ namespace sferes
 	    std::ofstream ofs(vm["out"].as<std::string>().c_str());
 	    ea.show_stat(stat, ofs, n);
 	  }
+      }
+      else if (vm.count("play"))
+      {
+        ea.play_run(vm["play"].as<std::string>());
       }
     else
     {

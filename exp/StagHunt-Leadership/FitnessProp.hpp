@@ -269,11 +269,13 @@ namespace sferes
 				}
 
 				this->_eval.eval(this->_pop, 0, Params::pop::size);
+
 /*#ifndef EA_EVAL_ALL
 				this->_eval.eval(this->_pop, nb_keep, Params::pop::size);
 #else
 				this->_eval.eval(this->_pop, 0, Params::pop::size);
 #endif*/
+				
 				this->apply_modifier();
 				std::partial_sort(this->_pop.begin(), this->_pop.begin() + Params::pop::size,
 							this->_pop.end(), fit::compare());

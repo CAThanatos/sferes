@@ -78,8 +78,10 @@ foreach my $dirOrig (@dirsOrig)
 						if($file =~ /\.dat$/)
 						{
 							open FILEIN, "<$dossierCont/$dirOrig/$subDir/$nodes[0]/$file" or die $!;
+							# print "$dossierCont/$dirOrig/$subDir/$nodes[0]/$file\n";
 
 							my $firstEval = undef;
+							my $firstGen = undef;
 							my $contenu = "";
 							while (my $ligne = <FILEIN>)
 							{
@@ -88,14 +90,20 @@ foreach my $dirOrig (@dirsOrig)
 									my $eval = $1;
 									my $reste = $2;
 
-#									$eval = (($firstGen * 20) + 10) + ($eval - 20);
+									# if(!defined($firstGen))
+									# {
+									# 	$firstGen = ($eval - 21)/20;
+									# }
+
+									# $eval = (($firstGen * 20) + 10) + ($eval - 20);
+									# $eval = ($eval - ($firstGen * 20 + 20)) + $firstGen;
 
 									if(!defined($firstEval))
 									{
 										$firstEval = $eval;
 									}
 
-#									$contenu = $contenu . "$eval,$reste\n";
+									# $contenu = $contenu . "$eval,$reste\n";
 									$contenu = $contenu . $ligne;
 								}
 							}
@@ -120,6 +128,7 @@ foreach my $dirOrig (@dirsOrig)
 										}
 										else
 										{
+											# print "STOP $eval/$firstEval\n";
 											$stop = 1;
 										}
 									}

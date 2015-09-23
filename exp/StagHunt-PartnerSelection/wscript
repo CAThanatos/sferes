@@ -32,14 +32,15 @@ def build(bld):
 													 variants = [
 													 							# 'NO_SHARING',
 													 							# 'NO_SHARING FOOD_MAX',
-													 							# 'NO_REPUTATION',
+													 							'NO_REPUTATION',
 													 							# 'NO_REPUTATION FOOD_MAX',
 
 													 							'NO_REPUTATION DEFECT0',
 													 							'NO_REPUTATION COOP0',
 
-													 							# 'FIXED_REPUTATION UNKNOWN_MEAN',
+													 							'FIXED_REPUTATION',
 													 							# 'FIXED_REPUTATION UNKNOWN_BEST',
+													 							# 'FIXED_REPUTATION UNKNOWN_MEAN',
 													 							
 													 							# 'EXP',
 													 							# 'EXP FOOD_MAX',

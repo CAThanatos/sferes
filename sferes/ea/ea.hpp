@@ -206,6 +206,16 @@ namespace sferes
 						}
 					}
         }
+        void play_run(const std::string& fname)
+        {
+#if defined(ELITIST) or defined(FITPROP)
+          dbg::trace trace("ea", DBG_HERE);
+          stc::exact(this)->play_run();
+#else
+          std::cerr << "play_run() not implemented with these ea parameters." << std::endl;
+          exit(1);
+#endif
+        }
         void random_pop()
         {
           dbg::trace trace("ea", DBG_HERE);
@@ -353,6 +363,22 @@ namespace sferes
 #ifdef COEVO
           ia >> BOOST_SERIALIZATION_NVP(_pop_co);
 #endif
+
+          // // Add a particular individual to the population
+          // std::string path = fname.substr(0, fname.find_last_of("/") + 1);
+          // std::ifstream ifs2((path + "genome.dat").c_str());
+          // if (!ifs2.fail())
+          // {
+          //   int cpt = 0;
+          //   while(ifs2.good())
+          //   {
+          //     std::string value;
+          //     std::getline(ifs2, value, ',');
+          //     // float valuef = std::atof(value.c_str());
+          //     _pop[_pop.size() - 1]->gen().data(cpt, std::atof(value.c_str()));
+          //     cpt++;
+          //   } 
+          // }
 
 #ifdef DUPLOAD
           int nb_genes = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;

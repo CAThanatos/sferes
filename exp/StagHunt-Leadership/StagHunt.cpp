@@ -107,6 +107,7 @@ namespace sferes
 				cpt_files = 0;
 #endif
 	
+			// std::cout << "yop" << std::endl;
 #ifdef MLP_PERSO
 				StagHuntRobot* robot1 = (StagHuntRobot*)(simu.robots()[0]);
 				StagHuntRobot* robot2 = (StagHuntRobot*)(simu.robots()[1]);
@@ -254,7 +255,8 @@ namespace sferes
 				hunter2->set_weights(ind2.data());
 #endif
 #endif
-	
+				// std::cout << "lait" << std::endl;
+
 				float food_trial = 0;
 
 #ifdef MOVING_LEADER
@@ -1148,7 +1150,11 @@ int main(int argc, char **argv)
 #ifdef ELITIST
   typedef gen::ElitistGen<Params::nn::genome_size, Params> gen_t;
 #else
+#ifdef EVOFLOAT
   typedef gen::EvoFloat<Params::nn::genome_size, Params> gen_t;
+#else
+  typedef gen::ElitistGen<Params::nn::genome_size, Params> gen_t;
+#endif
 #endif
 #endif
 #endif

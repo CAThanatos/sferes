@@ -101,7 +101,7 @@ namespace sferes
 							type1 = 1;
 
 #ifdef NO_REPUTATION
-							reputation = 0;
+							reputation = 0.5;
 #else
 							if(id != -1)
 							{
@@ -127,6 +127,8 @@ namespace sferes
 										rep = 0.5f;
 #elif defined(UNKNOWN_BEST)
 										rep = 1.0f;
+#else
+										rep = 0.5f;
 #endif
 
 									_vec_reputation[id] = rep;

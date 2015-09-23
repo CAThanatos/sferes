@@ -496,20 +496,23 @@ namespace sferes
 			{
 				int nb_weights = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;
 
-				_weights.clear();
-				_weights.resize(nb_weights);
+				if(_data.size() > nb_weights)
+				{
+					_weights.clear();
+					_weights.resize(nb_weights);
 
-				int first_weight = 0;
-				if(nn_chosen >= 1)
-					first_weight = nb_weights;
+					int first_weight = 0;
+					if(nn_chosen >= 1)
+						first_weight = nb_weights;
 
-				if(first_weight == 0)
-					_bool_nn1 = true;
-				else
-					_bool_nn1 = false;
+					if(first_weight == 0)
+						_bool_nn1 = true;
+					else
+						_bool_nn1 = false;
 
-				for(size_t i = first_weight; i < first_weight + nb_weights; ++i)
-					_weights[i - first_weight] = _data[i];
+					for(size_t i = first_weight; i < first_weight + nb_weights; ++i)
+						_weights[i - first_weight] = _data[i];
+				}
 			}
 #endif
 

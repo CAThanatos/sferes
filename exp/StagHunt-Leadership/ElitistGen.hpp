@@ -83,7 +83,7 @@ namespace sferes
 				_check_invariant(); 
       }
       
-      void mutate(float step_size) 
+      void mutate(float step_size = 1.0f) 
       {
 #ifdef GAUSSIAN_MUTATION
       	float sigma = Params::evo_float::sigma;
@@ -104,6 +104,17 @@ namespace sferes
 						_data[i] = misc::put_in_range(f, 0.0f, 1.0f);
 	  			}
 	  		}
+#elif defined(UNIFORM_MUTATION)
+				for (size_t i = 0; i < _size; i++)
+				{
+					float randMutation = misc::rand<float>();
+
+					if (randMutation < Params::evo_float::mutation_rate)
+					{
+						float f = misc::rand<float>(0.0f, 1.0f);
+						_data[i] = misc::put_in_range(f, 0.0f, 1.0f);
+	  			}
+	  		}
 #else
 				static const float eta_m = Params::evo_float::eta_m;
 				assert(eta_m != -1.0f);
@@ -116,6 +127,7 @@ namespace sferes
 							1 - pow(2.0 * (1.0 - ri), 1.0 / (eta_m + 1.0));
 						assert(!std::isnan(delta_i));
 						assert(!std::isinf(delta_i));
+						// std::cout << delta_i << std::endl;
 						float f = _data[i] + step_size*delta_i;
 						_data[i] = misc::put_in_range(f, 0.0f, 1.0f);
 					}
@@ -244,6 +256,11 @@ namespace sferes
 	    		_data.resize(Params::nn::genome_size);
 	    		_size = Params::nn::genome_size;
 	    	}
+	    }
+
+	    std::vector<float>& data()
+	    {
+	    	return _data;
 	    }
 
       float data(size_t i) const 
