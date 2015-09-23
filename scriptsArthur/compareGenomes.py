@@ -157,6 +157,7 @@ def main(args) :
 				# ax1.set_ylim(0.0, mu)
 				ax1.set_xlabel('Similarity')
 				ax1.set_ylabel('Number')
+				ax1.set_title('Similarity at evaluation ' + str(tabEval[-1]))
 
 				dataHeat = np.array(hashSimilarities[tabEval[-1]])
 				heatmap = ax2.pcolor(dataHeat, cmap=plt.cm.Blues, vmin = 0.0, vmax = 1.0)
@@ -168,10 +169,11 @@ def main(args) :
 
 				# want a more natural, table-like display
 				ax2.invert_yaxis()
-				ax2.xaxis.tick_top()
+				# ax2.xaxis.tick_top()
 
 				ax2.set_xticklabels(row_labels, minor=False)
 				ax2.set_yticklabels(column_labels, minor=False)
+				ax2.set_title('Similarity at evaluation ' + str(tabEval[-1]))
 
 
 				numDir = regexpSubDir.search(subDir).group(1)
