@@ -7,12 +7,12 @@ import sys
 
 regexp = re.compile(r"^(\d+),")
 if os.path.isdir(sys.argv[1]) :
-	# bestFitDir = os.path.join(sys.argv[1], "BestFit")
-	bestFitDir = os.path.join(sys.argv[1], "BestLeadership")
+	bestFitDir = os.path.join(sys.argv[1], "BestFit")
+	# bestFitDir = os.path.join(sys.argv[1], "BestLeadership")
 
 	if os.path.isdir(bestFitDir) :
-		# listFiles = [os.path.join(bestFitDir, file) for file in os.listdir(bestFitDir) if re.search(r"^bestfit", file)]
-		listFiles = [os.path.join(bestFitDir, file) for file in os.listdir(bestFitDir) if re.search(r"^bestleadership", file)]
+		listFiles = [os.path.join(bestFitDir, file) for file in os.listdir(bestFitDir) if re.search(r"^bestfit", file)]
+		# listFiles = [os.path.join(bestFitDir, file) for file in os.listdir(bestFitDir) if re.search(r"^bestleadership", file)]
 
 		for file in listFiles :
 			with open(file, "r") as fileRead :
