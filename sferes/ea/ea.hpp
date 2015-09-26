@@ -369,17 +369,25 @@ namespace sferes
           std::ifstream ifs2((path + "genome.dat").c_str());
           if (!ifs2.fail())
           {
-            std::cout << "Adding individual with genotype in genome.dat..." << std::endl;
-
-            int cpt = 0;
+            std::cout << "Adding individual(s) with genotype in genome.dat..." << std::endl;
+            
+            int numIndiv = 0;
             while(ifs2.good())
             {
-              std::string value;
-              std::getline(ifs2, value, ',');
-              // float valuef = std::atof(value.c_str());
-              _pop[_pop.size() - 1]->gen().data(cpt, std::atof(value.c_str()));
-              cpt++;
-            } 
+              std::string line;
+              std::getline(ifs2, line);
+
+              std::stringstream ss(line);
+              std::string gene;
+              int cpt = 0;
+              while(std::getline(ss, gene, ','))
+              {
+                _pop[_pop.size() - numIndiv - 1]->gen().data(cpt, std::atof(gene.c_str()));
+                cpt++;
+              }
+
+              numIndiv++;
+            }
           }
 
 #ifdef DUPLOAD
