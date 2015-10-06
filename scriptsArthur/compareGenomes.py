@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sys
 import shutil
+import random
 
 import Tools
 
@@ -102,7 +103,8 @@ def main(args) :
 					for i in range(0, len(listGenotypes)) :
 						curArray = []
 						for j in range(i, len(listGenotypes)) :
-							sim = similarity(listGenotypes[i], listGenotypes[j])
+							# sim = similarity(listGenotypes[i], listGenotypes[j])
+							sim = distance(listGenotypes[i], listGenotypes[j])
 							hashSimilarities[eval][i][j] = sim
 							hashSimilarities[eval][j][i] = sim
 
@@ -152,12 +154,14 @@ def main(args) :
 				ax0.set_xticklabels([tabEval[x] for x in ticks])
 
 				num_bins = 10
-				ax1.hist(hashSimilarities[tabEval[-1]][0], num_bins, facecolor='green', alpha=0.5)
+
+				randIndiv = random.randint(0, len(hashSimilarities[tabEval[-1]]) - 1)
+				ax1.hist(hashSimilarities[tabEval[-1]][randIndiv], num_bins, facecolor='green', alpha=0.5)
 				ax1.set_xlim(0.0, 1.0)
 				# ax1.set_ylim(0.0, mu)
-				ax1.set_xlabel('Similarity')
+				ax1.set_xlabel('Distance')
 				ax1.set_ylabel('Number')
-				ax1.set_title('Similarity at evaluation ' + str(tabEval[-1]))
+				ax1.set_title('Distance at evaluation ' + str(tabEval[-1]))
 
 				dataHeat = np.array(hashSimilarities[tabEval[-1]])
 				heatmap = ax2.pcolor(dataHeat, cmap=plt.cm.Blues, vmin = 0.0, vmax = 1.0)
@@ -173,7 +177,7 @@ def main(args) :
 
 				ax2.set_xticklabels(row_labels, minor=False)
 				ax2.set_yticklabels(column_labels, minor=False)
-				ax2.set_title('Similarity at evaluation ' + str(tabEval[-1]))
+				ax2.set_title('Distance at evaluation ' + str(tabEval[-1]))
 
 
 				numDir = regexpSubDir.search(subDir).group(1)
@@ -222,7 +226,7 @@ def main(args) :
 if __name__ == "__main__" :
 	parser = argparse.ArgumentParser()
 	parser.add_argument('directory', help = "Results directory")
-	parser.add_argument('-', '--file', help = "Genome file", default = "allgenomes.dat")
+	parser.add_argument('-f', '--file', help = "Genome file", default = "allgenomes.dat")
 	parser.add_argument('-p', '--precision', help = "Evaluation precision", type = int, default = 1000)
 	parser.add_argument('-o', '--output', help = "Output directory", default = "GraphsResults")
 	args = parser.parse_args()
