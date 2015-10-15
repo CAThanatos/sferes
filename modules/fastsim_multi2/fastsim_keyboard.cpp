@@ -70,24 +70,24 @@ int main(int argc, char *argv[])
     s.refresh();
     s.refresh_view();
 
-    float distance = r1->get_pos().dist_to(s1->get_x(), s1->get_y());
-    distance = distance - r1->get_radius() - s1->get_radius();
-    float angle12 = normalize_angle(atan2(s1->get_y() - r1->get_pos().y(), s1->get_x() - r1->get_pos().x()));
-    angle12 = normalize_angle(angle12 - r1->get_pos().theta());
+    // float distance = r1->get_pos().dist_to(s1->get_x(), s1->get_y());
+    // distance = distance - r1->get_radius() - s1->get_radius();
+    // float angle12 = normalize_angle(atan2(s1->get_y() - r1->get_pos().y(), s1->get_x() - r1->get_pos().x()));
+    // angle12 = normalize_angle(angle12 - r1->get_pos().theta());
 
-    std::cout << distance << "/" << angle12 << std::endl;
+    // std::cout << distance << "/" << angle12 << std::endl;
     
-		// for (size_t j = 0; j < 6; ++j)
-		// {
-		// 	float d = r1->get_lasers()[j].get_dist();
-		// 	float range = r1->get_lasers()[j].get_range();
+		for (size_t j = 0; j < 6; ++j)
+		{
+			float d = r1->get_lasers()[j].get_dist();
+			float range = r1->get_lasers()[j].get_range();
 		
-		// 	// Getting the input between 0 and 1
-		// 	d = d - 20.0f;
-		// 	float val = 1 - d/(range - 20.0f);
-		// 	std::cout << std::min(1.f, std::max(0.f, val)) << "/";
-		// }
-		// std::cout << std::endl;
+			// Getting the input between 0 and 1
+			d = d - 20.0f;
+			float val = 1 - d/(range - 20.0f);
+			std::cout << std::min(1.f, std::max(0.f, val)) << "/";
+		}
+		std::cout << std::endl;
   }
 
   return 0;

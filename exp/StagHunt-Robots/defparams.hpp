@@ -7,7 +7,9 @@
 #define ELITIST
 #endif
 
+#if !defined(POLYNOMIAL) && !defined(UNIFORM)
 #define GAUSSIAN_MUTATION
+#endif
 
 #ifndef ELMAN
 #define MLP_PERSO
@@ -64,6 +66,9 @@ struct Params
 #elif defined(MAP2400)
 		SFERES_STRING(map_name, SFERES_ROOT "/exp/StagHunt-Leadership/map2400x2400.pbm");
 		static const float real_w = 7200.0f;
+#elif defined(MAP200)
+		SFERES_STRING(map_name, SFERES_ROOT "/exp/StagHunt-Robots/map200x200.pbm");
+		static const float real_w = 600.0f;
 #else
 		SFERES_STRING(map_name, SFERES_ROOT "/exp/StagHunt-Leadership/map800x800.pbm");
 		static const float real_w = 2400.0f;
@@ -163,7 +168,11 @@ struct Params
 
 		static const int nb_bumpers = 0;
 		
+#ifdef NO_CAMERA
+		static const int nb_camera_pixels = 0;
+#else
 		static const int nb_camera_pixels = 12;
+#endif
 
 		static const int threshold_hamming = 0.5f;
 	};
@@ -195,7 +204,11 @@ struct Params
 		static const size_t nb_inputs = Params::simu::nb_lasers + Params::simu::nb_camera_pixels*nb_info_by_pixel + Params::simu::nb_bumpers 
 													+ Params::nn::nb_inputs_leadership + Params::nn::nb_inputs_scream + Params::nn::nb_inputs_compas;
 
+#ifdef FIT_SPEED
+		static const size_t nb_hidden = 0;
+#else
 		static const size_t nb_hidden = 8;
+#endif
 		
 		static const size_t nb_outputs = 2 + Params::nn::nb_outputs_scream;
 
@@ -220,7 +233,11 @@ struct Params
 #elif defined(ELMAN)
 		static const size_t genome_size = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + (Params::nn::nb_hidden + 3) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;
 #else
+#ifdef FIT_SPEED
+		static const size_t genome_size = (Params::nn::nb_inputs + 1) * Params::nn::nb_outputs;
+#else
 		static const size_t genome_size = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;
+#endif
 #endif
 	};
 	
@@ -405,6 +422,8 @@ struct Params
 
 #ifdef BSTAG_SOLO50
 #define FOOD_BIG_STAG_SOLO 50
+#elif defined(BSTAG_SOLO250)
+#define FOOD_BIG_STAG_SOLO 250
 #else
 #define FOOD_BIG_STAG_SOLO 0
 #endif

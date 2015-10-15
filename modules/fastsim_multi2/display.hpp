@@ -88,6 +88,7 @@ namespace fastsim
 		{
 			_file_video = file_video;
 			_record_video = true;
+            // _record_video = false;
 		}
 		
   protected:

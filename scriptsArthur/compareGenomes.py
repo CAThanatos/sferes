@@ -168,8 +168,8 @@ def main(args) :
 				plt.colorbar(heatmap)
 
 				# put the major ticks at the middle of each cell
-				ax2.set_xticks(np.arange(dataHeat.shape[0])+0.5, minor=False)
-				ax2.set_yticks(np.arange(dataHeat.shape[1])+0.5, minor=False)
+				ax2.set_xticks(np.arange(dataHeat.shape[0]) + 0.5, minor=False)
+				ax2.set_yticks(np.arange(dataHeat.shape[1]) + 0.5, minor=False)
 
 				# want a more natural, table-like display
 				ax2.invert_yaxis()
@@ -185,6 +185,10 @@ def main(args) :
 				plt.savefig(os.path.join(outputDir, "graphs" + str(numDir) + ".png"), bbox_inches = 'tight')
 				# plt.show()
 				plt.close()
+
+				print("\t\t--> Dir" + str(numDir) + " : ")
+				listEval = sorted([eval for eval in hashDistance.keys() if hashDistance[eval] > 0.2])
+				print(listEval)
 
 
 # def Wk(mu, clusters):

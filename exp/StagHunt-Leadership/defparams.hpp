@@ -314,14 +314,14 @@ struct Params
 	
   struct evo_float
   {
-#ifdef RATE1
     // the mutation rate of the real-valued vector
+#ifdef RATE1
     static const float mutation_rate = 0.002f;
 #elif defined RATE10
-    // the mutation rate of the real-valued vector
     static const float mutation_rate = 0.02f;
+#elif defined RATE0
+    static const float mutation_rate = 0.0f;
 #else
-    // the mutation rate of the real-valued vector
     static const float mutation_rate = 0.003f;
 #endif
 

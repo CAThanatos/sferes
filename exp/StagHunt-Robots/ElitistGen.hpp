@@ -104,6 +104,16 @@ namespace sferes
 						_data[i] = misc::put_in_range(f, 0.0f, 1.0f);
 	  			}
 	  		}
+#elif defined(UNIFORM)
+				for (size_t i = 0; i < _size; i++)
+				{
+					float randMutation = misc::rand<float>();
+					if (randMutation < Params::evo_float::mutation_rate)
+					{
+						float f = misc::rand<float>(0.0f, 1.0f);
+						_data[i] = misc::put_in_range(f, 0.0f, 1.0f);
+					}
+	  		}
 #else
 				static const float eta_m = Params::evo_float::eta_m;
 				assert(eta_m != -1.0f);

@@ -639,6 +639,9 @@ namespace sferes
 			ind1.add_fit_nn1(fit_nn1);
 			ind1.add_fit_nn2(fit_nn2);
 #endif
+
+     	// std::cout << "Food 1 : " << food1 << std::endl;
+     	// std::cout << "Food 2 : " << food2 << std::endl;
      	
      	food2 /= nb_encounters;
      	food1 /= nb_encounters;
@@ -760,6 +763,7 @@ namespace sferes
 			bool first_leader = false;
 #else
 			bool first_leader = misc::flip_coin();
+			// bool first_leader = true;
 #endif
 			_num_leader = first_leader?1:2;
 #endif

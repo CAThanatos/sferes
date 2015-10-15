@@ -40,7 +40,7 @@ namespace sferes
 
 				std::vector<float> inputs;
 				std::vector<float> outf(Params::nn::nb_outputs);
-				
+
 				// std::cout << " --- " << _bool_leader << " --- " << std::endl;
 
 				if(!_deactivated)
@@ -52,7 +52,7 @@ namespace sferes
 					size_t nb_lasers = this->get_lasers().size();
 
 					// *** set inputs ***
-					_sens_max = 0;
+					_sens_max = 0.0f;
 					for (size_t j = 0; j < nb_lasers; ++j)
 					{
 						float d = this->get_lasers()[j].get_dist();
@@ -69,10 +69,10 @@ namespace sferes
 							float val = 1 - d/(range - _radius);
 							inputs[j] = std::min(1.f, std::max(0.f, val));
 						
-							if(inputs[j] > _sens_max)
-								_sens_max = inputs[j];
+							_sens_max += inputs[j];
 						}
 					}
+					_sens_max /= (float)nb_lasers;
 					
 					int current_index = nb_lasers;
 		
@@ -164,39 +164,62 @@ namespace sferes
 					// std::cout << std::endl;
 	
 #ifdef MLP_PERSO
-					std::vector<float> hidden(Params::nn::nb_hidden);
-					
-					size_t cpt_weights = 0;
-					float lambda = 5.0f;
-					for(size_t i = 0; i < hidden.size(); ++i)
-					{
-						hidden[i] = 0.0f;
-						for(size_t j = 0; j < inputs.size(); ++j)
-						{
-							hidden[i] += inputs[j]*_weights[cpt_weights];
-							cpt_weights++;
-						}
-
-						// Bias neuron
-						hidden[i] += 1.0f*_weights[cpt_weights];
-						cpt_weights++;
-
-						hidden[i] = (1.0 / (exp(-hidden[i] * lambda) + 1));
-					}
-					
-					for(size_t i = 0; i < outf.size(); ++i)
-					{
-						outf[i] = 0.0f;
-						for(size_t j = 0; j < hidden.size(); ++j)
-						{
-							outf[i] += hidden[j]*_weights[cpt_weights];
-							cpt_weights++;
-						}
-
-						// Bias neuron
-						outf[i] += 1.0f*_weights[cpt_weights];
+ 					if(Params::nn::nb_hidden > 0)
+ 					{
+						std::vector<float> hidden(Params::nn::nb_hidden);
 						
-						outf[i] = (1.0 / (exp(-outf[i] * lambda) + 1));
+						size_t cpt_weights = 0;
+						float lambda = 5.0f;
+						for(size_t i = 0; i < hidden.size(); ++i)
+						{
+							hidden[i] = 0.0f;
+							for(size_t j = 0; j < inputs.size(); ++j)
+							{
+								hidden[i] += inputs[j]*_weights[cpt_weights];
+								cpt_weights++;
+							}
+
+							// Bias neuron
+							hidden[i] += 1.0f*_weights[cpt_weights];
+							cpt_weights++;
+
+							hidden[i] = (1.0 / (exp(-hidden[i] * lambda) + 1));
+						}
+						
+						for(size_t i = 0; i < outf.size(); ++i)
+						{
+							outf[i] = 0.0f;
+							for(size_t j = 0; j < hidden.size(); ++j)
+							{
+								outf[i] += hidden[j]*_weights[cpt_weights];
+								cpt_weights++;
+							}
+
+							// Bias neuron
+							outf[i] += 1.0f*_weights[cpt_weights];
+							
+							outf[i] = (1.0 / (exp(-outf[i] * lambda) + 1));
+						}
+					}
+					else
+					{
+						size_t cpt_weights = 0;
+						float lambda = 5.0f;
+						for(size_t i = 0; i < outf.size(); ++i)
+						{
+							outf[i] = 0.0f;
+							for(size_t j = 0; j < inputs.size(); ++j)
+							{
+								outf[i] += inputs[j]*_weights[cpt_weights];
+								cpt_weights++;
+							}
+
+							// Bias neuron
+							outf[i] += 1.0f*_weights[cpt_weights];
+							cpt_weights++;
+							
+							outf[i] = (1.0 / (exp(-outf[i] * lambda) + 1));
+						}
 					}
 					
 					assert(outf.size() == Params::nn::nb_outputs);
@@ -236,7 +259,12 @@ namespace sferes
 			void set_weights(const std::vector<float>& weights)
 			{
 				_weights.clear();
-				_weights.resize((Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_hidden * Params::nn::nb_outputs + Params::nn::nb_outputs);
+
+				if(Params::nn::nb_hidden > 0)
+					_weights.resize((Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_hidden * Params::nn::nb_outputs + Params::nn::nb_outputs);
+				else
+					_weights.resize((Params::nn::nb_inputs + 1) * Params::nn::nb_outputs);
+
 				assert(weights.size() == _weights.size());
 				
 				for(size_t i = 0; i < weights.size(); ++i)
@@ -372,6 +400,8 @@ namespace sferes
 				this->set_leader_status(bool_leader);
 			}
 			bool is_leader() { return _bool_leader; }
+
+			float get_sens_max() { return _sens_max; }
 
 		private :
 #ifdef MLP_PERSO
