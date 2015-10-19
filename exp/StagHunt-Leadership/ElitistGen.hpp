@@ -63,7 +63,7 @@ namespace sferes
       typedef Params params_t;
       typedef ElitistGen<Size, Params, Exact> this_t;
 
-      ElitistGen() : _data(Size), _size(Size)
+      ElitistGen() : _data(Size), _size(Size), _genome_from(-1)
       { }
 
       void random() 
@@ -279,6 +279,9 @@ namespace sferes
 				_check_invariant(); 
       }
       
+      void set_genome_from(int genome_from) { _genome_from = genome_from; }
+      int get_genome_from() { return _genome_from; }
+
       size_t size() const { return _size; }
 
       void resize(size_t size)
@@ -297,6 +300,7 @@ namespace sferes
     protected:
       std::vector<float> _data;
       int _size;
+      int _genome_from;
 
       void _check_invariant() const
       {

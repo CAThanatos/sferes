@@ -79,6 +79,8 @@ namespace sferes
 					_nb_leader_first = 0;
 					_nb_preys_killed_coop = 0;
 					_proportion_leader = 0;
+					_nb_ind1_leader_first = 0;
+
 #ifdef DOUBLE_NN
 					_nb_nn1_chosen = 0;
 					_nb_bigger_nn1_chosen = 0;
@@ -100,6 +102,8 @@ namespace sferes
 					_nb_leader_first_at = 0;
 					_nb_preys_killed_coop_at = 0;
 					_proportion_leader_at = 0;
+					_nb_ind1_leader_first_at = 0;
+
 #ifdef DOUBLE_NN
 					_nb_nn1_chosen_at = 0;
 					_nb_bigger_nn1_chosen_at = 0;
@@ -199,6 +203,13 @@ namespace sferes
 		    
 		    float nb_preys_killed_coop_at() const { return _nb_preys_killed_coop_at; }
 		    void add_nb_preys_killed_coop(float nb_preys_killed_coop) { _nb_preys_killed_coop_at.fetch_and_store(_nb_preys_killed_coop_at + nb_preys_killed_coop); }
+
+
+		    float nb_ind1_leader_first() const { return _nb_ind1_leader_first; }
+		    void set_nb_ind1_leader_first(float nb_ind1_leader_first) { _nb_ind1_leader_first = nb_ind1_leader_first; }
+		    
+		    float nb_ind1_leader_first_at() const { return _nb_ind1_leader_first_at; }
+		    void add_nb_ind1_leader_first(float nb_ind1_leader_first) { _nb_ind1_leader_first_at.fetch_and_store(_nb_ind1_leader_first_at + nb_ind1_leader_first); }
 
 
 #ifdef DOUBLE_NN
@@ -373,6 +384,10 @@ namespace sferes
 		    // Proportion of times the designated leader hunted first
 		    float _proportion_leader;
 		    tbb::atomic<float> _proportion_leader_at;
+
+		    // Proportion of times this particular individual arrived first on a prey
+		    float _nb_ind1_leader_first;
+		    tbb::atomic<float> _nb_ind1_leader_first_at;
 
 #ifdef DOUBLE_NN
 		    // Total number of times the first nn was chosen

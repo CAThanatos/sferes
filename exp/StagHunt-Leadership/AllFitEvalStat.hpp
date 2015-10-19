@@ -67,12 +67,14 @@ namespace sferes
 #endif
 						(*this->_log_file) << "," << ea.pop()[i]->nb_hares() << "," << ea.pop()[i]->nb_hares_solo() << "," << ea.pop()[i]->nb_sstag() << "," << ea.pop()[i]->nb_sstag_solo() << "," << ea.pop()[i]->nb_bstag() << "," << ea.pop()[i]->nb_bstag_solo() << std::endl;
 					
+#ifndef POP100
 						(*this->_log_file_genome) << ea.nb_eval();
 						for(size_t j = 0; j < ea.pop()[i]->gen().size(); ++j)
 						{
 							(*this->_log_file_genome) << "," << ea.pop()[i]->gen().data(j);
 						}
 						(*this->_log_file_genome) << std::endl;
+#endif
 					}
 				}
       }

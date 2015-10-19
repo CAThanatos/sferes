@@ -26,6 +26,9 @@ namespace sferes
 #ifdef COEVO
     template<typename Indiv>
       void eval_compet(Indiv& ind1, Indiv& ind2, int num_leader = 1) 
+#elif defined(GENOME_TRACES)
+    template<typename Indiv>
+      void eval_compet(Indiv& ind1, Indiv& ind2, bool genome_traces = false) 
 #else
     template<typename Indiv>
       void eval_compet(Indiv& ind1, Indiv& ind2) 
@@ -79,6 +82,8 @@ namespace sferes
 			_nb_preys_killed_coop = 0;
 
 			float proportion_leader = 0;
+
+			float nb_ind1_leader_first = 0;
 
 #ifdef DOUBLE_NN
 			float nb_nn1_chosen = 0;
@@ -523,6 +528,11 @@ namespace sferes
        	if(_nb_preys_killed_coop_trial > 0)
 	       	proportion_leader += fabs(0.5 - (_nb_leader_first_trial/_nb_preys_killed_coop_trial));//*(_nb_preys_killed_coop_trial/max_hunts);
 
+	      if(_num_leader == 1)
+	      	nb_ind1_leader_first += _nb_leader_first_trial;
+	      else
+	      	nb_ind1_leader_first += _nb_preys_killed_coop_trial - _nb_leader_first_trial;
+
 #ifdef DOUBLE_NN
 				if(hunter1->nn1_chosen())
 					fit_nn1 += food_trial;
@@ -551,6 +561,14 @@ namespace sferes
 					return;
 				}
 #endif
+
+#ifdef GENOME_TRACES
+				if(genome_traces)
+				{
+					_nb_ind1_leader_first = nb_ind1_leader_first;
+					return;
+				}
+#endif
 			}
 			
 			// Mean on all the trials
@@ -576,6 +594,7 @@ namespace sferes
 			_nb_leader_first /= Params::simu::nb_trials;
 			_nb_preys_killed_coop /= Params::simu::nb_trials;
 			proportion_leader /= Params::simu::nb_trials;
+			nb_ind1_leader_first /= Params::simu::nb_trials;
 
 #ifdef DOUBLE_NN
 			nb_nn1_chosen /= Params::simu::nb_trials;
@@ -621,10 +640,14 @@ namespace sferes
 			_nb_preys_killed_coop /= nb_encounters;
 			proportion_leader /= nb_encounters;
 			proportion_leader /= 0.5f; 
+			nb_ind1_leader_first /= nb_encounters;
 
 			ind1.add_nb_leader_first(_nb_leader_first);
 			ind1.add_nb_preys_killed_coop(_nb_preys_killed_coop);
 			ind1.add_proportion_leader(proportion_leader);
+			ind1.add_nb_ind1_leader_first(nb_ind1_leader_first);
+
+			_nb_ind1_leader_first = nb_ind1_leader_first;
 
 #ifdef DOUBLE_NN
 			nb_nn1_chosen /= nb_encounters;
@@ -1096,6 +1119,7 @@ namespace sferes
 
 		float _nb_leader_first_trial;
 		float _nb_preys_killed_coop_trial;
+		float _nb_ind1_leader_first;
 
 		std::string res_dir;
 		size_t gen;
@@ -1191,7 +1215,15 @@ int main(int argc, char **argv)
 		  sferes::stat::BestEverFitEval<phen_t, Params>,
 		  sferes::stat::AllFitEvalStat<phen_t, Params>,
 		  sferes::stat::BestLeadershipEval<phen_t, Params>,
+
+#ifndef POP100
 		  sferes::stat::AllLeadershipEvalStat<phen_t, Params>,
+
+#ifdef GENOME_TRACES
+		  sferes::stat::AllGenomesTraceStat<phen_t, Params>,
+#endif
+
+#endif
 #ifdef DOUBLE_NN
 		  sferes::stat::BestNNEval<phen_t, Params>,
 		  sferes::stat::AllNNEvalStat<phen_t, Params>,

@@ -37,6 +37,8 @@
 #include "StagHuntEvalParallel.hpp"
 #include "BestLeadershipEval.hpp"
 #include "AllLeadershipEvalStat.hpp"
+#include "AllGenomesTraceStat.hpp"
+
 #ifdef DOUBLE_NN
 #include "BestNNEval.hpp"
 #include "AllNNEvalStat.hpp"

@@ -402,14 +402,23 @@ struct Params
   struct pop
   {
     // size of the population
+#ifdef POP100
+    static const unsigned size = 100;
+#elif defined(POP20)
     static const unsigned size = 20;
+#else
+    static const unsigned size = 20;
+#endif
     
     // number of generations
     static const unsigned nb_gen = 20000;
     
-    // how often should the result file be written (here, each 10
-    // generation)
+    // how often should the result file be written
+#ifdef POP100
+    static const int dump_period = 20;
+#else
     static const int dump_period = 100;
+#endif
     
     // how often should the video be done
     static const int video_dump_period = 100;
@@ -580,6 +589,8 @@ struct Params
 // #define BEHAVIOUR_LOG
 
 #define BEHAVIOUR_VIDEO
+
+#define GENOME_TRACES
 
 #define TEST_VARIANCE_TRIALS
 

@@ -186,9 +186,9 @@ def main(args) :
 				# plt.show()
 				plt.close()
 
-				print("\t\t--> Dir" + str(numDir) + " : ")
-				listEval = sorted([eval for eval in hashDistance.keys() if hashDistance[eval] > 0.2])
-				print(listEval)
+				# print("\t\t--> Dir" + str(numDir) + " : ")
+				# listEval = sorted([eval for eval in hashDistance.keys() if hashDistance[eval] > 0.2])
+				# print(listEval)
 
 
 # def Wk(mu, clusters):

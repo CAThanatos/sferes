@@ -89,6 +89,11 @@ namespace sferes
 				std::vector<int> parents_list(lambda);
 				int parent_rank = 0;
 
+				// We set the genome_from value as if each of the individuals is going to clone itself 
+				// to the next generation
+				for(size_t i = 0; i < mu; ++i)
+					this->_pop[i]->gen().set_genome_from(i);
+
 #if defined(DOUBLE_NN) && defined(RECOMBINATION)
 				assert(lambda%2 == 0);
 				for(size_t i = 0; i < lambda - 1; i += 2)
@@ -118,6 +123,7 @@ namespace sferes
 				{
 					// Cloning of a parent
 					child_pop.push_back(this->_pop[parent_rank%mu]->clone());
+					child_pop[i]->gen().set_genome_from(parent_rank%mu);
 					parents_list[i] = parent_rank%mu;
 					parent_rank++;
 					
