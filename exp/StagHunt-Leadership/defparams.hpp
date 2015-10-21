@@ -415,7 +415,7 @@ struct Params
     
     // how often should the result file be written
 #ifdef POP100
-    static const int dump_period = 20;
+    static const int dump_period = 10;
 #else
     static const int dump_period = 100;
 #endif
