@@ -4,6 +4,8 @@ import os
 import argparse
 import re
 
+THRESHOLD_COOP_SOLO = 5.0
+
 
 def main(args) :
 	fileIn = os.path.join(args.directory, 'allgenomestrace.dat')
@@ -32,11 +34,6 @@ def main(args) :
 					nb_preys_killed_coop = float(s.group(4))
 					behaviour = None
 
-					if nb_ind1_leader_first/nb_preys_killed_coop > 0.5 :
-						behaviour = 'S'
-					else :
-						behaviour = 'F'
-
 		listEval = sorted(phyloTree.keys(), reverse = True)
 		listAncestors = []
 
@@ -47,6 +44,9 @@ def main(args) :
 			ancestor = phyloTree[listEval[cpt]][ancestor]
 			listAncestors.append(ancestor)
 			cpt += 1
+
+		print(listAncestors)
+		print('\t-> Oldest ancestor : ' + str(listAncestors[-1]))
 
 
 
