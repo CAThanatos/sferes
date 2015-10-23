@@ -7,12 +7,30 @@ import argparse
 import math
 import seaborn as sns
 import matplotlib.pyplot as plt
+import matplotlib
 import numpy as np
 import sys
 import shutil
 import random
 
 import Tools
+
+# SEABORN
+sns.set()
+sns.set_style('white')
+sns.set_context('paper')
+palette = sns.color_palette("husl", 3)
+
+
+# GRAPHS GLOBAL VARIABLES
+linewidth = 2
+linestyles = ['-', '--', '-.']
+linestylesOff = ['-', '-', '-']
+markers = [None, None, None] #['o', '+', '*']
+
+dpi = 96
+size = (1280/dpi, 1024/dpi)
+
 
 def distance(gen1, gen2) :
 	assert(len(gen1) == len(gen2))
@@ -60,6 +78,7 @@ def main(args) :
 
 					cumulEval = args.precision
 					lastEval = None
+					firstEval = True
 					listGenotypes = []
 					for line in fileRead :
 						s = regexp.search(line)
@@ -74,10 +93,12 @@ def main(args) :
 								if cumulEval >= args.precision :
 									cumulEval = 0
 
+								firstEval = False
+
 								cumulEval += eval - lastEval
 								lastEval = eval
 
-							if cumulEval >= args.precision:
+							if cumulEval >= args.precision or firstEval :
 								genotype = [float(gene) for gene in line.rstrip('\n').split(',')[1:]]
 
 								if eval not in hashGenotypes.keys() :
@@ -130,17 +151,9 @@ def main(args) :
 					distanceMean /= len(listGenotypes)
 					hashDistance[eval] = distanceMean
 
-
-				sns.set()
-				sns.set_style('white')
-				sns.set_context('paper')
-				palette = sns.color_palette("husl", 4)
-
 				column_labels = range(0, len(hashSimilarities[tabEval[-1]]))
 				row_labels = range(0, len(hashSimilarities[tabEval[-1]]))
 
-				dpi = 96
-				size = (1680/dpi, 1024/dpi)
 				fig, (ax0, ax1, ax2) = plt.subplots(ncols=3, figsize = size)
 
 				dataPlot = [hashDistance[eval] for eval in tabEval]
@@ -185,6 +198,116 @@ def main(args) :
 				plt.savefig(os.path.join(outputDir, "graphs" + str(numDir) + ".png"), bbox_inches = 'tight')
 				# plt.show()
 				plt.close()
+
+
+				if args.leadership :
+					fileLeadership = os.path.join(os.path.join(topDirectory, subDir), "bestleadership.dat")
+					hashProportion = {}
+
+					regexpLeadership = re.compile(r"^([^,]+),([^,]+),([^,]+),")
+					if os.path.isfile(fileLeadership) :
+						with open(fileLeadership, 'r') as fileRead :
+							fileRead = fileRead.readlines()
+
+							cumulEval = args.precision
+							lastEval = None
+							firstEval = True
+							for line in fileRead :
+								s = regexpLeadership.search(line)
+
+								if s :
+									eval = int(s.group(1))
+
+									if lastEval == None :
+										lastEval = eval
+
+									cumulEval += eval - lastEval
+									lastEval = eval
+
+									if cumulEval >= args.precision or firstEval :
+										hashProportion[eval] = float(s.group(3))
+										firstEval = False
+
+
+					# MATPLOTLIB PARAMS
+					matplotlib.rcParams['font.size'] = 15
+					matplotlib.rcParams['font.weight'] = 'bold'
+					matplotlib.rcParams['axes.labelsize'] = 25
+					matplotlib.rcParams['axes.labelweight'] = 'bold'
+					matplotlib.rcParams['xtick.labelsize'] = 25
+					matplotlib.rcParams['ytick.labelsize'] = 25
+					matplotlib.rcParams['legend.fontsize'] = 25
+
+					fig, ax0 = plt.subplots(ncols = 1, figsize = size)
+
+					plt.grid()
+
+					dataPlot = [hashDistance[eval] for eval in tabEval]
+					ax0.plot(range(len(dataPlot)), dataPlot, color=palette[0], linestyle='-', linewidth=2, marker=None)
+					dataPlot = [hashProportion[eval] for eval in tabEval]
+					ax0.plot(range(len(dataPlot)), dataPlot, color=palette[1], linestyle='--', linewidth=2, marker=None)
+
+					# axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
+					# axe1.set_xticklabels([tabPlotEvaluation[x] for x in range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10))])
+
+					tabPlotTicks = []
+					for eval in tabEval :
+						# tabPlotTicks.append(eval)
+						tabPlotTicks.append((eval - 10)/20)
+
+					ticks = range(0, len(tabEval), int(len(tabEval)/2))
+					if len(tabEval) - 1 not in ticks :
+						ticks.append(len(tabEval) - 1)
+
+					# tabPlotTicks[ticks[0]] = 0
+					# tabPlotTicks[ticks[1]] = 20000
+					# tabPlotTicks[ticks[2]] = 40000
+
+					ax0.set_xticks(ticks)
+					ax0.set_xticklabels([tabPlotTicks[x] for x in ticks])
+
+					# ticks = range(0, len(dataPlot), int(len(dataPlot)/5))
+					ax0.set_xlabel('Evaluation')
+					ax0.set_xlim(0, len(dataPlot) - 1)
+
+					ax0.set_ylabel('Value')
+					ax0.set_ylim(0.0, 1.0)
+
+					legend = plt.legend(['Genotype variance', 'Leadership ratio'], loc = 0, frameon=True)
+					frame = legend.get_frame()
+					frame.set_facecolor('0.9')
+					frame.set_edgecolor('0.9')
+
+					numDir = regexpSubDir.search(subDir).group(1)
+					plt.savefig(os.path.join(outputDir, "distancePlusLeadershipRun" + str(numDir) + ".png"), bbox_inches = 'tight')
+					plt.savefig(os.path.join(outputDir, "distancePlusLeadershipRun" + str(numDir) + ".png"), bbox_inches = 'tight')
+					# plt.show()
+					plt.close()
+
+
+					# if args.unique != -1 :
+					# 	# Proportion Leadership unique run
+					# 	fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+					# 	# plt.axes(frameon=0)
+					# 	plt.grid()
+
+					# 	dataPlot = [hashProportion[eval] for eval in tabEval]
+					# 	axe1.plot(range(len(dataPlot)), dataPlot, color=palette[0], linestyle='-', linewidth=2, marker=None)
+
+					# 	# axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
+					# 	# axe1.set_xticklabels([tabPlotEvaluation[x] for x in range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10))])
+
+					# 	ticks = range(0, len(dataPlot), int(len(dataPlot)/5))
+					# 	axe1.set_xticks(ticks)
+					# 	axe1.set_xticklabels([tabPlotEvaluation[x] for x in ticks])
+
+					# 	axe1.set_ylim(0.0, 1.0)
+
+					# 	plt.savefig(outputDir + "/uniqueProportionRun" + str(args.unique) + ".png", bbox_inches = 'tight')
+					# 	plt.savefig(outputDir + "/uniqueProportionRun" + str(args.unique) + ".svg", bbox_inches = 'tight')
+					# 	# plt.show()
+					# 	plt.close()
+
 
 				# print("\t\t--> Dir" + str(numDir) + " : ")
 				# listEval = sorted([eval for eval in hashDistance.keys() if hashDistance[eval] > 0.2])
@@ -233,6 +356,7 @@ if __name__ == "__main__" :
 	parser.add_argument('-f', '--file', help = "Genome file", default = "allgenomes.dat")
 	parser.add_argument('-p', '--precision', help = "Evaluation precision", type = int, default = 1000)
 	parser.add_argument('-o', '--output', help = "Output directory", default = "GraphsResults")
+	parser.add_argument('-l', '--leadership', help = "Draw best leadership", action = "store_true", default = False)
 	args = parser.parse_args()
 
 	main(args)

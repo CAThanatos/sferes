@@ -65,7 +65,7 @@ namespace sferes
             ea.pop()[i]->fit().eval_compet(*(ea.pop()[i]), *(ea.pop()[i]), true);
 
             (*this->_log_file) << ea.nb_eval();
-						(*this->_log_file) << "," << ea.pop()[i]->gen().get_genome_from() << "," << ea.pop()[i]->fit()._nb_ind1_leader_first << "," << ea.pop()[i]->fit()._nb_preys_killed_coop << std::endl;
+						(*this->_log_file) << "," << ea.pop()[i]->gen().get_genome_from() << "," << ea.pop()[i]->fit()._nb_ind1_leader_first << "," << ea.pop()[i]->fit()._nb_preys_killed_coop << "," << ea.pop()[i]->fit()._nb_preys_killed << std::endl;
 					}
 				}
       }
