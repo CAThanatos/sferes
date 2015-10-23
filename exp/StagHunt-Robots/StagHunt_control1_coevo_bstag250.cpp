@@ -63,6 +63,10 @@ namespace sferes
       float moy_hares2_solo = 0, moy_sstags2_solo = 0, moy_bstags2_solo = 0;
      	int food2 = 0;
 
+     	float speed = 0.0f;
+     	float diff_speed = 0.0f;
+     	float sens_max = 0.0f;
+
 #ifdef COEVO
      	_num_leader = num_leader;
 #endif
@@ -102,9 +106,12 @@ namespace sferes
 	
 #ifdef MLP_PERSO
 				StagHuntRobot* robot1 = (StagHuntRobot*)(simu.robots()[0]);
-				StagHuntRobot* robot2 = (StagHuntRobot*)(simu.robots()[1]);
 				Hunter* hunter1 = (Hunter*)robot1;
+
+#ifndef SOLO
+				StagHuntRobot* robot2 = (StagHuntRobot*)(simu.robots()[1]);
 				Hunter* hunter2 = (Hunter*)robot2;
+#endif
 
 #ifdef DOUBLE_NN
 				float rand1 = misc::rand(1.0f);
@@ -203,7 +210,9 @@ namespace sferes
 					nb_role_divisions++;
 #else
 				hunter1->set_weights(ind1.data());
+#ifndef SOLO
 				hunter2->set_weights(ind2.data());
+#endif
 #endif
 #endif
 	
@@ -211,6 +220,11 @@ namespace sferes
 
 				_nb_leader_first_trial = 0;
 				_nb_preys_killed_coop_trial = 0;
+
+				bool collision = false;
+				float speed_trial = 0.0f;
+				float diff_speed_trial = 0.0f;
+				float sens_max_trial = 0.0f;
 
 #ifdef DIVERSITY
 				std::vector<float> vec_sm_trial;
@@ -242,6 +256,24 @@ namespace sferes
 							
 							// v1 and v2 are between -4 and 4
 							simu.move_robot(v1, v2, num);
+
+							// speed_trial += ((v1 + v2) + 8.0)/16.0f;
+							// std::cout << v1 << "/" << v2 << ":" << speed_trial << std::endl;
+
+							if (robot->get_collision())
+							{
+								speed_trial += 0.0f;
+								diff_speed_trial += 1.0f;
+								sens_max_trial += 1.0f;
+							}
+							else
+							{
+								speed_trial += (fabs(v1) + fabs(v2))/8.0f;
+								diff_speed_trial += fabs(v1 - v2)/8.0f;
+								sens_max_trial += ((Hunter*)robot)->get_sens_max();
+							}
+
+							// std::cout << sens_max_trial << std::endl;
 						}
 					}
 
@@ -251,7 +283,11 @@ namespace sferes
 					// For each prey, we check if there are hunters close
 					std::vector<int> dead_preys;
 
+#ifdef SOLO
+					for(int k = 1; k < simu.robots().size(); ++k)
+#else
 					for(int k = 2; k < simu.robots().size(); ++k)
+#endif
 						check_status(simu, (Prey*)(simu.robots()[k]), dead_preys, k);
 					
 					// We remove the dead preys
@@ -360,6 +396,20 @@ namespace sferes
        	if(_nb_preys_killed_coop_trial > 0)
 	       	proportion_leader += fabs(0.5 - (_nb_leader_first_trial/_nb_preys_killed_coop_trial));//*(_nb_preys_killed_coop_trial/max_hunts);
 
+	      // if(collision)
+	      if(false)
+	      {
+	      	speed += 0.0;
+	      	diff_speed += 0.0;
+	      	sens_max += 0.0;
+	      }
+	      else
+	      {
+		      speed += speed_trial/(float)Params::simu::nb_steps;
+		      diff_speed += diff_speed_trial/(float)Params::simu::nb_steps;
+		      sens_max += sens_max_trial/(float)Params::simu::nb_steps;
+	    	}
+
 #ifdef DOUBLE_NN
 				if(hunter1->nn1_chosen())
 					fit_nn1 += food_trial;
@@ -375,6 +425,8 @@ namespace sferes
  	 				simu.dump_behaviour_log(fileDump.c_str());
 	 			}
 #endif
+
+     		// std::cout << speed << "/" << diff_speed << "/" << sens_max << std::endl;
 
 
 #if defined(BEHAVIOUR_VIDEO)
@@ -416,6 +468,10 @@ namespace sferes
 			fit_nn1 /= Params::simu::nb_trials;
 			fit_nn2 /= Params::simu::nb_trials;
 #endif
+
+			speed /= Params::simu::nb_trials;
+			diff_speed /= Params::simu::nb_trials;
+			sens_max /= Params::simu::nb_trials;
 		
 #ifdef NOT_AGAINST_ALL	
 			int nb_encounters = Params::pop::nb_opponents*Params::pop::nb_eval;
@@ -475,7 +531,14 @@ namespace sferes
      	food2 /= nb_encounters;
      	food1 /= nb_encounters;
 
+#ifdef FIT_SPEED
+     	float fit = speed*(1.0f - diff_speed)*(1.0f - sens_max);
+     	fit /= nb_encounters;
+     	// std::cout << speed << "/" << diff_speed << "/" << sens_max << " = " << fit << std::endl;
+     	ind1.fit().add_fitness(fit);
+#else
      	ind1.fit().add_fitness(food1);
+#endif
 			
 #if !defined(NOT_AGAINST_ALL) && !defined(ALTRUISM)
 			ind2.fit().add_fitness(food2);
@@ -537,7 +600,11 @@ namespace sferes
 			_num_leader = first_leader?1:2;
 #endif
 
+#ifdef SOLO
+			for(int i = 0; i < 1; ++i)
+#else
 			for(int i = 0; i < 2; ++i)
+#endif
 			{
 				Hunter* r;				
 				Posture pos = (invers_pos) ? pos_init[(i + 1)%2] : pos_init[i];
@@ -554,6 +621,11 @@ namespace sferes
 				else
 					r = new Hunter(Params::simu::hunter_radius, pos, HUNTER_COLOR, nn2);
 
+#ifdef SOLO
+				if(i > 0)
+					r->set_deactivated(true);
+#endif
+
 				if(!r->is_deactivated())
 				{	
 					// 12 lasers range sensors 
@@ -566,11 +638,13 @@ namespace sferes
 		
 					// 1 linear camera
 					// r->use_camera(LinearCamera(M_PI/2, Params::simu::nb_camera_pixels));
+#ifndef NO_CAMERA
 					r->use_camera(LinearCamera(M_PI/3.6, Params::simu::nb_camera_pixels));
+#endif
 
 					r->set_bool_leader(leader);
 				}
-		
+
 				simu.add_robot(r);
 			}
 					
@@ -630,7 +704,11 @@ namespace sferes
    		float px = prey->get_pos().x();
    		float py = prey->get_pos().y();
    		
+#ifdef SOLO
+   		for(int i = 0; i < 1; ++i)
+#else
    		for(int i = 0; i < 2; ++i)
+#endif
    		{
    			Hunter* hunter = (Hunter*)(simu.robots()[i]);
    			float hx = hunter->get_pos().x();
