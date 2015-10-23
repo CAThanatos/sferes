@@ -25,14 +25,15 @@ import math
 import shutil
 
 
-maxEval = 40000
-precision = 100
+precision = 10
 selection = None
 exclusion = None
 directories = None
 outputDir = "GraphsResultsFollowup"
 drawStatAnalysis = False
 removeOutput = False
+drawGen = False
+maxGen = 1500
 
 
 colorHaresSolo = 'lime'
@@ -84,9 +85,9 @@ def draw() :
 		os.makedirs(outputDir)
 
 
+	tabGeneration = []
 	tabEvaluation = []
 	dataHash = []
-	directoryCoevo = False
 	for directory in directories :
 		if os.path.isdir(directory) :
 			listBestFit = [f for f in os.listdir(directory) if (os.path.isfile(directory + "/" + f) and re.match(r"^bestfit(\d*)\.dat$", f))]
@@ -99,10 +100,6 @@ def draw() :
 			hashRatioSuccess = {}
 			hashRatioHares = {}
 
-			if re.search(r"COEVO", directory) :
-				directoryCoevo = True
-
-			# tabEvaluation = []
 			for fileBest in listBestFit :
 				m = re.search(r'^bestfit(\d*)\.dat$', fileBest)
 				run = int(m.group(1))
@@ -126,9 +123,8 @@ def draw() :
 					data = np.loadtxt(directory + "/" + fileBest, delimiter=',', usecols = (0, 1, 2, 3, 4, 5, 6, 7), dtype = dtypes)
 
 					cpt = 0
-					firstEval = True
-					lastEval = 0
-					maxEvalDone = False
+					maxGenDone = False
+					generation = 0
 					for line in data :
 						evaluation = line['evaluation']
 
@@ -136,34 +132,35 @@ def draw() :
 						# if directoryCoevo :
 						# 	evaluation += 10
 
-						cpt += evaluation - lastEval
-						lastEval = evaluation
+						cpt += 1
 
-						if cpt > precision or firstEval :
-							if not maxEvalDone :
-								hashFitness[run][evaluation] = line['fitness']
+						if cpt > precision or generation == 0 :
+							if not maxGenDone :
+								hashFitness[run][generation] = line['fitness']
 
-								hashNbSStags[run][evaluation] = line['nbSStags']
-								hashNbSStagsSolo[run][evaluation] = line['nbSStagsSolo']
-								hashNbSStagsDuo[run][evaluation] = line['nbSStags'] - line['nbSStagsSolo']
+								hashNbSStags[run][generation] = line['nbSStags']
+								hashNbSStagsSolo[run][generation] = line['nbSStagsSolo']
+								hashNbSStagsDuo[run][generation] = line['nbSStags'] - line['nbSStagsSolo']
 
-								# hashRatio[run][evaluation] = line['nbBStags']*100/(line['nbHares'] + line['nbBStags'])
-								# hashRatioSuccess[run][evaluation] = (line['nbBStags'] - line['nbBStagsSolo'])*100/(line['nbHares'] + (line['nbBStags'] - line['nbBStagsSolo'])) 
-								# hashRatioHares[run][evaluation] = line['nbHares']*100/(line['nbHares'] + line['nbBStags'])
-								hashRatio[run][evaluation] = 0
-								hashRatioSuccess[run][evaluation] = 0
-								hashRatioHares[run][evaluation] = 0
+								# hashRatio[run][generation] = line['nbBStags']*100/(line['nbHares'] + line['nbBStags'])
+								# hashRatioSuccess[run][generation] = (line['nbBStags'] - line['nbBStagsSolo'])*100/(line['nbHares'] + (line['nbBStags'] - line['nbBStagsSolo'])) 
+								# hashRatioHares[run][generation] = line['nbHares']*100/(line['nbHares'] + line['nbBStags'])
+								hashRatio[run][generation] = 0
+								hashRatioSuccess[run][generation] = 0
+								hashRatioHares[run][generation] = 0
+
+								if generation not in tabGeneration :
+									tabGeneration.append(generation)
 
 								if evaluation not in tabEvaluation :
 									tabEvaluation.append(evaluation)
 
 								cpt = 0
 
-								if evaluation > maxEval :
-									maxEvalDone = True
+								if generation > maxGen :
+									maxGenDone = True
 
-						if firstEval :
-							firstEval = False
+						generation += 1
 
 			hashData = {}
 			hashData["hashFitness"] = hashFitness
@@ -181,6 +178,7 @@ def draw() :
 
 
 	tabEvaluation = sorted(tabEvaluation)
+	tabGeneration = sorted(tabGeneration)
 	# lastEval = tabEvaluation[-1]
 	# diffEvals = lastEval - tabEvaluation[-2]
 
@@ -196,9 +194,9 @@ def draw() :
 		runsCoop = []
 
 		for run in hashNbSStags.keys() :
-			lastEvalRun = sorted(hashNbSStags[run].keys())[-1]
+			lastGenRun = sorted(hashNbSStags[run].keys())[-1]
 
-			if hashNbSStagsDuo[run][lastEvalRun] > hashNbSStags[run][lastEvalRun]/float(2.0) and hashNbSStagsDuo[run][lastEvalRun] > 1 :
+			if hashNbSStagsDuo[run][lastGenRun] > hashNbSStags[run][lastGenRun]/float(2.0) and hashNbSStagsDuo[run][lastGenRun] > 1 :
 				runsCoop.append(run)
 
 		hashRunCoop.append(runsCoop)
@@ -247,6 +245,7 @@ def draw() :
 	# 		cpt += 1
 
 	tabPlotEvaluation = tabEvaluation
+	tabPlotGeneration = tabGeneration
 
 
 	# Fitness Boxplots Stags
@@ -262,8 +261,8 @@ def draw() :
 		dataPerc75 = []
 		hashFitness = data['hashFitness']
 
-		for evaluation in tabPlotEvaluation :
-			fitnessEval = [hashFitness[run][evaluation] for run in hashFitness.keys() if run in hashRunCoop[cptData] and evaluation in hashFitness[run].keys()]
+		for generation in tabPlotGeneration :
+			fitnessEval = [hashFitness[run][generation] for run in hashFitness.keys() if run in hashRunCoop[cptData] and generation in hashFitness[run].keys()]
 			fitnessMed = np.median(fitnessEval)
 
 			perc25 = fitnessMed
@@ -302,24 +301,24 @@ def draw() :
 
 
 	tabPlotTicks = []
-	for eval in tabPlotEvaluation :
-		if eval > maxEval :
-			tabPlotTicks.append(maxEval)
+	for generation in tabPlotGeneration :
+		if generation > maxGen :
+			tabPlotTicks.append(maxGen)
 		else :
-			tabPlotTicks.append(eval)
+			tabPlotTicks.append(generation)
 
-	ticks = range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/2))
-	if len(tabPlotEvaluation) - 1 not in ticks :
-		ticks.append(len(tabPlotEvaluation) - 1)
+	ticks = range(0, len(tabPlotGeneration), int(len(tabPlotGeneration)/2))
+	if len(tabPlotGeneration) - 1 not in ticks :
+		ticks.append(len(tabPlotGeneration) - 1)
 
-	tabPlotTicks[ticks[0]] = 0
-	tabPlotTicks[ticks[1]] = 20000
-	tabPlotTicks[ticks[2]] = 40000
+	# tabPlotTicks[ticks[0]] = 0
+	# tabPlotTicks[ticks[1]] = 20000
+	# tabPlotTicks[ticks[2]] = 40000
 
 	axe1.set_xticks(ticks)
 	axe1.set_xticklabels([tabPlotTicks[x] for x in ticks])
-	axe1.set_xlabel("Evaluation")
-	axe1.set_xlim(0, len(tabPlotEvaluation) - 1)
+	axe1.set_xlabel("Generation")
+	axe1.set_xlim(0, len(tabPlotGeneration) - 1)
 
 	axe1.set_ylabel("Fitness")
 	# axe1.set_ylim(0, maxFitness + 0.1*maxFitness)
@@ -506,6 +505,7 @@ def drawLeadership() :
 		os.makedirs(outputDir)
 
 	tabEvaluation = []
+	tabGeneration = []
 	dataHash = []
 
 	for directory in directories :
@@ -537,32 +537,32 @@ def drawLeadership() :
 					data = np.loadtxt(directory + "/" + fileBest, delimiter=',', usecols = (0, 1, 2, 3), dtype = dtypes)
 
 					cpt = 0
-					firstEval = True
-					lastEval = 0
-					maxEvalDone = False
+					maxGenDone = False
+					generation = 0
 					for line in data :
 						evaluation = line['evaluation']
 
-						cpt += evaluation - lastEval
-						lastEval = evaluation
+						cpt += 1
 
-						if cpt > precision or firstEval :
-							if not maxEvalDone :
-								hashProportion[run][evaluation] = line['proportion']
-								hashProportionAsym[run][evaluation] = line['proportionAsym'] - 0.5
-								# hashNbLeaderFirst[run][evaluation] = line['nb_leader_first']
-								# hashNbTotalCoop[run][evaluation] = line['nb_total_coop']
+						if cpt > precision or generation == 0 :
+							if not maxGenDone :
+								hashProportion[run][generation] = line['proportion']
+								hashProportionAsym[run][generation] = line['proportionAsym'] - 0.5
+								# hashNbLeaderFirst[run][generation] = line['nb_leader_first']
+								# hashNbTotalCoop[run][generation] = line['nb_total_coop']
 
 								if evaluation not in tabEvaluation :
 									tabEvaluation.append(evaluation)
 
+								if generation not in tabGeneration :
+									tabGeneration.append(generation)
+
 								cpt = 0
 
-								if evaluation > maxEval :
-									maxEvalDone = True
+								if generation > maxGen :
+									maxGenDone = True
 
-						if firstEval :
-							firstEval = False
+						generation += 1
 
 
 			hashData = {}
@@ -573,6 +573,7 @@ def drawLeadership() :
 
 
 	tabEvaluation = sorted(tabEvaluation)
+	tabGeneration = sorted(tabGeneration)
 	# lastEval = tabEvaluation[-1]
 	# diffEvals = lastEval - tabEvaluation[-2]
 
@@ -586,54 +587,55 @@ def drawLeadership() :
 		runSuccess = []
 
 		for run in hashProportion.keys() :
-			lastEvalRun = sorted(hashProportion[run].keys())[-1]
+			lastGenRun = sorted(hashProportion[run].keys())[-1]
 
-			if hashProportion[run][lastEvalRun] > 0.75 :
+			if hashProportion[run][lastGenRun] > 0.75 :
 				runSuccess.append(run)
 
 		hashRunSuccess.append(runSuccess)
 
 
-	# Statistical Analysis
-	if args.statAnalysis :
-		cpt = 0
-		while cpt < len(dataHash) :
-			minEvalSerie1 = None
-			hashProportion = dataHash[cpt]["hashProportion"]
+	# # Statistical Analysis
+	# if args.statAnalysis :
+	# 	cpt = 0
+	# 	while cpt < len(dataHash) :
+	# 		minEvalSerie1 = None
+	# 		hashProportion = dataHash[cpt]["hashProportion"]
 
-			for run in hashRunSuccess[cpt] :
-				lastEval = sorted(hashProportion[run].keys())[-1]
+	# 		for run in hashRunSuccess[cpt] :
+	# 			lastEval = sorted(hashProportion[run].keys())[-1]
 
-				if minEvalSerie1 == None or lastEval < minEvalSerie1 :
-					minEvalSerie1 = lastEval
+	# 			if minEvalSerie1 == None or lastEval < minEvalSerie1 :
+	# 				minEvalSerie1 = lastEval
 
-			serie1 = [hashProportion[run][minEvalSerie1] for run in hashRunSuccess[cpt]]
+	# 		serie1 = [hashProportion[run][minEvalSerie1] for run in hashRunSuccess[cpt]]
 			
-			cpt2 = cpt + 1
-			while cpt2 < len(dataHash) :
-				minEvalSerie2 = None
-				hashProportion = dataHash[cpt2]["hashProportion"]
+	# 		cpt2 = cpt + 1
+	# 		while cpt2 < len(dataHash) :
+	# 			minEvalSerie2 = None
+	# 			hashProportion = dataHash[cpt2]["hashProportion"]
 
-				for run in hashRunSuccess[cpt2] :
-					lastEval = sorted(hashProportion[run].keys())[-1]
+	# 			for run in hashRunSuccess[cpt2] :
+	# 				lastEval = sorted(hashProportion[run].keys())[-1]
 
-					if minEvalSerie2 == None or lastEval < minEvalSerie2 :
-						minEvalSerie2 = lastEval
+	# 				if minEvalSerie2 == None or lastEval < minEvalSerie2 :
+	# 					minEvalSerie2 = lastEval
 
-				serie2 = [hashProportion[run][minEvalSerie2] for run in hashRunSuccess[cpt2]]
+	# 			serie2 = [hashProportion[run][minEvalSerie2] for run in hashRunSuccess[cpt2]]
 
-				U, P = stats.mannwhitneyu(serie1, serie2)
-				print("Min1 = " + str(minEvalSerie1) + ", Min2 = " + str(minEvalSerie2))
-				print("Mann-Whitney (" + directories[cpt] + ", " + directories[cpt2] + ")\n\t -> U = " + str(U) + "/P = " + str(P))
+	# 			U, P = stats.mannwhitneyu(serie1, serie2)
+	# 			print("Min1 = " + str(minEvalSerie1) + ", Min2 = " + str(minEvalSerie2))
+	# 			print("Mann-Whitney (" + directories[cpt] + ", " + directories[cpt2] + ")\n\t -> U = " + str(U) + "/P = " + str(P))
 
-				with open(os.path.join(outputDir, "statAnalysis.txt"), 'w') as fileWrite :
-					fileWrite.write("Min1 = " + str(minEvalSerie1) + ", Min2 = " + str(minEvalSerie2))
-					fileWrite.write("Mann-Whitney (" + directories[cpt] + ", " + directories[cpt2] + ")\n\t -> U = " + str(U) + "/P = " + str(P))
+	# 			with open(os.path.join(outputDir, "statAnalysis.txt"), 'w') as fileWrite :
+	# 				fileWrite.write("Min1 = " + str(minEvalSerie1) + ", Min2 = " + str(minEvalSerie2))
+	# 				fileWrite.write("Mann-Whitney (" + directories[cpt] + ", " + directories[cpt2] + ")\n\t -> U = " + str(U) + "/P = " + str(P))
 
-				cpt2 += 1
-			cpt += 1
+	# 			cpt2 += 1
+	# 		cpt += 1
 
 	tabPlotEvaluation = tabEvaluation
+	tabPlotGeneration = tabGeneration
 
 
 	# # Fitness Boxplots
@@ -816,8 +818,8 @@ def drawLeadership() :
 		dataPerc75 = []
 		hashProportion = data['hashProportion']
 
-		for evaluation in tabPlotEvaluation :
-			proportionEval = [hashProportion[run][evaluation] for run in hashProportion.keys() if evaluation in hashProportion[run].keys()]
+		for generation in tabPlotGeneration :
+			proportionEval = [hashProportion[run][generation] for run in hashProportion.keys() if generation in hashProportion[run].keys()]
 			proportionMed = np.median(proportionEval)
 
 			perc25 = proportionMed
@@ -855,26 +857,26 @@ def drawLeadership() :
 		cptData += 1
 
 	tabPlotTicks = []
-	for eval in tabPlotEvaluation :
-		if eval > maxEval :
-			tabPlotTicks.append(maxEval)
+	for generation in tabPlotGeneration :
+		if generation > maxGen :
+			tabPlotTicks.append(maxGen)
 		else :
-			tabPlotTicks.append(eval)
+			tabPlotTicks.append(generation)
 
-	ticks = range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/2))
-	if len(tabPlotEvaluation) - 1 not in ticks :
-		ticks.append(len(tabPlotEvaluation) - 1)
+	ticks = range(0, len(tabPlotGeneration), int(len(tabPlotGeneration)/2))
+	if len(tabPlotGeneration) - 1 not in ticks :
+		ticks.append(len(tabPlotGeneration) - 1)
 
-	tabPlotTicks[ticks[0]] = 0
-	tabPlotTicks[ticks[1]] = 20000
-	tabPlotTicks[ticks[2]] = 40000
+	# tabPlotTicks[ticks[0]] = 0
+	# tabPlotTicks[ticks[1]] = 20000
+	# tabPlotTicks[ticks[2]] = 40000
 
 	axe1.set_xticks(ticks)
 	axe1.set_xticklabels([tabPlotTicks[x] for x in ticks])
-	# axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
-	# axe1.set_xticklabels([tabPlotEvaluation[x] for x in range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10))])
-	axe1.set_xlabel("Evaluation")
-	axe1.set_xlim(0, len(tabPlotEvaluation) - 1)
+	# axe1.set_xticks(range(0, len(tabPlotGeneration), int(len(tabPlotGeneration)/10)))
+	# axe1.set_xticklabels([tabPlotGeneration[x] for x in range(0, len(tabPlotGeneration), int(len(tabPlotGeneration)/10))])
+	axe1.set_xlabel("Generation")
+	axe1.set_xlim(0, len(tabPlotGeneration) - 1)
 	axe1.set_ylabel("Proportion")
 	# axe1.set_ylim(0, maxFitness + 0.1*maxFitness)
 
@@ -890,11 +892,7 @@ def drawLeadership() :
 	plt.close()
 
 
-
 def main(args) :
-	global maxEval
-	maxEval = int(args.max)
-
 	global precision
 	precision = int(args.precision)
 
@@ -916,6 +914,9 @@ def main(args) :
 	global directories
 	directories = args.directories
 
+	global maxGen
+	maxGen = int(args.max)
+
 	if args.drawLeadership :
 		print("\t-> Drawing Leadership")
 		drawLeadership()
@@ -929,14 +930,15 @@ if __name__ == "__main__" :
 	parser = argparse.ArgumentParser()
 	parser.add_argument('directories', help = "Directories to plot", type=str, nargs='+')
 
-	parser.add_argument('-m', '--max', help = "Max evaluation", default='20000', type=int)
-	parser.add_argument('-p', '--precision', help = "Precision", default='100', type=int)
+	parser.add_argument('-m', '--max', help = "Max evaluation", default='1500', type=int)
+	parser.add_argument('-p', '--precision', help = "Precision", default='10', type=int)
 
-	parser.add_argument('-o', '--output', help = "Output directory", default='GraphsResults')
+	parser.add_argument('-o', '--output', help = "Output directory", default='GraphsResultsFollowup')
 	parser.add_argument('-r', '--removeOutput', help = "Remove output directory if exists", default=False, action='store_true')
 
 	parser.add_argument('-a', '--statAnalysis', help = "Compute Mann-Whitney", default=False, action='store_true')
 	parser.add_argument('-l', '--drawLeadership', help = "Draw leadership", default=False, action='store_true')
+	parser.add_argument('-u', '--unique', help = "Draw a unique run", default = -1, type = int)
 
 	parser.add_argument('-s', '--selection', help = "Selected runs", default=None, type=int, nargs='+')
 	parser.add_argument('-e', '--exclusion', help = "Excluded runs", default=None, type=int, nargs='+')
