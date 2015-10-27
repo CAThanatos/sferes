@@ -148,7 +148,7 @@ namespace sferes
 							// inputs[current_index + 3] = 0;
 						}
 
-						std::cout << inputs[current_index] << "/" << inputs[current_index+1] << "/" << inputs[current_index+2] << "/";
+						// std::cout << inputs[current_index] << "/" << inputs[current_index+1] << "/" << inputs[current_index+2] << "/";
 
 						current_index += Params::nn::nb_info_by_pixel;
  					}
@@ -161,7 +161,7 @@ namespace sferes
  					current_index++;
 #endif
 
-					std::cout << std::endl;
+					// std::cout << std::endl;
 	
 #ifdef MLP_PERSO
  					if(Params::nn::nb_hidden > 0)
