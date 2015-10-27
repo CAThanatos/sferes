@@ -364,6 +364,13 @@ namespace sferes
           ia >> BOOST_SERIALIZATION_NVP(_pop_co);
 #endif
 
+          for(int i = 0; i < _pop.size(); ++i)
+          {
+            for(int j = 0; j < _pop[i]->gen().size(); ++j)
+              std::cout << _pop[i]->gen().data(j) << ",";
+            std::cout << std::endl;
+          }
+
           // Add a particular individual to the population
           std::string path = fname.substr(0, fname.find_last_of("/") + 1);
           std::ifstream ifs2((path + "genome.dat").c_str());
