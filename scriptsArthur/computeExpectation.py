@@ -279,6 +279,12 @@ def main(args) :
 	ax9.set_ylim(0.0, 5000.0)
 	ax9.set_title("Expected values with respect to solo proportion with proportion followers = 0.0")
 
+	fig.tight_layout()
+
+	plt.savefig("./GraphsResults/Expectations.svg", bbox_inches = 'tight')
+	plt.savefig("./GraphsResults/Expectations.png", bbox_inches = 'tight')
+	plt.close()
+
 	# handles, labels = ax9.get_legend_handles_labels()
 	# ax9.legend()
 
@@ -287,8 +293,8 @@ def main(args) :
 	# frame.set_facecolor('0.9')
 	# frame.set_edgecolor('0.9')
 
-	fig.tight_layout()
-	plt.show()
+	# fig.tight_layout()
+	# plt.show()
 
 
 

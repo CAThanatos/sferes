@@ -566,6 +566,9 @@ namespace sferes
 				if(genome_traces)
 				{
 					_nb_ind1_leader_first = nb_ind1_leader_first;
+					_nb_preys_killed_ind1 = h1->nb_hares_hunted();
+					_nb_preys_killed_ind1 += h1->nb_small_stags_hunted();
+					_nb_preys_killed_ind1 += h1->nb_big_stags_hunted();
 					return;
 				}
 #endif
@@ -1115,6 +1118,7 @@ namespace sferes
 
 		float _nb_leader_first;
 		float _nb_preys_killed;
+		float _nb_preys_killed_ind1;
 		float _nb_preys_killed_coop;
 
 		float _nb_leader_first_trial;
