@@ -44,7 +44,7 @@ if os.path.isfile(templateFile) :
 dicExp = {}
 with open(fileToContinu, "r") as fileRead :
 	fileRead = fileRead.readlines()
-	lines = [line.rstrip('\n').split('\t') for line in fileRead]
+	lines = [line.rstrip('\n').split('\t') for line in fileRead if not line.startswith("#")]
 
 	dicExp = {}
 	dicRuns = {}

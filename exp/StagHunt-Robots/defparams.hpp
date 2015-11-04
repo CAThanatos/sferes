@@ -156,7 +156,7 @@ struct Params
 		
 		static const int nb_levels = 2;
 
-		static const float nb_steps = 5000;
+		static const float nb_steps = 500;
 		
 #ifdef TRACE_ONLY
 		static const int nb_trials = 20;

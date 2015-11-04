@@ -278,12 +278,39 @@ def main(args) :
 					frame.set_facecolor('0.9')
 					frame.set_edgecolor('0.9')
 
-					numDir = regexpSubDir.search(subDir).group(1)
 					plt.savefig(os.path.join(outputDir, "distancePlusLeadershipRun" + str(numDir) + ".png"), bbox_inches = 'tight')
 					plt.savefig(os.path.join(outputDir, "distancePlusLeadershipRun" + str(numDir) + ".png"), bbox_inches = 'tight')
 					# plt.show()
 					plt.close()
 
+				print("Run " + str(numDir) + " : ")
+				X = [np.array(genotype) for genotype in hashGenotypes[tabEval[-1]]]
+				ks, logWks, logWkbs, sk = gap_statistic(X)
+				print("\tks = " + str(ks))
+				print("\tlogWks = " + str(logWkbs))
+				print("\tlogWkbs = " + str(logWkbs))
+				print("\tsk = " + str(sk))
+
+				# The optimal number of clusters is the smallest k such that gap(k) - (gap(k + 1) - sk+1) >= 0
+				nbClusters = None
+				for indk, k in enumerate(ks) :
+					if indk < len(ks) - 1 :
+						Gapk = logWkbs[indk] - logWks[indk]
+						Gapk2 = logWkbs[indk + 1] - logWks[indk + 1]
+
+						if Gapk - (Gapk2 - sk[indk + 1]) >= 0 :
+							nbClusters = k
+							break
+
+				print("Optimal number of clusters : " + str(nbClusters))
+
+				# fig, ax0 = plt.subplots(ncols = 1, figsize = size)
+
+				# plt.grid()
+
+				# dataPlot = logWks
+				# ax0.plot(range(len(logWks)), dataPlot, color=palette[0], linestyle='-', linewidth=2, marker=None)
+				# plt.show()
 
 					# if args.unique != -1 :
 					# 	# Proportion Leadership unique run
@@ -314,41 +341,137 @@ def main(args) :
 				# print(listEval)
 
 
-# def Wk(mu, clusters):
-#     K = len(mu)
-#     return sum([np.linalg.norm(mu[i]-c)**2/(2*len(c)) \
-#                for i in range(K) for c in clusters[i]])
+def Wk(mu, clusters):
+    K = len(mu)
+    return sum([np.linalg.norm(mu[i]-c)**2/(2*len(c)) \
+               for i in range(K) for c in clusters[i]])
 	
-# def bounding_box(X):
-#     xmin, xmax = min(X,key=lambda a:a[0])[0], max(X,key=lambda a:a[0])[0]
-#     ymin, ymax = min(X,key=lambda a:a[1])[1], max(X,key=lambda a:a[1])[1]
-#     return (xmin,xmax), (ymin,ymax)
- 
-# def gap_statistic(X):
-#     (xmin,xmax), (ymin,ymax) = bounding_box(X)
-#     # Dispersion for real distribution
-#     ks = range(1,10)
-#     Wks = zeros(len(ks))
-#     Wkbs = zeros(len(ks))
-#     sk = zeros(len(ks))
-#     for indk, k in enumerate(ks):
-#         mu, clusters = find_centers(X,k)
-#         Wks[indk] = np.log(Wk(mu, clusters))
-#         # Create B reference datasets
-#         B = 10
-#         BWkbs = zeros(B)
-#         for i in range(B):
-#             Xb = []
-#             for n in range(len(X)):
-#                 Xb.append([random.uniform(xmin,xmax),
-#                           random.uniform(ymin,ymax)])
-#             Xb = np.array(Xb)
-#             mu, clusters = find_centers(Xb,k)
-#             BWkbs[i] = np.log(Wk(mu, clusters))
-#         Wkbs[indk] = sum(BWkbs)/B
-#         sk[indk] = np.sqrt(sum((BWkbs-Wkbs[indk])**2)/B)
-#     sk = sk*np.sqrt(1+1/B)
+def gap_statistic(X):
+    # Dispersion for real distribution
+    ks = range(1,10)
+    Wks = np.zeros(len(ks))
+    Wkbs = np.zeros(len(ks))
+    sk = np.zeros(len(ks))
 
+    for indk, k in enumerate(ks):
+        mu, clusters = find_centers(X, k)
+
+        Wks[indk] = np.log(Wk(mu, clusters))
+        # Create B reference datasets
+        B = 10
+        BWkbs = np.zeros(B)
+        for i in range(B):
+            Xb = []
+
+            for n in range(len(X)):
+            	curB = []
+
+            	for value in range(len(X[0])) :
+            		curB.append(random.uniform(0.0, 1.0))
+
+            	Xb.append(curB)
+
+            Xb = np.array(Xb)
+            mu, clusters = find_centers(Xb,k)
+            BWkbs[i] = np.log(Wk(mu, clusters))
+
+        Wkbs[indk] = sum(BWkbs)/B
+        sk[indk] = np.sqrt(sum((BWkbs-Wkbs[indk])**2)/B)
+
+    sk = sk*np.sqrt(1+1/B)
+    return(ks, Wks, Wkbs, sk)
+
+
+def cluster_points(X, mu):
+		clusters  = {}
+
+		for x in X:
+			distArrays = [(i[0], np.linalg.norm(x-mu[i[0]])) for i in enumerate(mu)]
+			minValue = min(distArrays, key=lambda t:t[1])[1]
+			listMins = [couple[0] for couple in distArrays if couple[1] == minValue]
+
+			bestmukey = None
+			# for minInd in listMins :
+			# 	if minInd not in clusters.keys() :
+			# 		bestmukey = minInd
+			# 		break
+
+			if bestmukey == None :
+				bestmukey = listMins[0]
+			try:
+				clusters[bestmukey].append(x)
+			except KeyError:
+				clusters[bestmukey] = [x]
+
+		# print(str(len(clusters)) + "/" + str(len(mu)))
+
+    # for i in enumerate(mu) :
+    # 	found = False
+    # 	for x in clusters[i[0]] :
+    # 		if np.array_equal(i[1], x) :
+    # 			found = True
+    # 			break
+
+    # 	if not found :
+    # 		print("yep")
+
+    # 	if i[0] not in clusters.keys() :
+    # 		print('mdr')
+    # 		clusters[i[0]] = []
+
+    # print(str(len(clusters)) + "/" + str(len(mu)))
+
+		return clusters
+ 
+def reevaluate_centers(mu, clusters):
+    newmu = []
+    keys = sorted(clusters.keys())
+    for k in keys:
+        newmu.append(np.mean(clusters[k], axis = 0))
+    return newmu
+ 
+def has_converged(mu, oldmu):
+    return set([tuple(a) for a in mu]) == set([tuple(a) for a in oldmu])
+ 
+def find_centers(X, K):
+
+    # Initialize to K random centers
+    # oldmu = random.sample(X, K)
+    # mu = random.sample(X, K)
+    oldmu = []
+    mu = []
+
+    for i in range(0, K) :
+    	tmpOldMu = []
+    	tmpMu = []
+
+    	for j in range(0, len(X[0])) :
+     		tmpOldMu.append(random.uniform(0.0, 1.0))
+     		tmpMu.append(random.uniform(0.0, 1.0))
+
+     	oldmu.append(tmpOldMu)
+     	mu.append(tmpMu)
+
+    clusters = {}
+    firstTime = True
+    # print('prout : ' + str(K) + "/" + str(len(X)) + "/" + str(len(oldmu)) + "/" + str(len(mu)))
+    while firstTime or not has_converged(mu, oldmu):
+        oldmu = mu
+        # print('caca')
+
+        # Assign all points in X to clusters
+        clusters = cluster_points(X, mu)
+        # print(str(len(clusters)) + "/" + str(len(mu)))
+
+        # Reevaluate centers
+        mu = reevaluate_centers(oldmu, clusters)
+
+        if firstTime :
+        	firstTime = False
+
+    # print('mdr')
+    # print(str(K) + "/" + str(len(mu)))
+    return(mu, clusters)
 
 if __name__ == "__main__" :
 	parser = argparse.ArgumentParser()
