@@ -41,7 +41,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 
-#define NO_VIDEO
+// #define NO_VIDEO
 
 namespace fastsim
 {

@@ -71,6 +71,8 @@ namespace sferes
 						
 							_sens_max += inputs[j];
 						}
+
+						// std::cout << inputs[j] << "/";
 					}
 					_sens_max /= (float)nb_lasers;
 					
@@ -167,7 +169,7 @@ namespace sferes
  					if(Params::nn::nb_hidden > 0)
  					{
 						std::vector<float> hidden(Params::nn::nb_hidden);
-						
+
 						size_t cpt_weights = 0;
 						float lambda = 5.0f;
 						for(size_t i = 0; i < hidden.size(); ++i)
@@ -185,7 +187,7 @@ namespace sferes
 
 							hidden[i] = (1.0 / (exp(-hidden[i] * lambda) + 1));
 						}
-						
+
 						for(size_t i = 0; i < outf.size(); ++i)
 						{
 							outf[i] = 0.0f;
@@ -197,6 +199,7 @@ namespace sferes
 
 							// Bias neuron
 							outf[i] += 1.0f*_weights[cpt_weights];
+							cpt_weights++;
 							
 							outf[i] = (1.0 / (exp(-outf[i] * lambda) + 1));
 						}
