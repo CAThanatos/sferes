@@ -285,6 +285,7 @@ namespace sferes
 #ifdef NETWORK_DOUBINPUTS
 					output += ((this->_params[index_gen_choice] - min_p)/(max_p - min_p))*this->_params[cpt_weights];
 					cpt_weights++;
+#endif
 
 					output += ((opponent._params[index_gen_choice] - min_p)/(max_p - min_p))*this->_params[cpt_weights];
 					cpt_weights++;
