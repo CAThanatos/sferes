@@ -40,10 +40,10 @@ def build(bld):
 													 							# 'CONTROL3 BSTAG0 SSTAG125 SCREAM SCREAM_PREY COM_COMPAS POS_CLOSE',
 													 							# 'CONTROL3 DOUBLE_NN DUPLICATION COM_NN BSTAG0 SSTAG125 POS_CLOSE',
 
-													 							# 'SETTING14 COEVO SSTAG250 POS_CLOSE',
-													 							'SETTING14 SSTAG250 POS_CLOSE',
+													 							'SETTING14 COEVO SSTAG250 POS_CLOSE',
+													 							# 'SETTING14 SSTAG250 POS_CLOSE',
 													 							# 'SETTING14 SSTAG250 RATE0 POS_CLOSE',
-													 							# 'SETTING14 SSTAG50 POS_CLOSE',
+													 							'SETTING14 SSTAG50 POS_CLOSE',
 													 							# 'SETTING14 COEVO SSTAG50 POS_CLOSE',
 
 													 							# 'SETTING13 POP100 FITPROP STD2',
