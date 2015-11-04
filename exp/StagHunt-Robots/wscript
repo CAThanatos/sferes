@@ -35,14 +35,14 @@ def build(bld):
 													 							# "CONTROL1 COEVO NO_PREYS FOLLOW",
 													 							# "SETTING15 COEVO BSTAG250",
 													 							# "SETTING15 COEVO PREYS1 BSTAG250",
+
+													 							"SETTING15 NO_PREYS SOLO BSTAG250 BSTAG_SOLO250",
+													 							"SETTING15 PREYS1 SOLO BSTAG250 BSTAG_SOLO250",
+													 							"SETTING15 PREYS1 BSTAG250 BSTAG_SOLO250"
+													 							"CONTROL1 NO_PREYS SOLO BSTAG250",
+													 							"CONTROL1 PREYS2 SOLO BSTAG250",
+													 							"CONTROL1 PREYS2 BSTAG250",
 													 							# "SETTING15 PREYS1 SOLO BSTAG250 BSTAG_SOLO250",
-													 							"SETTING15 SOLO NO_PREYS",
-													 							# 'CONTROL1 NO_CAMERA NO_PREYS MAP200 SOLO FIT_SPEED',
-													 							# 'CONTROL1 NO_CAMERA NO_PREYS MAP400 SOLO FIT_SPEED',
-													 							# 'CONTROL1 NO_CAMERA NO_PREYS MAP200 POLYNOMIAL SOLO FIT_SPEED',
-													 							# 'CONTROL1 NO_CAMERA NO_PREYS MAP200 UNIFORM SOLO FIT_SPEED',
-													 							# 'CONTROL1 NO_CAMERA NO_PREYS SOLO FIT_SPEED',
-													 							# 'CONTROL1 NO_CAMERA PREYS8 SOLO FIT_SPEED'
 																			])
 
 																			 

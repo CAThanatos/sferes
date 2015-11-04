@@ -354,7 +354,7 @@ namespace sferes
             exit(1);
           }
           
-					_gen = atof(fname.substr(fname.find_last_of("_") + 1, fname.length() - 1).c_str());
+					_gen = atof(fname.substr(fname.find_last_of("_") + 1, fname.length() - 1).c_str()) + 1;
           
           typedef boost::archive::binary_iarchive ia_t;
           ia_t ia(ifs);
@@ -364,12 +364,12 @@ namespace sferes
           ia >> BOOST_SERIALIZATION_NVP(_pop_co);
 #endif
 
-          for(int i = 0; i < _pop.size(); ++i)
-          {
-            for(int j = 0; j < _pop[i]->gen().size(); ++j)
-              std::cout << _pop[i]->gen().data(j) << ",";
-            std::cout << std::endl;
-          }
+          // for(int i = 0; i < _pop.size(); ++i)
+          // {
+          //   for(int j = 0; j < _pop[i]->gen().size(); ++j)
+          //     std::cout << _pop[i]->gen().data(j) << ",";
+          //   std::cout << std::endl;
+          // }
 
           // Add a particular individual to the population
           std::string path = fname.substr(0, fname.find_last_of("/") + 1);

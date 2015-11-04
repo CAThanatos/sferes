@@ -1205,7 +1205,7 @@ int main(int argc, char **argv)
   typedef boost::fusion::vector<
 #ifdef COEVO
 		  sferes::stat::BestFitEvalCoEvo<phen_t, Params>,
-		  sferes::stat::MeanFitEvalCoEvo<phen_t, Params>,
+		  // sferes::stat::MeanFitEvalCoEvo<phen_t, Params>,
 		  sferes::stat::BestEverFitEvalCoEvo<phen_t, Params>,
 		  sferes::stat::AllFitEvalStatCoEvo<phen_t, Params>,
 		  sferes::stat::BestLeadershipEvalCoEvo<phen_t, Params>,
@@ -1215,7 +1215,7 @@ int main(int argc, char **argv)
 #endif
 #else
 		  sferes::stat::BestFitEval<phen_t, Params>,
-		  sferes::stat::MeanFitEval<phen_t, Params>,
+		  // sferes::stat::MeanFitEval<phen_t, Params>,
 		  sferes::stat::BestEverFitEval<phen_t, Params>,
 		  sferes::stat::AllFitEvalStat<phen_t, Params>,
 		  sferes::stat::BestLeadershipEval<phen_t, Params>,

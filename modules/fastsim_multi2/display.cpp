@@ -885,7 +885,8 @@ namespace fastsim
        
     if(_record_video)
     {
-		  if(_cpt_frame%1 == 0)
+		  if(_cpt_frame%50 == 0)
+		  // if(_cpt_frame%1 == 0)
 		  {
 				std::string file_dump = _file_video;
 			

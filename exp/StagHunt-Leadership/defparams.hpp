@@ -15,6 +15,10 @@
 #define MLP_PERSO
 #endif
 
+#ifdef CONTROL3
+#define MLP_COR
+#endif
+
 #define NO_BOOLEAN
 
 #if defined(SETTING1) || defined(SETTING2) || defined(SETTING3) || defined(SETTING4) || defined(SETTING5) || defined(SETTING6) || defined(SETTING7) || defined(SETTING8) || defined(SETTING13)
