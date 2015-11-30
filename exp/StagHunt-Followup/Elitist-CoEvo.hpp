@@ -35,8 +35,8 @@
 
 
 
-#ifndef ELITIST_HPP_
-#define ELITIST_HPP_
+#ifndef ELITIST_COEVO_HPP_
+#define ELITIST_COEVO_HPP_
 
 #include <algorithm>
 #include <boost/foreach.hpp>
@@ -50,7 +50,7 @@ namespace sferes
 {
   namespace ea
   {
-    SFERES_EA(Elitist, Ea)
+    SFERES_EA(ElitistCoEvo, Ea)
     {
     public:
       typedef boost::shared_ptr<Phen > indiv_t;
@@ -60,7 +60,7 @@ namespace sferes
       static const unsigned mu = Params::pop::mu;
       static const unsigned lambda = Params::pop::lambda;
 
-			Elitist() : _step_size(1)
+			ElitistCoEvo() : _step_size(1), _step_size_co(1)
 			{ }
 
       void random_pop()
@@ -72,7 +72,17 @@ namespace sferes
 					indiv->random();
 				}
 
-				this->_eval.eval(this->_pop, 0, this->_pop.size());
+				this->_pop_co.resize(mu);
+				BOOST_FOREACH(boost::shared_ptr<Phen>& indiv, this->_pop_co)
+				{
+					indiv = boost::shared_ptr<Phen>(new Phen());
+					indiv->random();
+				}
+
+				_mixed_pop.clear();
+				_merge(this->_pop, this->_pop_co, this->_mixed_pop);
+
+				this->_eval.eval(this->_mixed_pop, 0, this->_mixed_pop.size());
 				this->apply_modifier();
 				std::partial_sort(this->_pop.begin(), this->_pop.begin() + mu,
 							this->_pop.end(), fit::compare());
@@ -81,66 +91,23 @@ namespace sferes
       
       void epoch()
       {
+      	// Population 1
 				assert(this->_pop.size()); 
 
 				// We create the children
 				pop_t child_pop;
-
 				std::vector<int> parents_list(lambda);
 				int parent_rank = 0;
-
-				// We set the genome_from value as if each of the individuals is going to clone itself 
-				// to the next generation
-				for(size_t i = 0; i < mu; ++i)
-					this->_pop[i]->gen().set_genome_from(i);
-
-#if defined(DOUBLE_NN) && defined(RECOMBINATION)
-				assert(lambda%2 == 0);
-				for(size_t i = 0; i < lambda - 1; i += 2)
-				{
-					// Recombination of parents
-					indiv_t new_indiv1 = indiv_t(new Phen());
-					indiv_t new_indiv2 = indiv_t(new Phen());
-					this->_pop[parent_rank%mu]->cross(this->_pop[(parent_rank + 1)%mu], new_indiv1, new_indiv2);
-
-					// Mutation
-					new_indiv1->gen().mutate(_step_size);
-					new_indiv2->gen().mutate(_step_size);
-
-					child_pop.push_back(new_indiv1);
-					child_pop.push_back(new_indiv2);
-
-					int worse_parent = parent_rank + 1;
-					if(this->_pop[parent_rank%mu]->fit().value() > this->_pop[(parent_rank + 1)%mu]->fit().value())
-						worse_parent = parent_rank;
-					
-					parents_list[i] = worse_parent%mu;
-
-					parent_rank = parent_rank + 2;
-				}
-#else
 				for(size_t i = 0; i < lambda; ++i)
 				{
 					// Cloning of a parent
 					child_pop.push_back(this->_pop[parent_rank%mu]->clone());
-					child_pop[i]->gen().set_genome_from(parent_rank%mu);
 					parents_list[i] = parent_rank%mu;
 					parent_rank++;
 					
-#if defined(DOUBLE_NN) && defined(DUPLICATION)
-					// Neural network duplication
-					if(misc::rand<float>() < Params::evo_float::duplication_rate)
-						child_pop[i]->gen().duplicate_nn();
-
-					// Neural network deletion
-					if(misc::rand<float>() < Params::evo_float::deletion_rate)
-						child_pop[i]->gen().delete_nn();
-#endif
-
 					// Mutation
 					child_pop[i]->gen().mutate(_step_size);
 				}
-#endif
 				assert(child_pop.size() == lambda);
 
 				pop_t selection_pop;
@@ -153,20 +120,53 @@ namespace sferes
 					selection_pop.push_back(child_pop[i]);
 				}
 				assert(selection_pop.size() == (mu + lambda));
+
+
+      	// Population 2
+				assert(this->_pop_co.size()); 
+
+				// We create the children
+				pop_t child_pop_co;;
+				std::vector<int> parents_list_co(lambda);
+				parent_rank = 0;
+				for(size_t i = 0; i < lambda; ++i)
+				{
+					// Cloning of a parent
+					child_pop_co.push_back(this->_pop_co[parent_rank%mu]->clone());
+					parents_list_co[i] = parent_rank%mu;
+					parent_rank++;
+					
+					// Mutation
+					child_pop_co[i]->gen().mutate(_step_size_co);
+				}
+				assert(child_pop_co.size() == lambda);
+
+				pop_t selection_pop_co;
+				for(size_t i = 0; i < mu; ++i)
+				{
+					selection_pop_co.push_back(this->_pop_co[i]);
+				}
+				for(size_t i = 0; i < lambda; ++i)
+				{
+					selection_pop_co.push_back(child_pop_co[i]);
+				}
+				assert(selection_pop_co.size() == (mu + lambda));
+
+
 				
 				// Evaluation of the children and the parents if need be
-#ifdef EVAL_PARENTS
-				this->_eval.eval(selection_pop, 0, selection_pop.size());
-#else
-				this->_eval.eval(selection_pop, mu, selection_pop.size());
-#endif
-								
+				pop_t selection_pop_mixed;
+				_merge(selection_pop, selection_pop_co, selection_pop_mixed);
+				this->_eval.eval(selection_pop_mixed, 0, selection_pop_mixed.size());
+
 				int successful_offsprings = 0;
+				int successful_offsprings_co = 0;
 
 #ifdef ONE_PLUS_ONE_REPLACEMENT
 				// We count the number of offsprings who are better than their parents
 				// and replace the parent population if need be
 				std::vector<bool> replaced(mu, false);
+				std::vector<bool> replaced_co(mu, false);
 				for(size_t i = 0; i < lambda; ++i)
 				{
 					if(child_pop[i]->fit().value() > this->_pop[parents_list[i]]->fit().value())
@@ -179,10 +179,24 @@ namespace sferes
 							replaced[parents_list[i]] = true;
 						}
 					}
+
+					if(child_pop_co[i]->fit().value() > this->_pop_co[parents_list_co[i]]->fit().value())
+					{
+						successful_offsprings++;
+						
+						if(!replaced_co[parents_list_co[i]])
+						{
+							this->_pop_co[parents_list_co[i]] = child_pop_co[i];
+							replaced_co[parents_list_co[i]] = true;
+						}
+					}
 				}
 #elif defined(N_PLUS_N_REPLACEMENT)
 				std::partial_sort(this->_pop.begin(), this->_pop.begin() + mu,
 							this->_pop.end(), fit::compare());
+
+				std::partial_sort(this->_pop_co.begin(), this->_pop_co.begin() + mu,
+							this->_pop_co.end(), fit::compare());
 
 				// We count the number of offsprings better than the worst parent
 				for(size_t i = 0; i < lambda; ++i)
@@ -191,15 +205,23 @@ namespace sferes
 					{
 						successful_offsprings++;
 					}
+					if(child_pop_co[i]->fit().value() > this->_pop_co[this->_pop_co.size() - 1]->fit().value())
+					{
+						successful_offsprings_co++;
+					}
 				}
 
 				std::partial_sort(selection_pop.begin(), selection_pop.begin() + mu + lambda,
 							selection_pop.end(), fit::compare());
-							
+
+				std::partial_sort(selection_pop_co.begin(), selection_pop_co.begin() + mu + lambda,
+							selection_pop_co.end(), fit::compare());
+															
 				// We select the mu best individuals
 				for(size_t i = 0; i < mu; ++i)
 				{
 					this->_pop[i] = selection_pop[i];
+					this->_pop_co[i] = selection_pop_co[i];
 				}
 #endif
 							
@@ -212,6 +234,15 @@ namespace sferes
 
 				std::partial_sort(this->_pop.begin(), this->_pop.begin() + mu,
 							this->_pop.end(), fit::compare());
+
+				ps = successful_offsprings_co/(float)lambda;
+				factor = (1.0f/3.0f) * (ps - 0.2f) / (1.0f - 0.2f);
+				_step_size_co = _step_size_co * exp(factor);
+
+				assert(this->_pop_co.size() == mu);
+
+				std::partial_sort(this->_pop_co.begin(), this->_pop_co.begin() + mu,
+							this->_pop_co.end(), fit::compare());
 							
 				dbg::out(dbg::info, "ea")<<"best fitness: " << this->_pop[0]->fit().value() << std::endl;
       }
@@ -223,9 +254,6 @@ namespace sferes
         boost::shared_ptr<Phen> ind1 = boost::shared_ptr<Phen>(new Phen());;
         boost::shared_ptr<Phen> ind2 = boost::shared_ptr<Phen>(new Phen());;
 
-
-				std::vector<float> genomeInd1;
-				std::vector<float> genomeInd2;
         if (!ifs.fail())
         {
           int numIndiv = 0;
@@ -240,34 +268,15 @@ namespace sferes
             while(std::getline(ss, gene, ','))
             {
               if(numIndiv == 0)
-              	genomeInd1.push_back(std::atof(gene.c_str()));
+                ind1->gen().data(cpt, std::atof(gene.c_str()));
               else
-              	genomeInd2.push_back(std::atof(gene.c_str()));
+                ind2->gen().data(cpt, std::atof(gene.c_str()));
 
               cpt++;
             }
 
             numIndiv++;
           }
-
-
-#if defined(DOUBLE_NN) && defined(DUPLICATION)
-					if(genomeInd1.size() > ind1->gen().size())
-						ind1->gen().resize(genomeInd1.size());
-
-					if(genomeInd2.size() > ind2->gen().size())
-						ind2->gen().resize(genomeInd2.size());
-#endif
-
-					// std::cout << genomeInd1.size() << "/" << genomeInd2.size() << std::endl;
-					// std::cout << ind1->gen().size() << "/" << ind2->gen().size() << std::endl;
-
-					// We copy the genotypes
-					for(size_t i = 0; i < genomeInd1.size(); ++i)
-						ind1->gen().data(i, genomeInd1[i]);
-
-					for(size_t i = 0; i < genomeInd2.size(); ++i)
-						ind2->gen().data(i, genomeInd2[i]);
 
           ind1->develop();
           ind2->develop();
@@ -282,10 +291,21 @@ namespace sferes
                     << "(does this file exist ?)" << std::endl;
           exit(1);
         }
-      }
-            
+      }      
     protected:
     	float _step_size;
+    	float _step_size_co;
+    	pop_t _mixed_pop;
+
+      void _merge(const pop_t& pop1, const pop_t& pop2, pop_t& pop3)
+      {
+				assert(pop1.size());
+				assert(pop2.size());
+				pop3.clear();
+				pop3.insert(pop3.end(), pop1.begin(), pop1.end());
+				pop3.insert(pop3.end(), pop2.begin(), pop2.end());
+				assert(pop3.size() == pop1.size() + pop2.size());
+      }
     };
   }
 }

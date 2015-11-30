@@ -283,26 +283,26 @@ def main(args) :
 					# plt.show()
 					plt.close()
 
-				print("Run " + str(numDir) + " : ")
-				X = [np.array(genotype) for genotype in hashGenotypes[tabEval[-1]]]
-				ks, logWks, logWkbs, sk = gap_statistic(X)
-				print("\tks = " + str(ks))
-				print("\tlogWks = " + str(logWkbs))
-				print("\tlogWkbs = " + str(logWkbs))
-				print("\tsk = " + str(sk))
+				# print("Run " + str(numDir) + " : ")
+				# X = [np.array(genotype) for genotype in hashGenotypes[tabEval[-1]]]
+				# ks, logWks, logWkbs, sk = gap_statistic(X)
+				# print("\tks = " + str(ks))
+				# print("\tlogWks = " + str(logWkbs))
+				# print("\tlogWkbs = " + str(logWkbs))
+				# print("\tsk = " + str(sk))
 
-				# The optimal number of clusters is the smallest k such that gap(k) - (gap(k + 1) - sk+1) >= 0
-				nbClusters = None
-				for indk, k in enumerate(ks) :
-					if indk < len(ks) - 1 :
-						Gapk = logWkbs[indk] - logWks[indk]
-						Gapk2 = logWkbs[indk + 1] - logWks[indk + 1]
+				# # The optimal number of clusters is the smallest k such that gap(k) - (gap(k + 1) - sk+1) >= 0
+				# nbClusters = None
+				# for indk, k in enumerate(ks) :
+				# 	if indk < len(ks) - 1 :
+				# 		Gapk = logWkbs[indk] - logWks[indk]
+				# 		Gapk2 = logWkbs[indk + 1] - logWks[indk + 1]
 
-						if Gapk - (Gapk2 - sk[indk + 1]) >= 0 :
-							nbClusters = k
-							break
+				# 		if Gapk - (Gapk2 - sk[indk + 1]) >= 0 :
+				# 			nbClusters = k
+				# 			break
 
-				print("Optimal number of clusters : " + str(nbClusters))
+				# print("Optimal number of clusters : " + str(nbClusters))
 
 				# fig, ax0 = plt.subplots(ncols = 1, figsize = size)
 

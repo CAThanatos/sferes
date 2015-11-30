@@ -22,7 +22,7 @@ namespace sferes
 			typedef Mlp< Neuron<PfWSum<>, AfSigmoidNoBias<> >, Connection<> > nn_t;
 #endif
 			
-			Hunter(float radius, const fastsim::Posture& pos, unsigned int color, nn_t& nn, bool deactivated = false, bool leader = false) : StagHuntRobot(radius, pos, color, color/100), _nn(nn), _food_gathered(0), _nb_hares_hunted(0), _nb_hares_hunted_solo(0), _nb_small_stags_hunted(0), _nb_small_stags_hunted_solo(0), _nb_big_stags_hunted(0), _nb_big_stags_hunted_solo(0), _deactivated(deactivated) 
+			Hunter(float radius, const fastsim::Posture& pos, unsigned int color, bool deactivated = false, bool leader = false) : StagHuntRobot(radius, pos, color, color/100), _food_gathered(0), _nb_hares_hunted(0), _nb_hares_hunted_solo(0), _nb_small_stags_hunted(0), _nb_small_stags_hunted_solo(0), _nb_big_stags_hunted(0), _nb_big_stags_hunted_solo(0), _deactivated(deactivated) 
 			{	
 				_distance_hunter = 0.0f;
 				_angle_hunter = 0.0f;
@@ -133,19 +133,6 @@ namespace sferes
 						{
 							type1 = 1;
 							type2 = 1;
-
-#ifdef DIFF_COLOR
-							if(!_bool_leader)
-							{
-								type1 = 0;
-								type2 = 1;
-							}
-#endif
-
-// #ifdef DIFF_COLOR
-// 							if(_bool_leader)
-// 								color = 1.0f;
-// #endif
 						}
 						// HARE
 						else if(HARE_COLOR == type)
@@ -168,37 +155,9 @@ namespace sferes
 								type2 = 0;
 								color = 1;
 							}
-
-#ifdef COLOR_BLIND
-							if(!_bool_leader)
-							{
-								type1 = 0;
-								type2 = 1;
-								color = 0.0f;
-							}
-#endif
 						}
 
 						float max_dist = sqrtf(2.0f*pow(Params::simu::real_w, 2));
-
-#ifdef RANGE_REDUCED
-						// If the distance to the target is more than a certain proportion of 
-						// the maximal distance, it is as if nothing has been seen
-						if(!_bool_leader)
-						{
-#ifdef RANGE50
-							if(dist > (0.5f * max_dist))
-#elif defined(RANGE25)
-							if(dist > (0.25f * max_dist))
-#elif defined(RANGE10)
-							if(dist > (0.1f * max_dist))
-#else
-							if(dist > (0.25f * max_dist))
-#endif
-								pixel = -1;
-
-						}
-#endif
 
 						if(pixel != -1)
 						{
@@ -253,21 +212,6 @@ namespace sferes
 	 					inputs[current_index + 1]  = 0.0f;
  					}
 #else
-#ifdef NEW_COMPAS
- 					if(_scream_value > 0.0f)
- 					{
- 						inputs[current_index] = 1.0f;
-	 					inputs[current_index + 1] = (3400.0f - _distance_hunter)/3400.0f;
-	 					inputs[current_index + 2] = _angle_hunter;
- 					}
- 					else
- 					{
-	 					inputs[current_index]  = 0.0f;
-	 					inputs[current_index + 1] = 0.0f;
-	 					inputs[current_index + 2] = 0.0f;
- 					}
- 					current_index++;
-#else
  					if(_scream_value > 0.0f)
  					{
 	 					inputs[current_index] = (3400.0f - _distance_hunter)/3400.0f;
@@ -278,7 +222,6 @@ namespace sferes
 	 					inputs[current_index]  = 0.0f;
 	 					inputs[current_index + 1]  = 0.0f;
  					}
-#endif
 #endif
 
  					// std::cout << inputs[current_index] << "/" << inputs[current_index + 1] << "/";
@@ -303,7 +246,6 @@ namespace sferes
 
 					// std::cout << std::endl;
 	
-#ifdef MLP_PERSO
 					std::vector<float> hidden(Params::nn::nb_hidden);
 					
 					size_t cpt_weights = 0;
@@ -335,28 +277,10 @@ namespace sferes
 
 						// Bias neuron
 						outf[i] += 1.0f*_weights[cpt_weights];
-#ifdef MLP_COR
 						cpt_weights++;
-#endif
 						
 						outf[i] = (1.0 / (exp(-outf[i] * lambda) + 1));
 					}
-
-					assert(outf.size() == Params::nn::nb_outputs);
-#else	
-					// Step check of the inputs
-					for(size_t i = 0; i < 3; ++i)
-					{
-						_nn.step(inputs);
-					}
-				
-					const std::vector<float>& outf2 = _nn.get_outf();
-
-					outf[0] = outf2[0];
-					outf[1] = outf2[1];
-
-					assert(outf.size() == Params::nn::nb_outputs);
-#endif
 
 					assert(outf.size() == Params::nn::nb_outputs);
 
@@ -387,7 +311,6 @@ namespace sferes
 				return outf;
   		}
 			
-#ifdef MLP_PERSO
 			void set_weights(const std::vector<float>& weights)
 			{
 				_weights.clear();
@@ -399,96 +322,19 @@ namespace sferes
 					_weights[i] = weights[i];
 				}
 			}
-
-			int choose_nn(const std::vector<float>& data, float diff_hunters)
+			
+			void set_weights(const std::vector<float>& weights, int beg, int end)
 			{
-				int nb_weights = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;
-
 				_weights.clear();
-				_weights.resize(nb_weights);
-
-				int first_weight = 0;
-
-				if(data.size() > (nb_weights + 1))
+				_weights.resize((Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_hidden * Params::nn::nb_outputs + Params::nn::nb_outputs);
+				assert((end - beg) == _weights.size());
+				assert(beg >= 0);
+				assert(end <= weights.size());
+				
+				for(size_t i = beg; i < end; ++i)
 				{
-#ifdef DECISION_THRESHOLD
-#ifdef CHOICE_ORDERED
-					float threshold = ((data[nb_weights * 2] - Params::parameters::min)/(Params::parameters::max - Params::parameters::min) * 3.0f) - 1.0f;
-#else
-					float threshold = ((data[nb_weights * 2]/Params::parameters::max) + 1.0f)/2.0f;
-#endif
-
-					if(diff_hunters > threshold)
-						first_weight = nb_weights;
-#elif defined(DECISION_MAPPING)
-					float mean_params = (Params::parameters::min + Params::parameters::max)/2.0f;
-
-#ifdef CHOICE_ORDERED
-					if(diff_hunters == -1)
-					{
-						float threshold = ((data[nb_weights*2 + 2]/Params::parameters::max) + 1.0f)/2.0f;
-						if(threshold >= 0.5f)
-							first_weight = nb_weights;
-					}
-					else
-#endif
-#ifdef NOISE_CHOICE
-					{
-						float sigma = 0.1f;
-						float f = misc::gaussian_rand<float>(0, sigma * sigma);
-						mean_params += f;
-						mean_params = misc::put_in_range(mean_params, -1.0f, 1.0f);
-
-						if(diff_hunters < 0.5f)
-						{
-							if(data[nb_weights*2] > mean_params)
-								first_weight = nb_weights;
-						}
-						else
-						{
-							if(data[nb_weights*2 + 1] > mean_params)
-								first_weight = nb_weights;
-						}
-					}
-#else
-					if(diff_hunters < 0.5f)
-					{
-						if(data[nb_weights*2] > mean_params)
-							first_weight = nb_weights;
-					}
-					else
-					{
-						if(data[nb_weights*2 + 1] > mean_params)
-							first_weight = nb_weights;
-					}
-#endif
-#else
-					float lambda = 5.0f;
-					float out = diff_hunters*data[nb_weights * 2] + data[nb_weights*2 + 1];
-					out = (1.0 / (exp(-out * lambda) + 1));
-
-					if(out > 0.5f)
-						first_weight = nb_weights;
-#endif
+					_weights[i - beg] = weights[i];
 				}
-
-#ifdef ERROR_CHOICE
-				if(misc::rand<float>() < Params::nn::proba_error_choice)
-				{
-					if(first_weight == 0)
-						first_weight = nb_weights;
-					else
-						first_weight = 0;
-				}
-#endif
-
-				if(first_weight == 0)
-					_bool_nn1 = true;
-
-				for(size_t i = first_weight; i < first_weight + nb_weights; ++i)
-					_weights[i - first_weight] = data[i];
-
-				return _bool_nn1?0:1;
 			}
 
 			void choose_nn(int nn_chosen, const std::vector<float>& data)
@@ -510,30 +356,6 @@ namespace sferes
 
 				_data = data;
 			}
-
-			void change_nn(int nn_chosen)
-			{
-				int nb_weights = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;
-
-				if(_data.size() > nb_weights)
-				{
-					_weights.clear();
-					_weights.resize(nb_weights);
-
-					int first_weight = 0;
-					if(nn_chosen >= 1)
-						first_weight = nb_weights;
-
-					if(first_weight == 0)
-						_bool_nn1 = true;
-					else
-						_bool_nn1 = false;
-
-					for(size_t i = first_weight; i < first_weight + nb_weights; ++i)
-						_weights[i - first_weight] = _data[i];
-				}
-			}
-#endif
 
 			bool nn1_chosen() { return _bool_nn1; }
   	
@@ -584,8 +406,6 @@ namespace sferes
 			void set_distance_hunter(float distance_hunter) { _distance_hunter = distance_hunter; }
 			void set_angle_hunter(float angle_hunter) { _angle_hunter = angle_hunter; }
 			void set_direction_hunter(float direction_hunter) { _direction_hunter = direction_hunter; }
-			
-			nn_t& get_nn() { return _nn; }
 
 			std::vector<float>& get_last_inputs() { return _last_inputs; }
 
@@ -612,11 +432,8 @@ namespace sferes
 #endif
 
 		private :
-#ifdef MLP_PERSO
 			std::vector<float> _weights;
-#endif
 
-			nn_t& _nn;
 			float _food_gathered;
 			int _nb_hares_hunted;
       int _nb_hares_hunted_solo;
@@ -640,10 +457,6 @@ namespace sferes
 
 #ifdef SCREAM
 			float _scream_value;
-#endif
-
-#ifdef STAG_STUN
-			int _stun_time;
 #endif
 
 #ifdef OBSTACLE_AVOIDANCE

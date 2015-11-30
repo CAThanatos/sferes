@@ -11,19 +11,6 @@
 #define GAUSSIAN_MUTATION
 #endif
 
-#ifndef ELMAN
-#define MLP_PERSO
-#endif
-
-#ifdef CONTROL3
-#define MLP_COR
-#endif
-
-#ifdef SCREAM_PREY
-#define NEW_COMPAS
-#define NO_DECAY
-#endif
-
 #define NO_BOOLEAN
 
 #if defined(SETTING1) || defined(SETTING2) || defined(SETTING3) || defined(SETTING4) || defined(SETTING5) || defined(SETTING6) || defined(SETTING7) || defined(SETTING8) || defined(SETTING13)
@@ -63,15 +50,6 @@
 #define NOT_AGAINST_ALL
 #endif
 
-#if (defined(FITFOLLOW) || defined(FITSECOND)) && defined(COEVO)
-#define DIFF_FIT
-#endif
-
-#ifdef AVOID_LEADER
-#define OBSTACLE_AVOIDANCE
-#define DEACT_LEADER
-#endif
-
 #ifdef NOT_AGAINST_ALL
 #define OPPONENTS5
 #endif
@@ -85,16 +63,16 @@ struct Params
 	struct simu
 	{
 #ifdef MAP800
-		SFERES_STRING(map_name, SFERES_ROOT "/exp/StagHunt-Leadership/map800x800.pbm");
+		SFERES_STRING(map_name, SFERES_ROOT "/exp/StagHunt-Followup/map800x800.pbm");
 		static const float real_w = 2400.0f;
 #elif defined(MAP1600)
-		SFERES_STRING(map_name, SFERES_ROOT "/exp/StagHunt-Leadership/map1600x1600.pbm");
+		SFERES_STRING(map_name, SFERES_ROOT "/exp/StagHunt-Followup/map1600x1600.pbm");
 		static const float real_w = 4800.0f;
 #elif defined(MAP2400)
-		SFERES_STRING(map_name, SFERES_ROOT "/exp/StagHunt-Leadership/map2400x2400.pbm");
+		SFERES_STRING(map_name, SFERES_ROOT "/exp/StagHunt-Followup/map2400x2400.pbm");
 		static const float real_w = 7200.0f;
 #else
-		SFERES_STRING(map_name, SFERES_ROOT "/exp/StagHunt-Leadership/map800x800.pbm");
+		SFERES_STRING(map_name, SFERES_ROOT "/exp/StagHunt-Followup/map800x800.pbm");
 		static const float real_w = 2400.0f;
 #endif
 		
@@ -201,16 +179,9 @@ struct Params
 		
 		static const float big_stag_radius = 20.0f;
 
-		
-		static const int nb_levels = 2;
-
 		static const float nb_steps = 20000;
 		
-#ifdef TRACE_ONLY
-		static const int nb_trials = 20;
-#else
 		static const int nb_trials = 5;
-#endif
 		
 		static const int nb_lasers = 12;
 
@@ -219,11 +190,6 @@ struct Params
 		static const int nb_camera_pixels = 12;
 
 		static const int threshold_hamming = 0.5f;
-
-#ifdef LIGHTS
-		static const int nb_lights = 3;
-		static const float light_radius = 20.0f;
-#endif
 	};
 	
 	struct nn
@@ -236,30 +202,10 @@ struct Params
 		static const size_t nb_inputs_leadership = 0;
 #endif
 
-#ifdef SCREAM
-#ifdef COM_COMPAS
 		static const size_t nb_inputs_scream = 0;
 		static const size_t nb_outputs_scream = 0;
-#else
-		static const size_t nb_inputs_scream = 1;
-		static const size_t nb_outputs_scream = 1;
-#endif
-#else
-		static const size_t nb_inputs_scream = 0;
-		static const size_t nb_outputs_scream = 0;
-#endif
 
-#ifdef COMPAS_FOLLOWER
-		static const size_t nb_inputs_compas = 2;
-#elif defined(COM_COMPAS)
-#ifdef NEW_COMPAS
-		static const size_t nb_inputs_compas = 3;
-#else
-		static const size_t nb_inputs_compas = 2;
-#endif
-#else
 		static const size_t nb_inputs_compas = 0;
-#endif
 
 		static const size_t nb_inputs = Params::simu::nb_lasers + Params::simu::nb_camera_pixels*nb_info_by_pixel + Params::simu::nb_bumpers 
 													+ Params::nn::nb_inputs_leadership + Params::nn::nb_inputs_scream + Params::nn::nb_inputs_compas;
@@ -268,40 +214,18 @@ struct Params
 		
 		static const size_t nb_outputs = 2 + Params::nn::nb_outputs_scream;
 
-#ifdef DOUBLE_NN
-#ifdef DUPLICATION
-#ifdef DECISION_MAPPING
-		static const size_t genome_size = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs + 2;
-#elif defined(NO_CHOICE_DUP) || defined(COM_NN)
-		static const size_t genome_size = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;
-#else
+#ifdef GBEARD
+#ifdef FIXED_CHOICE
 		static const size_t genome_size = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs + 1;
-#endif
 #else
-#ifdef DECISION_THRESHOLD
-		static const size_t genome_size = ((Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs) * 2 + 1;
-#elif defined(CHOICE_ORDERED) && !defined(FORCE_LEADER)
-		static const size_t genome_size = ((Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs) * 2 + 3;
+#ifdef NETWORK_DOUBINPUTS
+		static const size_t genome_size = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs + 4;
 #else
-		static const size_t genome_size = ((Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs) * 2 + 2;
+		static const size_t genome_size = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs + 3;
 #endif
 #endif
-#elif defined(ELMAN)
-		static const size_t genome_size = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + (Params::nn::nb_hidden + 3) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;
 #else
 		static const size_t genome_size = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;
-#endif
-
-#ifdef ERROR_CHOICE
-#ifdef ERROR10
-		static const float proba_error_choice = 0.1f;
-#elif defined(ERROR1)
-		static const float proba_error_choice = 0.01f;
-#elif defined(ERROR5)
-		static const float proba_error_choice = 0.05f;
-#else
-		static const float proba_error_choice = 0.2f;
-#endif
 #endif
 	};
 	
@@ -329,15 +253,7 @@ struct Params
   struct evo_float
   {
     // the mutation rate of the real-valued vector
-#ifdef RATE1
-    static const float mutation_rate = 0.002f;
-#elif defined RATE10
-    static const float mutation_rate = 0.02f;
-#elif defined RATE0
-    static const float mutation_rate = 0.0f;
-#else
     static const float mutation_rate = 0.003f;
-#endif
 
 #ifdef STRONG_MUTATION
     static const float strong_mutation_rate = 0.001f;
@@ -418,8 +334,6 @@ struct Params
     // size of the population
 #ifdef POP100
     static const unsigned size = 100;
-#elif defined(POP20)
-    static const unsigned size = 20;
 #else
     static const unsigned size = 20;
 #endif
@@ -475,6 +389,8 @@ struct Params
 #else
 		static const unsigned nb_eval = 1;
 #endif
+
+		static const unsigned size_list_pref = 5;
   };
   
   struct trajectory
@@ -582,11 +498,7 @@ struct Params
 
 #ifdef SCREAM
 #define SCREAM_MAX 100
-#ifdef NO_DECAY
-#define SCREAM_DECAY 0
-#else
 #define SCREAM_DECAY 10
-#endif
 #endif
 
 #ifdef STAG_STUN
