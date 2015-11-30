@@ -118,6 +118,54 @@ namespace sferes
 
 				
       }
+
+
+      void play_run(const std::string& fname)
+      {
+        // std::ifstream ifs(fname.c_str());
+
+        // boost::shared_ptr<Phen> ind1 = boost::shared_ptr<Phen>(new Phen());;
+        // boost::shared_ptr<Phen> ind2 = boost::shared_ptr<Phen>(new Phen());;
+
+        // if (!ifs.fail())
+        // {
+        //   int numIndiv = 0;
+        //   while(ifs.good())
+        //   {
+        //     std::string line;
+        //     std::getline(ifs, line);
+
+        //     std::stringstream ss(line);
+        //     std::string gene;
+        //     int cpt = 0;
+        //     while(std::getline(ss, gene, ','))
+        //     {
+        //       if(numIndiv == 0)
+        //         ind1->gen().data(cpt, std::atof(gene.c_str()));
+        //       else
+        //         ind2->gen().data(cpt, std::atof(gene.c_str()));
+
+        //       cpt++;
+        //     }
+
+        //     numIndiv++;
+        //   }
+
+        //   ind1->develop();
+        //   ind2->develop();
+        //   ind1->fit().set_mode(fit::mode::view);
+        //   // std::string file_behaviour = ea.res_dir() + "/behaviourGen_" + boost::lexical_cast<std::string>(ea.gen()) + ".bmp";
+        //   // ind1->fit().set_file_behaviour("./videoDir");
+        //   ind1->fit().eval_compet(*ind1, *ind2);
+        // }
+        // else
+        // {
+        //   std::cerr << "Cannot open :" << fname
+        //             << "(does this file exist ?)" << std::endl;
+        //   exit(1);
+        // }
+      }
+
       const std::vector<boost::shared_ptr<Phen> >& pareto_front() const { return _pareto_front; }
       const pop_t& mixed_pop() { return _mixed_pop; }
       const pop_t& parent_pop() { return _parent_pop; }

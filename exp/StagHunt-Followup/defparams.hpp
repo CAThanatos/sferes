@@ -54,7 +54,8 @@
 #define OPPONENTS5
 #endif
 
-#ifdef DIVSM
+#ifdef DIVERSITY
+#define DIVSM
 #define DIST_HAMMING
 #endif
 

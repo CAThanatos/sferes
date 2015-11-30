@@ -664,7 +664,7 @@ int main(int argc, char **argv)
 
 	// GENOTYPE
 #ifdef DIVERSITY
-  typedef gen::EvoFloat<Params::nn::genome_size, Params> gen_t;
+  typedef gen::ElitistGen<Params::nn::genome_size, Params> gen_t;
 #else
 #ifdef CMAES
   typedef gen::Cmaes<Params::nn::genome_size, Params> gen_t;
