@@ -26,12 +26,17 @@ namespace sferes
 			std::cout << "Nop !" << std::endl;
 		}
 
+#ifdef COEVO
+    template<typename Indiv>
+      void eval_compet(Indiv& ind1, Indiv& ind2, int num_leader = 1) 
+#else
 #ifdef GENOME_TRACES
     template<typename Indiv>
       void eval_compet(Indiv& ind1, Indiv& ind2, bool genome_traces = false) 
 #else
     template<typename Indiv>
       void eval_compet(Indiv& ind1, Indiv& ind2) 
+#endif
 #endif
     {
       typedef simu::FastsimMulti<Params> simu_t;
@@ -49,6 +54,10 @@ namespace sferes
       float moy_hares2 = 0, moy_sstags2 = 0, moy_bstags2 = 0;
       float moy_hares2_solo = 0, moy_sstags2_solo = 0, moy_bstags2_solo = 0;
      	int food2 = 0;
+
+#ifdef COEVO
+     	_num_leader = num_leader;
+#endif
 
 			_nb_leader_first = 0;
 			_nb_preys_killed = 0;
@@ -425,7 +434,11 @@ namespace sferes
 			invers_pos = false;
 #endif
 			
+#ifdef COEVO
+			bool first_leader = (_num_leader == 1);
+#else
 			bool first_leader = misc::flip_coin();
+#endif
 			_num_leader = first_leader?1:2;
 
 			for(int i = 0; i < 2; ++i)
@@ -688,6 +701,17 @@ int main(int argc, char **argv)
 
   // STATS 
   typedef boost::fusion::vector<
+#ifdef COEVO
+		  sferes::stat::BestFitEvalCoEvo<phen_t, Params>,
+		  // sferes::stat::MeanFitEvalCoEvo<phen_t, Params>,
+		  sferes::stat::BestEverFitEvalCoEvo<phen_t, Params>,
+		  sferes::stat::AllFitEvalStatCoEvo<phen_t, Params>,
+		  sferes::stat::BestLeadershipEvalCoEvo<phen_t, Params>,
+		  sferes::stat::AllLeadershipEvalStatCoEvo<phen_t, Params>,
+#ifdef BEHAVIOUR_VIDEO
+		  sferes::stat::BestFitBehaviourVideoCoEvo<phen_t, Params>,
+#endif
+#else
 		  sferes::stat::BestFitEval<phen_t, Params>,
 		  // sferes::stat::MeanFitEval<phen_t, Params>,
 		  sferes::stat::BestEverFitEval<phen_t, Params>,
@@ -708,6 +732,7 @@ int main(int argc, char **argv)
 		  // sferes::stat::MeanDiversityEval<phen_t, Params>,
 		  // sferes::stat::BestEverDiversityEval<phen_t, Params>,
 #endif
+#endif
 		  sferes::stat::StopEval<Params>
     >  stat_t;
   
@@ -723,7 +748,11 @@ int main(int argc, char **argv)
 #elif defined(CMAES)
   typedef ea::Cmaes<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
 #elif defined(ELITIST)
+#ifdef COEVO
+  typedef ea::ElitistCoEvo<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
+#else
   typedef ea::Elitist<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
+#endif
 #else
   typedef ea::RankSimple<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
 #endif

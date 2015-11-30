@@ -10,6 +10,18 @@ def main(args) :
 		with open(args.file, 'r') as fileRead :
 			fileRead = fileRead.readlines()
 
+			evalGenome = args.evaluation
+			if evalGenome == -1 :
+				cptLine = 0
+				while cptLine < len(fileRead) :
+					line = fileRead[cptLine]
+					s = regexp.search(line)
+
+					if s :
+						evalGenome = int(s.group(1))
+
+					cptLine += 1
+
 			cptLine = 0
 			while cptLine < len(fileRead) :
 				line = fileRead[cptLine]
@@ -18,7 +30,7 @@ def main(args) :
 				if s :
 					eval = int(s.group(1))
 
-					if eval >= args.evaluation :
+					if eval >= evalGenome :
 						lineGenotype = fileRead[cptLine + args.index]
 						genotype = lineGenotype.rstrip('\n').split(',')
 
@@ -40,7 +52,7 @@ def main(args) :
 if __name__ == "__main__" :
 	parser = argparse.ArgumentParser()
 	parser.add_argument('file', help = "Genome file")
-	parser.add_argument('evaluation', help = "Evaluation of genotype", type = int)
+	parser.add_argument('-e', '--evaluation', help = "Evaluation of genotype", type = int, default = -1)
 	parser.add_argument('-o', '--output', help = "Output file", default = "gen.out")
 	parser.add_argument('-n', '--index', help = "Genome index", default = 0, type = int)
 	args = parser.parse_args()

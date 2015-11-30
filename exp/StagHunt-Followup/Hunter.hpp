@@ -329,7 +329,7 @@ namespace sferes
 				_weights.resize((Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_hidden * Params::nn::nb_outputs + Params::nn::nb_outputs);
 				assert((end - beg) == _weights.size());
 				assert(beg >= 0);
-				assert(end < weights.size());
+				assert(end <= weights.size());
 				
 				for(size_t i = beg; i < end; ++i)
 				{

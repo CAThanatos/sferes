@@ -19,6 +19,11 @@
 #define MLP_COR
 #endif
 
+#ifdef SCREAM_PREY
+#define NEW_COMPAS
+#define NO_DECAY
+#endif
+
 #define NO_BOOLEAN
 
 #if defined(SETTING1) || defined(SETTING2) || defined(SETTING3) || defined(SETTING4) || defined(SETTING5) || defined(SETTING6) || defined(SETTING7) || defined(SETTING8) || defined(SETTING13)
@@ -234,10 +239,11 @@ struct Params
 #ifdef SCREAM
 #ifdef COM_COMPAS
 		static const size_t nb_inputs_scream = 0;
+		static const size_t nb_outputs_scream = 0;
 #else
 		static const size_t nb_inputs_scream = 1;
-#endif
 		static const size_t nb_outputs_scream = 1;
+#endif
 #else
 		static const size_t nb_inputs_scream = 0;
 		static const size_t nb_outputs_scream = 0;
@@ -246,7 +252,11 @@ struct Params
 #ifdef COMPAS_FOLLOWER
 		static const size_t nb_inputs_compas = 2;
 #elif defined(COM_COMPAS)
+#ifdef NEW_COMPAS
+		static const size_t nb_inputs_compas = 3;
+#else
 		static const size_t nb_inputs_compas = 2;
+#endif
 #else
 		static const size_t nb_inputs_compas = 0;
 #endif
@@ -572,7 +582,11 @@ struct Params
 
 #ifdef SCREAM
 #define SCREAM_MAX 100
+#ifdef NO_DECAY
+#define SCREAM_DECAY 0
+#else
 #define SCREAM_DECAY 10
+#endif
 #endif
 
 #ifdef STAG_STUN
@@ -594,7 +608,9 @@ struct Params
 
 #define BEHAVIOUR_VIDEO
 
+#ifndef COEVO
 #define GENOME_TRACES
+#endif
 
 #define TEST_VARIANCE_TRIALS
 

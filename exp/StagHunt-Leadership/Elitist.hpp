@@ -223,6 +223,9 @@ namespace sferes
         boost::shared_ptr<Phen> ind1 = boost::shared_ptr<Phen>(new Phen());;
         boost::shared_ptr<Phen> ind2 = boost::shared_ptr<Phen>(new Phen());;
 
+
+				std::vector<float> genomeInd1;
+				std::vector<float> genomeInd2;
         if (!ifs.fail())
         {
           int numIndiv = 0;
@@ -237,15 +240,34 @@ namespace sferes
             while(std::getline(ss, gene, ','))
             {
               if(numIndiv == 0)
-                ind1->gen().data(cpt, std::atof(gene.c_str()));
+              	genomeInd1.push_back(std::atof(gene.c_str()));
               else
-                ind2->gen().data(cpt, std::atof(gene.c_str()));
+              	genomeInd2.push_back(std::atof(gene.c_str()));
 
               cpt++;
             }
 
             numIndiv++;
           }
+
+
+#if defined(DOUBLE_NN) && defined(DUPLICATION)
+					if(genomeInd1.size() > ind1->gen().size())
+						ind1->gen().resize(genomeInd1.size());
+
+					if(genomeInd2.size() > ind2->gen().size())
+						ind2->gen().resize(genomeInd2.size());
+#endif
+
+					// std::cout << genomeInd1.size() << "/" << genomeInd2.size() << std::endl;
+					// std::cout << ind1->gen().size() << "/" << ind2->gen().size() << std::endl;
+
+					// We copy the genotypes
+					for(size_t i = 0; i < genomeInd1.size(); ++i)
+						ind1->gen().data(i, genomeInd1[i]);
+
+					for(size_t i = 0; i < genomeInd2.size(); ++i)
+						ind2->gen().data(i, genomeInd2[i]);
 
           ind1->develop();
           ind2->develop();

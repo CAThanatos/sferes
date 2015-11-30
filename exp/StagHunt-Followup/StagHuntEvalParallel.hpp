@@ -231,23 +231,65 @@ namespace sferes
 							gen_div = sqrtf(gen_div)/sqrtf(_pop[i]->gen().size());
 							vec_pref[k].value = gen_div;
 						}
-
- 						std::sort(vec_pref.begin(), vec_pref.end(), pref_value_comp);
 #elif defined(GBEARD)
  						for(size_t k = 0; k < _pop.size(); ++k)
  						{
  							vec_pref[k].index = k;
  							vec_pref[k].value = _pop[i]->get_pref_value(*_pop[k]);
  						}
-
- 						std::sort (vec_pref.begin(), vec_pref.end(), pref_value_comp);
 #endif
+
+#ifdef CHOOSE_BEST
+ 						std::sort(vec_pref.begin(), vec_pref.end(), pref_value_comp);
 
 						for(size_t k = 0; k < nb_opponents; ++k)
 						{
 							int opponent = vec_pref[0].index;
 							_pop[i]->fit().eval_compet(*_pop[i], *_pop[opponent]);
 						}
+#elif defined(SEVERAL_LISTS)
+						for(size_t k = 0; k < nb_opponents; ++k)
+						{
+							std::vector<pref_opp> vec_opponents(Params::pop::size_list_pref);
+							for(size_t l = 0; l < Params::pop::size_list_pref; ++l)
+							{
+								int opponent;
+								do
+								{
+									opponent = misc::rand(0, _size);
+								} while((opponent == i) || (opponent < 0) || (opponent >= _size));
+								vec_opponents[l].index = opponent;
+								vec_opponents[l].value = vec_pref[opponent].value;
+							}
+
+							// We sort this list
+							std::sort(vec_opponents.begin(), vec_opponents.end(), pref_value_comp);
+
+							int opponent = vec_opponents[k].index;
+							_pop[i]->fit().eval_compet(*_pop[i], *_pop[opponent]);
+						}
+#else
+						std::vector<pref_opp> vec_opponents(Params::pop::size_list_pref);
+						for(size_t k = 0; k < Params::pop::size_list_pref; ++k)
+						{
+							int opponent;
+							do
+							{
+								opponent = misc::rand(0, _size);
+							} while((opponent == i) || (opponent < 0) || (opponent >= _size));
+							vec_opponents[k].index = opponent;
+							vec_opponents[k].value = vec_pref[opponent].value;
+						}
+
+						// We sort this list
+						std::sort(vec_opponents.begin(), vec_opponents.end(), pref_value_comp);
+
+						for(size_t k = 0; k < nb_opponents; ++k)
+						{
+							int opponent = vec_opponents[0].index;
+							_pop[i]->fit().eval_compet(*_pop[i], *_pop[opponent]);
+						}
+#endif
 					}
 				}
       }

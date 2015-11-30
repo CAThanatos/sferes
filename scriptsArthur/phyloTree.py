@@ -75,7 +75,7 @@ def main(args) :
 					if len(s.groups()) > 4 :
 						nb_preys_killed = float(s.group(5))
 
-						if nb_preys_killed > 5 :
+						if nb_preys_killed > 10 :
 							if nb_preys_killed_coop < 5 :
 								behaviour = 'S'
 							else :
@@ -146,6 +146,7 @@ def main(args) :
 			plt.grid()
 
 			tabEvalPlot = [sorted(listEval)[i] for i in range(0, len(listEval), args.precision)]
+			print(tabEvalPlot)
 			proportionsSolo = []
 			proportionsTurner = []
 			proportionsFollower = []

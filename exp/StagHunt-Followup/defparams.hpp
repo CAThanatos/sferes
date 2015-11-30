@@ -332,7 +332,11 @@ struct Params
   struct pop
   {
     // size of the population
+#ifdef POP100
+    static const unsigned size = 100;
+#else
     static const unsigned size = 20;
+#endif
     
     // number of generations
     static const unsigned nb_gen = 20000;
@@ -385,6 +389,8 @@ struct Params
 #else
 		static const unsigned nb_eval = 1;
 #endif
+
+		static const unsigned size_list_pref = 5;
   };
   
   struct trajectory
@@ -514,7 +520,9 @@ struct Params
 
 #define BEHAVIOUR_VIDEO
 
+#ifndef COEVO
 #define GENOME_TRACES
+#endif
 
 #define TEST_VARIANCE_TRIALS
 

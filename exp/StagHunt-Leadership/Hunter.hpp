@@ -253,6 +253,21 @@ namespace sferes
 	 					inputs[current_index + 1]  = 0.0f;
  					}
 #else
+#ifdef NEW_COMPAS
+ 					if(_scream_value > 0.0f)
+ 					{
+ 						inputs[current_index] = 1.0f;
+	 					inputs[current_index + 1] = (3400.0f - _distance_hunter)/3400.0f;
+	 					inputs[current_index + 2] = _angle_hunter;
+ 					}
+ 					else
+ 					{
+	 					inputs[current_index]  = 0.0f;
+	 					inputs[current_index + 1] = 0.0f;
+	 					inputs[current_index + 2] = 0.0f;
+ 					}
+ 					current_index++;
+#else
  					if(_scream_value > 0.0f)
  					{
 	 					inputs[current_index] = (3400.0f - _distance_hunter)/3400.0f;
@@ -263,6 +278,7 @@ namespace sferes
 	 					inputs[current_index]  = 0.0f;
 	 					inputs[current_index + 1]  = 0.0f;
  					}
+#endif
 #endif
 
  					// std::cout << inputs[current_index] << "/" << inputs[current_index + 1] << "/";
