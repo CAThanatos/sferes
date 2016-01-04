@@ -264,7 +264,15 @@ struct Params
 		static const size_t nb_inputs = Params::simu::nb_lasers + Params::simu::nb_camera_pixels*nb_info_by_pixel + Params::simu::nb_bumpers 
 													+ Params::nn::nb_inputs_leadership + Params::nn::nb_inputs_scream + Params::nn::nb_inputs_compas;
 
+#ifdef HIDDEN16
+		static const size_t nb_hidden = 16;
+#elif defined(HIDDEN32)
+		static const size_t nb_hidden = 32;
+#elif defined(HIDDEN60)
+		static const size_t nb_hidden = 60;
+#else
 		static const size_t nb_hidden = 8;
+#endif
 		
 		static const size_t nb_outputs = 2 + Params::nn::nb_outputs_scream;
 

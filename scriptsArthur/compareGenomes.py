@@ -15,6 +15,22 @@ import random
 
 import Tools
 
+
+beginningGen = {
+								1 : 4300,
+								2 : 1900,
+								3 : 4300,
+								4 : 1900,
+								5 : 1900,
+								6 : 1900,
+								7 : 4100,
+								8 : 4200,
+								9 : 4200,
+								10 : 1900
+							 }
+
+beginningEval = {run : (beginningGen[run] - 1) * 20 + 30 for run in beginningGen.keys()}
+
 # SEABORN
 sns.set()
 sns.set_style('white')
@@ -242,22 +258,42 @@ def main(args) :
 
 					plt.grid()
 
+					startIndex = 0
 					dataPlot = [hashDistance[eval] for eval in tabEval]
+					if args.beginningGen :
+						cpt = 0
+						while cpt < len(tabEval) :
+							if beginningEval[int(numDir)] == tabEval[cpt] :
+								startIndex = cpt
+								break
+
+							cpt += 1
+						dataPlot = [hashDistance[eval] for eval in tabEval if eval >= beginningEval[int(numDir)]]
+
 					ax0.plot(range(len(dataPlot)), dataPlot, color=palette[0], linestyle='-', linewidth=2, marker=None)
+
 					dataPlot = [hashProportion[eval] for eval in tabEval]
+					if args.beginningGen :
+						dataPlot = [hashProportion[eval] for eval in tabEval if eval >= beginningEval[int(numDir)]]
+
 					ax0.plot(range(len(dataPlot)), dataPlot, color=palette[1], linestyle='--', linewidth=2, marker=None)
 
 					# axe1.set_xticks(range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10)))
 					# axe1.set_xticklabels([tabPlotEvaluation[x] for x in range(0, len(tabPlotEvaluation), int(len(tabPlotEvaluation)/10))])
 
+
 					tabPlotTicks = []
 					for eval in tabEval :
 						# tabPlotTicks.append(eval)
-						tabPlotTicks.append((eval - 10)/20)
+						if args.beginningGen :
+							if eval >= beginningEval[int(numDir)] :
+								tabPlotTicks.append((eval - beginningEval[int(numDir)])/20)
+						else :
+							tabPlotTicks.append((eval - 30)/20)
 
-					ticks = range(0, len(tabEval), int(len(tabEval)/2))
-					if len(tabEval) - 1 not in ticks :
-						ticks.append(len(tabEval) - 1)
+					ticks = range(0, len(dataPlot), int(len(dataPlot)/2))
+					if len(dataPlot) - 1 not in ticks :
+						ticks.append(len(dataPlot) - 1)
 
 					# tabPlotTicks[ticks[0]] = 0
 					# tabPlotTicks[ticks[1]] = 20000
@@ -267,8 +303,9 @@ def main(args) :
 					ax0.set_xticklabels([tabPlotTicks[x] for x in ticks])
 
 					# ticks = range(0, len(dataPlot), int(len(dataPlot)/5))
-					ax0.set_xlabel('Evaluation')
+					ax0.set_xlabel('Generation')
 					ax0.set_xlim(0, len(dataPlot) - 1)
+					# ax0.set_xlim(startIndex, len(dataPlot) - 1)
 
 					ax0.set_ylabel('Value')
 					ax0.set_ylim(0.0, 1.0)
@@ -279,7 +316,7 @@ def main(args) :
 					frame.set_edgecolor('0.9')
 
 					plt.savefig(os.path.join(outputDir, "distancePlusLeadershipRun" + str(numDir) + ".png"), bbox_inches = 'tight')
-					plt.savefig(os.path.join(outputDir, "distancePlusLeadershipRun" + str(numDir) + ".png"), bbox_inches = 'tight')
+					plt.savefig(os.path.join(outputDir, "distancePlusLeadershipRun" + str(numDir) + ".svg"), bbox_inches = 'tight')
 					# plt.show()
 					plt.close()
 
@@ -480,6 +517,7 @@ if __name__ == "__main__" :
 	parser.add_argument('-p', '--precision', help = "Evaluation precision", type = int, default = 1000)
 	parser.add_argument('-o', '--output', help = "Output directory", default = "GraphsResults")
 	parser.add_argument('-l', '--leadership', help = "Draw best leadership", action = "store_true", default = False)
+	parser.add_argument('-b', '--beginningGen', help = "First generation from which we draw", default = False, action = 'store_true')
 	args = parser.parse_args()
 
 	main(args)

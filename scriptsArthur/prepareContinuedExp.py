@@ -49,16 +49,18 @@ with open(fileToContinu, "r") as fileRead :
 	dicExp = {}
 	dicRuns = {}
 	for line in lines :
-		dicExp[line[0]] = line[1]
+		if len(line) > 1 :
+			dicExp[line[0]] = line[1]
 
-		if len(line) > 2 :
-			runs = line[2].split(',')
-			dicRuns[line[0]] = [int(run) for run in runs]
+			if len(line) > 2 :
+				runs = line[2].split(',')
+				dicRuns[line[0]] = [int(run) for run in runs]
 
 
 # We scan across all the directories
 reFileGen = re.compile(r"^popGen_(\d+)$")
 reDir = re.compile(r"^Dir(\d+)$")
+reExp = re.compile(r"build/default/exp/([^/]+)/")
 listDirs = [dir for dir in os.listdir(directory) if os.path.isdir(directory)]
 nbRuns = 0
 for dir in listDirs :
@@ -92,11 +94,12 @@ for dir in listDirs :
 
 				# And we then update the string which will be written in the experiment file
 				r = reDir.search(subDir)
+				e = reExp.search(dicExp[dir])
 				stringOut += "[" + dir.replace("_", " ") + " DIR" + str(r.group(1)) + "]\n"
 				stringOut += "nb_runs:1\n"
 				stringOut += "exec:" + dicExp[dir] + " -c " + os.path.join(dirOut, fileGenMax) + "\n"
-				stringOut += "res:ResultatsG5K/" + date + "/StagHunt-Leadership/" + dir + "/" + subDir + "\n"
-				stringOut += "build:./sferes2-0.99/waf --exp StagHunt-Leadership\n\n"
+				stringOut += "res:ResultatsG5K/" + date + "/" + str(e.group(1)) + "/" + dir + "/" + subDir + "\n"
+				stringOut += "build:./sferes2-0.99/waf --exp " + str(e.group(1)) + "\n\n"
 				# stringOut += "res:ResultatsG5K/" + date + "/StagHuntExp3-Duo/" + dir + "/" + subDir + "\n"
 				# stringOut += "build:./sferes2-0.99/waf --exp StagHuntExp3-Duo\n\n"
 

@@ -316,96 +316,96 @@ def main(args) :
 	linestylesOff = ['-', '-', '-']
 	markers = [None, None, None] #['o', '+', '*']
 
-	fig, ax0 = plt.subplots(ncols = 1, figsize = size)
-	# plt.grid()
+	# fig, ax0 = plt.subplots(ncols = 1, figsize = size)
+	# # plt.grid()
 
-	# -- Follower VS Solo VS Turner --
-	Zexpectation = hashExpectations['Follower']
-	Zexpectation = np.array(Zexpectation)
-	heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = 0.0, vmax = 5000.0)
+	# # -- Follower VS Solo VS Turner --
+	# Zexpectation = hashExpectations['Follower']
+	# Zexpectation = np.array(Zexpectation)
+	# heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = 0.0, vmax = 5000.0)
 
-	ticks = range(0, len(Xproportions), len(Xproportions)/5)
+	# ticks = range(0, len(Xproportions), len(Xproportions)/5)
 	
-	if len(Xproportions) - 1 not in ticks :
-		ticks.append(len(Xproportions) - 1)
+	# if len(Xproportions) - 1 not in ticks :
+	# 	ticks.append(len(Xproportions) - 1)
 
-	ax0.add_line(lines.Line2D([0, ticks[-1]], [0, ticks[-1]], color="black", linewidth = 2))
-	ax0.set_xlabel('Proportion of leaders')
-	ax0.set_xticks(ticks)
-	ax0.set_xticklabels([Yproportions[t] for t in ticks])
-	ax0.set_ylabel('Proportion of followers')
-	ax0.set_yticks(ticks)
-	ax0.set_yticklabels([Xproportions[t] for t in ticks])
-	ax0.invert_yaxis()
-	ax0.set_title('Expected value of follower individuals')
+	# ax0.add_line(lines.Line2D([0, ticks[-1]], [0, ticks[-1]], color="black", linewidth = 2))
+	# ax0.set_xlabel('Proportion of leaders')
+	# ax0.set_xticks(ticks)
+	# ax0.set_xticklabels([Yproportions[t] for t in ticks])
+	# ax0.set_ylabel('Proportion of followers')
+	# ax0.set_yticks(ticks)
+	# ax0.set_yticklabels([Xproportions[t] for t in ticks])
+	# ax0.invert_yaxis()
+	# ax0.set_title('Expected value of follower individuals')
 
-	plt.savefig("./GraphsResults/ExpectationsFollowers.svg", bbox_inches = 'tight')
-	plt.savefig("./GraphsResults/ExpectationsFollowers.png", bbox_inches = 'tight')
-	plt.close()
+	# plt.savefig("./GraphsResults/ExpectationsFollowers.svg", bbox_inches = 'tight')
+	# plt.savefig("./GraphsResults/ExpectationsFollowers.png", bbox_inches = 'tight')
+	# plt.close()
 
 
 
-	fig, ax0 = plt.subplots(ncols = 1, figsize = size)
-	# plt.grid()
+	# fig, ax0 = plt.subplots(ncols = 1, figsize = size)
+	# # plt.grid()
 
-	# -- Solo VS Turner VS Follower --
-	Zexpectation = hashExpectations['Solo']
-	Zexpectation = np.array(Zexpectation)
-	heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = 0.0, vmax = 5000.0)
+	# # -- Solo VS Turner VS Follower --
+	# Zexpectation = hashExpectations['Solo']
+	# Zexpectation = np.array(Zexpectation)
+	# heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = 0.0, vmax = 5000.0)
 
-	ticks = range(0, len(Xproportions), len(Xproportions)/5)
+	# ticks = range(0, len(Xproportions), len(Xproportions)/5)
 	
-	if len(Xproportions) - 1 not in ticks :
-		ticks.append(len(Xproportions) - 1)
+	# if len(Xproportions) - 1 not in ticks :
+	# 	ticks.append(len(Xproportions) - 1)
 
-	ax0.add_line(lines.Line2D([0, ticks[-1]], [0, ticks[-1]], color="black", linewidth = 2))
-	ax0.set_xlabel('Proportion of leaders')
-	ax0.set_xticks(ticks)
-	ax0.set_xticklabels([Yproportions[t] for t in ticks])
-	ax0.set_ylabel('Proportion of followers')
-	ax0.set_yticks(ticks)
-	ax0.set_yticklabels([Xproportions[t] for t in ticks])
-	ax0.invert_yaxis()
-	ax0.set_title('Expected value of solo individuals')
+	# ax0.add_line(lines.Line2D([0, ticks[-1]], [0, ticks[-1]], color="black", linewidth = 2))
+	# ax0.set_xlabel('Proportion of leaders')
+	# ax0.set_xticks(ticks)
+	# ax0.set_xticklabels([Yproportions[t] for t in ticks])
+	# ax0.set_ylabel('Proportion of followers')
+	# ax0.set_yticks(ticks)
+	# ax0.set_yticklabels([Xproportions[t] for t in ticks])
+	# ax0.invert_yaxis()
+	# ax0.set_title('Expected value of solo individuals')
 
-	plt.savefig("./GraphsResults/ExpectationsSolo.svg", bbox_inches = 'tight')
-	plt.savefig("./GraphsResults/ExpectationsSolo.png", bbox_inches = 'tight')
-	plt.close()
+	# plt.savefig("./GraphsResults/ExpectationsSolo.svg", bbox_inches = 'tight')
+	# plt.savefig("./GraphsResults/ExpectationsSolo.png", bbox_inches = 'tight')
+	# plt.close()
 
 
 
-	fig, ax0 = plt.subplots(ncols = 1, figsize = size)
-	# plt.grid()
+	# fig, ax0 = plt.subplots(ncols = 1, figsize = size)
+	# # plt.grid()
 
-	# -- Turner VS Follower VS Solo --
-	Zexpectation = hashExpectations['Turner']
-	Zexpectation = np.array(Zexpectation)
-	heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = 0.0, vmax = 5000.0)
+	# # -- Turner VS Follower VS Solo --
+	# Zexpectation = hashExpectations['Turner']
+	# Zexpectation = np.array(Zexpectation)
+	# heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = 0.0, vmax = 5000.0)
 
-	ticks = range(0, len(Xproportions), len(Xproportions)/5)
+	# ticks = range(0, len(Xproportions), len(Xproportions)/5)
 	
-	if len(Xproportions) - 1 not in ticks :
-		ticks.append(len(Xproportions) - 1)
+	# if len(Xproportions) - 1 not in ticks :
+	# 	ticks.append(len(Xproportions) - 1)
 
-	ax0.add_line(lines.Line2D([0, ticks[-1]], [0, ticks[-1]], color="black", linewidth = 2))
-	ax0.set_xlabel('Proportion of leaders')
-	ax0.set_xticks(ticks)
-	ax0.set_xticklabels([Yproportions[t] for t in ticks])
-	ax0.set_ylabel('Proportion of followers')
-	ax0.set_yticks(ticks)
-	ax0.set_yticklabels([Xproportions[t] for t in ticks])
-	ax0.invert_yaxis()
-	ax0.set_title('Expected value of turner individuals')
-	# plt.colorbar(heatmap)
+	# ax0.add_line(lines.Line2D([0, ticks[-1]], [0, ticks[-1]], color="black", linewidth = 2))
+	# ax0.set_xlabel('Proportion of leaders')
+	# ax0.set_xticks(ticks)
+	# ax0.set_xticklabels([Yproportions[t] for t in ticks])
+	# ax0.set_ylabel('Proportion of followers')
+	# ax0.set_yticks(ticks)
+	# ax0.set_yticklabels([Xproportions[t] for t in ticks])
+	# ax0.invert_yaxis()
+	# ax0.set_title('Expected value of turner individuals')
+	# # plt.colorbar(heatmap)
 
-	divider = make_axes_locatable(ax0)
-	cax = divider.append_axes("right", size="5%", pad=0.05)
+	# divider = make_axes_locatable(ax0)
+	# cax = divider.append_axes("right", size="5%", pad=0.05)
 
-	plt.colorbar(heatmap, cax=cax)
+	# plt.colorbar(heatmap, cax=cax)
 
-	plt.savefig("./GraphsResults/ExpectationsTurners.svg", bbox_inches = 'tight')
-	plt.savefig("./GraphsResults/ExpectationsTurners.png", bbox_inches = 'tight')
-	plt.close()
+	# plt.savefig("./GraphsResults/ExpectationsTurners.svg", bbox_inches = 'tight')
+	# plt.savefig("./GraphsResults/ExpectationsTurners.png", bbox_inches = 'tight')
+	# plt.close()
 
 
 	ZexpectationFollower = hashExpectations['Follower']
@@ -556,6 +556,7 @@ def main(args) :
 	# fig, ax0 = plt.subplots(ncols = 1, figsize = size)
 	
 	# Zexpectation = np.array(ZexpectationTurnerFollower)
+
 	# heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = 0.0, vmax = 5000.0)
 	# # heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = -5000.0, vmax = 5000.0)
 
@@ -572,6 +573,7 @@ def main(args) :
 	# ax0.set_yticks(ticks)
 	# ax0.set_yticklabels([Xproportions[t] for t in ticks])
 	# ax0.invert_yaxis()
+
 	# ax0.set_title('Substraction between turners and followers')
 
 	# divider = make_axes_locatable(ax0)
@@ -590,6 +592,7 @@ def main(args) :
 	# heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = 0.0, vmax = 5000.0)
 	# # heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = -5000.0, vmax = 5000.0)
 
+
 	# ticks = range(0, len(Xproportions), len(Xproportions)/5)
 	
 	# if len(Xproportions) - 1 not in ticks :
@@ -603,6 +606,7 @@ def main(args) :
 	# ax0.set_yticks(ticks)
 	# ax0.set_yticklabels([Xproportions[t] for t in ticks])
 	# ax0.invert_yaxis()
+
 	# ax0.set_title('Substraction between followers and solo')
 
 	# plt.savefig("./GraphsResults/SubstractionFollowersFull.svg", bbox_inches = 'tight')
