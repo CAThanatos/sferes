@@ -9,6 +9,8 @@ import matplotlib.cm as cm
 import matplotlib
 import numpy as np
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+from pylab import *
+import ternary
 
 
 
@@ -406,9 +408,6 @@ def main(args) :
 	plt.close()
 
 
-	# -- Follower - Solo
-	fig, ax0 = plt.subplots(ncols = 1, figsize = size)
-
 	ZexpectationFollower = hashExpectations['Follower']
 	ZexpectationSolo = hashExpectations['Solo']
 	ZexpectationTurner = hashExpectations['Turner']
@@ -421,6 +420,7 @@ def main(args) :
 	ZexpectationFollowerFull = []
 	ZexpectationSoloFull = []
 	ZexpectationTurnerFull = []
+	ZexpectationTest = dict()
 	cptX = 0
 	while cptX < len(ZexpectationFollower) :
 		tmpArrayFollowerSolo = []
@@ -453,6 +453,10 @@ def main(args) :
 			tmpArrayFollowerFull.append(ZexpectationFollower[cptX][cptY] if (tmpArrayFollowerSolo[cptY] > 0 and tmpArrayFollowerTurner[cptY] > 0) else 0)
 			tmpArraySoloFull.append(ZexpectationSolo[cptX][cptY] if (tmpArraySoloTurner[cptY] > 0 and tmpArraySoloFollower[cptY] > 0) else 0)
 			tmpArrayTurnerFull.append(ZexpectationTurner[cptX][cptY] if (tmpArrayTurnerSolo[cptY] > 0 and tmpArrayTurnerFollower[cptY] > 0) else 0)
+
+			if (cptX + cptY) <= 100 :
+				ZexpectationTest[(cptX, cptY, 100 - (cptX + cptY))] = ZexpectationFollower[cptX][cptY] if ZexpectationFollower[cptX][cptY] - ZexpectationSolo[cptX][cptY] > 0 else 0
+
 			cptY += 1
 
 		ZexpectationFollowerSolo.append(tmpArrayFollowerSolo)
@@ -467,204 +471,378 @@ def main(args) :
 
 		cptX += 1
 	
-	Zexpectation = np.array(ZexpectationFollowerSolo)
-	heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = 0.0, vmax = 5000.0)
-	# heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = -5000.0, vmax = 5000.0)
 
-	ticks = range(0, len(Xproportions), len(Xproportions)/5)
+	# # -- Follower - Solo
+	# fig, ax0 = plt.subplots(ncols = 1, figsize = size)
+
+	# Zexpectation = np.array(ZexpectationFollowerSolo)
+	# heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = 0.0, vmax = 5000.0)
+	# # heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = -5000.0, vmax = 5000.0)
+
+	# ticks = range(0, len(Xproportions), len(Xproportions)/5)
 	
-	if len(Xproportions) - 1 not in ticks :
-		ticks.append(len(Xproportions) - 1)
+	# if len(Xproportions) - 1 not in ticks :
+	# 	ticks.append(len(Xproportions) - 1)
 
-	ax0.add_line(lines.Line2D([0, ticks[-1]], [0, ticks[-1]], color="black", linewidth = 2))
-	ax0.set_xlabel('Proportion of leaders')
-	ax0.set_xticks(ticks)
-	ax0.set_xticklabels([Yproportions[t] for t in ticks])
-	ax0.set_ylabel('Proportion of followers')
-	ax0.set_yticks(ticks)
-	ax0.set_yticklabels([Xproportions[t] for t in ticks])
-	ax0.invert_yaxis()
-	ax0.set_title('Substraction between followers and solo')
+	# ax0.add_line(lines.Line2D([0, ticks[-1]], [0, ticks[-1]], color="black", linewidth = 2))
+	# ax0.set_xlabel('Proportion of leaders')
+	# ax0.set_xticks(ticks)
+	# ax0.set_xticklabels([Yproportions[t] for t in ticks])
+	# ax0.set_ylabel('Proportion of followers')
+	# ax0.set_yticks(ticks)
+	# ax0.set_yticklabels([Xproportions[t] for t in ticks])
+	# ax0.invert_yaxis()
+	# ax0.set_title('Substraction between followers and solo')
 
-	plt.savefig("./GraphsResults/SubstractionFollowersSolo.svg", bbox_inches = 'tight')
-	plt.savefig("./GraphsResults/SubstractionFollowersSolo.png", bbox_inches = 'tight')
-	plt.close()
+	# plt.savefig("./GraphsResults/SubstractionFollowersSolo.svg", bbox_inches = 'tight')
+	# plt.savefig("./GraphsResults/SubstractionFollowersSolo.png", bbox_inches = 'tight')
+	# plt.close()
 
 
-	# -- Solo - Turner
-	fig, ax0 = plt.subplots(ncols = 1, figsize = size)
+	# # -- Solo - Turner
+	# fig, ax0 = plt.subplots(ncols = 1, figsize = size)
 	
-	Zexpectation = np.array(ZexpectationSoloTurner)
-	heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = 0.0, vmax = 5000.0)
-	# heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = -5000.0, vmax = 5000.0)
+	# Zexpectation = np.array(ZexpectationSoloTurner)
+	# heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = 0.0, vmax = 5000.0)
+	# # heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = -5000.0, vmax = 5000.0)
 
-	ticks = range(0, len(Xproportions), len(Xproportions)/5)
+	# ticks = range(0, len(Xproportions), len(Xproportions)/5)
 	
-	if len(Xproportions) - 1 not in ticks :
-		ticks.append(len(Xproportions) - 1)
+	# if len(Xproportions) - 1 not in ticks :
+	# 	ticks.append(len(Xproportions) - 1)
 
-	ax0.add_line(lines.Line2D([0, ticks[-1]], [0, ticks[-1]], color="black", linewidth = 2))
-	ax0.set_xlabel('Proportion of leaders')
-	ax0.set_xticks(ticks)
-	ax0.set_xticklabels([Yproportions[t] for t in ticks])
-	ax0.set_ylabel('Proportion of followers')
-	ax0.set_yticks(ticks)
-	ax0.set_yticklabels([Xproportions[t] for t in ticks])
-	ax0.invert_yaxis()
-	ax0.set_title('Substraction between solo and turners')
+	# ax0.add_line(lines.Line2D([0, ticks[-1]], [0, ticks[-1]], color="black", linewidth = 2))
+	# ax0.set_xlabel('Proportion of leaders')
+	# ax0.set_xticks(ticks)
+	# ax0.set_xticklabels([Yproportions[t] for t in ticks])
+	# ax0.set_ylabel('Proportion of followers')
+	# ax0.set_yticks(ticks)
+	# ax0.set_yticklabels([Xproportions[t] for t in ticks])
+	# ax0.invert_yaxis()
+	# ax0.set_title('Substraction between solo and turners')
 
-	plt.savefig("./GraphsResults/SubstractionSoloTurners.svg", bbox_inches = 'tight')
-	plt.savefig("./GraphsResults/SubstractionSoloTurners.png", bbox_inches = 'tight')
-	plt.close()
+	# plt.savefig("./GraphsResults/SubstractionSoloTurners.svg", bbox_inches = 'tight')
+	# plt.savefig("./GraphsResults/SubstractionSoloTurners.png", bbox_inches = 'tight')
+	# plt.close()
 
 
-	# -- Turner - Solo
-	fig, ax0 = plt.subplots(ncols = 1, figsize = size)
+	# # -- Turner - Solo
+	# fig, ax0 = plt.subplots(ncols = 1, figsize = size)
 	
-	Zexpectation = np.array(ZexpectationTurnerSolo)
-	heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = 0.0, vmax = 5000.0)
-	# heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = -5000.0, vmax = 5000.0)
+	# Zexpectation = np.array(ZexpectationTurnerSolo)
+	# heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = 0.0, vmax = 5000.0)
+	# # heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = -5000.0, vmax = 5000.0)
 
-	ticks = range(0, len(Xproportions), len(Xproportions)/5)
+	# ticks = range(0, len(Xproportions), len(Xproportions)/5)
 	
-	if len(Xproportions) - 1 not in ticks :
-		ticks.append(len(Xproportions) - 1)
+	# if len(Xproportions) - 1 not in ticks :
+	# 	ticks.append(len(Xproportions) - 1)
 
-	ax0.add_line(lines.Line2D([0, ticks[-1]], [0, ticks[-1]], color="black", linewidth = 2))
-	ax0.set_xlabel('Proportion of leaders')
-	ax0.set_xticks(ticks)
-	ax0.set_xticklabels([Yproportions[t] for t in ticks])
-	ax0.set_ylabel('Proportion of followers')
-	ax0.set_yticks(ticks)
-	ax0.set_yticklabels([Xproportions[t] for t in ticks])
-	ax0.invert_yaxis()
-	ax0.set_title('Substraction between turners and solo')
+	# ax0.add_line(lines.Line2D([0, ticks[-1]], [0, ticks[-1]], color="black", linewidth = 2))
+	# ax0.set_xlabel('Proportion of leaders')
+	# ax0.set_xticks(ticks)
+	# ax0.set_xticklabels([Yproportions[t] for t in ticks])
+	# ax0.set_ylabel('Proportion of followers')
+	# ax0.set_yticks(ticks)
+	# ax0.set_yticklabels([Xproportions[t] for t in ticks])
+	# ax0.invert_yaxis()
+	# ax0.set_title('Substraction between turners and solo')
 
-	plt.savefig("./GraphsResults/SubstractionTurnersSolo.svg", bbox_inches = 'tight')
-	plt.savefig("./GraphsResults/SubstractionTurnersSolo.png", bbox_inches = 'tight')
-	plt.close()
+	# plt.savefig("./GraphsResults/SubstractionTurnersSolo.svg", bbox_inches = 'tight')
+	# plt.savefig("./GraphsResults/SubstractionTurnersSolo.png", bbox_inches = 'tight')
+	# plt.close()
 
-	# -- Turner - Follower
-	fig, ax0 = plt.subplots(ncols = 1, figsize = size)
+	# # -- Turner - Follower
+	# fig, ax0 = plt.subplots(ncols = 1, figsize = size)
 	
-	Zexpectation = np.array(ZexpectationTurnerFollower)
-	heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = 0.0, vmax = 5000.0)
-	# heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = -5000.0, vmax = 5000.0)
+	# Zexpectation = np.array(ZexpectationTurnerFollower)
+	# heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = 0.0, vmax = 5000.0)
+	# # heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = -5000.0, vmax = 5000.0)
 
-	ticks = range(0, len(Xproportions), len(Xproportions)/5)
+	# ticks = range(0, len(Xproportions), len(Xproportions)/5)
 	
-	if len(Xproportions) - 1 not in ticks :
-		ticks.append(len(Xproportions) - 1)
+	# if len(Xproportions) - 1 not in ticks :
+	# 	ticks.append(len(Xproportions) - 1)
 
-	ax0.add_line(lines.Line2D([0, ticks[-1]], [0, ticks[-1]], color="black", linewidth = 2))
-	ax0.set_xlabel('Proportion of leaders')
-	ax0.set_xticks(ticks)
-	ax0.set_xticklabels([Yproportions[t] for t in ticks])
-	ax0.set_ylabel('Proportion of followers')
-	ax0.set_yticks(ticks)
-	ax0.set_yticklabels([Xproportions[t] for t in ticks])
-	ax0.invert_yaxis()
-	ax0.set_title('Substraction between turners and followers')
+	# ax0.add_line(lines.Line2D([0, ticks[-1]], [0, ticks[-1]], color="black", linewidth = 2))
+	# ax0.set_xlabel('Proportion of leaders')
+	# ax0.set_xticks(ticks)
+	# ax0.set_xticklabels([Yproportions[t] for t in ticks])
+	# ax0.set_ylabel('Proportion of followers')
+	# ax0.set_yticks(ticks)
+	# ax0.set_yticklabels([Xproportions[t] for t in ticks])
+	# ax0.invert_yaxis()
+	# ax0.set_title('Substraction between turners and followers')
 
-	divider = make_axes_locatable(ax0)
-	cax = divider.append_axes("right", size="5%", pad=0.05)
+	# divider = make_axes_locatable(ax0)
+	# cax = divider.append_axes("right", size="5%", pad=0.05)
 
-	plt.colorbar(heatmap, cax=cax)
+	# plt.colorbar(heatmap, cax=cax)
 
-	plt.savefig("./GraphsResults/SubstractionTurnersFollowers.svg", bbox_inches = 'tight')
-	plt.savefig("./GraphsResults/SubstractionTurnersFollowers.png", bbox_inches = 'tight')
-	plt.close()
+	# plt.savefig("./GraphsResults/SubstractionTurnersFollowers.svg", bbox_inches = 'tight')
+	# plt.savefig("./GraphsResults/SubstractionTurnersFollowers.png", bbox_inches = 'tight')
+	# plt.close()
 
 	
-	fig, ax0 = plt.subplots(ncols = 1, figsize = size)
+	# fig, ax0 = plt.subplots(ncols = 1, figsize = size)
 
-	Zexpectation = np.array(ZexpectationFollowerFull)
-	heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = 0.0, vmax = 5000.0)
-	# heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = -5000.0, vmax = 5000.0)
+	# Zexpectation = np.array(ZexpectationFollowerFull)
+	# heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = 0.0, vmax = 5000.0)
+	# # heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = -5000.0, vmax = 5000.0)
 
-	ticks = range(0, len(Xproportions), len(Xproportions)/5)
+	# ticks = range(0, len(Xproportions), len(Xproportions)/5)
 	
-	if len(Xproportions) - 1 not in ticks :
-		ticks.append(len(Xproportions) - 1)
+	# if len(Xproportions) - 1 not in ticks :
+	# 	ticks.append(len(Xproportions) - 1)
 
-	ax0.add_line(lines.Line2D([0, ticks[-1]], [0, ticks[-1]], color="black", linewidth = 2))
-	ax0.set_xlabel('Proportion of leaders')
-	ax0.set_xticks(ticks)
-	ax0.set_xticklabels([Yproportions[t] for t in ticks])
-	ax0.set_ylabel('Proportion of followers')
-	ax0.set_yticks(ticks)
-	ax0.set_yticklabels([Xproportions[t] for t in ticks])
-	ax0.invert_yaxis()
-	ax0.set_title('Substraction between followers and solo')
+	# ax0.add_line(lines.Line2D([0, ticks[-1]], [0, ticks[-1]], color="black", linewidth = 2))
+	# ax0.set_xlabel('Proportion of leaders')
+	# ax0.set_xticks(ticks)
+	# ax0.set_xticklabels([Yproportions[t] for t in ticks])
+	# ax0.set_ylabel('Proportion of followers')
+	# ax0.set_yticks(ticks)
+	# ax0.set_yticklabels([Xproportions[t] for t in ticks])
+	# ax0.invert_yaxis()
+	# ax0.set_title('Substraction between followers and solo')
 
-	plt.savefig("./GraphsResults/SubstractionFollowersFull.svg", bbox_inches = 'tight')
-	plt.savefig("./GraphsResults/SubstractionFollowersFull.png", bbox_inches = 'tight')
-	plt.close()
+	# plt.savefig("./GraphsResults/SubstractionFollowersFull.svg", bbox_inches = 'tight')
+	# plt.savefig("./GraphsResults/SubstractionFollowersFull.png", bbox_inches = 'tight')
+	# plt.close()
 
 
-	# -- Solo - Turner
-	fig, ax0 = plt.subplots(ncols = 1, figsize = size)
+	# # -- Solo - Turner
+	# fig, ax0 = plt.subplots(ncols = 1, figsize = size)
 	
-	Zexpectation = np.array(ZexpectationSoloFull)
-	heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = 0.0, vmax = 5000.0)
-	# heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = -5000.0, vmax = 5000.0)
+	# Zexpectation = np.array(ZexpectationSoloFull)
+	# heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = 0.0, vmax = 5000.0)
+	# # heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = -5000.0, vmax = 5000.0)
 
-	ticks = range(0, len(Xproportions), len(Xproportions)/5)
+	# ticks = range(0, len(Xproportions), len(Xproportions)/5)
 	
-	if len(Xproportions) - 1 not in ticks :
-		ticks.append(len(Xproportions) - 1)
+	# if len(Xproportions) - 1 not in ticks :
+	# 	ticks.append(len(Xproportions) - 1)
 
-	ax0.add_line(lines.Line2D([0, ticks[-1]], [0, ticks[-1]], color="black", linewidth = 2))
-	ax0.set_xlabel('Proportion of leaders')
-	ax0.set_xticks(ticks)
-	ax0.set_xticklabels([Yproportions[t] for t in ticks])
-	ax0.set_ylabel('Proportion of followers')
-	ax0.set_yticks(ticks)
-	ax0.set_yticklabels([Xproportions[t] for t in ticks])
-	ax0.invert_yaxis()
-	ax0.set_title('Substraction between solo and turners')
+	# ax0.add_line(lines.Line2D([0, ticks[-1]], [0, ticks[-1]], color="black", linewidth = 2))
+	# ax0.set_xlabel('Proportion of leaders')
+	# ax0.set_xticks(ticks)
+	# ax0.set_xticklabels([Yproportions[t] for t in ticks])
+	# ax0.set_ylabel('Proportion of followers')
+	# ax0.set_yticks(ticks)
+	# ax0.set_yticklabels([Xproportions[t] for t in ticks])
+	# ax0.invert_yaxis()
+	# ax0.set_title('Substraction between solo and turners')
 
-	plt.savefig("./GraphsResults/SubstractionSoloFull.svg", bbox_inches = 'tight')
-	plt.savefig("./GraphsResults/SubstractionSoloFull.png", bbox_inches = 'tight')
-	plt.close()
+	# plt.savefig("./GraphsResults/SubstractionSoloFull.svg", bbox_inches = 'tight')
+	# plt.savefig("./GraphsResults/SubstractionSoloFull.png", bbox_inches = 'tight')
+	# plt.close()
 
 
-	# -- Turner - Follower
-	fig, ax0 = plt.subplots(ncols = 1, figsize = size)
+	# # -- Turner - Follower
+	# fig, ax0 = plt.subplots(ncols = 1, figsize = size)
 	
-	Zexpectation = np.array(ZexpectationTurnerFull)
-	heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = 2500.0, vmax = 3500.0)
-	# heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = -5000.0, vmax = 5000.0)
+	# Zexpectation = np.array(ZexpectationTurnerFull)
+	# heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = 2500.0, vmax = 3500.0)
+	# # heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = -5000.0, vmax = 5000.0)
 
-	ticks = range(0, len(Xproportions), len(Xproportions)/5)
+	# ticks = range(0, len(Xproportions), len(Xproportions)/5)
 	
-	if len(Xproportions) - 1 not in ticks :
-		ticks.append(len(Xproportions) - 1)
+	# if len(Xproportions) - 1 not in ticks :
+	# 	ticks.append(len(Xproportions) - 1)
 
-	ax0.add_line(lines.Line2D([0, ticks[-1]], [0, ticks[-1]], color="black", linewidth = 2))
-	ax0.set_xlabel('Proportion of leaders')
-	ax0.set_xticks(ticks)
-	ax0.set_xticklabels([Yproportions[t] for t in ticks])
-	ax0.set_ylabel('Proportion of followers')
-	ax0.set_yticks(ticks)
-	ax0.set_yticklabels([Xproportions[t] for t in ticks])
-	ax0.invert_yaxis()
-	ax0.set_title('Substraction between turners and followers')
+	# ax0.add_line(lines.Line2D([0, ticks[-1]], [0, ticks[-1]], color="black", linewidth = 2))
+	# ax0.set_xlabel('Proportion of leaders')
+	# ax0.set_xticks(ticks)
+	# ax0.set_xticklabels([Yproportions[t] for t in ticks])
+	# ax0.set_ylabel('Proportion of followers')
+	# ax0.set_yticks(ticks)
+	# ax0.set_yticklabels([Xproportions[t] for t in ticks])
+	# ax0.invert_yaxis()
+	# ax0.set_title('Substraction between turners and followers')
 
-	divider = make_axes_locatable(ax0)
-	cax = divider.append_axes("right", size="5%", pad=0.05)
+	# divider = make_axes_locatable(ax0)
+	# cax = divider.append_axes("right", size="5%", pad=0.05)
 
-	plt.colorbar(heatmap, cax=cax)
+	# plt.colorbar(heatmap, cax=cax)
 
-	plt.savefig("./GraphsResults/SubstractionTurnersFull.svg", bbox_inches = 'tight')
-	plt.savefig("./GraphsResults/SubstractionTurnersFull.png", bbox_inches = 'tight')
-	plt.close()
+	# plt.savefig("./GraphsResults/SubstractionTurnersFull.svg", bbox_inches = 'tight')
+	# plt.savefig("./GraphsResults/SubstractionTurnersFull.png", bbox_inches = 'tight')
+	# plt.close()
 
+
+	scale = 100
+	figure, tax = ternary.figure(scale = scale)
+
+	# Zexpectation = np.array(ZexpectationTest)
+	# print(ZexpectationTest)
+	tax.heatmap(ZexpectationTest, cmap = cm.jet, style="triangular")#, vmin = 0, vmax = 5000)
+	tax.boundary(linewidth=2.0)
+
+	# ticks = [round(i / float(scale), 1) for i in range(scale + 1)]
+	ticks = range(0, scale + 1, 20)
+	tax.ticks(ticks=ticks, axis='rlb', linewidth=1, clockwise=True,
+	          offset=0.03)
+ 	# tax.ticks(axis='lbr', linewidth=1)
+
+	# Remove default Matplotlib Axes
+	tax.clear_matplotlib_ticks()
+
+	tax.left_axis_label("Left label $\\alpha^2$")
+	tax.right_axis_label("Right label $\\beta^2$")
+	tax.bottom_axis_label("Bottom label $\\Gamma - \\Omega$")
+
+	# tax.set_title("Test")
+
+	tax.show()
+
+
+
+
+	# k = 0.5
+	# s = 1000
+
+	# data = vstack((
+	#     array([k,0,0]) + rand(s,3), 
+	#     array([0,k,0]) + rand(s,3), 
+	#     array([0,0,k]) + rand(s,3)
+	# ))
+	# color = array([[1,0,0]]*s + [[0,1,0]]*s + [[0,0,1]]*s)
+	# print("Length : " + str(len(data)))
+	# print(data)
+	# print(color)
+
+	# newdata,ax = ternaryPlot(data)
+	# print(newdata)
+
+	# ax.scatter(
+	#     newdata[:,0],
+	#     newdata[:,1],
+	#     s=2,
+	#     alpha=0.5,
+	#     color=color
+	#     )
+	# show()
+
+
+	# -- All
+	# fig, ax0 = plt.subplots(ncols = 1, figsize = size)
+	
+	# Zexpectation = np.array(ZexpectationFollowerSolo)
+	# plt.contourf(Xproportions, Yproportions, Zexpectation)
+
+	# heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = 2500.0, vmax = 3500.0)
+	# # heatmap = ax0.imshow(Zexpectation, cmap = cm.jet, vmin = -5000.0, vmax = 5000.0)
+
+	# ticks = range(0, len(Xproportions), len(Xproportions)/5)
+	
+	# if len(Xproportions) - 1 not in ticks :
+	# 	ticks.append(len(Xproportions) - 1)
+
+	# ax0.add_line(lines.Line2D([0, ticks[-1]], [0, ticks[-1]], color="black", linewidth = 2))
+	# ax0.set_xlabel('Proportion of leaders')
+	# ax0.set_xticks(ticks)
+	# ax0.set_xticklabels([Yproportions[t] for t in ticks])
+	# ax0.set_ylabel('Proportion of followers')
+	# ax0.set_yticks(ticks)
+	# ax0.set_yticklabels([Xproportions[t] for t in ticks])
+	# ax0.invert_yaxis()
+	# ax0.set_title('Substraction between turners and followers')
+
+	# divider = make_axes_locatable(ax0)
+	# cax = divider.append_axes("right", size="5%", pad=0.05)
+
+	# plt.colorbar(heatmap, cax=cax)
+
+	# plt.savefig("./GraphsResults/All.svg", bbox_inches = 'tight')
+	# plt.savefig("./GraphsResults/All.png", bbox_inches = 'tight')
+	# plt.close()
 
 	# Zexpectation = ZexpectationFollower - ZexpectationSolo
 	# print(ZexpectationFollower)
 	# print(ZexpectationSolo)
 
+
+
+
+# def ternaryPlot(
+#             data,
+
+#             # Scale data for ternary plot (i.e. a + b + c = 1)
+#             scaling = True,
+
+#             # Direction of first vertex.
+#             start_angle = 90,
+
+#             # Orient labels perpendicular to vertices.
+#             rotate_labels = True,
+
+#             # Labels for vertices.
+#             labels = ('Solo', 'Follower', 'Turner'),
+
+#             # Offset for label from vertex (percent of distance from origin).
+#             label_offset = 0.10,
+
+#             # Any matplotlib keyword args for plots.
+#             edge_args = {'color':'black','linewidth':2},
+
+#             # Any matplotlib keyword args for figures.
+#             fig_args = {'figsize':(8,8),'facecolor':'white','edgecolor':'white'},
+#         ):
+
+#   # This will create a basic "ternary" plot (or quaternary, etc.)
+#   basis = array(
+#                   [
+#                       [
+#                           cos(2*_*pi/3 + start_angle*pi/180),
+#                           sin(2*_*pi/3 + start_angle*pi/180)
+#                       ] 
+#                       for _ in range(3)
+#                   ]
+#               )
+
+#   # If data is Nx3, newdata is Nx2.
+#   if scaling:
+#       # Scales data for you.
+#       newdata = dot((data.T / data.sum(-1)).T,basis)
+#   else:
+#       # Assumes data already sums to 1.
+#       newdata = dot(data,basis)
+
+#   fig = figure(**fig_args)
+#   ax = fig.add_subplot(111)
+
+#   for i,l in enumerate(labels):
+#       if i >= 3:
+#           break
+#       x = basis[i,0]
+#       y = basis[i,1]
+#       if rotate_labels:
+#           angle = 180*arctan(y/x)/pi + 90
+#           if angle > 90 and angle <= 270:
+#               angle = mod(angle + 180,360)
+#       else:
+#           angle = 0
+#       ax.text(
+#               x*(1 + label_offset),
+#               y*(1 + label_offset),
+#               l,
+#               horizontalalignment='center',
+#               verticalalignment='center',
+#               rotation=angle
+#           )
+
+#   # Clear normal matplotlib axes graphics.
+#   ax.set_xticks(())
+#   ax.set_yticks(())
+#   ax.set_frame_on(False)
+
+#   # Plot border
+#   ax.plot(
+#       [basis[_,0] for _ in range(3) + [0,]],
+#       [basis[_,1] for _ in range(3) + [0,]],
+#       **edge_args
+#   )
+
+#   return newdata,ax
 
 
 if __name__ == "__main__" :
