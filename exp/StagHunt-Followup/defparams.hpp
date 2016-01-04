@@ -308,7 +308,7 @@ struct Params
 #endif
     
     // we choose the polynomial cross-over type
-    static const sferes::gen::evo_float::cross_over_t cross_over_type = sferes::gen::evo_float::sbx;
+    static const sferes::gen::evo_float::cross_over_t cross_over_type = sferes::gen::evo_float::no_cross_over;
     
     // the cross rate of the real-valued vector
     static const float cross_rate = 0.05f;
@@ -335,6 +335,8 @@ struct Params
     // size of the population
 #ifdef POP100
     static const unsigned size = 100;
+#elif defined(POP200)
+    static const unsigned size = 200;
 #else
     static const unsigned size = 20;
 #endif
@@ -343,10 +345,10 @@ struct Params
     static const unsigned nb_gen = 20000;
     
     // how often should the result file be written
-#ifdef POP100
+#if defined(POP100) || defined(POP200)
     static const int dump_period = 10;
 #else
-    static const int dump_period = 100;
+    static const int dump_period = 50;
 #endif
     
     // how often should the video be done

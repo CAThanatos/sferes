@@ -359,8 +359,9 @@ namespace sferes
 
 			_nb_ind1_leader_first = nb_ind1_leader_first;
 
-     	// std::cout << "Food 1 : " << food1 << std::endl;
-     	// std::cout << "Food 2 : " << food2 << std::endl;
+			// std::cout << "----------" << std::endl;
+   //   	std::cout << "Food 1 : " << food1 << std::endl;
+   //   	std::cout << "Food 2 : " << food2 << std::endl;
      	
      	food2 /= nb_encounters;
      	food1 /= nb_encounters;
@@ -432,6 +433,7 @@ namespace sferes
 #else
 			bool first_leader = misc::flip_coin();
 #endif
+
 			_num_leader = first_leader?1:2;
 
 			for(int i = 0; i < 2; ++i)

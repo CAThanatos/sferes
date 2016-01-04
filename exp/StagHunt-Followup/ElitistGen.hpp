@@ -50,12 +50,18 @@
 #include <sferes/dbg/dbg.hpp>
 #include <sferes/stc.hpp>
 #include <sferes/misc.hpp>
+#include <sferes/gen/evo_float.hpp>
 
 
 namespace sferes
 {
   namespace gen
   {
+    namespace elitist_gen
+    {
+      enum cross_over_t { recombination = 0, sbx, no_cross_over };
+    }
+
     template<int Size, typename Params, typename Exact = stc::Itself> 
     class ElitistGen : public stc::Any<Exact>
     {
@@ -137,36 +143,69 @@ namespace sferes
 
 	    void cross(const ElitistGen& o, ElitistGen& c1, ElitistGen& c2)
 	    {
-	    	if(misc::rand<float>() < Params::evo_float::cross_rate)
-	    	{
-					int nb_genes = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;
+				if (Params::evo_float::cross_over_type != sferes::gen::evo_float::no_cross_over && 
+				    misc::rand<float>() < Params::evo_float::cross_rate)
+				{
+				  static const float eta_c = 15;
+				  assert(eta_c != -1);
 
-					assert(this->size() == nb_genes * 2);
-					assert(o.size() == nb_genes * 2);
-					assert(c1.size() == nb_genes * 2);
-					assert(c2.size() == nb_genes * 2);
+				  for (unsigned int i = 0; i < this->size(); i++)
+			    {
+			      float y1 = std::min(this->data(i), o.data(i));
+			      float y2 = std::max(this->data(i), o.data(i));
+			      static const float yl = 0.0;
+			      static const float yu = 1.0;		
+	
+			      if (fabs(y1 - y2) > std::numeric_limits<float>::epsilon())
+						{
+						  float rand = misc::rand<float>();
+						  float beta = 1.0 + (2.0 * (y1 - yl) / (y2 - y1));
+						  float alpha = 2.0 - pow(beta, -(eta_c + 1.0));
+						  float betaq = 0;
+						  if (rand <= (1.0 / alpha))
+						    betaq = pow((rand * alpha), (1.0 / (eta_c + 1.0)));
+						  else
+						    betaq = pow ((1.0 / (2.0 - rand * alpha)) , (1.0 / (eta_c + 1.0)));
+						  float cf1 = 0.5 * ((y1 + y2) - betaq * (y2 - y1));
+						  beta = 1.0 + (2.0 * (yu - y2) / (y2 - y1));
+						  alpha = 2.0 - pow(beta, -(eta_c + 1.0));
+						  if (rand <= (1.0 / alpha))
+						    betaq = pow ((rand * alpha), (1.0 / (eta_c + 1.0)));
+						  else
+						    betaq = pow ((1.0/(2.0 - rand * alpha)), (1.0 / (eta_c + 1.0)));
+						  float cf2 = 0.5 * ((y1 + y2) + betaq * (y2 - y1));
+						  
+						  cf1 = misc::put_in_range(cf1, yl, yu); 
+						  cf2 = misc::put_in_range(cf2, yl, yu);
+						  
+						  assert(!std::isnan(cf1));
+						  assert(!std::isnan(cf2));
+						  
+						  if (misc::flip_coin())
+					    {
+					      c1.data(i, cf1);
+					      c2.data(i, cf2);
+					    }
+						  else
+					    {
+					      c1.data(i, cf2);
+					      c2.data(i, cf1);
+					    }
+						}
+			    }
+ 				}
+				else if (misc::flip_coin())
+			  {
+			    c1 = *this;
+			    c2 = o;
+			  }
+				else
+			  {
+			    c1 = o;
+			    c2 = *this;
+			  }
 
-					for(size_t i = 0; i < nb_genes; ++i)
-					{
-						c1.data(i, this->data(i));
-						c2.data(i, o.data(i));
-					}
-					for(size_t i = nb_genes; i < nb_genes*2; ++i)
-					{
-						c1.data(i, o.data(i));
-						c2.data(i, this->data(i));
-					}
-					c1.data(nb_genes * 2, this->data(nb_genes * 2));
-					c2.data(nb_genes * 2, o.data(nb_genes * 2));
-	    	}
-	    	else
-	    	{
-	    		for(size_t i = 0; i < _size; ++i)
-	    		{
-	    			c1.data(i, this->data(i));
-	    			c2.data(i, o.data(i));
-	    		}
-	    	}
+				_check_invariant();
 	    }
 
 	    void duplicate_nn()

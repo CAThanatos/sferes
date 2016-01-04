@@ -85,38 +85,56 @@ namespace sferes
 
       void epoch()
       {
-	this->_pop.clear();
-	_pareto_front.clear();
-	_selection (_parent_pop, _child_pop);
- 	parallel::p_for(parallel::range_t(0, _child_pop.size()),
- 			mutate<crowd::Indiv<Phen> >(_child_pop));
+      	// Used when loading from a previous experiment
+      	if(!_parent_pop.size())
+      	{
+					_parent_pop.resize(this->_pop.size());
+					parallel::p_for(parallel::range_t(0, _parent_pop.size()),
+							random<crowd::Indiv<Phen> >(_parent_pop));
+					for (size_t i = 0; i < this->_pop.size(); ++i)
+					{
+						for (size_t j = 0; j < this->_pop[i]->gen().size(); ++j)
+              _parent_pop[i]->gen().data(j, this->_pop[i]->gen().data(j));
 
-#ifndef EA_EVAL_ALL
-	_eval_pop(_child_pop);
-	_merge(_parent_pop, _child_pop, _mixed_pop);
-#else
-	_merge(_parent_pop, _child_pop, _mixed_pop);
-	_eval_pop(_mixed_pop);
-#endif
-	_apply_modifier(_mixed_pop);
-#ifndef NDEBUG
-	BOOST_FOREACH(indiv_t& ind, _mixed_pop)
-	  for (size_t i = 0; i < ind->fit().objs().size(); ++i)
-	    { assert(!std::isnan(ind->fit().objs()[i])); }
-#endif
-  	_fill_nondominated_sort(_mixed_pop, _parent_pop);
-	_mixed_pop.clear();
-	_child_pop.clear();
+           	_parent_pop[i]->fit().resize_objs(this->_pop[i]->fit().objs().size());
+            for (size_t j = 0; j < this->_pop[i]->fit().objs().size(); ++j)
+            	_parent_pop[i]->fit().set_obj(j, this->_pop[i]->fit().objs()[j]);
+          }
+						// _parent_pop.push_back(indiv_t());
+					  // _parent_pop[i] = this->_pop[i];
+				  // _copy_pop(this->_pop, _parent_pop);
+				}
 
-	_convert_pop(_parent_pop, this->_pop);
+				this->_pop.clear();
+				_pareto_front.clear();
+				_selection (_parent_pop, _child_pop);
+			 	parallel::p_for(parallel::range_t(0, _child_pop.size()),
+			 			mutate<crowd::Indiv<Phen> >(_child_pop));
 
-	assert(_parent_pop.size() == Params::pop::size);
-	assert(_pareto_front.size() <= Params::pop::size * 2);
-	assert(_mixed_pop.size() == 0);
-	//	assert(_child_pop.size() == 0);
-	assert(this->_pop.size() == Params::pop::size);
+			#ifndef EA_EVAL_ALL
+				_eval_pop(_child_pop);
+				_merge(_parent_pop, _child_pop, _mixed_pop);
+			#else
+				_merge(_parent_pop, _child_pop, _mixed_pop);
+				_eval_pop(_mixed_pop);
+			#endif
+				_apply_modifier(_mixed_pop);
+			#ifndef NDEBUG
+				BOOST_FOREACH(indiv_t& ind, _mixed_pop)
+				  for (size_t i = 0; i < ind->fit().objs().size(); ++i)
+				    { assert(!std::isnan(ind->fit().objs()[i])); }
+			#endif
+			  	_fill_nondominated_sort(_mixed_pop, _parent_pop);
+				_mixed_pop.clear();
+				_child_pop.clear();
 
-				
+				_convert_pop(_parent_pop, this->_pop);
+
+				assert(_parent_pop.size() == Params::pop::size);
+				assert(_pareto_front.size() <= Params::pop::size * 2);
+				assert(_mixed_pop.size() == 0);
+				//	assert(_child_pop.size() == 0);
+				assert(this->_pop.size() == Params::pop::size);
       }
 
 
@@ -186,9 +204,16 @@ namespace sferes
       void _convert_pop(const pop_t& pop1,
 			std::vector<boost::shared_ptr<Phen> > & pop2)
       {
-	pop2.resize(pop1.size());
-	for (size_t i = 0; i < pop1.size(); ++i)
-	  pop2[i] = pop1[i];
+				pop2.resize(pop1.size());
+				for (size_t i = 0; i < pop1.size(); ++i)
+				  pop2[i] = pop1[i];
+      }
+
+      void _copy_pop(std::vector<boost::shared_ptr<Phen> > & pop1, pop_t& pop2)
+      {
+				pop2.resize(pop1.size());
+				for (size_t i = 0; i < pop1.size(); ++i)
+				  pop2[i] = pop1[i];
       }
 
       void _eval_pop(pop_t& pop)

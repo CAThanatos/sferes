@@ -2135,7 +2135,7 @@ def draw(**parametres) :
 					drawAllDiv(dossier + '/' + curDir)
 				elif re.match(r'^ParetoFront$', curDir) and not parametres["argNoDrawFit"] :
 					print('\t -> Drawing pareto front : ' + curDir)
-					# drawPareto(dossier + '/' + curDir)
+					drawPareto(dossier + '/' + curDir)
 				elif parametres["argDrawRun"] :
 					m = re.match(r'^Dir(\d+)$', curDir)
 					if m and not parametres["argNoDrawFit"] :

@@ -49,6 +49,42 @@ colorErrorTotal = 'black'
 alphaTotal = 1
 
 
+payoffsOpt = [
+							5250,
+							5000,
+							5250,
+							5250,
+							5250,
+							4900,
+							5050,
+							5100,
+							5100,
+							5500,
+							5000,
+							5250,
+							5250,
+							5250,
+							5100,
+							5250,
+							5000,
+							5000,
+							5050,
+							4650
+						 ]
+
+beginningGen = {
+								1 : 4300,
+								2 : 1900,
+								3 : 4300,
+								4 : 1900,
+								5 : 1900,
+								6 : 1900,
+								7 : 4100,
+								8 : 4200,
+								9 : 4200,
+								10 : 1900
+							 }
+
 
 # SEABORN
 sns.set()
@@ -76,7 +112,7 @@ size = (1280/dpi, 1024/dpi)
 
 
 
-def draw() :
+def draw(args) :
 	if os.path.isdir(outputDir) :
 		if removeOutput :
 			shutil.rmtree(outputDir)
@@ -132,33 +168,39 @@ def draw() :
 						# if directoryCoevo :
 						# 	evaluation += 10
 
-						cpt += 1
+						if not args.beginningGen or (run in beginningGen.keys() and generation >= beginningGen[run]) :
+							# print(str(run) + " : " + str(generation))
+							cpt += 1
 
-						if cpt > precision or generation == 0 :
-							if not maxGenDone :
-								hashFitness[run][generation] = line['fitness']
+							curGen = generation
+							if args.beginningGen :
+								curGen = generation - beginningGen[run]
 
-								hashNbSStags[run][generation] = line['nbSStags']
-								hashNbSStagsSolo[run][generation] = line['nbSStagsSolo']
-								hashNbSStagsDuo[run][generation] = line['nbSStags'] - line['nbSStagsSolo']
+							if cpt > precision or curGen == 0 :
+								if not maxGenDone :
+									hashFitness[run][curGen] = line['fitness']
 
-								# hashRatio[run][generation] = line['nbBStags']*100/(line['nbHares'] + line['nbBStags'])
-								# hashRatioSuccess[run][generation] = (line['nbBStags'] - line['nbBStagsSolo'])*100/(line['nbHares'] + (line['nbBStags'] - line['nbBStagsSolo'])) 
-								# hashRatioHares[run][generation] = line['nbHares']*100/(line['nbHares'] + line['nbBStags'])
-								hashRatio[run][generation] = 0
-								hashRatioSuccess[run][generation] = 0
-								hashRatioHares[run][generation] = 0
+									hashNbSStags[run][curGen] = line['nbSStags']
+									hashNbSStagsSolo[run][curGen] = line['nbSStagsSolo']
+									hashNbSStagsDuo[run][curGen] = line['nbSStags'] - line['nbSStagsSolo']
 
-								if generation not in tabGeneration :
-									tabGeneration.append(generation)
+									# hashRatio[run][curGen] = line['nbBStags']*100/(line['nbHares'] + line['nbBStags'])
+									# hashRatioSuccess[run][curGen] = (line['nbBStags'] - line['nbBStagsSolo'])*100/(line['nbHares'] + (line['nbBStags'] - line['nbBStagsSolo'])) 
+									# hashRatioHares[run][curGen] = line['nbHares']*100/(line['nbHares'] + line['nbBStags'])
+									hashRatio[run][curGen] = 0
+									hashRatioSuccess[run][curGen] = 0
+									hashRatioHares[run][curGen] = 0
 
-								if evaluation not in tabEvaluation :
-									tabEvaluation.append(evaluation)
+									if curGen not in tabGeneration :
+										tabGeneration.append(curGen)
 
-								cpt = 0
+									if evaluation not in tabEvaluation :
+										tabEvaluation.append(evaluation)
 
-								if generation > maxGen :
-									maxGenDone = True
+									cpt = 0
+
+									if curGen > maxGen :
+										maxGenDone = True
 
 						generation += 1
 
@@ -174,7 +216,6 @@ def draw() :
 			hashData["hashRatioHares"] = hashRatioHares
 
 			dataHash.append(hashData)
-
 
 
 	tabEvaluation = sorted(tabEvaluation)
@@ -263,6 +304,7 @@ def draw() :
 
 		for generation in tabPlotGeneration :
 			fitnessEval = [hashFitness[run][generation] for run in hashFitness.keys() if run in hashRunCoop[cptData] and generation in hashFitness[run].keys()]
+			print(fitnessEval)
 			fitnessMed = np.median(fitnessEval)
 
 			perc25 = fitnessMed
@@ -333,6 +375,131 @@ def draw() :
 	plt.savefig(outputDir + "/boxplotFitness.png", bbox_inches = 'tight')
 	plt.savefig(outputDir + "/boxplotFitness.svg", bbox_inches = 'tight')
 	plt.close()
+
+
+	if args.optimum :
+		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+		# plt.axes(frameon=0)
+		plt.grid()
+
+		# Fitness
+		cptData = 0
+		for data in dataHash :
+			dataPlot = []
+			dataPerc25 = []
+			dataPerc75 = []
+			hashFitness = data['hashFitness']
+
+			for generation in tabPlotGeneration :
+				fitnessEval = [hashFitness[run][generation] for run in hashFitness.keys() if run in hashRunCoop[cptData] and generation in hashFitness[run].keys()]
+				fitnessMed = np.median(fitnessEval)
+
+				perc25 = fitnessMed
+				perc75 = fitnessMed
+				if len(fitnessEval) > 1 :
+					perc25 = np.percentile(fitnessEval, 25)
+					perc75 = np.percentile(fitnessEval, 75)
+
+				dataPlot.append(fitnessMed)
+				dataPerc25.append(perc25)
+				dataPerc75.append(perc75)
+
+			cpt = 0
+			while cpt < len(dataPlot) :
+				if math.isnan(dataPlot[cpt]) :
+					if cpt > 0 and cpt < len(dataPlot) - 1 :
+						dataPlot[cpt] = (dataPlot[cpt + 1] + dataPlot[cpt - 1])/2
+						dataPerc25[cpt] = (dataPerc25[cpt + 1] + dataPerc25[cpt - 1])/2
+						dataPerc75[cpt] = (dataPerc75[cpt + 1] + dataPerc75[cpt - 1])/2
+					elif cpt > 0 :
+						dataPlot[cpt] = dataPlot[cpt - 1]
+						dataPerc25[cpt] = dataPerc25[cpt - 1]
+						dataPerc75[cpt] = dataPerc75[cpt - 1]
+					else :
+						dataPlot[cpt] = dataPlot[cpt + 1]
+						dataPerc25[cpt] = dataPerc25[cpt + 1]
+						dataPerc75[cpt] = dataPerc75[cpt + 1]
+
+				cpt += 1
+
+			axe1.plot(range(len(dataPlot)), dataPlot, color=palette[cptData], linestyle=linestyles[cptData], linewidth=linewidth, marker=markers[cptData])
+
+			plt.fill_between(range(len(dataPlot)), dataPerc25, dataPerc75, alpha=0.25, linewidth=0, color=palette[cptData])
+
+			cptData += 1
+
+		dataPlot = []
+		dataPerc25 = []
+		dataPerc75 = []
+		for generation in tabPlotGeneration :
+			fitnessMed = np.median(payoffsOpt)
+
+			perc25 = fitnessMed
+			perc75 = fitnessMed
+			if len(payoffsOpt) > 1 :
+				perc25 = np.percentile(payoffsOpt, 25)
+				perc75 = np.percentile(payoffsOpt, 75)
+
+			dataPlot.append(fitnessMed)
+			dataPerc25.append(perc25)
+			dataPerc75.append(perc75)
+
+		cpt = 0
+		while cpt < len(dataPlot) :
+			if math.isnan(dataPlot[cpt]) :
+				if cpt > 0 and cpt < len(dataPlot) - 1 :
+					dataPlot[cpt] = (dataPlot[cpt + 1] + dataPlot[cpt - 1])/2
+					dataPerc25[cpt] = (dataPerc25[cpt + 1] + dataPerc25[cpt - 1])/2
+					dataPerc75[cpt] = (dataPerc75[cpt + 1] + dataPerc75[cpt - 1])/2
+				elif cpt > 0 :
+					dataPlot[cpt] = dataPlot[cpt - 1]
+					dataPerc25[cpt] = dataPerc25[cpt - 1]
+					dataPerc75[cpt] = dataPerc75[cpt - 1]
+				else :
+					dataPlot[cpt] = dataPlot[cpt + 1]
+					dataPerc25[cpt] = dataPerc25[cpt + 1]
+					dataPerc75[cpt] = dataPerc75[cpt + 1]
+
+			cpt += 1
+
+		axe1.plot(range(len(dataPlot)), dataPlot, color=palette[cptData], linestyle=linestyles[cptData], linewidth=linewidth, marker=markers[cptData])
+
+		plt.fill_between(range(len(dataPlot)), dataPerc25, dataPerc75, alpha=0.25, linewidth=0, color=palette[cptData])
+
+
+		tabPlotTicks = []
+		for generation in tabPlotGeneration :
+			if generation > maxGen :
+				tabPlotTicks.append(maxGen)
+			else :
+				tabPlotTicks.append(generation)
+
+		ticks = range(0, len(tabPlotGeneration), int(len(tabPlotGeneration)/2))
+		if len(tabPlotGeneration) - 1 not in ticks :
+			ticks.append(len(tabPlotGeneration) - 1)
+
+		# tabPlotTicks[ticks[0]] = 0
+		# tabPlotTicks[ticks[1]] = 20000
+		# tabPlotTicks[ticks[2]] = 40000
+
+		axe1.set_xticks(ticks)
+		axe1.set_xticklabels([tabPlotTicks[x] for x in ticks])
+		axe1.set_xlabel("Generation")
+		axe1.set_xlim(0, len(tabPlotGeneration) - 1)
+
+		axe1.set_ylabel("Fitness")
+		axe1.set_ylim(0, 6000)
+
+		legend = plt.legend(['Random population', 'Optimum'], loc = 4, frameon=True)
+		frame = legend.get_frame()
+		frame.set_facecolor('0.9')
+		frame.set_edgecolor('0.9')
+
+		# axe1.set_title('Boxplot of best fitness')
+
+		plt.savefig(outputDir + "/boxplotFitnessOpt.png", bbox_inches = 'tight')
+		plt.savefig(outputDir + "/boxplotFitnessOpt.svg", bbox_inches = 'tight')
+		plt.close()
 
 
 	# # Proportion of cooperation
@@ -496,7 +663,7 @@ def draw() :
 
 
 
-def drawLeadership() :
+def drawLeadership(args) :
 	if os.path.isdir(outputDir) :
 		if removeOutput :
 			shutil.rmtree(outputDir)
@@ -919,10 +1086,10 @@ def main(args) :
 
 	if args.drawLeadership :
 		print("\t-> Drawing Leadership")
-		drawLeadership()
+		drawLeadership(args)
 	else :
 		print("\t-> Drawing Hunting Task")
-		draw()
+		draw(args)
 
 
 
@@ -935,6 +1102,7 @@ if __name__ == "__main__" :
 
 	parser.add_argument('-o', '--output', help = "Output directory", default='GraphsResultsFollowup')
 	parser.add_argument('-r', '--removeOutput', help = "Remove output directory if exists", default=False, action='store_true')
+	parser.add_argument('-b', '--beginningGen', help = "First generation from which we draw", default = False, action = 'store_true')
 
 	parser.add_argument('-a', '--statAnalysis', help = "Compute Mann-Whitney", default=False, action='store_true')
 	parser.add_argument('-l', '--drawLeadership', help = "Draw leadership", default=False, action='store_true')
@@ -942,6 +1110,8 @@ if __name__ == "__main__" :
 
 	parser.add_argument('-s', '--selection', help = "Selected runs", default=None, type=int, nargs='+')
 	parser.add_argument('-e', '--exclusion', help = "Excluded runs", default=None, type=int, nargs='+')
+
+	parser.add_argument('-O', '--optimum', help = "Draw optimum", default = False, action = 'store_true')
 
 	args = parser.parse_args()
 

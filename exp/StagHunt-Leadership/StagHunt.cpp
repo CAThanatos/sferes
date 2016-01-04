@@ -97,6 +97,7 @@ namespace sferes
 			std::vector<float> vec_sm;
 #endif
 
+			// std::cout << "-----" << std::endl;
       for (size_t j = 0; j < Params::simu::nb_trials; ++j)
       {
 				// clock_t deb = clock();
@@ -142,28 +143,28 @@ namespace sferes
 				if(hunter1->is_leader())
 				{
 					hunter1->choose_nn(0, ind1.data());
-					hunter2->choose_nn(1, ind1.data());
+					hunter2->choose_nn(1, ind2.data());
 				}
 				else
 				{
 					hunter1->choose_nn(1, ind1.data());
-					hunter2->choose_nn(0, ind1.data());
+					hunter2->choose_nn(0, ind2.data());
 				}
 #elif defined(NO_CHOICE_DUP)
 				int nb_weights = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;
 
-				if(ind1.data().size() == (nb_weights + 1))
+				if(ind1.data().size() == nb_weights)
 				{
 					hunter1->choose_nn(0, ind1.data());
 
-					if((ind2.data().size() == (nb_weights + 1)) || (misc::rand<float>() < 0.5f))
+					if((ind2.data().size() == nb_weights) || (misc::rand<float>() < 0.5f))
 						hunter2->choose_nn(0, ind2.data());
 					else
 						hunter2->choose_nn(1, ind2.data());
 				}	
 				else
 				{
-					if(ind2.data().size() == (nb_weights + 1))
+					if(ind2.data().size() == nb_weights)
 					{
 						if(misc::rand<float>() < 0.5f)
 							hunter1->choose_nn(0, ind1.data());
@@ -514,6 +515,12 @@ namespace sferes
        	Hunter* h2 = (Hunter*)(simu.robots()[1]);
        	food2 += h2->get_food_gathered();
        	
+       	// std::cout << "Trial " << j << " : " << std::endl;
+       	// std::cout << "Food 1 : " << h1->get_food_gathered()  << std::endl;
+       	// std::cout << "Food 2 : " << h2->get_food_gathered()  << std::endl;
+       	// float tmpLeadership = fabs(0.5 - (_nb_leader_first_trial/_nb_preys_killed_coop_trial))/0.5;
+       	// std::cout << "Leadership : " << tmpLeadership << std::endl;
+
        	moy_hares2 += h2->nb_hares_hunted();
        	moy_sstags2 += h2->nb_small_stags_hunted();
        	moy_bstags2 += h2->nb_big_stags_hunted();
@@ -666,8 +673,9 @@ namespace sferes
 			ind1.add_fit_nn2(fit_nn2);
 #endif
 
-     	// std::cout << "Food 1 : " << food1 << std::endl;
-     	// std::cout << "Food 2 : " << food2 << std::endl;
+			// std::cout << "Final : " << std::endl;
+   //   	std::cout << "Food 1 : " << food1 << std::endl;
+   //   	std::cout << "Food 2 : " << food2 << std::endl;
      	
      	food2 /= nb_encounters;
      	food1 /= nb_encounters;

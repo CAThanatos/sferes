@@ -131,21 +131,13 @@ namespace sferes
 						// HUNTER
 						if(HUNTER_COLOR == type) 
 						{
+#ifdef DIFF_COLOR
+							type1 = 0;
+							type2 = 1;
+#else
 							type1 = 1;
 							type2 = 1;
-
-#ifdef DIFF_COLOR
-							if(!_bool_leader)
-							{
-								type1 = 0;
-								type2 = 1;
-							}
 #endif
-
-// #ifdef DIFF_COLOR
-// 							if(_bool_leader)
-// 								color = 1.0f;
-// #endif
 						}
 						// HARE
 						else if(HARE_COLOR == type)

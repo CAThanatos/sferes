@@ -36,8 +36,8 @@ done
 
 if [[ -z $site ]]
 then
-	for i in rennes grenoble lille luxembourg lyon nancy reims sophia toulouse nantes; do
-	#for i in rennes grenoble lille luxembourg lyon nancy reims sophia; do
+	#for i in rennes grenoble lille luxembourg lyon nancy reims sophia toulouse nantes; do
+	for i in rennes grenoble lille luxembourg lyon nancy reims sophia nantes; do
 		echo "rsync on $i..."
 	
 		rsync -avz /home/abernard/sferes2-0.99/sferes $i.g5k:~/sferes2-0.99

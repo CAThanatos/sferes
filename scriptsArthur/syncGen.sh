@@ -33,7 +33,8 @@ done
 
 if [[ -z $site ]]
 then
-	for i in lille rennes grenoble luxembourg lyon nancy reims sophia toulouse nantes; do
+	#for i in lille rennes grenoble luxembourg lyon nancy reims sophia toulouse nantes; do
+	for i in lille rennes grenoble luxembourg lyon nancy reims sophia nantes; do
 		ssh $i.g5k "rm -r lastGenPop"
 		scp -r lastGenPop/ $i.g5k:./
 		scp TemplateExp.exp $i.g5k:./
