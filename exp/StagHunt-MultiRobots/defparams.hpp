@@ -86,7 +86,14 @@ struct Params
 #endif
 		
 		static const float hunter_radius = 20.0f;
+
+#ifdef HUNTERS5
+		static const int nb_hunters = 5;
+#elif defined(HUNTERS2)
+		static const int nb_hunters = 2;
+#else
 		static const int nb_hunters = 3;
+#endif
 		
 		static const float hare_radius = 30.0f;
 
@@ -477,11 +484,21 @@ struct Params
 
 #define FOOD_SMALL_STAG_SOLO 50
 #ifdef SSTAG250
+#ifdef NO_LEVELS
+#define FOOD_SMALL_STAG_COOP_LOW 250
+#define FOOD_SMALL_STAG_COOP_HIGH 250
+#else
 #define FOOD_SMALL_STAG_COOP_LOW 125
 #define FOOD_SMALL_STAG_COOP_HIGH 250
+#endif
 #elif defined(SSTAG150)
+#ifdef NO_LEVELS
+#define FOOD_SMALL_STAG_COOP_LOW 150
+#define FOOD_SMALL_STAG_COOP_HIGH 150
+#else
 #define FOOD_SMALL_STAG_COOP_LOW 100
 #define FOOD_SMALL_STAG_COOP_HIGH 150
+#endif
 #else
 #define FOOD_SMALL_STAG_COOP_LOW 100
 #define FOOD_SMALL_STAG_COOP_HIGH 150
