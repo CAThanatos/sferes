@@ -6,7 +6,7 @@
 #define BSTAG0
 #define SSTAG125
 #define POS_CLOSE
-#line 1 "/home/arthur/sferes2-0.99/exp/StagHunt-MultiRobots/StagHunt.cpp"
+#line 1 "/home/abernard/sferes2-0.99/exp/StagHunt-MultiRobots/StagHunt.cpp"
 #include "includes.hpp"
 #include "defparams.hpp"
 

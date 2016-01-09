@@ -163,12 +163,24 @@ struct Params
 		
 		static const int nb_small_stags = 0;
 		
+#ifdef RADIUS30
 		static const float big_stag_radius = 30.0f;
+#elif defined(RADIUS40)
+		static const float big_stag_radius = 40.0f;
+#elif defined(RADIUS50)
+		static const float big_stag_radius = 50.0f;
+#else
+		static const float big_stag_radius = 30.0f;
+#endif
 
 		
 		static const int nb_levels = 2;
 
+#ifdef STAMINA3200
+		static const float nb_steps = 40000;
+#else
 		static const float nb_steps = 20000;
+#endif
 		
 #ifdef TRACE_ONLY
 		static const int nb_trials = 20;
@@ -184,15 +196,11 @@ struct Params
 
 		static const int threshold_hamming = 0.5f;
 
-		static const int nb_hunters_coop_hares = 3;
+		static const int nb_hunters_coop_hares_max = Params::simu::nb_hunters;
 
-#ifdef COOP_SSTAGS2
-		static const int nb_hunters_coop_sstags = 2;
-#else
-		static const int nb_hunters_coop_sstags = 3;
-#endif
+		static const int nb_hunters_coop_sstags_max = Params::simu::nb_hunters;
 		
-		static const int nb_hunters_coop_bstags = 3;
+		static const int nb_hunters_coop_bstags_max = Params::simu::nb_hunters;
 	};
 	
 	struct nn
@@ -212,7 +220,11 @@ struct Params
 		static const size_t nb_inputs_scream = 0;
 		static const size_t nb_outputs_scream = 0;
 
+#ifdef COM_COMPAS
+		static const size_t nb_inputs_compas = 2;
+#else
 		static const size_t nb_inputs_compas = 0;
+#endif
 
 		static const size_t nb_inputs = Params::simu::nb_lasers + Params::simu::nb_camera_pixels*nb_info_by_pixel + Params::simu::nb_bumpers 
 													+ Params::nn::nb_inputs_leadership + Params::nn::nb_inputs_scream + Params::nn::nb_inputs_compas;
@@ -239,7 +251,7 @@ struct Params
 #ifdef CMAES
 	struct cmaes
 	{
-		static const float max_value =-1e-10;
+		static const float max_value = -1e-10;
 		
 		static const float sigma = 0.5f;
 		
@@ -435,39 +447,44 @@ struct Params
 
 #ifdef NO_STAMINA
 #define STAMINA 1
-#elif defined(STAMINA50)
-#define STAMINA 50
-#elif defined(STAMINA100)
-#define STAMINA 100
+#elif defined(STAMINA800)
+#define STAMINA 800
+#elif defined(STAMINA1600)
+#define STAMINA 1600
+#elif defined(STAMINA3200)
+#define STAMINA 3200
 #else
 #define STAMINA 1600
 #endif
 
 #ifdef NO_COOP
 #define FOOD_HARE_SOLO 50
-#define FOOD_HARE_COOP 50
+#define FOOD_HARE_COOP_LOW 50
+#define FOOD_HARE_COOP_HIGH 50
 
 #define FOOD_SMALL_STAG_SOLO 500
-#define FOOD_SMALL_STAG_COOP 500
+#define FOOD_SMALL_STAG_COOP_LOW 500
+#define FOOD_SMALL_STAG_COOP_HIGH 500
 
 #define FOOD_BIG_STAG_SOLO 5000
-#define FOOD_BIG_STAG_COOP 5000
+#define FOOD_BIG_STAG_COOP_LOW 5000
+#define FOOD_BIG_STAG_COOP_HIGH 5000
+
 #else
 #define FOOD_HARE_SOLO 50
-#define FOOD_HARE_COOP 50
+#define FOOD_HARE_COOP_LOW 50
+#define FOOD_HARE_COOP_HIGH 50
 
 #define FOOD_SMALL_STAG_SOLO 50
-
 #ifdef SSTAG250
-#define FOOD_SMALL_STAG_COOP 250
-#elif defined(SSTAG125)
-#define FOOD_SMALL_STAG_COOP 125
-#elif defined(SSTAG500)
-#define FOOD_SMALL_STAG_COOP 500
-#elif defined(SSTAG50)
-#define FOOD_SMALL_STAG_COOP 50
+#define FOOD_SMALL_STAG_COOP_LOW 125
+#define FOOD_SMALL_STAG_COOP_HIGH 250
+#elif defined(SSTAG150)
+#define FOOD_SMALL_STAG_COOP_LOW 100
+#define FOOD_SMALL_STAG_COOP_HIGH 150
 #else
-#define FOOD_SMALL_STAG_COOP 250
+#define FOOD_SMALL_STAG_COOP_LOW 100
+#define FOOD_SMALL_STAG_COOP_HIGH 150
 #endif
 
 #ifdef BSTAG_SOLO500
@@ -478,22 +495,24 @@ struct Params
 #define FOOD_BIG_STAG_SOLO 0
 #endif
 
+#define FOOD_BIG_STAG_COOP_LOW 0
+
 #ifdef BSTAG2500
-#define FOOD_BIG_STAG_COOP 2500
+#define FOOD_BIG_STAG_COOP_HIGH 2500
 #elif defined(BSTAG1000)
-#define FOOD_BIG_STAG_COOP 1000
+#define FOOD_BIG_STAG_COOP_HIGH 1000
 #elif defined(BSTAG500)
-#define FOOD_BIG_STAG_COOP 500
+#define FOOD_BIG_STAG_COOP_HIGH 500
 #elif defined(BSTAG250)
-#define FOOD_BIG_STAG_COOP 250
+#define FOOD_BIG_STAG_COOP_HIGH 250
 #elif defined(BSTAG175)
-#define FOOD_BIG_STAG_COOP 175
+#define FOOD_BIG_STAG_COOP_HIGH 175
 #elif defined(BSTAG100)
-#define FOOD_BIG_STAG_COOP 100
+#define FOOD_BIG_STAG_COOP_HIGH 100
 #elif defined(BSTAG0)
-#define FOOD_BIG_STAG_COOP 0
+#define FOOD_BIG_STAG_COOP_HIGH 0
 #else
-#define FOOD_BIG_STAG_COOP 500
+#define FOOD_BIG_STAG_COOP_HIGH 500
 #endif
 #endif
 

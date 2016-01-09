@@ -77,7 +77,14 @@ namespace sferes
 #else
           (*this->_log_file) << ea.nb_eval() << "," << _best->fit().value();
 #endif
-					(*this->_log_file) << "," << _best->nb_hares() << "," << _best->nb_hares_solo() << "," << _best->nb_sstag() << "," << _best->nb_sstag_solo() << "," << _best->nb_bstag() << "," << _best->nb_bstag_solo() << std::endl;
+          for(size_t i = 0; i < Params::simu::nb_hunters; ++i)
+          {
+            (*this->_log_file) << "," << _best->nb_hares(i);
+            (*this->_log_file) << "," << _best->nb_sstags(i);
+            (*this->_log_file) << "," << _best->nb_bstags(i);
+          }
+          (*this->_log_file) << std::endl;
+
 					
 					(*this->_log_file_genome) << ea.nb_eval();
 					for(size_t i = 0; i < _best->gen().size(); ++i)

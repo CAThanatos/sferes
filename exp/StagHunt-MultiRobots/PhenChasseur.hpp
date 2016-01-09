@@ -55,7 +55,7 @@ namespace sferes
 #ifdef EIGEN_CORE_H
 		    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 #endif
-		    PhenChasseur() : _params((*this)._gen.size()), _nb_hares(0), _nb_hares_solo(0), _nb_sstag(0), _nb_sstag_solo(0), _nb_bstag(0), _nb_bstag_solo(0), _nb_leader_first(0), _nb_preys_killed_coop(0), _pop_pos(-1), _developed(false) {
+		    PhenChasseur() : _params((*this)._gen.size()), _nb_leader_first(0), _nb_preys_killed_coop(0), _pop_pos(-1), _developed(false) {
 		    }
 		    
 		    typedef float type_t;
@@ -70,29 +70,55 @@ namespace sferes
 					for (unsigned i = 0; i < _params.size(); ++i)
 						_params[i] = this->_gen.data(i) * (max_p - min_p) + min_p;
 						
-					_nb_hares = 0;
-					_nb_hares_solo = 0;
-					_nb_sstag = 0;
-					_nb_sstag_solo = 0;
-					_nb_bstag = 0;
-					_nb_bstag_solo = 0;
+					_nb_hares.clear();
+					_nb_hares.resize(Params::simu::nb_hunters);
+					_nb_sstags.clear();
+					_nb_sstags.resize(Params::simu::nb_hunters);
+					_nb_bstags.clear();
+					_nb_bstags.resize(Params::simu::nb_hunters);
+
+					// _nb_hares = 0;
+					// _nb_hares = 0;
+					// _nb_sstags = 0;
+					// _nb_sstags = 0;
+					// _nb_bstags = 0;
+					// _nb_bstags = 0;
+
 					_nb_leader_first = 0;
 					_nb_preys_killed_coop = 0;
 					_proportion_leader = 0;
 					_nb_ind1_leader_first = 0;
 					_developed = true;
 
-					_nb_hares_at = 0;
-					_nb_hares_solo_at = 0;
-					_nb_sstag_at = 0;
-					_nb_sstag_solo_at = 0;
-					_nb_bstag_at = 0;
-					_nb_bstag_solo_at = 0;
+					_nb_hares_at.clear();
+					_nb_hares_at.resize(Params::simu::nb_hunters);
+					_nb_sstags_at.clear();
+					_nb_sstags_at.resize(Params::simu::nb_hunters);
+					_nb_bstags_at.clear();
+					_nb_bstags_at.resize(Params::simu::nb_hunters);
+
+					// _nb_hares_at = 0;
+					// _nb_hares_at = 0;
+					// _nb_sstags_at = 0;
+					// _nb_sstags_at = 0;
+					// _nb_bstags_at = 0;
+					// _nb_bstags_at = 0;
+
 					_nb_leader_first_at = 0;
 					_nb_preys_killed_coop_at = 0;
 					_proportion_leader_at = 0;
 					_nb_ind1_leader_first_at = 0;
 					this->fit().fitness_at = 0;
+
+					for(size_t i = 0; i < Params::simu::nb_hunters; ++i)
+					{
+						_nb_hares[i] = 0.0f;
+						_nb_hares_at[i] = 0.0f;
+						_nb_sstags[i] = 0.0f;
+						_nb_sstags_at[i] = 0.0f;
+						_nb_bstags[i] = 0.0f;
+						_nb_bstags_at[i] = 0.0f;
+					}
 				}
 
 				float data(size_t i) const { assert(i < size()); return _params[i]; }
@@ -127,32 +153,48 @@ namespace sferes
 						os<<p<<",";
 					os<<std::endl;
 		    }
-		    
-		    float nb_hares() const { return _nb_hares; }
-        float nb_hares_solo() const { return _nb_hares_solo; }
-		    void set_nb_hares(float nb_hares, float solo) { _nb_hares = nb_hares; _nb_hares_solo = solo; }
 
-		    float nb_hares_at() const { return _nb_hares_at; }
-        float nb_hares_solo_at() const {return _nb_hares_solo_at; }
-		    void add_nb_hares(float nb_hares, float solo) { _nb_hares_at.fetch_and_store(_nb_hares_at + nb_hares); _nb_hares_solo_at.fetch_and_store(_nb_hares_solo_at + solo); }
+		    float nb_hares(int index) { return _nb_hares[index]; }
+		    void set_nb_hares(float nb_hares, int nb_hunters) { _nb_hares[nb_hunters] = nb_hares; }
+
+		    float nb_hares_at(int index) { return _nb_hares_at[index]; }
+		    void add_nb_hares(float nb_hares, int nb_hunters) { _nb_hares_at[nb_hunters].fetch_and_store(_nb_hares_at[nb_hunters] + nb_hares); }
 
 		    
-		    float nb_sstag() const { return _nb_sstag; }
-		    float nb_sstag_solo() const { return _nb_sstag_solo; }
-		    void set_nb_sstags(float nb_sstag, float solo) { _nb_sstag = nb_sstag; _nb_sstag_solo = solo; }
-		    
-		    float nb_sstag_at() const { return _nb_sstag_at; }
-		    float nb_sstag_solo_at() const { return _nb_sstag_solo_at; }
-		    void add_nb_sstags(float nb_sstag, float solo) { _nb_sstag_at.fetch_and_store(_nb_sstag_at + nb_sstag); _nb_sstag_solo_at.fetch_and_store(_nb_sstag_solo_at + solo); }
+		    float nb_sstags(int index) { return _nb_sstags[index]; }
+		    void set_nb_sstags(float nb_sstags, int nb_hunters) { _nb_sstags[nb_hunters] = nb_sstags; } // std::cout << "SET NB SSTAGS : [" << nb_hunters - 1 << "] -> " << nb_sstags << std::endl; }
+
+		    float nb_sstags_at(int index) { return _nb_sstags_at[index]; }
+		    void add_nb_sstags(float nb_sstags, int nb_hunters) { _nb_sstags_at[nb_hunters].fetch_and_store(_nb_sstags_at[nb_hunters] + nb_sstags); }
 
 
-		    float nb_bstag() const { return _nb_bstag; }
-		    float nb_bstag_solo() const { return _nb_bstag_solo; }
-		    void set_nb_bstags(float nb_bstag, float solo) { _nb_bstag = nb_bstag; _nb_bstag_solo = solo; }
+		    float nb_bstags(int index) { return _nb_bstags[index]; }
+		    void set_nb_bstags(float nb_bstags, int nb_hunters) { _nb_bstags[nb_hunters] = nb_bstags; }
+
+		    float nb_bstags_at(int index) { return _nb_bstags_at[index]; }
+		    void add_nb_bstags(float nb_bstags, int nb_hunters) { _nb_bstags_at[nb_hunters].fetch_and_store(_nb_bstags_at[nb_hunters] + nb_bstags); }
+
+
+		    // float nb_hares(int index) { return _nb_hares; }
+		    // void set_nb_hares(float nb_hares, int nb_hunters) { _nb_hares = nb_hares; }
+
+		    // float nb_hares_at(int index) { return _nb_hares_at; }
+		    // void add_nb_hares(float nb_hares, int nb_hunters) { _nb_hares_at.fetch_and_store(_nb_hares_at + nb_hares); }
+
 		    
-		    float nb_bstag_at() const { return _nb_bstag_at; }
-		    float nb_bstag_solo_at() const { return _nb_bstag_solo_at; }
-		    void add_nb_bstags(float nb_bstag, float solo) { _nb_bstag_at.fetch_and_store(_nb_bstag_at + nb_bstag); _nb_bstag_solo_at.fetch_and_store(_nb_bstag_solo_at + solo); }
+		    // float nb_sstags(int index) { return _nb_sstags; }
+		    // void set_nb_sstags(float nb_sstags, int nb_hunters) { _nb_sstags = nb_sstags; }
+
+		    // float nb_sstags_at(int index) { return _nb_sstags_at; }
+		    // void add_nb_sstags(float nb_sstags, int nb_hunters) { _nb_sstags_at.fetch_and_store(_nb_sstags_at + nb_sstags); }
+
+
+		    // float nb_bstags(int index) { return _nb_bstags; }
+		    // void set_nb_bstags(float nb_bstags, int nb_hunters) { _nb_bstags = nb_bstags; }
+
+		    // float nb_bstags_at(int index) { return _nb_bstags_at; }
+		    // void add_nb_bstags(float nb_bstags, int nb_hunters) { _nb_bstags_at.fetch_and_store(_nb_bstags_at + nb_bstags); }
+
 
 		    
 		    float proportion_leader() const { return _proportion_leader; }
@@ -217,26 +259,29 @@ namespace sferes
 
 		    std::vector<float> _params;
 		    
-		    // Number of hares caughted
-		    float _nb_hares;
-        float _nb_hares_solo;
-        
-		    tbb::atomic<float>  _nb_hares_at;
-        tbb::atomic<float>  _nb_hares_solo_at;
+		    // // Number of hares caughted
+		    std::vector<float> _nb_hares;
+		    std::vector<tbb::atomic<float> >  _nb_hares_at;
 		    
-		    // Number of small stags caughted
-		    float _nb_sstag;
-		    float _nb_sstag_solo;
-
-		    tbb::atomic<float> _nb_sstag_at;
-		    tbb::atomic<float> _nb_sstag_solo_at;
+		    // // Number of small stags caughted
+		    std::vector<float> _nb_sstags;
+		    std::vector<tbb::atomic<float> >  _nb_sstags_at;
 		    
-		    // Number of big stags caughted
-		    float _nb_bstag;
-		    float _nb_bstag_solo;
-
-		    tbb::atomic<float> _nb_bstag_at;
-		    tbb::atomic<float> _nb_bstag_solo_at;
+		    // // Number of big stags caughted
+		    std::vector<float> _nb_bstags;
+		    std::vector<tbb::atomic<float> >  _nb_bstags_at;
+		    
+		    // // Number of hares caughted
+		    // float _nb_hares;
+		    // tbb::atomic<float> _nb_hares_at;
+		    
+		    // // Number of small stags caughted
+		    // float _nb_sstags;
+		    // tbb::atomic<float> _nb_sstags_at;
+		    
+		    // // Number of big stags caughted
+		    // float _nb_bstags;
+		    // tbb::atomic<float> _nb_bstags_at;
 		    
 		    // Number of times the leader arrived first on a prey
 		    float _nb_leader_first;

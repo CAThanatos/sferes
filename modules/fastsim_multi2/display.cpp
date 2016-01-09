@@ -811,8 +811,8 @@ namespace fastsim
 				// _circle(_screen, x, y, r, 255, 0, 0);
 		  // }
 		  
-		  if(i == _selected || (i == (_selected + 1) % _robots.size()))
-		  {
+		  // if(i == _selected || (i == (_selected + 1) % _robots.size()))
+		  // {
 		  	int status = _robots[i]->get_display_status("circle_ext");
 		  	if(status >= 0)
 		  		_circle(_screen, x, y, r, _color_from_id(_screen, status));
@@ -827,7 +827,7 @@ namespace fastsim
 				  _line(_screen, x - r, y, x + r, y, _color_from_id(_screen, status));
 				  _line(_screen, x, y - r, x, y + r, _color_from_id(_screen, status));
 		  	}
-		  } 
+		  // } 
 			
 		  // direction
 		  Uint32 color = SDL_MapRGB(_screen->format, 0, 255, 0);

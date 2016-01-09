@@ -87,7 +87,13 @@ namespace sferes
 #else
           (*this->_log_file) << ea.nb_eval() << "," << _bestEver->fit().value();
 #endif
-					(*this->_log_file) << "," << _bestEver->nb_hares() << "," << _bestEver->nb_hares_solo() << "," << _bestEver->nb_sstag() << "," << _bestEver->nb_sstag_solo() << "," << _bestEver->nb_bstag() << "," << _bestEver->nb_bstag_solo() << std::endl;
+          for(size_t i = 0; i < Params::simu::nb_hunters; ++i)
+          {
+            (*this->_log_file) << "," << _bestEver->nb_hares(i);
+            (*this->_log_file) << "," << _bestEver->nb_sstags(i);
+            (*this->_log_file) << "," << _bestEver->nb_bstags(i);
+          }
+          (*this->_log_file) << std::endl;
 				}
       }
 

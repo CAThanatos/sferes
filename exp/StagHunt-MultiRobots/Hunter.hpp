@@ -12,7 +12,7 @@ namespace sferes
 	class Hunter : public StagHuntRobot
 	{
 		public :
-			Hunter(float radius, const fastsim::Posture& pos, unsigned int color, bool deactivated = false, bool leader = false) : StagHuntRobot(radius, pos, (leader) ? color : color + 50, color/100), _food_gathered(0), _nb_hares_hunted(0), _nb_hares_hunted_solo(0), _nb_small_stags_hunted(0), _nb_small_stags_hunted_solo(0), _nb_big_stags_hunted(0), _nb_big_stags_hunted_solo(0), _deactivated(deactivated) 
+			Hunter(float radius, const fastsim::Posture& pos, unsigned int color, bool deactivated = false, bool leader = false) : StagHuntRobot(radius, pos, (leader) ? color : color + 50, color/100), _food_gathered(0), _nb_hares_hunted(Params::simu::nb_hunters, 0), _nb_small_stags_hunted(Params::simu::nb_hunters, 0), _nb_big_stags_hunted(Params::simu::nb_hunters, 0), _deactivated(deactivated) 
 			{	
 				_distance_hunter = 0.0f;
 				_angle_hunter = 0.0f;
@@ -181,8 +181,18 @@ namespace sferes
 
 						// std::cout << inputs[current_index] << "/" << inputs[current_index+1] << "/" << inputs[current_index+2] << "/" << inputs[current_index+3] << "/";
 
+// #ifdef LEADER_COLOR
+						// std::cout << inputs[current_index+4] << "/";
+// #endif
+
 						current_index += Params::nn::nb_info_by_pixel;
  					}
+
+#ifdef COM_COMPAS
+ 					inputs[current_index] = (3400.0f - _distance_hunter)/3400.0f;
+ 					inputs[current_index + 1] = _angle_hunter;
+ 					current_index += 2;
+#endif
 
 					// std::cout << std::endl;
 	
@@ -424,21 +434,14 @@ namespace sferes
 			float get_food_gathered() { return _food_gathered; }
 			void add_food(float food) { _food_gathered += food; }
 			
-			void eat_hare(bool solo) { _nb_hares_hunted++; if(solo) _nb_hares_hunted_solo++; }
-			void eat_small_stag(bool solo) { _nb_small_stags_hunted++; if(solo) _nb_small_stags_hunted_solo++; }
-			void eat_big_stag(bool solo) 
-			{ 
-				_nb_big_stags_hunted++; 
-				if(solo) 
-					_nb_big_stags_hunted_solo++; 
-			}
+			void eat_hare(int nb_hunters) { assert(nb_hunters <= _nb_hares_hunted.size()); _nb_hares_hunted[nb_hunters - 1]++; }
+			void eat_small_stag(int nb_hunters) { assert(nb_hunters <= _nb_small_stags_hunted.size()); _nb_small_stags_hunted[nb_hunters - 1]++; }
+			void eat_big_stag(int nb_hunters) { assert(nb_hunters <= _nb_big_stags_hunted.size()); _nb_big_stags_hunted[nb_hunters - 1]++; }
 
-			int nb_hares_hunted() { return _nb_hares_hunted; }
-	    int nb_hares_hunted_solo() { return _nb_hares_hunted_solo; }
-			int nb_small_stags_hunted() { return _nb_small_stags_hunted; }
-			int nb_small_stags_hunted_solo() { return _nb_small_stags_hunted_solo; }
-			int nb_big_stags_hunted() { return _nb_big_stags_hunted; }
-			int nb_big_stags_hunted_solo() { return _nb_big_stags_hunted_solo; }
+			std::vector<int>& nb_hares_hunted() { return _nb_hares_hunted; }
+			std::vector<int>& nb_small_stags_hunted() { return _nb_small_stags_hunted; }
+			std::vector<int>& nb_big_stags_hunted() { return _nb_big_stags_hunted; }
+
 			bool is_deactivated() { return _deactivated; }
 			void set_deactivated(bool deactivated) { _deactivated = deactivated; }		
 
@@ -458,12 +461,10 @@ namespace sferes
 			std::vector<float> _weights;
 
 			float _food_gathered;
-			int _nb_hares_hunted;
-      int _nb_hares_hunted_solo;
-			int _nb_small_stags_hunted;
-			int _nb_small_stags_hunted_solo;
-			int _nb_big_stags_hunted;
-			int _nb_big_stags_hunted_solo;
+			std::vector<int> _nb_hares_hunted;
+			std::vector<int> _nb_small_stags_hunted;
+			std::vector<int> _nb_big_stags_hunted;
+
 			bool _deactivated;
 
 			float _distance_hunter;

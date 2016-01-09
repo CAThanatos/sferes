@@ -26,6 +26,9 @@ namespace sferes
 #ifdef COEVO
     template<typename Indiv>
       void eval_compet(Indiv& ind1, Indiv& ind2, int num_leader = 1) 
+#elif defined(LISTMATCH)
+    template<typename Indiv>
+      void eval_compet(Indiv& ind1, Indiv& ind2, bool evaluated1 = false, bool evaluated2 = false) 
 #elif defined(GENOME_TRACES)
     template<typename Indiv>
       void eval_compet(Indiv& ind1, Indiv& ind2, bool genome_traces = false) 
@@ -628,10 +631,6 @@ namespace sferes
       moy_hares1_solo /= nb_encounters;
      	moy_sstags1_solo /= nb_encounters;
      	moy_bstags1_solo /= nb_encounters;
-     	
-			ind1.add_nb_hares(moy_hares1, moy_hares1_solo);
-			ind1.add_nb_sstag(moy_sstags1, moy_sstags1_solo);
-			ind1.add_nb_bstag(moy_bstags1, moy_bstags1_solo);
 
      	moy_hares2 /= nb_encounters;
      	moy_sstags2 /= nb_encounters;
@@ -639,24 +638,12 @@ namespace sferes
       moy_hares2_solo /= nb_encounters;
      	moy_sstags2_solo /= nb_encounters;
      	moy_bstags2_solo /= nb_encounters;
-     	
-#if !defined(NOT_AGAINST_ALL) && !defined(ALTRUISM)
-			ind2.add_nb_hares(moy_hares2, moy_hares1_solo);
-			ind2.add_nb_sstag(moy_sstags2, moy_sstags1_solo);
-			ind2.add_nb_bstag(moy_bstags2, moy_bstags1_solo);
-#endif
 
 			_nb_leader_first /= nb_encounters;
 			_nb_preys_killed_coop /= nb_encounters;
 			proportion_leader /= nb_encounters;
 			proportion_leader /= 0.5f; 
 			nb_ind1_leader_first /= nb_encounters;
-
-			ind1.add_nb_leader_first(_nb_leader_first);
-			ind1.add_nb_preys_killed_coop(_nb_preys_killed_coop);
-			ind1.add_proportion_leader(proportion_leader);
-			ind1.add_nb_ind1_leader_first(nb_ind1_leader_first);
-
 			_nb_ind1_leader_first = nb_ind1_leader_first;
 
 #ifdef DOUBLE_NN
@@ -665,50 +652,65 @@ namespace sferes
 			nb_role_divisions /= nb_encounters;
 			fit_nn1 /= nb_encounters;
 			fit_nn2 /= nb_encounters;
-
-			ind1.add_nb_nn1_chosen(nb_nn1_chosen);
-			ind1.add_nb_bigger_nn1_chosen(nb_bigger_nn1_chosen);
-			ind1.add_nb_role_divisions(nb_role_divisions);
-			ind1.add_fit_nn1(fit_nn1);
-			ind1.add_fit_nn2(fit_nn2);
 #endif
 
-			// std::cout << "Final : " << std::endl;
-   //   	std::cout << "Food 1 : " << food1 << std::endl;
-   //   	std::cout << "Food 2 : " << food2 << std::endl;
-     	
      	food2 /= nb_encounters;
      	food1 /= nb_encounters;
-
-#ifdef FITFOLLOW
-     	fit2 = fit_follow/(Params::simu::nb_steps * Params::simu::nb_trials);
-     	fit2 /= nb_encounters;
-
-
-     	if (_num_leader == 1)
+     	
+#ifdef LISTMATCH
+     	if(evaluated1)
+#else
+     	if(true)
+#endif
      	{
-#ifdef COEVO
-     		ind1.fit().add_fitness(food1);
-#else
-     		// float max_hunts = (float)Params::simu::nb_steps/(float)STAMINA;
-     		float max_hunts = 15;
-     		float max_fitness = max_hunts*(float)FOOD_BIG_STAG_COOP;
-     		float fit1 = (float)food1/max_fitness;
+				ind1.add_nb_hares(moy_hares1, moy_hares1_solo);
+				ind1.add_nb_sstag(moy_sstags1, moy_sstags1_solo);
+				ind1.add_nb_bstag(moy_bstags1, moy_bstags1_solo);
 
-     		if (fit1 >= 1.0) fit1 = 1.0;
+				ind1.add_nb_leader_first(_nb_leader_first);
+				ind1.add_nb_preys_killed_coop(_nb_preys_killed_coop);
+				ind1.add_proportion_leader(proportion_leader);
+				ind1.add_nb_ind1_leader_first(nb_ind1_leader_first);
 
-     		ind1.fit().add_fitness(fit1);
+#ifdef DOUBLE_NN
+				ind1.add_nb_nn1_chosen(nb_nn1_chosen);
+				ind1.add_nb_bigger_nn1_chosen(nb_bigger_nn1_chosen);
+				ind1.add_nb_role_divisions(nb_role_divisions);
+				ind1.add_fit_nn1(fit_nn1);
+				ind1.add_fit_nn2(fit_nn2);
 #endif
-     	}
-     	else
-     		ind1.fit().add_fitness(fit2);
+	
+	     	ind1.fit().add_fitness(food1);
+			}
+     	
+#if (!defined(NOT_AGAINST_ALL) && !defined(ALTRUISM)) || defined(LISTMATCH)
+#ifdef LISTMATCH
+			if(evaluated2)
 #else
-     	ind1.fit().add_fitness(food1);
+			if(true)
 #endif
-			
-#if !defined(NOT_AGAINST_ALL) && !defined(ALTRUISM)
-			ind2.fit().add_fitness(food2);
+			{
+				ind2.add_nb_hares(moy_hares2, moy_hares1_solo);
+				ind2.add_nb_sstag(moy_sstags2, moy_sstags1_solo);
+				ind2.add_nb_bstag(moy_bstags2, moy_bstags1_solo);
+
+				ind2.add_nb_leader_first(_nb_leader_first);
+				ind2.add_nb_preys_killed_coop(_nb_preys_killed_coop);
+				ind2.add_proportion_leader(proportion_leader);
+				ind2.add_nb_ind1_leader_first(nb_ind1_leader_first);
+
+#ifdef DOUBLE_NN
+				ind2.add_nb_nn1_chosen(nb_nn1_chosen);
+				ind2.add_nb_bigger_nn1_chosen(nb_bigger_nn1_chosen);
+				ind2.add_nb_role_divisions(nb_role_divisions);
+				ind2.add_fit_nn1(fit_nn1);
+				ind2.add_fit_nn2(fit_nn2);
 #endif
+
+				ind2.fit().add_fitness(food2);
+			}
+#endif
+
 
 #ifdef DIVERSITY
 			for(size_t l = 0; l < vec_sm.size(); ++l)

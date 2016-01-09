@@ -24,12 +24,24 @@ namespace sferes
 				if(leader)
 				{
 					this->set_display_status("circle_ext", 9); 
-					this->set_display_status("circle_int", 9); 
+					this->set_display_status("circle_int", 9);
+
+#ifdef LEADER_COLOR
+	        int color_type = floor(color()/100) * 100;
+	        if (color_type == HUNTER_COLOR)
+	        	this->set_color(color_type + 50);
+#endif
 				}
 				else
 				{
 					this->remove_display_status("circle_ext"); 
 					this->remove_display_status("circle_int"); 
+
+#ifdef LEADER_COLOR
+	        int color_type = floor(color()/100) * 100;
+	        if (color_type == HUNTER_COLOR)
+	        	this->set_color(color_type);
+#endif
 				}
 			}
 		protected :

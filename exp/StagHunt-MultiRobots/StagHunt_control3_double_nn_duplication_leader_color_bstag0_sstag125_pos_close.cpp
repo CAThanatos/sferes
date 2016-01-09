@@ -6,7 +6,7 @@
 #define BSTAG0
 #define SSTAG125
 #define POS_CLOSE
-#line 1 "/home/arthur/sferes2-0.99/exp/StagHunt-MultiRobots/StagHunt.cpp"
+#line 1 "/home/abernard/sferes2-0.99/exp/StagHunt-MultiRobots/StagHunt.cpp"
 #include "includes.hpp"
 #include "defparams.hpp"
 
@@ -40,12 +40,19 @@ namespace sferes
 
 			// clock_t deb = clock();
 
-      std::vector<float> vec_mean_nb_hares(vec_ind.size(), 0.0f);
-      std::vector<float> vec_mean_nb_hares_solo(vec_ind.size(), 0.0f);
-      std::vector<float> vec_mean_nb_sstags(vec_ind.size(), 0.0f);
-      std::vector<float> vec_mean_nb_sstags_solo(vec_ind.size(), 0.0f);
-      std::vector<float> vec_mean_nb_bstags(vec_ind.size(), 0.0f);
-      std::vector<float> vec_mean_nb_bstags_solo(vec_ind.size(), 0.0f);
+      std::vector<std::vector<float> > vec_mean_nb_hares(vec_ind.size());
+      std::vector<std::vector<float> > vec_mean_nb_sstags(vec_ind.size());
+      std::vector<std::vector<float> > vec_mean_nb_bstags(vec_ind.size());
+
+      for(size_t i = 0; i < vec_ind.size(); ++i)
+      {
+      	for(size_t j = 0; j < Params::simu::nb_hunters; ++j)
+      	{
+      		vec_mean_nb_hares[i].push_back(0.0f);
+      		vec_mean_nb_sstags[i].push_back(0.0f);
+      		vec_mean_nb_bstags[i].push_back(0.0f);
+      	}
+      }
 
       std::vector<float> vec_mean_food(vec_ind.size(), 0.0f);
 
@@ -54,8 +61,10 @@ namespace sferes
       _nb_preys_killed_coop = 0.0f;
       float proportion_leader = 0.0f;
 
+      std::cout << "lol" << std::endl;
       for (size_t j = 0; j < Params::simu::nb_trials; ++j)
       {
+	      std::cout << "mdr" << std::endl;
 	    	// init
 				map_t map(Params::simu::map_name(), Params::simu::real_w);
 				simu_t simu(map, (this->mode() == fit::mode::view));
@@ -119,6 +128,7 @@ namespace sferes
 				_nb_leader_first_trial = 0;
 				_nb_preys_killed_coop_trial = 0;
 
+	      std::cout << "prout" << std::endl;
 				for (size_t i = 0; i < Params::simu::nb_steps && !stop_eval; ++i)
 				{
 					// Number of steps the robots are evaluated
@@ -220,6 +230,7 @@ namespace sferes
 						}
 					} // *** end of dead_preys while look ***
 				} // *** end of step ***
+	      std::cout << "caca" << std::endl;
 
 
 
@@ -234,12 +245,13 @@ namespace sferes
 	 			for(size_t i = 0; i < vec_ind.size(); ++i)
 	 			{
 	 				Hunter* hunter = (Hunter*)simu.robots()[i];
-	 				vec_mean_nb_hares[i] += hunter->nb_hares_hunted();
-	 				vec_mean_nb_hares_solo[i] += hunter->nb_hares_hunted_solo();
-	 				vec_mean_nb_sstags[i] += hunter->nb_small_stags_hunted();
-	 				vec_mean_nb_sstags_solo[i] += hunter->nb_small_stags_hunted_solo();
-	 				vec_mean_nb_bstags[i] += hunter->nb_big_stags_hunted();
-	 				vec_mean_nb_bstags_solo[i] += hunter->nb_big_stags_hunted_solo();
+
+	 				for(size_t k = 0; k < Params::simu::nb_hunters; ++k)
+	 				{
+	 					vec_mean_nb_hares[i][k] += hunter->nb_hares_hunted()[k];
+	 					vec_mean_nb_sstags[i][k] += hunter->nb_small_stags_hunted()[k];
+	 					vec_mean_nb_bstags[i][k] += hunter->nb_big_stags_hunted()[k];
+	 				}
 
 	 				vec_mean_food[i] += hunter->get_food_gathered();
 	 			}
@@ -249,8 +261,11 @@ namespace sferes
 
 	     	if(_nb_preys_killed_coop_trial > 0)
 	       	proportion_leader += fabs(1.0f - (_nb_leader_first_trial/_nb_preys_killed_coop_trial));//*(_nb_preys_killed_coop_trial/max_hunts);
+
+	      std::cout << "fikou" << std::endl;
 	    } // *** end of trial ***
 			
+	    std::cout << "blougi" << std::endl;
 		
 #ifdef NOT_AGAINST_ALL	
 			int nb_encounters = Params::pop::nb_opponents*Params::pop::nb_eval;
@@ -269,9 +284,12 @@ namespace sferes
 			{
 				if(is_evaluated[i])
 				{
-					vec_ind[i]->add_nb_hares(vec_mean_nb_hares[i]/nb_simulations, vec_mean_nb_hares_solo[i]/nb_simulations);
-					vec_ind[i]->add_nb_sstags(vec_mean_nb_sstags[i]/nb_simulations, vec_mean_nb_sstags_solo[i]/nb_simulations);
-					vec_ind[i]->add_nb_bstags(vec_mean_nb_bstags[i]/nb_simulations, vec_mean_nb_bstags_solo[i]/nb_simulations);
+					for(size_t j = 0; j < Params::simu::nb_hunters; ++j)
+					{
+						vec_ind[i]->add_nb_hares(vec_mean_nb_hares[i][j]/nb_simulations, j);
+						vec_ind[i]->add_nb_sstags(vec_mean_nb_sstags[i][j]/nb_simulations, j);
+						vec_ind[i]->add_nb_bstags(vec_mean_nb_bstags[i][j]/nb_simulations, j);
+					}
 
 					vec_ind[i]->add_nb_leader_first(_nb_leader_first);
 					vec_ind[i]->add_nb_preys_killed_coop(_nb_preys_killed_coop);
@@ -280,6 +298,7 @@ namespace sferes
 					vec_ind[i]->fit().add_fitness(vec_mean_food[i]/nb_simulations);
 				}
 			}
+	    std::cout << "blago" << std::endl;
     } // *** end of eval ***
 
     
@@ -473,7 +492,7 @@ namespace sferes
    			Prey::type_prey type = prey->get_type();
    			dead_preys.push_back(position);
 
-				bool alone = true;
+				bool alone = (prey->get_nb_blocked() > 1) ? false : true;
 
 				_nb_preys_killed++;
 
@@ -482,26 +501,11 @@ namespace sferes
    				hunters[i]->add_food(food);
 
    				if(type == Prey::HARE)
-   				{
-						if(prey->get_nb_blocked() >= Params::simu::nb_hunters_coop_hares)
-							alone = false;
-
-   					hunters[i]->eat_hare(alone);
-   				}
+   					hunters[i]->eat_hare(prey->get_nb_blocked());
    				else if(type == Prey::SMALL_STAG)
-   				{
-						if(prey->get_nb_blocked() >= Params::simu::nb_hunters_coop_sstags)
-							alone = false;
-
-   					hunters[i]->eat_small_stag(alone);
-   				}
+   					hunters[i]->eat_small_stag(prey->get_nb_blocked());
    				else
-   				{
-						if(prey->get_nb_blocked() >= Params::simu::nb_hunters_coop_bstags)
-							alone = false;
-
-   					hunters[i]->eat_big_stag(alone);
-   				}
+   					hunters[i]->eat_big_stag(prey->get_nb_blocked());
    			}
 
 				if(!alone)

@@ -381,7 +381,6 @@ namespace sferes
 					}
 				}
 
-
 #ifdef ALTRUISM
 				parallel::init();
 				parallel::p_for(parallel::range_t(begin, end), _parallel_ev_altruism<Phen>(pop));
@@ -413,9 +412,12 @@ namespace sferes
 					pop[i]->fit().set_obj(0, pop[i]->fit().fitness_at);
 					pop[i]->fit().set_value(pop[i]->fit().fitness_at);
 
-					pop[i]->set_nb_hares(pop[i]->nb_hares_at(), pop[i]->nb_hares_solo_at());
-					pop[i]->set_nb_sstags(pop[i]->nb_sstag_at(), pop[i]->nb_sstag_solo_at());
-					pop[i]->set_nb_bstags(pop[i]->nb_bstag_at(), pop[i]->nb_bstag_solo_at());
+					for(size_t j = 0; j < Params::simu::nb_hunters; ++j)
+					{
+						pop[i]->set_nb_hares(pop[i]->nb_hares_at(j), j);
+						pop[i]->set_nb_sstags(pop[i]->nb_sstags_at(j), j);
+						pop[i]->set_nb_bstags(pop[i]->nb_bstags_at(j), j);
+					}
 
 					pop[i]->set_nb_leader_first(pop[i]->nb_leader_first_at());
 					pop[i]->set_nb_preys_killed_coop(pop[i]->nb_preys_killed_coop_at());

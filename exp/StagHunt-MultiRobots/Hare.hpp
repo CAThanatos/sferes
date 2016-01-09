@@ -12,13 +12,28 @@ namespace sferes
 	class Hare : public Prey
 	{
 		public :
-			Hare() : Prey() { _stamina = STAMINA; }
+			std::map<int, int> map_reward_hares;
+
+			Hare() : Prey() { _stamina = STAMINA; set_rewards(); }
 			Hare(float radius, const fastsim::Posture& pos, int color) : Prey(radius, pos, color, color/100) 
 			{ 
 				_stamina = STAMINA; 
 				_type_prey = Prey::HARE; 
+				set_rewards();
 			}
 			
+			void set_rewards()
+			{
+				map_reward_hares[1] = FOOD_HARE_SOLO;
+
+				int level_reward = 0;
+				if(Params::simu::nb_hunters_coop_hares_max > 2)
+					level_reward = int((FOOD_HARE_COOP_HIGH - FOOD_HARE_COOP_LOW)/(Params::simu::nb_hunters_coop_hares_max - 2));
+
+				for(size_t i = 2; i <= Params::simu::nb_hunters_coop_hares_max; ++i)
+					map_reward_hares[i] = FOOD_HARE_COOP_LOW + (i - 2) * level_reward;
+			}
+
 			~Hare()	{	}
 			
 			void blocked_by_hunters(int nb_hunters)
@@ -42,10 +57,8 @@ namespace sferes
 			
 			float feast()
 			{
-				if(1 == _nb_blocked)
-					return FOOD_HARE_SOLO;
-				else if(_nb_blocked >= Params::simu::nb_hunters_coop_hares)
-					return FOOD_HARE_COOP;
+				if(_nb_blocked >= 1)
+					return map_reward_hares[_nb_blocked];
 				else
 					return 0;
 			}
