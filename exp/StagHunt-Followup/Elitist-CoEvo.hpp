@@ -65,14 +65,22 @@ namespace sferes
 
       void random_pop()
       {
-				this->_pop.resize(mu);
+      	if(Params::pop::pop_init > 0)
+      		this->_pop.resize(Params::pop::pop_init/2);
+      	else
+      		this->_pop.resize(mu);
+
 				BOOST_FOREACH(boost::shared_ptr<Phen>& indiv, this->_pop)
 				{
 					indiv = boost::shared_ptr<Phen>(new Phen());
 					indiv->random();
 				}
 
-				this->_pop_co.resize(mu);
+      	if(Params::pop::pop_init > 0)
+      		this->_pop_co.resize(Params::pop::pop_init/2);
+      	else
+      		this->_pop_co.resize(mu);
+
 				BOOST_FOREACH(boost::shared_ptr<Phen>& indiv, this->_pop_co)
 				{
 					indiv = boost::shared_ptr<Phen>(new Phen());

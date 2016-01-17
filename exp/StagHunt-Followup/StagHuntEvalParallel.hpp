@@ -415,7 +415,7 @@ namespace sferes
 				_compute_novelty(pop, begin, end);
 #endif
 
-#if defined(DIVERSITY) || defined(NOVELTY)
+#if (defined(DIVERSITY) || defined(NOVELTY)) && !defined(FITNESS_SHARING)
 				for (size_t i = begin; i != end; ++i)
 				{
 #if !defined(NOVELTY)
@@ -437,6 +437,30 @@ namespace sferes
 				}
 #endif
 
+#ifdef FITNESS_SHARING
+				for(size_t i = begin; i != end; ++i)
+				{
+					float mi = 1;
+					for(size_t j = begin; j != end; ++j)
+					{
+						if(i != j)
+						{
+#ifdef DIVERSITY
+#ifdef DIST_HAMMING
+							if(pop[i]->dist_hamming_diversity(*pop[j]) >= Params::pop::diversity_threshold)
+#else
+							if(pop[i]->dist_diversity(*pop[j]) >= Params::pop::diversity_threshold)
+#endif
+#else
+							if(pop[i]->dist(*pop[j]) >= Params::pop::dist_threshold)
+#endif
+								mi += 1;
+						}
+					}
+
+					pop[i]->fit().set_value(pop[i]->fit().value()/mi);
+				}
+#endif
 
 #ifndef NDEBUG
 				os << "GEN : " << time(NULL) - duration << std::endl;

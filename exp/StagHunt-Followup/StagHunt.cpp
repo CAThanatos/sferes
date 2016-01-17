@@ -690,6 +690,8 @@ int main(int argc, char **argv)
 	// EVALUATION
 	#ifdef COEVO
 		typedef eval::StagHuntEvalParallelCoEvo<Params> eval_t;
+	#elif defined(TUPLES)
+		typedef eval::StagHuntEvalParallelTuple<Params> eval_t;
 	#else
 		typedef eval::StagHuntEvalParallel<Params> eval_t;
 	#endif
@@ -718,8 +720,17 @@ int main(int argc, char **argv)
 		  sferes::stat::AllGenomesTraceStat<phen_t, Params>,
 #endif
 
+#ifdef TUPLES
+		  sferes::stat::BestFitEvalTuple<phen_t, Params>,
+		  sferes::stat::AllFitEvalStatTuple<phen_t, Params>,
+#endif
+
 #ifdef BEHAVIOUR_VIDEO
+#ifdef TUPLES
+		  sferes::stat::BestFitBehaviourVideoTuple<phen_t, Params>,
+#else
 		  sferes::stat::BestFitBehaviourVideo<phen_t, Params>,
+#endif
 #endif
 #ifdef DIVERSITY
 		  sferes::stat::BestDiversityEval<phen_t, Params>,
@@ -735,7 +746,7 @@ int main(int argc, char **argv)
   typedef modif::Dummy<Params> modifier_t;
 
 	// EVOLUTION ALGORITHM
-#ifdef DIVERSITY
+#if defined(DIVERSITY) && !defined(RESTART)
 	typedef ea::Nsga2<phen_t, eval_t, stat_t, modifier_t, Params> ea_t; 
 #else
 #ifdef FITPROP
@@ -745,6 +756,8 @@ int main(int argc, char **argv)
 #elif defined(ELITIST)
 #ifdef COEVO
   typedef ea::ElitistCoEvo<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
+#elif defined(TUPLES)
+  typedef ea::ElitistTuple<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
 #else
   typedef ea::Elitist<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
 #endif

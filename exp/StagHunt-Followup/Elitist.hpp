@@ -65,7 +65,11 @@ namespace sferes
 
       void random_pop()
       {
-				this->_pop.resize(mu);
+      	if(Params::pop::pop_init > 0)
+      		this->_pop.resize(Params::pop::pop_init);
+      	else
+      		this->_pop.resize(mu);
+
 				BOOST_FOREACH(boost::shared_ptr<Phen>& indiv, this->_pop)
 				{
 					indiv = boost::shared_ptr<Phen>(new Phen());
@@ -93,6 +97,28 @@ namespace sferes
 				// to the next generation
 				for(size_t i = 0; i < mu; ++i)
 					this->_pop[i]->gen().set_genome_from(i);
+
+#ifdef RESTART
+				int nb_min_diversity = 0;
+				for(size_t i = 0; i < mu; ++i)
+					if(this->_pop[i]->fit().obj(1) < Params::pop::diversity_threshold)
+						nb_min_diversity++;
+
+				int total_restarts = Params::pop::prop_restart*nb_min_diversity;
+				std::vector<size_t> ord_vect;
+				misc::rand_ind(ord_vect, mu);
+				int nb_restarts = 0;
+				for(size_t i = 0; (i < mu) && (nb_restarts < total_restarts); ++i)
+				{
+					int index_ind = ord_vect[i];
+					if(this->_pop[i]->fit().obj(1) < Params::pop::diversity_threshold)
+					{
+						this->_pop[i] = boost::shared_ptr<Phen>(new Phen());
+						this->_pop[i]->gen().random();
+						nb_restarts++;
+					}
+				}
+#endif
 
 #if defined(DOUBLE_NN) && defined(RECOMBINATION)
 				assert(lambda%2 == 0);
@@ -123,7 +149,21 @@ namespace sferes
 				{
 					// Cloning of a parent
 					child_pop.push_back(this->_pop[parent_rank%mu]->clone());
+
+#ifdef RANDOM_MUTANT
+					float proba_random_mutant = misc::rand<float>();
+
+					if(proba_random_mutant < Params::evo_float::random_mutant_probability)
+					{
+						child_pop[i]->gen().set_genome_from(-1);
+						child_pop[i]->gen().random();
+					}
+					else
+						child_pop[i]->gen().set_genome_from(parent_rank%mu);
+#else
 					child_pop[i]->gen().set_genome_from(parent_rank%mu);
+#endif
+
 					parents_list[i] = parent_rank%mu;
 					parent_rank++;
 					
@@ -156,7 +196,12 @@ namespace sferes
 				
 				// Evaluation of the children and the parents if need be
 #ifdef EVAL_PARENTS
+#ifdef SEPARATE_PARENTS
+				this->_eval.eval(selection_pop, 0, mu);
+				this->_eval.eval(selection_pop, mu, selection_pop.size());
+#else
 				this->_eval.eval(selection_pop, 0, selection_pop.size());
+#endif
 #else
 				this->_eval.eval(selection_pop, mu, selection_pop.size());
 #endif
@@ -204,9 +249,11 @@ namespace sferes
 #endif
 							
 				// We modify the step_size
+#ifndef NO_STEP_SIZE
 				float ps = successful_offsprings/(float)lambda;
 				float factor = (1.0f/3.0f) * (ps - 0.2f) / (1.0f - 0.2f);
 				_step_size = _step_size * exp(factor);
+#endif
 
 				assert(this->_pop.size() == mu);
 

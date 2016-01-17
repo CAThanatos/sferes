@@ -44,6 +44,14 @@
 #include "AllNNEvalStat.hpp"
 #endif
 
+#ifdef TUPLES
+#include "Elitist-Tuple.hpp"
+#include "StagHuntEvalParallel-Tuple.hpp"
+#include "BestFitEval-Tuple.hpp"
+#include "BestFitBehaviourVideo-Tuple.hpp"
+#include "AllFitEvalStat-Tuple.hpp"
+#endif
+
 #ifdef COEVO
 #include "Elitist-CoEvo.hpp"
 #include "StagHuntEvalParallel-CoEvo.hpp"

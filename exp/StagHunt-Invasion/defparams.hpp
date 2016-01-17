@@ -281,6 +281,8 @@ struct Params
     
 #ifdef STD1
     static const float sigma = 0.1f;
+#elif defined(STD2)
+    static const float sigma = 0.2f;
 #elif defined(STD05)
     static const float sigma = 0.05f;
 #else

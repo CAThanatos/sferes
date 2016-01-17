@@ -372,14 +372,14 @@ namespace sferes
 					list_matches.push_back(list_matches_ind);
 				}
 
-				int nb_matches = 0;
-				for(int i = 0; i < list_matches.size(); ++i)
-				{
-					for(int j = 0; j < list_matches[i].size(); ++j)
-					{
-						nb_matches++;
-					}
-				}
+				// int nb_matches = 0;
+				// for(int i = 0; i < list_matches.size(); ++i)
+				// {
+				// 	for(int j = 0; j < list_matches[i].size(); ++j)
+				// 	{
+				// 		nb_matches++;
+				// 	}
+				// }
 
 #ifdef ALTRUISM
 				parallel::init();

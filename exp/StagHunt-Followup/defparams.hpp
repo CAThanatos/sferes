@@ -328,6 +328,14 @@ struct Params
 #endif
     static const float deletion_rate = 0.005f;
 #endif
+
+#ifdef RANDOM_MUTANT
+    static const float random_mutant_probability = 0.01f;
+#endif
+
+#ifdef TUPLE_SWAP
+    static const float tuple_swap_probability = 0.1f;
+#endif
   };
   
   struct pop
@@ -337,12 +345,21 @@ struct Params
     static const unsigned size = 100;
 #elif defined(POP200)
     static const unsigned size = 200;
+#elif defined(MU2) && defined(LAMBDA2)
+    static const unsigned size = 4;
 #else
     static const unsigned size = 20;
 #endif
+
+#ifdef POP_INIT20
+    static const int pop_init = 20;
+#else
+    // Initial population is equal to pop size (or mu) by default
+    static const int pop_init = -1;
+#endif
     
     // number of generations
-    static const unsigned nb_gen = 20000;
+    static const unsigned nb_gen = 100000;
     
     // how often should the result file be written
 #if defined(POP100) || defined(POP200)
@@ -368,11 +385,35 @@ struct Params
     // The budget in a number of evaluations for the simulation
     static const int budget = 50000; //Params::pop::size * 850;
 
-#ifdef ELITIST
-		static const unsigned mu = Params::pop::size/2;
-		static const unsigned lambda = Params::pop::size/2;
+    static const float dist_threshold = 0.2;
+    static const float diversity_threshold = 0.2;
+
+#ifdef RESTART
+    static const float prop_restart = 0.8;
 #endif
 
+
+#ifdef ELITIST
+#ifdef MU2
+		static const unsigned mu = 2;
+#elif defined(MU1)
+		static const unsigned mu = 1;
+#else
+		static const unsigned mu = Params::pop::size/2;
+#endif
+
+#ifdef LAMBDA2
+		static const unsigned lambda = 2;
+#elif defined(LAMBDA1)
+		static const unsigned lambda = 1;
+#else
+		static const unsigned lambda = Params::pop::size/2;
+#endif
+#endif
+
+#ifdef TUPLES
+		static const unsigned nb_opponents = 1;		
+#else
 #ifdef OPPONENTS1
 		static const unsigned nb_opponents = 1;		
 #elif defined(OPPONENTS2)
@@ -385,6 +426,7 @@ struct Params
 		static const unsigned nb_opponents = 20;		
 #else
 		static const unsigned nb_opponents = 5;		
+#endif
 #endif
 
 #ifdef EVAL5
@@ -532,8 +574,13 @@ struct Params
 #define CMAES_BOUNDARIES
 
 #ifdef ELITIST
+#ifndef NEVAL_PARENTS
 #define EVAL_PARENTS
+#endif
+
+#ifndef ONE_PLUS_ONE_REPLACEMENT
 #define N_PLUS_N_REPLACEMENT
+#endif
 #endif
 
 #if defined(SETTING2) || defined(SETTING4) || defined(SETTING6) || defined(SETTING8) || defined(SETTING13)
