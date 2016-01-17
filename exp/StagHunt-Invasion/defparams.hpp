@@ -405,7 +405,7 @@ struct Params
 #elif defined(POP_INIT100)
 		static const int pop_init = 100;
 #else
-		static const int pop_init = 1;
+		static const int pop_init = 50;
 #endif
 
 #ifdef MULTIPLE_OFFSPRINGS
