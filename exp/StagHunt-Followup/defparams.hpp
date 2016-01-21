@@ -358,6 +358,24 @@ struct Params
     static const int pop_init = -1;
 #endif
     
+#ifdef PAIRING
+#ifdef NICHE4
+    static const int nb_niches = 4;
+#elif defined(NICHE2)
+    static const int nb_niches = 2;
+#elif defined(NICHE10)
+    static const int nb_niches = 10;
+#else
+    static const int nb_niches = 4;
+#endif
+
+#ifdef EVOL_PAIRING
+		static const int nb_offsprings_evol_pairing = 5;
+		static const int evolve_pairing_period = 50;
+		static const float proba_mut_pairing = 0.25;
+#endif
+#endif
+
     // number of generations
     static const unsigned nb_gen = 100000;
     
@@ -563,7 +581,7 @@ struct Params
 
 // #define BEHAVIOUR_LOG
 
-#define BEHAVIOUR_VIDEO
+// #define BEHAVIOUR_VIDEO
 
 #ifndef COEVO
 #define GENOME_TRACES

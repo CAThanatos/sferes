@@ -52,6 +52,14 @@
 #include "AllFitEvalStat-Tuple.hpp"
 #endif
 
+#ifdef PAIRING
+#include "Elitist-Pairing.hpp"
+#include "StagHuntEvalParallel-Pairing.hpp"
+#include "BestFitEval-Pairing.hpp"
+#include "BestFitBehaviourVideo-Pairing.hpp"
+#include "AllFitEvalStat-Pairing.hpp"
+#endif
+
 #ifdef COEVO
 #include "Elitist-CoEvo.hpp"
 #include "StagHuntEvalParallel-CoEvo.hpp"

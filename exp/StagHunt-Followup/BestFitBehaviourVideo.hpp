@@ -66,6 +66,9 @@ namespace sferes
             max = _best->fit().obj(0);
           }
         }
+#elif defined(PAIRING)
+        int best_niche = ea.find_best_niche();
+        _best = ea.vec_niches()[best_niche][0];
 #endif
 
         if (ea.dump_enabled() && (ea.gen() % Params::pop::video_dump_period == 0))

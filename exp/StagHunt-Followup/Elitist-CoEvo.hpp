@@ -95,6 +95,10 @@ namespace sferes
 				std::partial_sort(this->_pop.begin(), this->_pop.begin() + mu,
 							this->_pop.end(), fit::compare());
 				this->_pop.resize(mu);
+
+				std::partial_sort(this->_pop_co.begin(), this->_pop_co.begin() + mu,
+							this->_pop_co.end(), fit::compare());
+				this->_pop_co.resize(mu);
       }
       
       void epoch()

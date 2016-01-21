@@ -60,7 +60,11 @@ namespace sferes
       static const unsigned mu = Params::pop::mu;
       static const unsigned lambda = Params::pop::lambda;
 
+#ifdef ONE_PLUS_ONE_REPLACEMENT
+			Elitist() : _step_size(mu, 1.0f)
+#else
 			Elitist() : _step_size(1)
+#endif
 			{ }
 
       void random_pop()
@@ -178,7 +182,11 @@ namespace sferes
 #endif
 
 					// Mutation
+#ifdef ONE_PLUS_ONE_REPLACEMENT
+					child_pop[i]->gen().mutate(_step_size[parents_list[i]]);
+#else
 					child_pop[i]->gen().mutate(_step_size);
+#endif
 				}
 #endif
 				assert(child_pop.size() == lambda);
@@ -214,6 +222,8 @@ namespace sferes
 				std::vector<bool> replaced(mu, false);
 				for(size_t i = 0; i < lambda; ++i)
 				{
+					successful_offsprings = 0;
+
 					if(child_pop[i]->fit().value() > this->_pop[parents_list[i]]->fit().value())
 					{
 						successful_offsprings++;
@@ -223,6 +233,13 @@ namespace sferes
 							this->_pop[parents_list[i]] = child_pop[i];
 							replaced[parents_list[i]] = true;
 						}
+							
+						// We modify the step_size
+#ifndef NO_STEP_SIZE
+						float ps = successful_offsprings/(float)lambda;
+						float factor = (1.0f/3.0f) * (ps - 0.2f) / (1.0f - 0.2f);
+						_step_size[parents_list[i]] = _step_size[parents_list[i]] * exp(factor);
+#endif
 					}
 				}
 #elif defined(N_PLUS_N_REPLACEMENT)
@@ -246,13 +263,13 @@ namespace sferes
 				{
 					this->_pop[i] = selection_pop[i];
 				}
-#endif
 							
 				// We modify the step_size
 #ifndef NO_STEP_SIZE
 				float ps = successful_offsprings/(float)lambda;
 				float factor = (1.0f/3.0f) * (ps - 0.2f) / (1.0f - 0.2f);
 				_step_size = _step_size * exp(factor);
+#endif
 #endif
 
 				assert(this->_pop.size() == mu);
@@ -310,7 +327,11 @@ namespace sferes
       }
             
     protected:
+#ifdef ONE_PLUS_ONE_REPLACEMENT
+    	std::vector<float> _step_size;
+#else
     	float _step_size;
+#endif
     };
   }
 }
