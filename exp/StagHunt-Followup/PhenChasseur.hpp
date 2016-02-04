@@ -139,6 +139,25 @@ namespace sferes
 					os<<std::endl;
 		    }
 		    
+		    void reset_values()
+		    {
+		    	this->fit().fitness_at.fetch_and_store(0.0f);
+		    	
+		    	_nb_hares_at.fetch_and_store(0.0);
+		    	_nb_hares_solo_at.fetch_and_store(0.0);
+
+		    	_nb_sstag_at.fetch_and_store(0.0);
+		    	_nb_sstag_solo_at.fetch_and_store(0.0);
+
+		    	_nb_bstag_at.fetch_and_store(0.0);
+		    	_nb_bstag_solo_at.fetch_and_store(0.0);
+
+					_nb_leader_first_at.fetch_and_store(0.0);
+					_nb_preys_killed_coop_at.fetch_and_store(0.0);
+					_proportion_leader_at.fetch_and_store(0.0);
+					_nb_ind1_leader_first_at.fetch_and_store(0.0);
+		    }
+
 		    float nb_hares() const { return _nb_hares; }
         float nb_hares_solo() const { return _nb_hares_solo; }
 		    void set_nb_hares(float nb_hares, float solo) { _nb_hares = nb_hares; _nb_hares_solo = solo; }

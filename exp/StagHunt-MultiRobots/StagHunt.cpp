@@ -65,7 +65,6 @@ namespace sferes
 				cpt_files = 0;
 #endif
 
-#ifdef DOUBLE_NN
 				float max_rand = 0.0f;
 				int max_ind = -1;
 				for (size_t k = 0; k < vec_ind.size(); ++k)
@@ -82,6 +81,7 @@ namespace sferes
 				assert(max_ind > -1);
 				_num_leader = max_ind;
 
+#ifdef DOUBLE_NN
 #ifdef COM_NN
 				for(size_t k = 0; k < vec_ind.size(); ++k)
 				{
@@ -170,6 +170,18 @@ namespace sferes
 					}
 				}
 #endif
+#else
+				for(size_t k = 0; k < vec_ind.size(); ++k)
+				{
+					StagHuntRobot* robot = (StagHuntRobot*)(simu.robots()[k]);
+					Hunter* hunter = (Hunter*)robot;
+					hunter->set_weights(vec_ind[k]->data());
+
+					if(k == max_ind)
+						hunter->set_bool_leader(true);
+					else
+						hunter->set_bool_leader(false);
+				}
 #endif
 
 				_nb_leader_first_trial = 0;
@@ -683,7 +695,11 @@ int main(int argc, char **argv)
   typedef phen::PhenChasseur<gen_t, fit_t, Params> phen_t;
 
 	// EVALUATION
-		typedef eval::StagHuntEvalParallel<Params> eval_t;
+#ifdef PAIRING
+	typedef eval::StagHuntEvalParallelPairing<Params> eval_t;
+#else
+	typedef eval::StagHuntEvalParallel<Params> eval_t;
+#endif
 
   // STATS 
   typedef boost::fusion::vector<
@@ -693,6 +709,11 @@ int main(int argc, char **argv)
 		  sferes::stat::AllFitEvalStat<phen_t, Params>,
 		  sferes::stat::BestLeadershipEval<phen_t, Params>,
 
+// #ifdef PAIRING
+// 		  sferes::stat::BestFitEvalPairing<phen_t, Params>,
+// 		  sferes::stat::AllFitEvalStatPairing<phen_t, Params>,
+// #endif
+
 #ifndef POP100
 		  sferes::stat::AllLeadershipEvalStat<phen_t, Params>,
 #ifdef GENOME_TRACES
@@ -700,7 +721,11 @@ int main(int argc, char **argv)
 #endif
 #endif
 #ifdef BEHAVIOUR_VIDEO
+// #ifdef PAIRING
+// 		  sferes::stat::BestFitBehaviourVideoPairing<phen_t, Params>,
+// #else
 		  sferes::stat::BestFitBehaviourVideo<phen_t, Params>,
+// #endif
 #endif
 		  sferes::stat::StopEval<Params>
     >  stat_t;
@@ -715,7 +740,11 @@ int main(int argc, char **argv)
 #elif defined(CMAES)
   typedef ea::Cmaes<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
 #elif defined(ELITIST)
+#ifdef PAIRING
+  typedef ea::ElitistPairing<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
+#else
   typedef ea::Elitist<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
+#endif
 #else
   typedef ea::RankSimple<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
 #endif

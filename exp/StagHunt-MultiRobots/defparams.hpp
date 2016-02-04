@@ -362,8 +362,19 @@ struct Params
     static const unsigned size = 100;
 #elif defined(POP20)
     static const unsigned size = 20;
+#elif defined(POP36)
+    static const unsigned size = 36;
 #else
     static const unsigned size = 20;
+#endif
+
+#ifdef POP_INIT20
+    static const int pop_init = 20;
+#elif defined(POP_INIT24)
+    static const int pop_init = 24;
+#else
+    // Initial population is equal to pop size (or mu) by default
+    static const int pop_init = -1;
 #endif
     
     // number of generations
@@ -379,6 +390,40 @@ struct Params
     // how often should the video be done
     static const int video_dump_period = 100;
     
+#ifdef PAIRING
+#ifdef NICHE4
+    static const int nb_niches = 4;
+#elif defined(NICHE2)
+    static const int nb_niches = 2;
+#elif defined(NICHE3)
+    static const int nb_niches = 3;
+#elif defined(NICHE8)
+    static const int nb_niches = 8;
+#elif defined(NICHE10)
+    static const int nb_niches = 10;
+#else
+    static const int nb_niches = 4;
+#endif
+
+#ifdef EVOL_PAIRING
+		static const int nb_offsprings_evol_pairing = 5;
+		static const int evolve_pairing_period = 50;
+		static const float proba_mut_pairing = 0.25;
+#endif
+
+#ifdef PRUNING
+#ifdef EVAL_PRUNING1000
+		static const int pruning_eval_period = 1000;
+#elif defined(EVAL_PRUNING200)
+		static const int pruning_eval_period = 200;
+#elif defined(EVAL_PRUNING100)
+		static const int pruning_eval_period = 100;
+#else
+		static const int pruning_eval_period = 500;
+#endif
+#endif
+#endif
+
     // how many individuals should be created during the random
     // generation process?
     static const int initial_aleat = 1;
@@ -394,8 +439,25 @@ struct Params
     static const int budget = 50000; //Params::pop::size * 850;
 
 #ifdef ELITIST
+#ifdef MU6
+		static const unsigned mu = 6;
+#elif defined(MU9)
+		static const unsigned mu = 9;
+#elif defined(MU18)
+		static const unsigned mu = 18;
+#else
 		static const unsigned mu = Params::pop::size/2;
+#endif
+
+#ifdef LAMBDA6
+		static const unsigned lambda = 6;
+#elif defined(LAMBDA9)
+		static const unsigned lambda = 9;
+#elif defined(LAMBDA18)
+		static const unsigned lambda = 18;
+#else
 		static const unsigned lambda = Params::pop::size/2;
+#endif
 #endif
 
 #ifdef OPPONENTS1

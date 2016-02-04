@@ -192,6 +192,14 @@ namespace sferes
 
 				remove_genotypes(vec_remove_genotypes, pos_mutant);
 
+#ifdef EVAL_PARENTS
+				if((this->gen() % Params::pop::eval_parents_period) == 0)
+				{
+					for(size_t i = 0; i < _nb_genotypes - 1; ++i)
+						this->_eval.eval(this->_pop, i, 0, _nb_genotypes);
+				}
+#endif
+
 				// float to_divide = Params::pop::invasion_frequency;
 				// while(to_divide > 0.0f)
 				// {
@@ -323,7 +331,55 @@ namespace sferes
 							
 				// dbg::out(dbg::info, "ea")<<"best fitness: " << this->_pop[0]->fit().value() << std::endl;
       }
-      
+
+
+      void load_genotypes() { _nb_genotypes = this->_pop.size(); }
+
+      void play_run(const std::string& fname)
+      {
+        std::ifstream ifs(fname.c_str());
+
+        boost::shared_ptr<Phen> ind1 = boost::shared_ptr<Phen>(new Phen());;
+        boost::shared_ptr<Phen> ind2 = boost::shared_ptr<Phen>(new Phen());;
+
+        if (!ifs.fail())
+        {
+          int numIndiv = 0;
+          while(ifs.good())
+          {
+            std::string line;
+            std::getline(ifs, line);
+
+            std::stringstream ss(line);
+            std::string gene;
+            int cpt = 0;
+            while(std::getline(ss, gene, ','))
+            {
+              if(numIndiv == 0)
+                ind1->gen().data(cpt, std::atof(gene.c_str()));
+              else
+                ind2->gen().data(cpt, std::atof(gene.c_str()));
+
+              cpt++;
+            }
+
+            numIndiv++;
+          }
+
+          ind1->develop();
+          ind2->develop();
+          ind1->fit().set_mode(fit::mode::view);
+          // std::string file_behaviour = ea.res_dir() + "/behaviourGen_" + boost::lexical_cast<std::string>(ea.gen()) + ".bmp";
+          // ind1->fit().set_file_behaviour("./videoDir");
+          ind1->fit().eval_compet(*ind1, *ind2);
+        }
+        else
+        {
+          std::cerr << "Cannot open :" << fname
+                    << "(does this file exist ?)" << std::endl;
+          exit(1);
+        }
+      }      
     protected:
     	size_t _nb_genotypes;
 

@@ -34,6 +34,14 @@
 #include "AllLeadershipEvalStat.hpp"
 #include "AllGenomesTraceStat.hpp"
 
+#ifdef PAIRING
+#include "Elitist-Pairing.hpp"
+#include "StagHuntEvalParallel-Pairing.hpp"
+#include "BestFitEval-Pairing.hpp"
+#include "BestFitBehaviourVideo-Pairing.hpp"
+#include "AllFitEvalStat-Pairing.hpp"
+#endif
+
 #include "StopEval.hpp"
 #include "BestFitBehaviourVideo.hpp"
 

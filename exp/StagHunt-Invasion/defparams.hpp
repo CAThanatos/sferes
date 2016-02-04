@@ -229,6 +229,10 @@ struct Params
   {
 #ifdef NO_MUT_APP
   	static const float mutant_apparition_rate = 0.0f;
+#elif defined(MUT_APP1)
+  	static const float mutant_apparition_rate = 1.0f;
+#elif defined(MUT_APP10)
+  	static const float mutant_apparition_rate = 0.1f;
 #else
   	static const float mutant_apparition_rate = 0.001f;
 #endif
@@ -256,7 +260,7 @@ struct Params
   	static const float mutation_rate = 3.0f;
 #else
     // the mutation rate of the real-valued vector
-    static const float mutation_rate = 0.001f;
+    static const float mutation_rate = 0.003; //0.001f;
 #endif
 
 
@@ -314,7 +318,7 @@ struct Params
 #elif defined(POP1000)
     static const unsigned size = 1000;
 #else
-    static const unsigned size = 100;
+    static const unsigned size = 10;
 #endif
 
     // size of the population
@@ -344,7 +348,13 @@ struct Params
     // The budget in a number of evaluations for the simulation
     static const int budget = 50000; //Params::pop::size * 850;
 
-#ifdef ELITIST
+#ifdef EVAL_PERIOD1
+    static const int eval_parents_period = 1;
+#else
+    static const int eval_parents_period = 50;
+#endif
+
+#if defined(ELITIST) || defined(ELITISTINV)
 #ifdef ONEPLUSONE
 		static const unsigned mu = 1;
 		static const unsigned lambda = 1;
@@ -528,7 +538,7 @@ struct Params
 
 // #define BEHAVIOUR_LOG
 
-// #define BEHAVIOUR_VIDEO
+#define BEHAVIOUR_VIDEO
 
 #define TEST_VARIANCE_TRIALS
 
