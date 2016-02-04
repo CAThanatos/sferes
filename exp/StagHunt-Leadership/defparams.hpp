@@ -149,6 +149,12 @@ struct Params
 #elif defined(RATIO35)
 	static const int nb_hares = 0.65*total_preys;
 	static const int nb_big_stags = total_preys - nb_hares;
+#elif defined(RATIO33)
+	static const int nb_hares = (2.0f/3.0f)*total_preys;
+	static const int nb_big_stags = total_preys - nb_hares;
+#elif defined(RATIO16)
+	static const int nb_hares = (5.0f/6.0f)*total_preys;
+	static const int nb_big_stags = total_preys - nb_hares;
 #else
 	static const int nb_big_stags = total_preys/2;
 	static const int nb_hares = total_preys/2;
@@ -433,13 +439,13 @@ struct Params
 #endif
     
     // number of generations
-    static const unsigned nb_gen = 20000;
+    static const unsigned nb_gen = 10000;
     
     // how often should the result file be written
 #ifdef POP100
     static const int dump_period = 10;
 #else
-    static const int dump_period = 100;
+    static const int dump_period = 50;
 #endif
     
     // how often should the video be done

@@ -274,6 +274,7 @@ namespace sferes
 				for(size_t i = 0; i < mu; ++i)
 				{
 					this->_pop[i] = selection_pop[i];
+					boost::shared_ptr<PhenInvasion> new_indiv = boost::shared_ptr<PhenInvasion>(new PhenInvasion());
 				}
 #endif
 							

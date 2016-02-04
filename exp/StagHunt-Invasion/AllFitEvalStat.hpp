@@ -58,13 +58,9 @@ namespace sferes
 				this->_create_log_file_genome(ea, "allgenomes.dat");
 				if (ea.dump_enabled())
 				{
-					for(int i = 0; i < ea.pop().size(); ++i)
+					for(int i = 0; i < ea.nb_genotypes(); ++i)
 					{
-#ifdef DIVERSITY
-            (*this->_log_file) << ea.nb_eval() << "," << ea.pop()[i]->fit().obj(0);
-#else
-						(*this->_log_file) << ea.nb_eval() << "," << ea.pop()[i]->fit().value();
-#endif
+						(*this->_log_file) << ea.nb_eval() << "," << ea.gen() << "," << ea.pop()[i]->fit().value();
 						(*this->_log_file) << "," << ea.pop()[i]->nb_hares() << "," << ea.pop()[i]->nb_hares_solo() << "," << ea.pop()[i]->nb_sstags() << "," << ea.pop()[i]->nb_sstags_solo() << "," << ea.pop()[i]->nb_bstags() << "," << ea.pop()[i]->nb_bstags_solo() << std::endl;
 					
 						(*this->_log_file_genome) << ea.nb_eval();

@@ -886,7 +886,7 @@ namespace sferes
 		
 				simu.add_robot(r);
 			}
-					
+
 			// Then the hares std::vector<Posture> vec_pos;
 			int nb_big_stags = Params::simu::ratio_big_stags*Params::simu::nb_big_stags;
 			int nb_small_stags = Params::simu::nb_big_stags - nb_big_stags;

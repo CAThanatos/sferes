@@ -353,6 +353,8 @@ struct Params
 
 #ifdef POP_INIT20
     static const int pop_init = 20;
+#elif defined(POP_INIT24)
+    static const int pop_init = 24;
 #else
     // Initial population is equal to pop size (or mu) by default
     static const int pop_init = -1;
@@ -363,6 +365,8 @@ struct Params
     static const int nb_niches = 4;
 #elif defined(NICHE2)
     static const int nb_niches = 2;
+#elif defined(NICHE8)
+    static const int nb_niches = 8;
 #elif defined(NICHE10)
     static const int nb_niches = 10;
 #else
@@ -373,6 +377,18 @@ struct Params
 		static const int nb_offsprings_evol_pairing = 5;
 		static const int evolve_pairing_period = 50;
 		static const float proba_mut_pairing = 0.25;
+#endif
+
+#ifdef PRUNING
+#ifdef EVAL_PRUNING1000
+		static const int pruning_eval_period = 1000;
+#elif defined(EVAL_PRUNING200)
+		static const int pruning_eval_period = 200;
+#elif defined(EVAL_PRUNING100)
+		static const int pruning_eval_period = 100;
+#else
+		static const int pruning_eval_period = 500;
+#endif
 #endif
 #endif
 
@@ -412,7 +428,11 @@ struct Params
 
 
 #ifdef ELITIST
-#ifdef MU2
+#ifdef MU8
+		static const unsigned mu = 8;
+#elif defined(MU4)
+		static const unsigned mu = 4;
+#elif defined(MU2)
 		static const unsigned mu = 2;
 #elif defined(MU1)
 		static const unsigned mu = 1;
@@ -420,7 +440,11 @@ struct Params
 		static const unsigned mu = Params::pop::size/2;
 #endif
 
-#ifdef LAMBDA2
+#ifdef LAMBDA8
+		static const unsigned lambda = 8;
+#elif defined(LAMBDA4)
+		static const unsigned lambda = 4;
+#elif defined(LAMBDA2)
 		static const unsigned lambda = 2;
 #elif defined(LAMBDA1)
 		static const unsigned lambda = 1;

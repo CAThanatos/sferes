@@ -28,6 +28,9 @@ namespace sferes
             max = _best->fit().obj(0);
           }
         }
+#elif defined(PAIRING)
+        int best_niche = ea.find_best_niche();
+        _best = ea.vec_niches()[best_niche][0];
 #endif
 
 				this->_create_log_file_leadership(ea, "bestleadership.dat");

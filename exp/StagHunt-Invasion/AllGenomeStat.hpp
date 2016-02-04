@@ -35,8 +35,8 @@
 
 
 
-#ifndef BEST_FIT_EVAL_
-#define BEST_FIT_EVAL_
+#ifndef ALL_GENOME_
+#define ALL_GENOME_
 
 #include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/nvp.hpp>
@@ -47,66 +47,28 @@ namespace sferes
   namespace stat
   {
     // assume that the population is sorted !
-    SFERES_STAT(BestFitEval, Stat)
+    SFERES_STAT(AllGenomeStat, Stat)
     {
     public:
       template<typename E>
 				void refresh(const E& ea)
       {
 				assert(!ea.pop().empty());
-				_best = *ea.pop().begin();
-
-        float max = ea.pop()[0]->fit().value();
-        for(size_t i = 0; i < ea.nb_genotypes(); ++i)
-        {
-          if(ea.pop()[i]->fit().value() > max)
-          {
-            _best = ea.pop()[i];
-            max = _best->fit().value();
-          }
-        }
-
-				this->_create_log_file(ea, "bestfit.dat");
-				this->_create_log_file_genome(ea, "bestgenome.dat");
+				this->_create_log_file(ea, "allgenomestat.dat");
 				if (ea.dump_enabled())
 				{
-          (*this->_log_file) << ea.nb_eval() << "," << _best->fit().value();
-					(*this->_log_file) << "," << _best->nb_hares() << "," << _best->nb_hares_solo() << "," << _best->nb_sstags() << "," << _best->nb_sstags_solo() << "," << _best->nb_bstags() << "," << _best->nb_bstags_solo() << std::endl;
-					
-					(*this->_log_file_genome) << ea.nb_eval();
-					for(size_t i = 0; i < _best->gen().size(); ++i)
-					{
-						(*this->_log_file_genome) << "," << _best->gen().data(i);
-					}
-					(*this->_log_file_genome) << std::endl;
+					(*this->_log_file) << ea.nb_eval() << "," << ea.gen() << "," << ea.nb_genotypes() << std::endl;;
 				}
       }
+
       void show(std::ostream& os, size_t k)
       {
-				_best->develop();
-				_best->show(os);
-				_best->fit().set_mode(fit::mode::view);
-				_best->fit().eval_compet(*_best, *_best);
+      	std::cout << "No sense in showing this stat !" << std::endl;
       }
-      const boost::shared_ptr<Phen> best() const { return _best; }
+
       template<class Archive>
       void serialize(Archive & ar, const unsigned int version)
       {
-        ar & BOOST_SERIALIZATION_NVP(_best);
-      }
-    protected:
-      boost::shared_ptr<Phen> _best;
-      
-      boost::shared_ptr<std::ofstream> _log_file_genome;
-      
-      template<typename E>
-      void _create_log_file_genome(const E& ea, const std::string& name)
-      {
-				if (!_log_file_genome && ea.dump_enabled())
-				{
-					std::string log = ea.res_dir() + "/" + name;
-					_log_file_genome = boost::shared_ptr<std::ofstream>(new std::ofstream(log.c_str()));
-				}
       }
     };
   }

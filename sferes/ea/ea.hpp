@@ -334,6 +334,7 @@ namespace sferes
 #ifdef COEVO
           oa << BOOST_SERIALIZATION_NVP(_pop_co);
 #endif
+
           std::cout << fname << " written" << std::endl;
 
           
@@ -360,8 +361,17 @@ namespace sferes
           ia_t ia(ifs);
           ia >> BOOST_SERIALIZATION_NVP(_seed);
 	        ia >> BOOST_SERIALIZATION_NVP(_pop);
+
+#if defined(ELITISTINV) || defined(FINITE) || defined(INFINITE)
+          stc::exact(this)->load_genotypes();
+#endif
+
 #ifdef COEVO
           ia >> BOOST_SERIALIZATION_NVP(_pop_co);
+#endif
+
+#ifdef PAIRING
+          stc::exact(this)->load_niches();
 #endif
 
           // for(int i = 0; i < _pop.size(); ++i)
@@ -374,6 +384,10 @@ namespace sferes
           // Add a particular individual to the population
           std::string path = fname.substr(0, fname.find_last_of("/") + 1);
           std::ifstream ifs2((path + "genome.dat").c_str());
+
+#if defined(ELITISTINV) || defined(FINITE) || defined(INFINITE)
+          stc::exact(this)->load_genome();
+#else
           if (!ifs2.fail())
           {
             std::cout << "Adding individual(s) with genotype in genome.dat..." << std::endl;
@@ -396,6 +410,7 @@ namespace sferes
               numIndiv++;
             }
           }
+#endif
 
 #ifdef DUPLOAD
           int nb_genes = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;

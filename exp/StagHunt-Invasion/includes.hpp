@@ -29,6 +29,7 @@
 #include "AllFitEvalStat.hpp"
 #include "BestPayoffEval.hpp"
 #include "AllPayoffEvalStat.hpp"
+#include "AllGenomeStat.hpp"
 #include "PhenChasseur.hpp"
 #include "ElitistGen.hpp"
 #include "FitnessProp.hpp"
@@ -36,6 +37,7 @@
 // #include "StagHuntEvalParallel.hpp"
 #include "InvasionEa.hpp"
 #include "InvasionEaFinite.hpp"
+#include "InvasionEaElitist.hpp"
 #include "EvalInvasion.hpp"
 #include "PhenInvasion.hpp"
 

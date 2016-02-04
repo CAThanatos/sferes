@@ -228,6 +228,7 @@ namespace sferes
 
 						// Bias neuron
 						outf[i] += 1.0f*_weights[cpt_weights];
+						cpt_weights++;
 						
 						outf[i] = (1.0 / (exp(-outf[i] * lambda) + 1));
 					}

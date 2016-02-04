@@ -69,66 +69,66 @@ namespace sferes
       bool mutate(float step_size = 1.0f) 
       { 
       	bool mutation = false;
+      	if(misc::rand<float>() < Params::evo_float::mutant_apparition_rate)
+      	{
+	      	float mutation_rate = Params::evo_float::mutation_rate;
 
 #ifdef GAUSSIAN_MUTATION
-      	float mutation_rate = Params::evo_float::mutation_rate/Params::nn::genome_size;
-    
-      	float sigma = Params::evo_float::sigma;
-				for (size_t i = 0; i < Size; i++)
-					if (misc::rand<float>() < mutation_rate)
-					{
-				  	bool strong_mutation = false;
+	      	float sigma = Params::evo_float::sigma;
+					for (size_t i = 0; i < Size; i++)
+						if (misc::rand<float>() < mutation_rate)
+						{
+					  	bool strong_mutation = false;
 
 #ifdef BIG_MUTATION_RATE
-				  	// Probabilty to get a stronger mutation: sampling in a uniform distribution
-		      	float rand_big_rate = misc::rand<float>();
+					  	// Probabilty to get a stronger mutation: sampling in a uniform distribution
+			      	float rand_big_rate = misc::rand<float>();
 
-		      	if(rand_big_rate < Params::evo_float::strong_mutation_probability)
-		      		strong_mutation = true;
+			      	if(rand_big_rate < Params::evo_float::strong_mutation_probability)
+			      		strong_mutation = true;
 #endif
 
-		      	if(strong_mutation)
-		      	{
+			      	if(strong_mutation)
+			      	{
+			      		float f = misc::rand<float>();
+			      		_data[i] = misc::put_in_range(f, 0.0f, 1.0f);
+			      	}
+			      	else
+							{
+								float f = _data[i] + step_size * misc::gaussian_rand<float>(0, sigma * sigma);
+								_data[i] = misc::put_in_range(f, 0.0f, 1.0f);
+							}
+
+							mutation = true;
+		  			}
+#elif defined(UNIFORM_MUT)
+					for (size_t i = 0; i < Size; i++)
+						if (misc::rand<float>() < mutation_rate)
+						{
+
 		      		float f = misc::rand<float>();
 		      		_data[i] = misc::put_in_range(f, 0.0f, 1.0f);
-		      	}
-		      	else
-						{
-							float f = _data[i] + step_size * misc::gaussian_rand<float>(0, sigma * sigma);
-							_data[i] = misc::put_in_range(f, 0.0f, 1.0f);
-						}
-
-						mutation = true;
-	  			}
-#elif defined(UNIFORM_MUT)
-      	float mutation_rate = Params::evo_float::mutation_rate/Params::nn::genome_size;
-    
-				for (size_t i = 0; i < Size; i++)
-					if (misc::rand<float>() < mutation_rate)
-					{
-
-	      		float f = misc::rand<float>();
-	      		_data[i] = misc::put_in_range(f, 0.0f, 1.0f);
-						mutation = true;
-	  			}
+							mutation = true;
+		  			}
 #else
-				static const float eta_m = Params::evo_float::eta_m;
-				assert(eta_m != -1.0f);
-				for (size_t i = 0; i < Size; i++)
-					if (misc::rand<float>() < Params::evo_float::mutation_rate)
-					{
-						float ri = misc::rand<float>();
-						float delta_i = ri < 0.5 ?
-							pow(2.0 * ri, 1.0 / (eta_m + 1.0)) - 1.0 :
-							1 - pow(2.0 * (1.0 - ri), 1.0 / (eta_m + 1.0));
-						assert(!std::isnan(delta_i));
-						assert(!std::isinf(delta_i));
-						float f = _data[i] + step_size * delta_i;
-						_data[i] = misc::put_in_range(f, 0.0f, 1.0f);
+					static const float eta_m = Params::evo_float::eta_m;
+					assert(eta_m != -1.0f);
+					for (size_t i = 0; i < Size; i++)
+						if (misc::rand<float>() < Params::evo_float::mutation_rate)
+						{
+							float ri = misc::rand<float>();
+							float delta_i = ri < 0.5 ?
+								pow(2.0 * ri, 1.0 / (eta_m + 1.0)) - 1.0 :
+								1 - pow(2.0 * (1.0 - ri), 1.0 / (eta_m + 1.0));
+							assert(!std::isnan(delta_i));
+							assert(!std::isinf(delta_i));
+							float f = _data[i] + step_size * delta_i;
+							_data[i] = misc::put_in_range(f, 0.0f, 1.0f);
 
-						mutation = true;
-					}
+							mutation = true;
+						}
 #endif
+				}
 
 				_check_invariant();
 				return mutation;

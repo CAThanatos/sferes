@@ -446,7 +446,7 @@ namespace sferes
           ind1->fit().set_mode(fit::mode::view);
           // std::string file_behaviour = ea.res_dir() + "/behaviourGen_" + boost::lexical_cast<std::string>(ea.gen()) + ".bmp";
           // ind1->fit().set_file_behaviour("./videoDir");
-          ind1->fit().eval_compet(*ind1, *ind2);
+          // ind1->fit().eval_compet(*ind1, *ind2);
         }
         else
         {

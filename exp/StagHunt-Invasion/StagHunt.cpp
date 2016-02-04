@@ -632,6 +632,7 @@ int main(int argc, char **argv)
 		  sferes::stat::AllFitEvalStat<phen_t, Params>,
 		  sferes::stat::BestPayoffEval<phen_t, Params>,
 		  sferes::stat::AllPayoffEvalStat<phen_t, Params>,
+		  sferes::stat::AllGenomeStat<phen_t, Params>,
 #ifdef BEHAVIOUR_VIDEO
 		  sferes::stat::BestFitBehaviourVideo<phen_t, Params>,
 #endif
@@ -653,6 +654,8 @@ int main(int argc, char **argv)
 	typedef ea::Elitist<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
 #elif defined(INFINITE)
 	typedef ea::InvasionEa<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
+#elif defined(ELITISTINV)
+	typedef ea::InvasionEaElitist<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
 #else
 	typedef ea::InvasionEa<phen_t, eval_t, stat_t, modifier_t, Params> ea_t;
 #endif

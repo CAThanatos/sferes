@@ -183,6 +183,13 @@ namespace sferes
 				assert(_nb_genotypes > 0);
 				assert(_nb_genotypes <= Params::pop::size);
 
+#ifdef EVAL_PARENTS
+				if((this->gen() % Params::pop::eval_parents_period) == 0)
+					for(size_t i = 0; i < _nb_genotypes; ++i)
+						if(pop_offsprings[i]->is_evaluated())
+							pop_offsprings[i]->set_evaluated(false);
+#endif
+
 				// We evaluate all new mutants
 				for(size_t i = 0; i < _nb_genotypes; ++i)
 					if(!pop_offsprings[i]->is_evaluated())
@@ -287,6 +294,8 @@ namespace sferes
           exit(1);
         }
       }
+
+      void load_genotypes() { _nb_genotypes = this->_pop.size(); }
             
     protected:
     	size_t _nb_genotypes;

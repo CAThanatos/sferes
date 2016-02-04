@@ -328,10 +328,6 @@ namespace sferes
       moy_hares1_solo /= nb_encounters;
      	moy_sstags1_solo /= nb_encounters;
      	moy_bstags1_solo /= nb_encounters;
-     	
-			ind1.add_nb_hares(moy_hares1, moy_hares1_solo);
-			ind1.add_nb_sstag(moy_sstags1, moy_sstags1_solo);
-			ind1.add_nb_bstag(moy_bstags1, moy_bstags1_solo);
 
      	moy_hares2 /= nb_encounters;
      	moy_sstags2 /= nb_encounters;
@@ -351,6 +347,24 @@ namespace sferes
 			proportion_leader /= nb_encounters;
 			proportion_leader /= 0.5f; 
 			nb_ind1_leader_first /= nb_encounters;
+     	
+     	food2 /= nb_encounters;
+     	food1 /= nb_encounters;
+     	
+#ifdef KEEP_BEST_EVAL
+			if(food1 > ind1.fit().fitness_at)
+	     	ind1.reset_values();
+#endif
+
+#ifdef GROUP_FITNESS
+	    ind1.fit().add_fitness((food1 + food2)/2.0f);
+#else
+			ind1.fit().add_fitness(food1);
+#endif	     
+
+			ind1.add_nb_hares(moy_hares1, moy_hares1_solo);
+			ind1.add_nb_sstag(moy_sstags1, moy_sstags1_solo);
+			ind1.add_nb_bstag(moy_bstags1, moy_bstags1_solo);
 
 			ind1.add_nb_leader_first(_nb_leader_first);
 			ind1.add_nb_preys_killed_coop(_nb_preys_killed_coop);
@@ -362,11 +376,6 @@ namespace sferes
 			// std::cout << "----------" << std::endl;
    //   	std::cout << "Food 1 : " << food1 << std::endl;
    //   	std::cout << "Food 2 : " << food2 << std::endl;
-     	
-     	food2 /= nb_encounters;
-     	food1 /= nb_encounters;
-
-     	ind1.fit().add_fitness(food1);
 			
 #if !defined(NOT_AGAINST_ALL) && !defined(ALTRUISM)
 			ind2.fit().add_fitness(food2);

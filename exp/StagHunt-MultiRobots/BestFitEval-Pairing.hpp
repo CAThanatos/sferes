@@ -35,79 +35,82 @@
 
 
 
-#ifndef BEST_FIT_EVAL_
-#define BEST_FIT_EVAL_
+#ifndef BEST_FIT_EVAL_PAIRING_
+#define BEST_FIT_EVAL_PAIRING_
 
 #include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/nvp.hpp>
 #include <sferes/stat/stat.hpp>
+#include "Elitist-Pairing.hpp"
 
 namespace sferes
 {
   namespace stat
   {
     // assume that the population is sorted !
-    SFERES_STAT(BestFitEval, Stat)
+    SFERES_STAT(BestFitEvalPairing, Stat)
     {
     public:
+      typedef boost::shared_ptr<Phen > indiv_t;
+      typedef typename std::vector<indiv_t> pop_t;
+      typedef typename pop_t::iterator it_t;
+
       template<typename E>
 				void refresh(const E& ea)
       {
-				assert(!ea.pop().empty());
-				_best = *ea.pop().begin();
-
-        float max = ea.pop()[0]->fit().value();
-        for(size_t i = 0; i < ea.nb_genotypes(); ++i)
+        float best_fit = 0.0f;
+        int best_niche = 0;
+        for(size_t i = 0; i < ea.vec_niches().size(); ++i)
         {
-          if(ea.pop()[i]->fit().value() > max)
+          for(size_t j = 0; j < ea.vec_niches()[i].size(); ++j)
           {
-            _best = ea.pop()[i];
-            max = _best->fit().value();
+            if(ea.vec_niches()[i][j]->fit().value() > best_fit)
+            {
+              best_fit = ea.vec_niches()[i][j]->fit().value();
+              best_niche = i;
+            }
           }
         }
 
-				this->_create_log_file(ea, "bestfit.dat");
-				this->_create_log_file_genome(ea, "bestgenome.dat");
+        _best_niche = ea.vec_niches()[best_niche];
+
+        int niche_opp = 0;
+        for(size_t i = 0; i < ea.vec_pairing()[best_niche].size(); ++i)
+        {
+          if(ea.vec_pairing()[best_niche][i])
+          {
+            niche_opp = i;
+            break;
+          }
+        }
+
+        _best_niche_opp = ea.vec_niches()[niche_opp];
+
+				this->_create_log_file(ea, "bestfitniche.dat");
 				if (ea.dump_enabled())
 				{
-          (*this->_log_file) << ea.nb_eval() << "," << _best->fit().value();
-					(*this->_log_file) << "," << _best->nb_hares() << "," << _best->nb_hares_solo() << "," << _best->nb_sstags() << "," << _best->nb_sstags_solo() << "," << _best->nb_bstags() << "," << _best->nb_bstags_solo() << std::endl;
-					
-					(*this->_log_file_genome) << ea.nb_eval();
-					for(size_t i = 0; i < _best->gen().size(); ++i)
-					{
-						(*this->_log_file_genome) << "," << _best->gen().data(i);
-					}
-					(*this->_log_file_genome) << std::endl;
+          (*this->_log_file) << ea.nb_eval() << "," << niche_opp << "," << _best_niche[0]->fit().value();
+					(*this->_log_file) << "," << _best_niche[0]->nb_hares() << "," << _best_niche[0]->nb_hares_solo() << "," << _best_niche[0]->nb_sstag() << "," << _best_niche[0]->nb_sstag_solo() << "," << _best_niche[0]->nb_bstag() << "," << _best_niche[0]->nb_bstag_solo() << std::endl;
 				}
       }
+
       void show(std::ostream& os, size_t k)
       {
-				_best->develop();
-				_best->show(os);
-				_best->fit().set_mode(fit::mode::view);
-				_best->fit().eval_compet(*_best, *_best);
+        _best_niche[0]->develop();
+        _best_niche_opp[0]->develop();
+
+				_best_niche[0]->fit().set_mode(fit::mode::view);
+				_best_niche[0]->fit().eval_compet(*_best_niche[0], *_best_niche_opp[0]);
       }
-      const boost::shared_ptr<Phen> best() const { return _best; }
+      const pop_t best() const { return _best_niche; }
       template<class Archive>
       void serialize(Archive & ar, const unsigned int version)
       {
-        ar & BOOST_SERIALIZATION_NVP(_best);
+        ar & BOOST_SERIALIZATION_NVP(_best_niche);
       }
     protected:
-      boost::shared_ptr<Phen> _best;
-      
-      boost::shared_ptr<std::ofstream> _log_file_genome;
-      
-      template<typename E>
-      void _create_log_file_genome(const E& ea, const std::string& name)
-      {
-				if (!_log_file_genome && ea.dump_enabled())
-				{
-					std::string log = ea.res_dir() + "/" + name;
-					_log_file_genome = boost::shared_ptr<std::ofstream>(new std::ofstream(log.c_str()));
-				}
-      }
+      pop_t _best_niche;
+      pop_t _best_niche_opp;
     };
   }
 }
