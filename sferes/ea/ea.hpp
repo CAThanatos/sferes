@@ -371,7 +371,7 @@ namespace sferes
 #endif
 
 #ifdef PAIRING
-          stc::exact(this)->load_niches();
+          stc::exact(this)->load_niches(fname);
 #endif
 
           // for(int i = 0; i < _pop.size(); ++i)

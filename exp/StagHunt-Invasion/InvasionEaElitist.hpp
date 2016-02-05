@@ -265,91 +265,91 @@ namespace sferes
 
       void load_genotypes() { _nb_genotypes = this->_pop.size(); }
 
-      void load_genome() 
+      void load_genome(const std::string& fname) 
       {
-      //   // Add a particular individual to the population
-      //   std::string path = fname.substr(0, fname.find_last_of("/") + 1);
-      //   std::ifstream ifs2((path + "genome.dat").c_str());
+        // Add a particular individual to the population
+        std::string path = fname.substr(0, fname.find_last_of("/") + 1);
+        std::ifstream ifs2((path + "genome.dat").c_str());
 
-      //   if (!ifs2.fail())
-      //   {
-      //     std::cout << "Adding individual(s) with genotype in genome.dat..." << std::endl;
+        if (!ifs2.fail())
+        {
+          std::cout << "Adding individual(s) with genotype in genome.dat..." << std::endl;
           
-      //     std::vector<std::vector<float> > new_inds;
-      //     while(ifs2.good())
-      //     {
-      //       std::string line;
-      //       std::getline(ifs2, line);
+          std::vector<std::vector<float> > new_inds;
+          while(ifs2.good())
+          {
+            std::string line;
+            std::getline(ifs2, line);
 
-      //       std::stringstream ss(line);
-      //       std::string gene;
+            std::stringstream ss(line);
+            std::string gene;
 
-      //       std::vector<float> vec_genotype;
-      //       while(std::getline(ss, gene, ','))
-      //       	vec_genotype.push_back(std::atof(gene.c_str()));
+            std::vector<float> vec_genotype;
+            while(std::getline(ss, gene, ','))
+            	vec_genotype.push_back(std::atof(gene.c_str()));
 
-      //       new_inds.push_back(vec_genotype);
-      //     }
+            new_inds.push_back(vec_genotype);
+          }
 
-      //     int old_nb_genotypes = _nb_genotypes;
-      //     for(size_t i = 0; i < new_inds.size(); ++i)
-      //     {
-      //     	// We add the individual to the list of genotypes
-						// boost::shared_ptr<PhenInvasion> new_indiv = boost::shared_ptr<PhenInvasion>(new PhenInvasion());
+          int old_nb_genotypes = _nb_genotypes;
+          for(size_t i = 0; i < new_inds.size(); ++i)
+          {
+          	// We add the individual to the list of genotypes
+						boost::shared_ptr<Phen> new_indiv = boost::shared_ptr<Phen>(new Phen());
 
-						// for(unsigned j = 0; j < new_indiv->_gen.size(); ++j)
-						// 	new_indiv->_gen.data(i, new_inds[i][j]);
+						for(unsigned j = 0; j < new_indiv->_gen.size(); ++j)
+							new_indiv->_gen.data(i, new_inds[i][j]);
 
-						// new_indiv->set_pop_pos(_nb_genotypes); 
-						// new_indiv->develop();
-						// new_indiv->set_freq(1.0f/(float)mu);
-						// this->_pop.push_back(new_indiv);
+						new_indiv->set_pop_pos(_nb_genotypes); 
+						new_indiv->develop();
+						new_indiv->set_freq(1.0f/(float)mu);
+						this->_pop.push_back(new_indiv);
 
-						// // We evaluate the individual
-						// this->_eval.eval(this->_pop, _nb_genotypes, 0, _nb_genotypes + 1);
+						// We evaluate the individual
+						this->_eval.eval(this->_pop, _nb_genotypes, 0, _nb_genotypes + 1);
 
-						// // We remove one of the individuals
-						// int rand_ind = misc::rand<int>(0, old_nb_genotypes);
-						// this->_pop[rand_ind]->set_freq(this->_pop[rand_ind]->get_freq() - 1.0f/(float)mu);
+						// We remove one of the individuals
+						int rand_ind = misc::rand<int>(0, old_nb_genotypes);
+						this->_pop[rand_ind]->set_freq(this->_pop[rand_ind]->get_freq() - 1.0f/(float)mu);
 
-						// if(this->_pop[rand_ind]->get_freq() <= 0.0f)
-						// {
-						// 	std::vector<int> vec_remove_genotypes;
-						// 	vec_remove_genotypes.push_back(rand_ind);
+						if(this->_pop[rand_ind]->get_freq() <= 0.0f)
+						{
+							std::vector<int> vec_remove_genotypes;
+							vec_remove_genotypes.push_back(rand_ind);
 
-						// 	remove_genotypes(vec_remove_genotypes, this->_pop);
-						// }
+							remove_genotypes(vec_remove_genotypes, this->_pop);
+						}
 
-						// _nb_genotypes++;
-      //     }
+						_nb_genotypes++;
+          }
 
-		    //   for(size_t i = 0; i < _nb_genotypes; ++i)
-		    //   {
-						// float fitness = 0;
-						// float nb_hares = 0, nb_hares_solo = 0;
-						// float nb_sstags = 0, nb_sstags_solo = 0;
-						// float nb_bstags = 0, nb_bstags_solo = 0;
+		      for(size_t i = 0; i < _nb_genotypes; ++i)
+		      {
+						float fitness = 0;
+						float nb_hares = 0, nb_hares_solo = 0;
+						float nb_sstags = 0, nb_sstags_solo = 0;
+						float nb_bstags = 0, nb_bstags_solo = 0;
 
-						// for(size_t j = 0; j < _nb_genotypes; ++j)
-						// {
-						// 	fitness += this->_pop[i]->get_payoff(j) * this->_pop[j]->get_freq();
+						for(size_t j = 0; j < _nb_genotypes; ++j)
+						{
+							fitness += this->_pop[i]->get_payoff(j) * this->_pop[j]->get_freq();
 
-						// 	nb_hares += this->_pop[i]->get_nb_hares(j) * this->_pop[j]->get_freq();
-						// 	nb_hares_solo += this->_pop[i]->get_nb_hares_solo(j) * this->_pop[j]->get_freq();
+							nb_hares += this->_pop[i]->get_nb_hares(j) * this->_pop[j]->get_freq();
+							nb_hares_solo += this->_pop[i]->get_nb_hares_solo(j) * this->_pop[j]->get_freq();
 
-						// 	nb_sstags += this->_pop[i]->get_nb_sstags(j) * this->_pop[j]->get_freq();
-						// 	nb_sstags_solo += this->_pop[i]->get_nb_sstags_solo(j) * this->_pop[j]->get_freq();
+							nb_sstags += this->_pop[i]->get_nb_sstags(j) * this->_pop[j]->get_freq();
+							nb_sstags_solo += this->_pop[i]->get_nb_sstags_solo(j) * this->_pop[j]->get_freq();
 
-						// 	nb_bstags += this->_pop[i]->get_nb_bstags(j) * this->_pop[j]->get_freq();
-						// 	nb_bstags_solo += this->_pop[i]->get_nb_bstags_solo(j) * this->_pop[j]->get_freq();
-						// }
+							nb_bstags += this->_pop[i]->get_nb_bstags(j) * this->_pop[j]->get_freq();
+							nb_bstags_solo += this->_pop[i]->get_nb_bstags_solo(j) * this->_pop[j]->get_freq();
+						}
 
-						// this->_pop[i]->fit().set_value(fitness);
-						// this->_pop[i]->set_nb_hares(nb_hares, nb_hares_solo);
-						// this->_pop[i]->set_nb_sstags(nb_sstags, nb_sstags_solo);
-						// this->_pop[i]->set_nb_bstags(nb_bstags, nb_bstags_solo);
-		    //   }
-      //   }
+						this->_pop[i]->fit().set_value(fitness);
+						this->_pop[i]->set_nb_hares(nb_hares, nb_hares_solo);
+						this->_pop[i]->set_nb_sstags(nb_sstags, nb_sstags_solo);
+						this->_pop[i]->set_nb_bstags(nb_bstags, nb_bstags_solo);
+		      }
+        }
       }
 
       void play_run(const std::string& fname)
