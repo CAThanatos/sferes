@@ -326,6 +326,27 @@ namespace sferes
 		    bool is_evaluated() { return _evaluated; }
 
 		    tbb::mutex mutex_vectors;
+
+			  // template<typename G, typename F, typename P, typename E> 
+		    // typedef Indiv<G, F, P, E> baseClass;
+
+	     //  template<class Archive>
+		    // void serialize_freq(Archive& ar, const unsigned int version)
+		    // {
+	     //   	// ar & BOOST_SERIALIZATION_NVP(_freq);
+		    // }
+
+	      template<class Archive>
+	      void serialize(Archive & ar, const unsigned int version)
+	      {
+					dbg::trace trace("phen", DBG_HERE);
+					Gen& gen = this->_gen;
+					Fit& fit = this->_fit;
+	        ar & BOOST_SERIALIZATION_NVP(gen);
+	        ar & BOOST_SERIALIZATION_NVP(fit);
+	       	ar & BOOST_SERIALIZATION_NVP(_freq);
+	       	ar & BOOST_SERIALIZATION_NVP(_pop_pos);
+	      }
       
 		  protected:
 		    std::vector<float> _params;

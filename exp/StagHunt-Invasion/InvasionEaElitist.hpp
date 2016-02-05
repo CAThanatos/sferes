@@ -265,7 +265,7 @@ namespace sferes
 
       void load_genotypes() { _nb_genotypes = this->_pop.size(); }
 
-      void load_genome(const std::string& fname) 
+      void load_genome(const std::string fname) 
       {
         // Add a particular individual to the population
         std::string path = fname.substr(0, fname.find_last_of("/") + 1);
@@ -292,21 +292,20 @@ namespace sferes
           }
 
           int old_nb_genotypes = _nb_genotypes;
+
+
+          std::cout << "Adding " << new_inds.size() << " individuals" << std::endl;
           for(size_t i = 0; i < new_inds.size(); ++i)
           {
           	// We add the individual to the list of genotypes
 						boost::shared_ptr<Phen> new_indiv = boost::shared_ptr<Phen>(new Phen());
 
-						for(unsigned j = 0; j < new_indiv->_gen.size(); ++j)
-							new_indiv->_gen.data(i, new_inds[i][j]);
+						for(unsigned j = 0; j < new_indiv->gen().size(); ++j)
+							new_indiv->gen().data(i, new_inds[i][j]);
 
 						new_indiv->set_pop_pos(_nb_genotypes); 
-						new_indiv->develop();
 						new_indiv->set_freq(1.0f/(float)mu);
 						this->_pop.push_back(new_indiv);
-
-						// We evaluate the individual
-						this->_eval.eval(this->_pop, _nb_genotypes, 0, _nb_genotypes + 1);
 
 						// We remove one of the individuals
 						int rand_ind = misc::rand<int>(0, old_nb_genotypes);
@@ -323,33 +322,53 @@ namespace sferes
 						_nb_genotypes++;
           }
 
-		      for(size_t i = 0; i < _nb_genotypes; ++i)
-		      {
-						float fitness = 0;
-						float nb_hares = 0, nb_hares_solo = 0;
-						float nb_sstags = 0, nb_sstags_solo = 0;
-						float nb_bstags = 0, nb_bstags_solo = 0;
-
-						for(size_t j = 0; j < _nb_genotypes; ++j)
-						{
-							fitness += this->_pop[i]->get_payoff(j) * this->_pop[j]->get_freq();
-
-							nb_hares += this->_pop[i]->get_nb_hares(j) * this->_pop[j]->get_freq();
-							nb_hares_solo += this->_pop[i]->get_nb_hares_solo(j) * this->_pop[j]->get_freq();
-
-							nb_sstags += this->_pop[i]->get_nb_sstags(j) * this->_pop[j]->get_freq();
-							nb_sstags_solo += this->_pop[i]->get_nb_sstags_solo(j) * this->_pop[j]->get_freq();
-
-							nb_bstags += this->_pop[i]->get_nb_bstags(j) * this->_pop[j]->get_freq();
-							nb_bstags_solo += this->_pop[i]->get_nb_bstags_solo(j) * this->_pop[j]->get_freq();
-						}
-
-						this->_pop[i]->fit().set_value(fitness);
-						this->_pop[i]->set_nb_hares(nb_hares, nb_hares_solo);
-						this->_pop[i]->set_nb_sstags(nb_sstags, nb_sstags_solo);
-						this->_pop[i]->set_nb_bstags(nb_bstags, nb_bstags_solo);
-		      }
         }
+
+				// We evaluate all new mutants (and parents if need be)
+				for(size_t i = 0; i < _nb_genotypes; ++i)
+				{
+					this->_pop[i]->develop();
+					this->_pop[i]->set_pop_pos(i);
+				}
+
+				for(size_t i = 0; i < _nb_genotypes; ++i)
+				{
+					this->_eval.eval(this->_pop, i, 0, _nb_genotypes);
+					this->_pop[i]->set_evaluated(true);
+				}
+
+        // We evaluate all the population
+        // std::cout << "Nb genotypes : " << _nb_genotypes << std::endl;
+        // std::cout << "Taille pop : " << this->_pop.size() << std::endl;
+	      for(size_t i = 0; i < _nb_genotypes; ++i)
+	      {
+					float fitness = 0;
+					float nb_hares = 0, nb_hares_solo = 0;
+					float nb_sstags = 0, nb_sstags_solo = 0;
+					float nb_bstags = 0, nb_bstags_solo = 0;
+
+					for(size_t j = 0; j < _nb_genotypes; ++j)
+					{
+						fitness += this->_pop[i]->get_payoff(j) * this->_pop[j]->get_freq();
+
+						nb_hares += this->_pop[i]->get_nb_hares(j) * this->_pop[j]->get_freq();
+						nb_hares_solo += this->_pop[i]->get_nb_hares_solo(j) * this->_pop[j]->get_freq();
+
+						nb_sstags += this->_pop[i]->get_nb_sstags(j) * this->_pop[j]->get_freq();
+						nb_sstags_solo += this->_pop[i]->get_nb_sstags_solo(j) * this->_pop[j]->get_freq();
+
+						nb_bstags += this->_pop[i]->get_nb_bstags(j) * this->_pop[j]->get_freq();
+						nb_bstags_solo += this->_pop[i]->get_nb_bstags_solo(j) * this->_pop[j]->get_freq();
+					}
+
+					this->_pop[i]->fit().set_value(fitness);
+					this->_pop[i]->set_nb_hares(nb_hares, nb_hares_solo);
+					this->_pop[i]->set_nb_sstags(nb_sstags, nb_sstags_solo);
+					this->_pop[i]->set_nb_bstags(nb_bstags, nb_bstags_solo);
+	      }
+
+	      // for(size_t i = 0; i < _nb_genotypes; ++i)
+	      // 	std::cout << "Genotype " << i << " : (" << this->_pop[i]->get_freq() << "," << this->_pop[i]->fit().value() << ")" << std::endl;
       }
 
       void play_run(const std::string& fname)
