@@ -345,6 +345,8 @@ struct Params
     static const unsigned size = 100;
 #elif defined(POP200)
     static const unsigned size = 200;
+#elif defined(POP40)
+    static const unsigned size = 40;
 #elif defined(MU2) && defined(LAMBDA2)
     static const unsigned size = 4;
 #else
@@ -428,7 +430,9 @@ struct Params
 
 
 #ifdef ELITIST
-#ifdef MU8
+#ifdef MU20
+		static const unsigned mu = 20;
+#elif defined(MU8)
 		static const unsigned mu = 8;
 #elif defined(MU4)
 		static const unsigned mu = 4;
@@ -440,7 +444,9 @@ struct Params
 		static const unsigned mu = Params::pop::size/2;
 #endif
 
-#ifdef LAMBDA8
+#ifdef LAMBDA20
+		static const unsigned lambda = 20;
+#elif defined(LAMBDA8)
 		static const unsigned lambda = 8;
 #elif defined(LAMBDA4)
 		static const unsigned lambda = 4;

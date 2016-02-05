@@ -63,7 +63,7 @@ namespace sferes
 						(*this->_log_file) << ea.nb_eval() << "," << ea.gen() << "," << ea.pop()[i]->fit().value();
 						(*this->_log_file) << "," << ea.pop()[i]->nb_hares() << "," << ea.pop()[i]->nb_hares_solo() << "," << ea.pop()[i]->nb_sstags() << "," << ea.pop()[i]->nb_sstags_solo() << "," << ea.pop()[i]->nb_bstags() << "," << ea.pop()[i]->nb_bstags_solo() << std::endl;
 					
-						(*this->_log_file_genome) << ea.nb_eval();
+						(*this->_log_file_genome) << ea.nb_eval() << "," << ea.gen();
 						for(size_t j = 0; j < ea.pop()[i]->gen().size(); ++j)
 						{
 							(*this->_log_file_genome) << "," << ea.pop()[i]->gen().data(j);
