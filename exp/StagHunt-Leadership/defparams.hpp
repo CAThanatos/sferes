@@ -445,7 +445,7 @@ struct Params
 #endif
     
     // number of generations
-    static const unsigned nb_gen = 1500;
+    static const unsigned nb_gen = 1501;
     
     // how often should the result file be written
 #ifdef POP100
