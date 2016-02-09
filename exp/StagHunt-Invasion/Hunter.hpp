@@ -228,7 +228,9 @@ namespace sferes
 
 						// Bias neuron
 						outf[i] += 1.0f*_weights[cpt_weights];
+// #ifdef MLP_COR
 						cpt_weights++;
+// #endif
 						
 						outf[i] = (1.0 / (exp(-outf[i] * lambda) + 1));
 					}

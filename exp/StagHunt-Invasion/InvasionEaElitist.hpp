@@ -301,7 +301,7 @@ namespace sferes
 						boost::shared_ptr<Phen> new_indiv = boost::shared_ptr<Phen>(new Phen());
 
 						for(unsigned j = 0; j < new_indiv->gen().size(); ++j)
-							new_indiv->gen().data(i, new_inds[i][j]);
+							new_indiv->gen().data(j, new_inds[i][j]);
 
 						new_indiv->set_pop_pos(_nb_genotypes); 
 						new_indiv->set_freq(1.0f/(float)mu);
@@ -338,8 +338,6 @@ namespace sferes
 				}
 
         // We evaluate all the population
-        // std::cout << "Nb genotypes : " << _nb_genotypes << std::endl;
-        // std::cout << "Taille pop : " << this->_pop.size() << std::endl;
 	      for(size_t i = 0; i < _nb_genotypes; ++i)
 	      {
 					float fitness = 0;
@@ -366,9 +364,6 @@ namespace sferes
 					this->_pop[i]->set_nb_sstags(nb_sstags, nb_sstags_solo);
 					this->_pop[i]->set_nb_bstags(nb_bstags, nb_bstags_solo);
 	      }
-
-	      // for(size_t i = 0; i < _nb_genotypes; ++i)
-	      // 	std::cout << "Genotype " << i << " : (" << this->_pop[i]->get_freq() << "," << this->_pop[i]->fit().value() << ")" << std::endl;
       }
 
       void play_run(const std::string& fname)
