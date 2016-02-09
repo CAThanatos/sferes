@@ -100,7 +100,8 @@ namespace sferes
 #endif
 					if (randMutation < Params::evo_float::mutation_rate)
 					{
-						float f = _data[i] + step_size * misc::gaussian_rand<float>(0, sigma * sigma);
+						float value_mut = step_size * misc::gaussian_rand<float>(0, sigma * sigma);
+						float f = _data[i] + value_mut;
 						_data[i] = misc::put_in_range(f, 0.0f, 1.0f);
 	  			}
 	  		}
@@ -128,7 +129,8 @@ namespace sferes
 						assert(!std::isnan(delta_i));
 						assert(!std::isinf(delta_i));
 						// std::cout << delta_i << std::endl;
-						float f = _data[i] + step_size*delta_i;
+						float value_mut = step_size*delta_i;
+						float f = _data[i] + value_mut;
 						_data[i] = misc::put_in_range(f, 0.0f, 1.0f);
 					}
 #endif

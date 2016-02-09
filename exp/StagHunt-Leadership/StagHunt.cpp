@@ -564,6 +564,7 @@ namespace sferes
 	 			}
 #endif
 
+	 			// std::cout << h1->nb_big
 
 #if defined(BEHAVIOUR_VIDEO)
 				if(this->mode() == fit::mode::view)

@@ -611,7 +611,7 @@ struct Params
 
 // #define BEHAVIOUR_LOG
 
-// #define BEHAVIOUR_VIDEO
+#define BEHAVIOUR_VIDEO
 
 #ifndef COEVO
 #define GENOME_TRACES

@@ -518,6 +518,7 @@ if __name__ == "__main__" :
 	parser.add_argument('-o', '--output', help = "Output directory", default = "GraphsResults")
 	parser.add_argument('-l', '--leadership', help = "Draw best leadership", action = "store_true", default = False)
 	parser.add_argument('-b', '--beginningGen', help = "First generation from which we draw", default = False, action = 'store_true')
+	# parser.add_argument('-g', '--generation', help = "Draw by generation", default = False, action = 'store_true')
 	args = parser.parse_args()
 
 	main(args)

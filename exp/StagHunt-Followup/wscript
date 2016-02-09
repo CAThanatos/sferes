@@ -57,10 +57,11 @@ def build(bld):
 													 							# 'SETTING14 STD2 SSTAG250 DIVERSITY',
 													 							# 'SETTING14 SSTAG250 DIVERSITY',
 
-													 							# 'SETTING14 KEEP_BEST_EVAL POP_INIT24 SSTAG250',
-													 							'SETTING14 COEVO SSTAG250',
-													 							'SETTING14 ELITIST POP40 MU20 LAMBDA20 SSTAG250',
-													 							'SETTING14 FITPROP POP40 STD2 SSTAG250',
+													 							'SETTING14 FITPROP POP40 STD2 SSTAG50',
+													 							'SETTING14 FITPROP STD2 SSTAG250',
+													 							'SETTING14 FITPROP STD3 SSTAG250',
+													 							'SETTING14 FITPROP STD4 SSTAG250',
+													 							'SETTING14 FITPROP POLYNOMIAL SSTAG250',
 
 													 							# 'SETTING14 TUPLES TUPLE_SWAP SSTAG250',
 													 							# 'SETTING14 TUPLES TUPLE_SWAP STD2 SSTAG250',

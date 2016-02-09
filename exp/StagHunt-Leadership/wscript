@@ -31,7 +31,7 @@ def build(bld):
 #                           json = 'StagHuntExp3.json',
 													 variants = [
 													 							# 'CONTROL3 DOUBLE_NN DUPLICATION NO_CHOICE_DUP BSTAG0 SSTAG50 POS_CLOSE',
-													 							'CONTROL3 DOUBLE_NN DUPLICATION NO_CHOICE_DUP BSTAG0 SSTAG125 POS_CLOSE',
+													 							# 'CONTROL3 DOUBLE_NN DUPLICATION NO_CHOICE_DUP BSTAG0 SSTAG125 POS_CLOSE',
 													 							# 'CONTROL3 BSTAG0 SSTAG50 POS_CLOSE',
 													 							# 'CONTROL3 BSTAG0 SSTAG125 POS_CLOSE',
 
@@ -60,10 +60,9 @@ def build(bld):
 													 							# 'SETTING13 POP100 ALTRUISM FITPROP STD15',
 																				# 'SETTING13 POP100 FITPROP POLYNOMIAL',
 
-																				'SETTING13 FITPROP STD2',
 																				'SETTING13 FITPROP POLYNOMIAL',
-																				'CONTROL1 FITPROP RATIO33 STD2',
-																				'CONTROL1 FITPROP RATIO16 STD2',
+																				# 'CONTROL1 FITPROP RATIO33 STD2',
+																				# 'CONTROL1 FITPROP RATIO16 STD2',
 
 																				# 'CONTROL1 POP100 FITPROP STD2 BSTAG500',
 																				# 'CONTROL1 POP100 FITPROP STD2 BSTAG500 BSTAG_SOLO50',

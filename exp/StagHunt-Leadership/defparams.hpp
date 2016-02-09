@@ -399,6 +399,12 @@ struct Params
     static const float sigma = 0.19f;
 #elif defined(STD2)
     static const float sigma = 0.2f;
+#elif defined(STD25)
+    static const float sigma = 0.25f;
+#elif defined(STD3)
+    static const float sigma = 0.3f;
+#elif defined(STD4)
+    static const float sigma = 0.4f;
 #else
     static const float sigma = 0.01f;
 #endif
@@ -439,7 +445,7 @@ struct Params
 #endif
     
     // number of generations
-    static const unsigned nb_gen = 10000;
+    static const unsigned nb_gen = 1500;
     
     // how often should the result file be written
 #ifdef POP100

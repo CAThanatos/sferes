@@ -256,6 +256,7 @@ namespace sferes
 				// We finally replace the new population (and mutate the individuals in the process)
 				for(unsigned i = 0; i < this->_pop.size(); ++i)
 					this->_pop[i].reset();
+
 				this->_pop.clear();
 				this->_pop.resize(Params::pop::size);
 				assert(this->_pop.size() == new_pop.size());
