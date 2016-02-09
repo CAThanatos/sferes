@@ -266,6 +266,11 @@ namespace sferes
 							
 				// We modify the step_size
 #ifndef NO_STEP_SIZE
+				std::ofstream os("step_size.txt", std::ios::out | std::ios::app);
+				os << _step_size << std::endl;
+				os.close();
+
+				int duration = time(NULL);
 				float ps = successful_offsprings/(float)lambda;
 				float factor = (1.0f/3.0f) * (ps - 0.2f) / (1.0f - 0.2f);
 				_step_size = _step_size * exp(factor);

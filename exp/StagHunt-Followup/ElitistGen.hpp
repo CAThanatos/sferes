@@ -91,6 +91,8 @@ namespace sferes
       
       void mutate(float step_size = 1.0f) 
       {
+				std::ofstream os("mutations.txt", std::ios::out | std::ios::app);
+
 #ifdef GAUSSIAN_MUTATION
       	float sigma = Params::evo_float::sigma;
 				for (size_t i = 0; i < _size; i++)
@@ -106,8 +108,11 @@ namespace sferes
 #endif
 					if (randMutation < Params::evo_float::mutation_rate)
 					{
-						float f = _data[i] + step_size * misc::gaussian_rand<float>(0, sigma * sigma);
+						float mut_value = step_size * misc::gaussian_rand<float>(0, sigma * sigma);
+						float f = _data[i] + mut_value;
 						_data[i] = misc::put_in_range(f, 0.0f, 1.0f);
+
+						os << mut_value << std::endl;
 	  			}
 	  		}
 #elif defined(UNIFORM_MUTATION)
@@ -139,6 +144,7 @@ namespace sferes
 					}
 #endif
 				_check_invariant();
+				os.close();
 	    }
 
 	    void cross(const ElitistGen& o, ElitistGen& c1, ElitistGen& c2)
