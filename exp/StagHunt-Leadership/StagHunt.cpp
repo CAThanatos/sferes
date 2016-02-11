@@ -27,8 +27,13 @@ namespace sferes
     template<typename Indiv>
       void eval_compet(Indiv& ind1, Indiv& ind2, int num_leader = 1) 
 #elif defined(LISTMATCH)
+#ifdef GENOME_TRACES
     template<typename Indiv>
-      void eval_compet(Indiv& ind1, Indiv& ind2, bool evaluated1 = false, bool evaluated2 = false) 
+      void eval_compet(Indiv& ind1, Indiv& ind2, bool genome_traces = false, bool evaluateInd2 = false) 
+#else
+    template<typename Indiv>
+      void eval_compet(Indiv& ind1, Indiv& ind2, bool evaluateInd2 = false) 
+#endif
 #elif defined(GENOME_TRACES)
     template<typename Indiv>
       void eval_compet(Indiv& ind1, Indiv& ind2, bool genome_traces = false) 
@@ -658,35 +663,28 @@ namespace sferes
      	food2 /= nb_encounters;
      	food1 /= nb_encounters;
      	
-#ifdef LISTMATCH
-     	if(evaluated1)
-#else
-     	if(true)
-#endif
-     	{
-				ind1.add_nb_hares(moy_hares1, moy_hares1_solo);
-				ind1.add_nb_sstag(moy_sstags1, moy_sstags1_solo);
-				ind1.add_nb_bstag(moy_bstags1, moy_bstags1_solo);
+			ind1.add_nb_hares(moy_hares1, moy_hares1_solo);
+			ind1.add_nb_sstag(moy_sstags1, moy_sstags1_solo);
+			ind1.add_nb_bstag(moy_bstags1, moy_bstags1_solo);
 
-				ind1.add_nb_leader_first(_nb_leader_first);
-				ind1.add_nb_preys_killed_coop(_nb_preys_killed_coop);
-				ind1.add_proportion_leader(proportion_leader);
-				ind1.add_nb_ind1_leader_first(nb_ind1_leader_first);
+			ind1.add_nb_leader_first(_nb_leader_first);
+			ind1.add_nb_preys_killed_coop(_nb_preys_killed_coop);
+			ind1.add_proportion_leader(proportion_leader);
+			ind1.add_nb_ind1_leader_first(nb_ind1_leader_first);
 
 #ifdef DOUBLE_NN
-				ind1.add_nb_nn1_chosen(nb_nn1_chosen);
-				ind1.add_nb_bigger_nn1_chosen(nb_bigger_nn1_chosen);
-				ind1.add_nb_role_divisions(nb_role_divisions);
-				ind1.add_fit_nn1(fit_nn1);
-				ind1.add_fit_nn2(fit_nn2);
+			ind1.add_nb_nn1_chosen(nb_nn1_chosen);
+			ind1.add_nb_bigger_nn1_chosen(nb_bigger_nn1_chosen);
+			ind1.add_nb_role_divisions(nb_role_divisions);
+			ind1.add_fit_nn1(fit_nn1);
+			ind1.add_fit_nn2(fit_nn2);
 #endif
-	
-	     	ind1.fit().add_fitness(food1);
-			}
+
+     	ind1.fit().add_fitness(food1);
      	
 #if (!defined(NOT_AGAINST_ALL) && !defined(ALTRUISM)) || defined(LISTMATCH)
 #ifdef LISTMATCH
-			if(evaluated2)
+			if(evaluateInd2)
 #else
 			if(true)
 #endif

@@ -54,6 +54,8 @@ def build(bld):
 													 							# 'SETTING14 SSTAG50 POS_CLOSE',
 													 							# 'SETTING14 COEVO SSTAG50 POS_CLOSE',
 
+													 							'SETTING15 LISTMATCH SSTAG250 POS_CLOSE'
+
 													 							# 'SETTING13 POP100 FITPROP STD2',
 													 							# 'SETTING13 POP100 ALTRUISM FITPROP STD2',
 													 							# 'SETTING13 POP100 FITPROP STD15',
@@ -63,8 +65,8 @@ def build(bld):
 																				# 'SETTING13 FITPROP POLYNOMIAL',
 																				# 'CONTROL1 FITPROP RATIO33 STD2',
 																				# 'CONTROL1 FITPROP RATIO16 STD2',
-																				'CONTROL1 FITPROP RATIO84 POLYNOMIAL',
-																				'CONTROL1 FITPROP RATIO16 POLYNOMIAL',
+																				# 'CONTROL1 FITPROP RATIO84 POLYNOMIAL',
+																				# 'CONTROL1 FITPROP RATIO16 POLYNOMIAL',
 
 																				# 'CONTROL1 POP100 FITPROP STD2 BSTAG500',
 																				# 'CONTROL1 POP100 FITPROP STD2 BSTAG500 BSTAG_SOLO50',

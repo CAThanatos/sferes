@@ -124,6 +124,49 @@ namespace sferes
     };
         
     template<typename Phen>
+    struct _parallel_ev_select_list
+    {
+      typedef std::vector<boost::shared_ptr<Phen> > pop_t;
+      pop_t _pop;
+      int nb_opponents;
+      int nb_eval;
+      int _size;
+      list_matches_t _list_matches;
+
+      ~_parallel_ev_select_list() { }
+      _parallel_ev_select_list(const pop_t& pop, int size, const list_matches_t& list_matches) : _pop(pop), _size(size), _list_matches(list_matches)
+      {
+		    nb_opponents = Params::pop::nb_opponents;
+		    nb_eval = Params::pop::nb_eval;
+      }
+      _parallel_ev_select_list(const _parallel_ev_select_list& ev) : _pop(ev._pop), _size(ev._size), _list_matches(ev._list_matches)
+      {
+		    nb_opponents = Params::pop::nb_opponents;
+		    nb_eval = Params::pop::nb_eval;
+      }
+      void operator() (const parallel::range_t& r) const
+      {
+				for (size_t i = r.begin(); i != r.end(); ++i)
+				{
+					assert(i < _pop.size());
+					assert(i < _list_matches.size());
+
+					for(size_t j = 0; j < _list_matches[i].size(); ++j)
+					{
+						std::vector<boost::shared_ptr<Phen> > vec_ind;
+						std::vector<bool> vec_eval;
+
+						vec_ind.push_back(_pop[i]);
+						vec_eval.push_back(true);
+
+						std::cout << i << " AGAINST " << _list_matches[i][j][0][0] << " WITH " << _list_matches[i][j][0][1] << std::endl;
+						_pop[i]->fit().eval_compet(*_pop[i], *_pop[_list_matches[i][j][0][0]], _list_matches[i][j][0][1]);
+					}
+				}
+      }
+    };
+        
+    template<typename Phen>
     struct _parallel_ev_select
     {
       typedef std::vector<boost::shared_ptr<Phen> > pop_t;
@@ -182,55 +225,6 @@ namespace sferes
 							_pop[i]->fit().eval_compet(*_pop[i], *_pop[opponent]);
 						}
 #endif
-					}
-				}
-      }
-    };
-        
-    template<typename Phen>
-    struct _parallel_ev_select_list
-    {
-      typedef std::vector<boost::shared_ptr<Phen> > pop_t;
-      pop_t _pop;
-      int nb_opponents;
-      int nb_eval;
-      int _size;
-      list_matches_t _list_matches;
-
-      ~_parallel_ev_select_list() { }
-      _parallel_ev_select_list(const pop_t& pop, int size, const list_matches_t& list_matches) : _pop(pop), _size(size), _list_matches(list_matches)
-      {
-		    nb_opponents = Params::pop::nb_opponents;
-		    nb_eval = Params::pop::nb_eval;
-      }
-      _parallel_ev_select_list(const _parallel_ev_select_list& ev) : _pop(ev._pop), _size(ev._size), _list_matches(ev._list_matches)
-      {
-		    nb_opponents = Params::pop::nb_opponents;
-		    nb_eval = Params::pop::nb_eval;
-      }
-      void operator() (const parallel::range_t& r) const
-      {
-				for (size_t i = r.begin(); i != r.end(); ++i)
-				{
-					assert(i < _pop.size());
-					assert(i < _list_matches.size());
-
-					for(size_t j = 0; j < _list_matches[i].size(); ++j)
-					{
-						std::vector<boost::shared_ptr<Phen> > vec_ind;
-						std::vector<bool> vec_eval;
-
-						vec_ind.push_back(_pop[i]);
-						vec_eval.push_back(true);
-
-						for(size_t k = 0; k < _list_matches[i][j].size(); ++k)
-						{
-							assert(_list_matches[i][j][k][0] < _pop.size());
-							vec_ind.push_back(_pop[_list_matches[i][j][k][0]]);
-							vec_eval.push_back((_list_matches[i][j][k][1]) == 1);
-						}
-
-						_pop[i]->fit().eval_compet(vec_ind[0], vec_ind[1], vec_eval[0], vec_eval[1]);
 					}
 				}
       }
@@ -308,7 +302,6 @@ namespace sferes
 						pop[i]->fit().set_obj(k, 0);
 
 #ifdef LISTMATCH
-
 					// Creation of the matching list
 					list_matches_ind_t list_matches_ind;
 					while(vec_nb_simulations[i] < nb_simulations_max)
@@ -374,6 +367,15 @@ namespace sferes
 					}
 					list_matches.push_back(list_matches_ind);
 #endif
+				}
+
+				for(size_t i = 0; i < list_matches.size(); ++i)
+				{
+					std::cout << "Individual " << i << " : " << std::endl;
+
+					for(size_t j = 0; j < list_matches[i].size(); ++j)
+						std::cout << "(" << list_matches[i][j][0][0] << "," << list_matches[i][j][0][0] << "), ";
+					std::cout << std::endl;
 				}
 
 #ifdef ALTRUISM
