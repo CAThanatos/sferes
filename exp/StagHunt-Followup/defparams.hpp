@@ -3,6 +3,10 @@
 
 #include <sferes/gen/evo_float.hpp>
 
+#ifndef NO_LISTMATCH
+#define LISTMATCH
+#endif
+
 #ifndef FITPROP
 #define ELITIST
 #endif

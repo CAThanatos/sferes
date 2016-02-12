@@ -159,7 +159,6 @@ namespace sferes
 						vec_ind.push_back(_pop[i]);
 						vec_eval.push_back(true);
 
-						std::cout << i << " AGAINST " << _list_matches[i][j][0][0] << " WITH " << _list_matches[i][j][0][1] << std::endl;
 						_pop[i]->fit().eval_compet(*_pop[i], *_pop[_list_matches[i][j][0][0]], _list_matches[i][j][0][1]);
 					}
 				}
@@ -367,15 +366,6 @@ namespace sferes
 					}
 					list_matches.push_back(list_matches_ind);
 #endif
-				}
-
-				for(size_t i = 0; i < list_matches.size(); ++i)
-				{
-					std::cout << "Individual " << i << " : " << std::endl;
-
-					for(size_t j = 0; j < list_matches[i].size(); ++j)
-						std::cout << "(" << list_matches[i][j][0][0] << "," << list_matches[i][j][0][0] << "), ";
-					std::cout << std::endl;
 				}
 
 #ifdef ALTRUISM

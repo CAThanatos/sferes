@@ -22,14 +22,20 @@ namespace sferes
 #ifdef COEVO
     template<typename Indiv>
       void eval_compet(Indiv& ind1, Indiv& ind2, int num_leader = 1) 
-#else
+#elif defined(LISTMATCH)
 #ifdef GENOME_TRACES
+    template<typename Indiv>
+      void eval_compet(Indiv& ind1, Indiv& ind2, bool genome_traces = false, bool evaluateInd2 = false) 
+#else
+    template<typename Indiv>
+      void eval_compet(Indiv& ind1, Indiv& ind2, bool evaluateInd2 = false) 
+#endif
+#elif defined(GENOME_TRACES)
     template<typename Indiv>
       void eval_compet(Indiv& ind1, Indiv& ind2, bool genome_traces = false) 
 #else
     template<typename Indiv>
       void eval_compet(Indiv& ind1, Indiv& ind2) 
-#endif
 #endif
     {
       typedef simu::FastsimMulti<Params> simu_t;
@@ -376,9 +382,25 @@ namespace sferes
 			// std::cout << "----------" << std::endl;
    //   	std::cout << "Food 1 : " << food1 << std::endl;
    //   	std::cout << "Food 2 : " << food2 << std::endl;
-			
-#if !defined(NOT_AGAINST_ALL) && !defined(ALTRUISM)
-			ind2.fit().add_fitness(food2);
+			     	
+#if (!defined(NOT_AGAINST_ALL) && !defined(ALTRUISM)) || defined(LISTMATCH)
+#ifdef LISTMATCH
+			if(evaluateInd2)
+#else
+			if(true)
+#endif
+			{
+				ind2.add_nb_hares(moy_hares2, moy_hares1_solo);
+				ind2.add_nb_sstag(moy_sstags2, moy_sstags1_solo);
+				ind2.add_nb_bstag(moy_bstags2, moy_bstags1_solo);
+
+				ind2.add_nb_leader_first(_nb_leader_first);
+				ind2.add_nb_preys_killed_coop(_nb_preys_killed_coop);
+				ind2.add_proportion_leader(proportion_leader);
+				ind2.add_nb_ind1_leader_first(nb_ind1_leader_first);
+
+				ind2.fit().add_fitness(food2);
+			}
 #endif
 
 #ifdef DIVERSITY

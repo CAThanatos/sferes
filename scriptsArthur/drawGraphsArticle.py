@@ -238,7 +238,7 @@ def drawAllFit(dossier) :
 		axe1.set_xticklabels([tabGeneration[indice] for indice in tabEvaluationTicks])
 		axe1.set_xlabel('Generation')
 
-		axe1.set_ylabel('Pourcentage of stags hunted')
+		axe1.set_ylabel('Percentage of stags hunted')
 		axe1.set_ylim(-5, 105)
 
 		plt.savefig(dossier + "/figureRatioBStags.png", bbox_inches = 'tight')
@@ -295,7 +295,7 @@ def drawAllFit(dossier) :
 		axe1.set_xticklabels([tabGeneration[indice] for indice in tabEvaluationTicks])
 		axe1.set_xlabel('Generation')
 
-		axe1.set_ylabel('Pourcentage of stags hunted')
+		axe1.set_ylabel('Percentage of stags hunted')
 		# axe1.set_ylim(0, 100)
 
 		plt.savefig(dossier + "/figureRatioBStagsSuccess.png", bbox_inches = 'tight')
@@ -352,7 +352,7 @@ def drawAllFit(dossier) :
 		axe1.set_xticklabels([tabGeneration[indice] for indice in tabEvaluationTicks])
 		axe1.set_xlabel('Generation')
 
-		axe1.set_ylabel('Pourcentage of hares hunted')
+		axe1.set_ylabel('Percentage of hares hunted')
 		axe1.set_ylim(0, 100)
 
 		plt.savefig(dossier + "/figureRatioHares.png", bbox_inches = 'tight')
@@ -409,7 +409,7 @@ def drawAllFit(dossier) :
 		axe1.set_xticklabels([tabGeneration[indice] for indice in tabEvaluationTicks])
 		axe1.set_xlabel('Generation')
 
-		axe1.set_ylabel('Pourcentage of hares hunted')
+		axe1.set_ylabel('Percentage of hares hunted')
 		axe1.set_ylim(0, 100)
 
 		plt.savefig(dossier + "/figureRatioHaresSuccess.png", bbox_inches = 'tight')
@@ -832,7 +832,7 @@ def drawBestFit(dossier) :
 		axe1.set_xticklabels([tabGeneration[indice] for indice in tabEvaluationTicks])
 		axe1.set_xlabel('Generation')
 
-		axe1.set_ylabel('Pourcentage of stags hunted')
+		axe1.set_ylabel('Percentage of stags hunted')
 		# axe1.set_ylim(0, 100)
 
 		plt.savefig(dossier + "/figureRatioBStagsSuccess.png", bbox_inches = 'tight')

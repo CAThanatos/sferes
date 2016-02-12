@@ -57,9 +57,8 @@ def build(bld):
 													 							# 'SETTING14 STD2 SSTAG250 DIVERSITY',
 													 							# 'SETTING14 SSTAG250 DIVERSITY',
 
-													 							# 'SETTING14 FITPROP POP40 STD2 SSTAG250',
-													 							# 'SETTING14 FITPROP POP40 POLYNOMIAL SSTAG250',
-													 							'SETTING14 FITPROP STD2 SSTAG250',
+													 							'SETTING14 FITPROP POP40 STD2 SSTAG250',
+													 							'SETTING14 FITPROP POP40 POLYNOMIAL SSTAG250',
 													 							# 'SETTING14 FITPROP STD3 SSTAG250',
 													 							# 'SETTING14 FITPROP STD4 SSTAG250',
 													 							# 'SETTING14 FITPROP POLYNOMIAL SSTAG250',
