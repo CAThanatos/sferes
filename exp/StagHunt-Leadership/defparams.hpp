@@ -150,6 +150,9 @@ struct Params
 #elif defined(RATIO65)
 	static const int nb_big_stags = 0.65*total_preys;
 	static const int nb_hares = total_preys - nb_big_stags;
+#elif defined(RATIO66)
+	static const int nb_big_stags = (2.0f/3.0f)*total_preys;
+	static const int nb_hares = total_preys - nb_big_stags;
 #elif defined(RATIO84)
 	static const int nb_big_stags = (5.0f/6.0f)*total_preys;
 	static const int nb_hares = total_preys - nb_big_stags;
@@ -452,7 +455,7 @@ struct Params
 #endif
     
     // number of generations
-    static const unsigned nb_gen = 100000;
+    static const unsigned nb_gen = 10001;
     
     // how often should the result file be written
 #ifdef POP100
