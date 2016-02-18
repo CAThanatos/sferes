@@ -385,7 +385,7 @@ namespace sferes
           std::string path = fname.substr(0, fname.find_last_of("/") + 1);
           std::ifstream ifs2((path + "genome.dat").c_str());
 
-#if defined(ELITISTINV) || defined(FINITE) || defined(INFINITE)
+#if defined(ELITISTINV) || defined(FINITE) || defined(INFINITE) || defined(FITPROP)
           stc::exact(this)->load_genome(fname);
 #else
           if (!ifs2.fail())

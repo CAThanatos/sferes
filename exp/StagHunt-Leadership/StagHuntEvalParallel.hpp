@@ -159,7 +159,12 @@ namespace sferes
 						vec_ind.push_back(_pop[i]);
 						vec_eval.push_back(true);
 
-						_pop[i]->fit().eval_compet(*_pop[i], *_pop[_list_matches[i][j][0][0]], _list_matches[i][j][0][1]);
+#ifdef GENOME_TRACES
+						_pop[i]->fit().eval_compet(*_pop[i], *_pop[_list_matches[i][j][0][0]], false, (_list_matches[i][j][0][1] == 0) ? false : true);
+#else
+						_pop[i]->fit().eval_compet(*_pop[i], *_pop[_list_matches[i][j][0][0]], (_list_matches[i][j][0][1] == 0) ? false : true);
+#endif
+						// _pop[i]->fit().eval_compet(*_pop[i], *_pop[_list_matches[i][j][0][0]], _list_matches[i][j][0][1]);
 					}
 				}
       }

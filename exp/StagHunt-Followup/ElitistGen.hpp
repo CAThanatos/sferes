@@ -91,6 +91,10 @@ namespace sferes
       
       void mutate(float step_size = 1.0f) 
       {
+#ifdef MUT_APP_RATE
+      	if(misc::rand<float>() < Params::evo_float::mutant_apparition_rate)
+#endif
+      	{
 #ifdef GAUSSIAN_MUTATION
       	float sigma = Params::evo_float::sigma;
 				for (size_t i = 0; i < _size; i++)
@@ -139,6 +143,7 @@ namespace sferes
 						_data[i] = misc::put_in_range(f, 0.0f, 1.0f);
 					}
 #endif
+				}
 				_check_invariant();
 	    }
 

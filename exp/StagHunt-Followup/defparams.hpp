@@ -257,6 +257,14 @@ struct Params
 	
   struct evo_float
   {
+#ifdef MUT_APP_RATE
+#ifdef RATE5
+  	static const float mutant_apparition_rate = 0.05;
+#elif defined(RATE25)
+  	static const float mutant_apparition_rate = 0.25;
+#endif
+#endif
+
     // the mutation rate of the real-valued vector
     static const float mutation_rate = 0.003f;
 

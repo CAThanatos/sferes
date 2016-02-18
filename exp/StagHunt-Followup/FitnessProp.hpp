@@ -57,6 +57,9 @@ namespace sferes
 
       static const unsigned nb_keep = (unsigned)(Params::pop::keep_rate * Params::pop::size);
 
+			FitnessProp() : _step_size(1.0f)
+			{ }
+
       void random_pop()
       {
 				this->_pop.resize(Params::pop::size * Params::pop::initial_aleat);
@@ -263,12 +266,20 @@ namespace sferes
 				for (unsigned i = 0; i < new_pop.size(); ++i)
 				{
 #ifndef NO_MUTATION
+#ifdef STEP_SIZE
+					new_pop[i]->gen().mutate(_step_size);
+#else
 					new_pop[i]->mutate();
+#endif
 #endif
 					this->_pop[i] = new_pop[i];
 				}
 
 				this->_eval.eval(this->_pop, 0, Params::pop::size);
+
+#ifdef STEP_SIZE
+				_step_size = 2 * _step_size;
+#endif
 
 /*#ifndef EA_EVAL_ALL
 				this->_eval.eval(this->_pop, nb_keep, Params::pop::size);
@@ -282,7 +293,39 @@ namespace sferes
 				dbg::out(dbg::info, "ea")<<"best fitness: " << this->_pop[0]->fit().value() << std::endl;
       }
 
-      
+
+      void load_genome(const std::string fname) 
+      {
+        // Add a particular individual to the population
+        std::string path = fname.substr(0, fname.find_last_of("/") + 1);
+        std::ifstream ifs2((path + "genome.dat").c_str());
+
+        if (!ifs2.fail())
+        {
+          std::cout << "Adding individual(s) with genotype in genome.dat..." << std::endl;
+          
+          int numIndiv = 0;
+          while(ifs2.good())
+          {
+            std::string line;
+            std::getline(ifs2, line);
+
+            std::stringstream ss(line);
+            std::string gene;
+            int cpt = 0;
+            while(std::getline(ss, gene, ','))
+            {
+              _pop[_pop.size() - numIndiv - 1]->gen().data(cpt, std::atof(gene.c_str()));
+              cpt++;
+            }
+
+            numIndiv++;
+          }
+        }
+
+				this->_eval.eval(this->_pop, 0, this->_pop.size());
+      }
+
       void play_run(const std::string& fname)
       {
         std::ifstream ifs(fname.c_str());
@@ -330,6 +373,7 @@ namespace sferes
       }
       
     protected:
+    	float _step_size;
     };
   }
 }

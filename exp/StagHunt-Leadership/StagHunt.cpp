@@ -689,9 +689,9 @@ namespace sferes
 			if(true)
 #endif
 			{
-				ind2.add_nb_hares(moy_hares2, moy_hares1_solo);
-				ind2.add_nb_sstag(moy_sstags2, moy_sstags1_solo);
-				ind2.add_nb_bstag(moy_bstags2, moy_bstags1_solo);
+				ind2.add_nb_hares(moy_hares2, moy_hares2_solo);
+				ind2.add_nb_sstag(moy_sstags2, moy_sstags2_solo);
+				ind2.add_nb_bstag(moy_bstags2, moy_bstags2_solo);
 
 				ind2.add_nb_leader_first(_nb_leader_first);
 				ind2.add_nb_preys_killed_coop(_nb_preys_killed_coop);
