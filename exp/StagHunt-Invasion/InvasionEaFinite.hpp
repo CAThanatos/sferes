@@ -136,7 +136,7 @@ namespace sferes
 				{
 					for(size_t j = 0; j < Params::pop::size; j += Params::pop::nb_offsprings)
 					{
-						float random_child = misc::rand(1.0f);
+						float random_child = misc::rand<float>();
 						float fit_sum = 0.0f;
 
 						for(size_t i = 0; i < old_nb_genotypes; ++i)
@@ -357,6 +357,9 @@ namespace sferes
 					this->_pop[i]->set_nb_bstags(nb_bstags, nb_bstags_solo);
 	      }
       }
+
+      void fill_pop()
+      {}
 
       void play_run(const std::string& fname)
       {

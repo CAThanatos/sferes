@@ -3,6 +3,10 @@
 
 #include <sferes/gen/evo_float.hpp>
 
+#ifdef COEVO
+#define NO_LISTMATCH
+#endif
+
 #ifndef NO_LISTMATCH
 #define LISTMATCH
 #endif
@@ -379,6 +383,8 @@ struct Params
     static const int nb_niches = 4;
 #elif defined(NICHE2)
     static const int nb_niches = 2;
+#elif defined(NICHE3)
+    static const int nb_niches = 3;
 #elif defined(NICHE8)
     static const int nb_niches = 8;
 #elif defined(NICHE10)

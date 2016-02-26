@@ -366,6 +366,9 @@ namespace sferes
 	      }
       }
 
+      void fill_pop()
+      {}
+
       void play_run(const std::string& fname)
       {
         std::ifstream ifs(fname.c_str());

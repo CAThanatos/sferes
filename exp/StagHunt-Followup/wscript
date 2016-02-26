@@ -68,9 +68,24 @@ def build(bld):
 													 							# 'SETTING14 FITPROP UNIFORM_MUTATION MUT_APP_RATE RATE5 SSTAG250',
 													 							# 'SETTING14 FITPROP UNIFORM_MUTATION MUT_APP_RATE RATE25 SSTAG250',
 													 							# 'SETTING14 SSTAG250',
-													 							# 'SETTING14 FITPROP POP100 STD2 SSTAG250',
 
+													 							# ---- POP20 EXPERIMENTS ----
+													 							'SETTING14 FITPROP STD2 SSTAG250',
+													 							'SETTING14 SSTAG250',
+
+													 							# ---- POP40 EXPERIMENTS ----
 													 							'SETTING14 FITPROP POP40 STD2 SSTAG250',
+													 							'SETTING14 POP40 MU20 LAMBDA20 SSTAG250',
+
+													 							# ---- POP100 EXPERIMENTS ----
+													 							'SETTING14 FITPROP POP100 STD2 SSTAG250',
+													 							'SETTING14 POP100 MU50 LAMBDA50 SSTAG250',
+
+													 							# ---- COEVO ----
+													 							'SETTING14 COEVO SSTAG250',
+
+													 							# ---- COEVO3 ----
+													 							'SETTING14 PAIRING NICHE3 MU7 LAMBDA7 AGAINST_ALL_NICHES SSTAG250',
 
 													 							# 'SETTING14 TUPLES TUPLE_SWAP SSTAG250',
 													 							# 'SETTING14 TUPLES TUPLE_SWAP STD2 SSTAG250',

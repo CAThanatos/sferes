@@ -11,9 +11,11 @@ import numpy as np
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from pylab import *
 import ternary
+
 import os
 import re
 import sys
+
 
 
 
@@ -55,6 +57,7 @@ def main(args) :
 	palette = sns.color_palette("husl", 4)
 
 	dpi = 96
+
 	size = (1280/dpi, 1024/dpi)
 
 	tabProportions = {}
@@ -88,6 +91,15 @@ def main(args) :
 		hashExpectations['Solo'].append(tmpArraySolo)
 		hashExpectations['Turner'].append(tmpArrayTurner)
 
+
+	# matplotlib.rcParams['font.size'] = 15
+	# matplotlib.rcParams['font.weight'] = 'bold'
+	# matplotlib.rcParams['axes.labelsize'] = 25
+	# matplotlib.rcParams['axes.titlesize'] = 25
+	# matplotlib.rcParams['axes.labelweight'] = 'bold'
+	# matplotlib.rcParams['xtick.labelsize'] = 25
+	# matplotlib.rcParams['ytick.labelsize'] = 25
+	# matplotlib.rcParams['legend.fontsize'] = 25
 
 	matplotlib.rcParams['font.size'] = 15
 	matplotlib.rcParams['font.weight'] = 'bold'
@@ -854,9 +866,11 @@ def main(args) :
 		# Remove default Matplotlib Axes
 		tax.clear_matplotlib_ticks()
 
-		tax.left_axis_label("Solo")
-		tax.right_axis_label("Follower")
-		tax.bottom_axis_label("Turner")
+		fontsize = 25
+		fontweight = 'bold'
+		tax.left_axis_label("Solo", (0.0 - 0.09, 1.0 + 0.17, 0.5), 0.0, fontsize = fontsize, fontweight = fontweight)
+		tax.right_axis_label("Follower", (1.0 - 0.06, 0.1, 0.0), -120, fontsize = fontsize, fontweight = fontweight)
+		tax.bottom_axis_label("Turner", (-0.04, 0.1, 1.0), 120, fontsize = fontsize, fontweight = fontweight)
 
 		# plt.colorbar(Q, cax = tax.get_axes())
 
@@ -889,9 +903,11 @@ def main(args) :
 		# Remove default Matplotlib Axes
 		tax.clear_matplotlib_ticks()
 
-		tax.left_axis_label("Solo")
-		tax.right_axis_label("Follower")
-		tax.bottom_axis_label("Turner")
+		fontsize = 25
+		fontweight = 'bold'
+		tax.left_axis_label("Solo", (0.0 - 0.09, 1.0 + 0.17, 0.5), 0.0, fontsize = fontsize, fontweight = fontweight)
+		tax.right_axis_label("Follower", (1.0 - 0.06, 0.1, 0.0), -120, fontsize = fontsize, fontweight = fontweight)
+		tax.bottom_axis_label("Turner", (-0.04, 0.1, 1.0), 120, fontsize = fontsize, fontweight = fontweight)
 
 		# divider = make_axes_locatable(ax5)
 		# cax = divider.append_axes("right", size="5%", pad=0.05)
@@ -953,9 +969,11 @@ def main(args) :
 			# Remove default Matplotlib Axes
 			tax.clear_matplotlib_ticks()
 
-			tax.left_axis_label("Solo")
-			tax.right_axis_label("Follower")
-			tax.bottom_axis_label("Turner")
+			fontsize = 25
+			fontweight = 'bold'
+			tax.left_axis_label("Solo", (0.0 - 0.09, 1.0 + 0.17, 0.5), 0.0, fontsize = fontsize, fontweight = fontweight)
+			tax.right_axis_label("Follower", (1.0 - 0.06, 0.1, 0.0), -120, fontsize = fontsize, fontweight = fontweight)
+			tax.bottom_axis_label("Turner", (-0.04, 0.1, 1.0), 120, fontsize = fontsize, fontweight = fontweight)
 			legend = plt.legend(frameon = True)
 			frame = legend.get_frame()
 			frame.set_facecolor('0.9')
@@ -992,7 +1010,7 @@ def main(args) :
 
 			cpt = 0
 			for scatter in listScatters :
-				tax.scatter(scatter, color = listColors[cpt % len(listColors)], marker = listMarkers[cpt % len(listMarkers)], s = 50, label = listLabels[cpt % len(listLabels)])
+				tax.scatter(scatter, color = listColors[cpt % len(listColors)], marker = listMarkers[cpt % len(listMarkers)], s = 75, label = listLabels[cpt % len(listLabels)])
 
 				cpt += 1
 
@@ -1012,9 +1030,11 @@ def main(args) :
 			# Remove default Matplotlib Axes
 			tax.clear_matplotlib_ticks()
 
-			tax.left_axis_label("Solo")
-			tax.right_axis_label("Follower")
-			tax.bottom_axis_label("Turner")
+			fontsize = 25
+			fontweight = 'bold'
+			tax.left_axis_label("Solo", (0.0 - 0.09, 1.0 + 0.17, 0.5), 0.0, fontsize = fontsize, fontweight = fontweight)
+			tax.right_axis_label("Follower", (1.0 - 0.06, 0.1, 0.0), -120, fontsize = fontsize, fontweight = fontweight)
+			tax.bottom_axis_label("Turner", (-0.04, 0.1, 1.0), 120, fontsize = fontsize, fontweight = fontweight)
 			legend = plt.legend(frameon = True)
 			frame = legend.get_frame()
 			frame.set_facecolor('0.9')

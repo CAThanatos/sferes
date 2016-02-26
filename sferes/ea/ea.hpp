@@ -331,6 +331,7 @@ namespace sferes
           oa_t oa(ofs);
           oa << BOOST_SERIALIZATION_NVP(_seed);
 	        oa << BOOST_SERIALIZATION_NVP(_pop);
+
 #ifdef COEVO
           oa << BOOST_SERIALIZATION_NVP(_pop_co);
 #endif
@@ -362,6 +363,14 @@ namespace sferes
           ia >> BOOST_SERIALIZATION_NVP(_seed);
 	        ia >> BOOST_SERIALIZATION_NVP(_pop);
 
+#if defined(FITPROP)
+          if(_pop.size() < Params::pop::size)
+            stc::exact(this)->fill_pop();
+#elif defined(ELITIST)
+          if(_pop.size() < Params::pop::mu)
+            stc::exact(this)->fill_pop();
+#endif
+
 #if defined(ELITISTINV) || defined(FINITE) || defined(INFINITE)
           stc::exact(this)->load_genotypes();
 #endif
@@ -371,7 +380,7 @@ namespace sferes
 #endif
 
 #ifdef PAIRING
-          stc::exact(this)->load_niches(fname);
+          // stc::exact(this)->load_niches(fname);
 #endif
 
           // for(int i = 0; i < _pop.size(); ++i)

@@ -233,6 +233,8 @@ struct Params
   	static const float mutant_apparition_rate = 1.0f;
 #elif defined(MUT_APP10)
   	static const float mutant_apparition_rate = 0.1f;
+#elif defined(MUT_APP50)
+  	static const float mutant_apparition_rate = 0.5f;
 #else
   	static const float mutant_apparition_rate = 0.001f;
 #endif
@@ -309,6 +311,8 @@ struct Params
     // size of the population
 #ifdef ONEPLUSONE
   	static const unsigned size = 2;
+#elif defined(POP2)
+    static const unsigned size = 2;
 #elif defined(POP20)
     static const unsigned size = 20;
 #elif defined(POP100)
@@ -410,6 +414,8 @@ struct Params
 		static const int pop_init = 10;
 #elif defined(POP_INIT1)
 		static const int pop_init = 1;
+#elif defined(POP_INIT2)
+		static const int pop_init = 2;
 #elif defined(POP_INIT50)
 		static const int pop_init = 50;
 #elif defined(POP_INIT100)

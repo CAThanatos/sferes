@@ -315,7 +315,7 @@ namespace sferes
             int cpt = 0;
             while(std::getline(ss, gene, ','))
             {
-              _pop[_pop.size() - numIndiv - 1]->gen().data(cpt, std::atof(gene.c_str()));
+              this->_pop[this->_pop.size() - numIndiv - 1]->gen().data(cpt, std::atof(gene.c_str()));
               cpt++;
             }
 
@@ -323,6 +323,24 @@ namespace sferes
           }
         }
 
+				this->_eval.eval(this->_pop, 0, this->_pop.size());
+      }
+
+      void fill_pop()
+      {
+        std::cout << "Duplicating individuals from pop_size = " << this->_pop.size() << " to pop_size = " << Params::pop::size << std::endl;
+
+        int cur_pop_size = this->_pop.size();
+        this->_pop.resize(Params::pop::size);
+
+        int cpt_indiv = 0;
+        for(size_t i = cur_pop_size; i < Params::pop::size; ++i)
+        {
+          this->_pop[i] = this->_pop[cpt_indiv]->clone();
+          cpt_indiv = (cpt_indiv + 1)%cur_pop_size;
+        }
+
+        assert(this->_pop.size() == Params::pop::size);
 				this->_eval.eval(this->_pop, 0, this->_pop.size());
       }
 
