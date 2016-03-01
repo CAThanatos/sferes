@@ -174,16 +174,16 @@ def main(args) :
 	   bp['whiskers'][i*2 + 1].set_linewidth(2)
 	   # top and bottom fliers
 	   # (set allows us to set many parameters at once)
-	   bp['fliers'][0].set(markerfacecolor=palette[i],
+	   bp['fliers'][0].set(markerfacecolor='black',
 	                   marker='o', alpha=0.75, markersize=6,
 	                   markeredgecolor='none')
-	   bp['fliers'][1].set(markerfacecolor=palette[i],
+	   bp['fliers'][1].set(markerfacecolor='black',
 	                   marker='o', alpha=0.75, markersize=6,
 	                   markeredgecolor='none')
-	   # bp['fliers'][i * 2].set(markerfacecolor=palette[i],
+	   # bp['fliers'][i * 2].set(markerfacecolor='black',
 	   #                 marker='o', alpha=0.75, markersize=6,
 	   #                 markeredgecolor='none')
-	   # bp['fliers'][i * 2 + 1].set(markerfacecolor=palette[i],
+	   # bp['fliers'][i * 2 + 1].set(markerfacecolor='black',
 	   #                 marker='o', alpha=0.75, markersize=6,
 	   #                 markeredgecolor='none')
 	   bp['medians'][i].set_color('black')
@@ -207,6 +207,9 @@ def main(args) :
 	fig.subplots_adjust(left=0.2)
 
 	ax.set_xticklabels(['Leader/Follower\nstrategy', 'Turner\nstrategy'])
+
+	ax.set_xlabel("Strategy")
+	ax.set_ylabel("Average reward")
 
 	y_max = np.max(np.concatenate((dataHash['SF'][:, 0], dataHash['TT'][:, 0])))
 	# y_min = np.min(np.concatenate((dataHash['SF'][:, 0], dataHash['TT'][:, 0])))
@@ -271,16 +274,16 @@ def main(args) :
 	   bp['whiskers'][i*2 + 1].set_linewidth(2)
 	   # top and bottom fliers
 	   # (set allows us to set many parameters at once)
-	   bp['fliers'][0].set(markerfacecolor=palette[i],
+	   bp['fliers'][0].set(markerfacecolor='black',
 	                   marker='o', alpha=0.75, markersize=6,
 	                   markeredgecolor='none')
-	   bp['fliers'][1].set(markerfacecolor=palette[i],
+	   bp['fliers'][1].set(markerfacecolor='black',
 	                   marker='o', alpha=0.75, markersize=6,
 	                   markeredgecolor='none')
-	   # bp['fliers'][i * 2].set(markerfacecolor=palette[i],
+	   # bp['fliers'][i * 2].set(markerfacecolor='black',
 	   #                 marker='o', alpha=0.75, markersize=6,
 	   #                 markeredgecolor='none')
-	   # bp['fliers'][i * 2 + 1].set(markerfacecolor=palette[i],
+	   # bp['fliers'][i * 2 + 1].set(markerfacecolor='black',
 	   #                 marker='o', alpha=0.75, markersize=6,
 	   #                 markeredgecolor='none')
 	   bp['medians'][i].set_color('black')
@@ -304,6 +307,9 @@ def main(args) :
 	fig.subplots_adjust(left=0.2)
 
 	ax.set_xticklabels(['Leader/Follower\nstrategy', 'Turner\nstrategy'])
+
+	ax.set_xlabel("Strategy")
+	ax.set_ylabel("Leadership ratio")
 
 	y_max = np.max(np.concatenate((dataHash['SF'][:, 2], dataHash['TT'][:, 2])))
 	# y_min = np.min(np.concatenate((dataHash['SF'][:, 0], dataHash['TT'][:, 0])))

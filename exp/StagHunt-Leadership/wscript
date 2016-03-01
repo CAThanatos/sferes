@@ -67,8 +67,9 @@ def build(bld):
 																				# 'CONTROL1 FITPROP POLYNOMIAL',
 																				# 'CONTROL1 FITPROP RATIO66 POLYNOMIAL',
 																				# 'CONTROL1 FITPROP RATIO33 POLYNOMIAL',
-																				'CONTROL1 FITPROP RATIO16 POLYNOMIAL',
-																				'CONTROL1 FITPROP RATIO84 POLYNOMIAL',
+																				# 'CONTROL1 FITPROP RATIO16 POLYNOMIAL',
+																				# 'CONTROL1 FITPROP RATIO84 POLYNOMIAL',
+																				'SETTING14 SSTAG250 POS_CLOSE',
 
 																				# 'CONTROL1 POP100 FITPROP STD2 BSTAG500',
 																				# 'CONTROL1 POP100 FITPROP STD2 BSTAG500 BSTAG_SOLO50',

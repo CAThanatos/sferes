@@ -1263,13 +1263,21 @@ def drawLeadership(args) :
 
 	# print y_max
 
-	# ax.annotate("", xy=(1, 1), xycoords='data',
-	#            xytext=(2, 1), textcoords='data',
-	#            arrowprops=dict(arrowstyle="-", ec='#000000',
-	#                            connectionstyle="bar,fraction=0.05"))
-	# ax.text(1.5, 1 + abs(1 - y_min)*0.05, stars,
-	#        horizontalalignment='center',
-	#        verticalalignment='center')
+	cptData = 0
+	while cptData < len(dataStats) :
+		cptComp = cptData + 1
+		while cptComp < len(dataStats[cptData]) :
+			if dataStats[cptData][cptComp] != "-" :
+				ax.annotate("", xy=(cptData + 1, 0.75), xycoords='data',
+				           xytext=(cptComp + 1, 0.75), textcoords='data',
+				           arrowprops=dict(arrowstyle="-", ec='#000000',
+				                           connectionstyle="bar,fraction=0.05"))
+				ax.text(2, 0.80, dataStats[cptData][cptComp],
+				       horizontalalignment='center',
+				       verticalalignment='center')
+
+			cptComp += 1
+		cptData += 1
 
 	plt.savefig(outputDir + "/boxplotLeadershipTime.png", bbox_inches = 'tight')
 	plt.savefig(outputDir + "/boxplotLeadershipTime.svg", bbox_inches = 'tight')
