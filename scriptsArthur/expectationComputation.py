@@ -12,6 +12,11 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from pylab import *
 import ternary
 
+import os
+import re
+import sys
+
+
 
 
 FITNESS_ARRAY = {
@@ -52,73 +57,8 @@ def main(args) :
 	palette = sns.color_palette("husl", 4)
 
 	dpi = 96
-	size = (1680/dpi, 1024/dpi)
-	# fig, (ax0, ax1, ax2) = plt.subplots(ncols=3, figsize = size)
 
-	# fig = plt.figure(figsize = size)	
-	# ax0 = plt.subplot2grid((4,3), (0,0))
-	# ax1 = plt.subplot2grid((4,3), (0,1))
-	# ax2 = plt.subplot2grid((4,3), (0,2))
-	# ax3 = plt.subplot2grid((4,3), (1,0))
-	# ax4 = plt.subplot2grid((4,3), (1,1))
-	# ax5 = plt.subplot2grid((4,3), (1,2))
-	# ax6 = plt.subplot2grid((4,3), (2,0))
-	# ax7 = plt.subplot2grid((4,3), (2,1))
-	# ax8 = plt.subplot2grid((4,3), (3,0))
-	# ax9 = plt.subplot2grid((4,3), (3,1))
-	# ax0 = plt.subplot2grid((2,6), (0,0), colspan = 2)
-	# ax1 = plt.subplot2grid((2,6), (0,2), colspan = 2)
-	# ax2 = plt.subplot2grid((2,6), (0,4), colspan = 2)
-	# ax3 = plt.subplot2grid((2,6), (1,0))
-	# ax4 = plt.subplot2grid((2,6), (1,1))
-	# ax5 = plt.subplot2grid((2,6), (1,2))
-	# ax6 = plt.subplot2grid((2,6), (1,3))
-	# ax7 = plt.subplot2grid((2,6), (1,4))
-	# ax8 = plt.subplot2grid((2,6), (1,5))
-
-	# # -- Solo VS Follower --
-	# Yexpectation = []
-	# tabProportions = {}
-	# for proportion in Xproportions :
-	# 	tabProportions['Solo'] = proportion
-	# 	tabProportions['Follower'] = 1.0 - proportion
-	# 	Yexpectation.append(computeExpectation('Solo', tabProportions))
-
-	# ax0.plot(Xproportions, Yexpectation, color = palette[0], linestyle = '-', linewidth = 2, marker = None)
-	# ax0.set_xlabel('Proportion of solo')
-	# ax0.set_ylabel('Expected value')
-	# ax0.set_ylim(0.0, 5000.0)
-	# ax0.set_title('Expected value of solo individuals against followers')	
-
-
-	# # -- Follower VS Turner --
-	# Yexpectation = []
-	# tabProportions = {}
-	# for proportion in Xproportions :
-	# 	tabProportions['Follower'] = proportion
-	# 	tabProportions['Turner'] = 1.0 - proportion
-	# 	Yexpectation.append(computeExpectation('Follower', tabProportions))
-
-	# ax1.plot(Xproportions, Yexpectation, color = palette[0], linestyle = '-', linewidth = 2, marker = None)
-	# ax1.set_xlabel('Proportion of followers')
-	# ax1.set_ylabel('Expected value')
-	# ax1.set_ylim(0.0, 5000.0)
-	# ax1.set_title('Expected value of follower individuals against turners')	
-
-
-	# # -- Turner VS Solo --
-	# Yexpectation = []
-	# tabProportions = {}
-	# for proportion in Xproportions :
-	# 	tabProportions['Turner'] = proportion
-	# 	tabProportions['Solo'] = 1.0 - proportion
-	# 	Yexpectation.append(computeExpectation('Turner', tabProportions))
-
-	# ax2.plot(Xproportions, Yexpectation, color = palette[0], linestyle = '-', linewidth = 2, marker = None)
-	# ax2.set_xlabel('Proportion of turners')
-	# ax2.set_ylabel('Expected value')
-	# ax2.set_ylim(0.0, 5000.0)
-	# ax2.set_title('Expected value of turner individuals against solo')	
+	size = (1280/dpi, 1024/dpi)
 
 	tabProportions = {}
 	Xproportions = np.arange(0.0, 1.0 + args.precision, args.precision)	
@@ -151,6 +91,15 @@ def main(args) :
 		hashExpectations['Solo'].append(tmpArraySolo)
 		hashExpectations['Turner'].append(tmpArrayTurner)
 
+
+	# matplotlib.rcParams['font.size'] = 15
+	# matplotlib.rcParams['font.weight'] = 'bold'
+	# matplotlib.rcParams['axes.labelsize'] = 25
+	# matplotlib.rcParams['axes.titlesize'] = 25
+	# matplotlib.rcParams['axes.labelweight'] = 'bold'
+	# matplotlib.rcParams['xtick.labelsize'] = 25
+	# matplotlib.rcParams['ytick.labelsize'] = 25
+	# matplotlib.rcParams['legend.fontsize'] = 25
 
 	matplotlib.rcParams['font.size'] = 15
 	matplotlib.rcParams['font.weight'] = 'bold'
@@ -185,6 +134,11 @@ def main(args) :
 	ZexpectationTurnerFull = dict()
 	ZexpectationAllFull = dict()
 
+	listPoints = list()
+	listPointsDest = list()
+	listPointsEquilibrium = list()
+	precisionVector = 2
+
 	cptX = 0
 	while cptX < len(Xproportions) :
 
@@ -192,6 +146,7 @@ def main(args) :
 		while cptY < len(Yproportions) :
 			if (cptX + cptY) <= 100 :
 				curTuple = (cptX, cptY, 100 - (cptX + cptY))
+
 				ZexpectationFollower[curTuple] = hashExpectations['Follower'][cptX][cptY]
 				ZexpectationSolo[curTuple] = hashExpectations['Solo'][cptX][cptY]
 				ZexpectationTurner[curTuple] = hashExpectations['Turner'][cptX][cptY]
@@ -233,6 +188,37 @@ def main(args) :
 				else :
 					ZexpectationAllFull[curTuple] = 0.0
 
+
+				if (cptX%precisionVector == 0) and (cptY%precisionVector == 0) :
+					listPoints.append(curTuple)
+					propFollower = cptX/float(100)
+					propSolo = cptY/float(100)
+					propTurner = 1.0 - (propFollower + propSolo)
+
+					# print("(" + str(propFollower) + "," + str(propSolo) + "," + str(propTurner) + ")")
+
+					fitnessFollower = hashExpectations['Follower'][cptX][cptY]
+					fitnessSolo = hashExpectations['Solo'][cptX][cptY]
+					fitnessTurner = hashExpectations['Turner'][cptX][cptY]
+
+					# print("(" + str(fitnessFollower) + "," + str(fitnessSolo) + "," + str(fitnessTurner) + ")")
+
+					meanFitness = propFollower*fitnessFollower + propSolo*fitnessSolo + propTurner*fitnessTurner
+
+					# print("Mean fitness : " + str(meanFitness))
+
+					nextPropFollower = propFollower * fitnessFollower / meanFitness
+					nextPropSolo = propSolo * fitnessSolo / meanFitness
+					nextPropTurner = propTurner * fitnessTurner / meanFitness
+
+					assert(abs((nextPropFollower + nextPropSolo + nextPropTurner) - 1.0) <= 1e-10)
+
+					listPointsDest.append((nextPropFollower*100, nextPropSolo*100, nextPropTurner*100))
+
+					if (nextPropSolo == propSolo) and (nextPropTurner == propTurner) and (nextPropFollower == propFollower) :
+						listPointsEquilibrium.append(curTuple)
+
+
 			cptY += 1
 		cptX += 1
 
@@ -240,13 +226,22 @@ def main(args) :
 	scale = 100
 
 
+	# with open("debug.txt", "w") as fileWrite :
+		
+	# 	cpt = 0
+	# 	while cpt < len(listPoints) :
+	# 		fileWrite.write(str(listPoints[cpt]) + " -> " + str(listPointsDest[cpt]) + "\n")
+
+	# 		cpt += 1
+
 	# # -- Expectation Followers --
 	# fig, ax = plt.subplots(ncols = 1, figsize = size)
 	# ax.axis("off")
 	# figure, tax = ternary.figure(ax = ax, scale = scale)
 
 	# # print(ZexpectationFollower)
-	# tax.heatmap(ZexpectationFollower, cmap = cm.jet, style="triangular", vmin = 0, vmax = 5000)
+	# tax.get_axes().set_aspect(1.)
+	# tax.heatmap(ZexpectationFollower, cmap = cm.jet, style="triangular", vmin = 0, vmax = 5000, colorbar = False)
 	# # tax.scatter([(10, 20, 30)], color = 'red')
 	# # tax.scatter([(0, 20, 10)], color = 'blue')
 	# # tax.scatter([(80, 10, 10)], color = 'green')
@@ -276,7 +271,8 @@ def main(args) :
 	# ax.axis("off")
 	# figure, tax = ternary.figure(ax = ax, scale = scale)
 
-	# tax.heatmap(ZexpectationSolo, cmap = cm.jet, style="triangular", vmin = 0, vmax = 5000)
+	# tax.get_axes().set_aspect(1.)
+	# tax.heatmap(ZexpectationSolo, cmap = cm.jet, style="triangular", vmin = 0, vmax = 5000, colorbar = False)
 	# tax.boundary(linewidth=2.0)
 	# tax.gridlines(color="black", multiple=10)
 
@@ -303,6 +299,7 @@ def main(args) :
 	# ax.axis("off")
 	# figure, tax = ternary.figure(ax = ax, scale = scale)
 
+	# tax.get_axes().set_aspect(1.)
 	# tax.heatmap(ZexpectationTurner, cmap = cm.jet, style="triangular", vmin = 0, vmax = 5000)
 	# tax.boundary(linewidth=2.0)
 	# tax.gridlines(color="black", multiple=10)
@@ -330,6 +327,7 @@ def main(args) :
 	# ax.axis("off")
 	# figure, tax = ternary.figure(ax = ax, scale = scale)
 
+	# tax.get_axes().set_aspect(1.)
 	# tax.heatmap(ZexpectationFollowerSolo, cmap = cm.jet, style="triangular", vmin = 0, vmax = 5000)
 	# tax.boundary(linewidth=2.0)
 	# tax.gridlines(color="black", multiple=10)
@@ -357,6 +355,7 @@ def main(args) :
 	# ax.axis("off")
 	# figure, tax = ternary.figure(ax = ax, scale = scale)
 
+	# tax.get_axes().set_aspect(1.)
 	# tax.heatmap(ZexpectationFollowerTurner, cmap = cm.jet, style="triangular", vmin = 0, vmax = 5000)
 	# tax.boundary(linewidth=2.0)
 	# tax.gridlines(color="black", multiple=10)
@@ -384,6 +383,7 @@ def main(args) :
 	# ax.axis("off")
 	# figure, tax = ternary.figure(ax = ax, scale = scale)
 
+	# tax.get_axes().set_aspect(1.)
 	# tax.heatmap(ZexpectationFollowerFull, cmap = cm.jet, style="triangular", vmin = 0, vmax = 5000)
 	# tax.boundary(linewidth=2.0)
 	# tax.gridlines(color="black", multiple=10)
@@ -411,6 +411,7 @@ def main(args) :
 	# ax.axis("off")
 	# figure, tax = ternary.figure(ax = ax, scale = scale)
 
+	# tax.get_axes().set_aspect(1.)
 	# tax.heatmap(ZexpectationSoloFollower, cmap = cm.jet, style="triangular", vmin = 0, vmax = 5000)
 	# tax.boundary(linewidth=2.0)
 	# tax.gridlines(color="black", multiple=10)
@@ -438,6 +439,7 @@ def main(args) :
 	# ax.axis("off")
 	# figure, tax = ternary.figure(ax = ax, scale = scale)
 
+	# tax.get_axes().set_aspect(1.)
 	# tax.heatmap(ZexpectationSoloTurner, cmap = cm.jet, style="triangular", vmin = 0, vmax = 5000)
 	# tax.boundary(linewidth=2.0)
 	# tax.gridlines(color="black", multiple=10)
@@ -465,6 +467,7 @@ def main(args) :
 	# ax.axis("off")
 	# figure, tax = ternary.figure(ax = ax, scale = scale)
 
+	# tax.get_axes().set_aspect(1.)
 	# tax.heatmap(ZexpectationSoloFull, cmap = cm.jet, style="triangular", vmin = 0, vmax = 5000)
 	# tax.boundary(linewidth=2.0)
 	# tax.gridlines(color="black", multiple=10)
@@ -492,6 +495,7 @@ def main(args) :
 	# ax.axis("off")
 	# figure, tax = ternary.figure(ax = ax, scale = scale)
 
+	# tax.get_axes().set_aspect(1.)
 	# tax.heatmap(ZexpectationTurnerFollower, cmap = cm.jet, style="triangular", vmin = 0, vmax = 5000)
 	# tax.boundary(linewidth=2.0)
 	# tax.gridlines(color="black", multiple=10)
@@ -519,6 +523,7 @@ def main(args) :
 	# ax.axis("off")
 	# figure, tax = ternary.figure(ax = ax, scale = scale)
 
+	# tax.get_axes().set_aspect(1.)
 	# tax.heatmap(ZexpectationTurnerSolo, cmap = cm.jet, style="triangular", vmin = 0, vmax = 5000)
 	# tax.boundary(linewidth=2.0)
 	# tax.gridlines(color="black", multiple=10)
@@ -547,6 +552,7 @@ def main(args) :
 	# ax.axis("off")
 	# figure, tax = ternary.figure(ax = ax, scale = scale)
 
+	# tax.get_axes().set_aspect(1.)
 	# tax.heatmap(ZexpectationTurnerFull, cmap = cm.jet, style="triangular", vmin = 0, vmax = 5000)
 	# tax.boundary(linewidth=2.0)
 	# tax.gridlines(color="black", multiple=10)
@@ -721,36 +727,429 @@ def main(args) :
 	pC = (36, 64, 0)
 	pD = (50, 50, 0)
 
-	# -- Expectation All Full --
-	fig, ax = plt.subplots(ncols = 1, figsize = size)
-	ax.axis("off")
-	figure, tax = ternary.figure(ax = ax, scale = scale)
+	# # -- Expectation All Full --
+	# fig, ax = plt.subplots(ncols = 1, figsize = size)
+	# ax.axis("off")
+	# figure, tax = ternary.figure(ax = ax, scale = scale)
 
-	tax.heatmap(ZexpectationAllFull, cmap = cm.jet, style="triangular", vmin = 0, vmax = 5000)
-	# tax.heatmap(ZexpectationFollowerPart, cmap = cm.jet, style="triangular", vmin = 0, vmax = 5000)
-	# tax.heatmap(ZexpectationSoloPart, cmap = cm.jet, style="triangular", vmin = 0, vmax = 5000)
-	# tax.heatmap(ZexpectationTurnerPart, cmap = cm.jet, style="triangular", vmin = 0, vmax = 5000)
-	tax.plot([pA, pB, pC], color = 'black', linewidth = 2, linestyle = "--")
-	tax.plot([pA, pB, pD], color = 'black', linewidth = 2, linestyle = "--")
-	tax.boundary(linewidth=2.0)
-	tax.gridlines(color="black", multiple=10)
+	# tax.get_axes().set_aspect(1.)
+	# tax.heatmap(ZexpectationAllFull, cmap = cm.jet, style="triangular", vmin = 0, vmax = 5000)
+	# # tax.heatmap(ZexpectationFollowerPart, cmap = cm.jet, style="triangular", vmin = 0, vmax = 5000)
+	# # tax.heatmap(ZexpectationSoloPart, cmap = cm.jet, style="triangular", vmin = 0, vmax = 5000)
+	# # tax.heatmap(ZexpectationTurnerPart, cmap = cm.jet, style="triangular", vmin = 0, vmax = 5000)
+	# tax.plot([pA, pB, pC], color = 'black', linewidth = 2, linestyle = "--")
+	# tax.plot([pA, pB, pD], color = 'black', linewidth = 2, linestyle = "--")
+	# tax.boundary(linewidth=2.0)
+	# tax.gridlines(color="black", multiple=10)
 
-	# ticks = [round(i / float(scale), 1) for i in range(scale + 1)]
-	# ticks = range(0, scale + 1, 20)
-	# tax.ticks(ticks=ticks, axis='rlb', linewidth=1, clockwise=True)#, offset=0.03)
- 	# tax.ticks(axis='lbr', linewidth=1)
-	tax.ticks(axis = 'lbr', multiple = 20, linewidth = 1, clockwise = True)
+	# # ticks = [round(i / float(scale), 1) for i in range(scale + 1)]
+	# # ticks = range(0, scale + 1, 20)
+	# # tax.ticks(ticks=ticks, axis='rlb', linewidth=1, clockwise=True)#, offset=0.03)
+ # 	# tax.ticks(axis='lbr', linewidth=1)
+	# tax.ticks(axis = 'lbr', multiple = 20, linewidth = 1, clockwise = True)
 
-	# Remove default Matplotlib Axes
-	tax.clear_matplotlib_ticks()
+	# # Remove default Matplotlib Axes
+	# tax.clear_matplotlib_ticks()
 
-	tax.left_axis_label("Solo")
-	tax.right_axis_label("Follower")
-	tax.bottom_axis_label("Turner")
+	# tax.left_axis_label("Solo")
+	# tax.right_axis_label("Follower")
+	# tax.bottom_axis_label("Turner")
 
-	plt.tight_layout()
-	plt.savefig("./GraphsResults/ExpectationsAllFull.svg", bbox_inches = 'tight')
-	plt.savefig("./GraphsResults/ExpectationsAllFull.png", bbox_inches = 'tight')
+	# plt.tight_layout()
+	# plt.savefig("./GraphsResults/ExpectationsAllFull.svg", bbox_inches = 'tight')
+	# plt.savefig("./GraphsResults/ExpectationsAllFull.png", bbox_inches = 'tight')
+
+
+	if args.vector :
+		# -- Expectation All Full --
+		fig, ax = plt.subplots(ncols = 1, figsize = size)
+		ax.axis("off")
+		figure, tax = ternary.figure(ax = ax, scale = scale)
+
+		X, Y = ternary.helpers.project_sequence(listPoints)
+		X2, Y2 = ternary.helpers.project_sequence(listPointsDest)
+
+		# X2 = ternary.helpers.unzip(listPoints)[0]
+		# Y2 = ternary.helpers.unzip(listPoints)[1]
+
+		# print(X2)
+		# print(X)
+		# print(Y2)
+		# print(Y)
+
+		# U = ternary.helpers.unzip(listVectors)[0]
+		# V = ternary.helpers.unzip(listVectors)[1]
+		U = [X2[i] - X[i] for i in range(0, len(X))]
+		V = [Y2[i] - Y[i] for i in range(0, len(Y))]
+
+		# with open("debug.txt", "a") as fileWrite :
+		# 	fileWrite.write("----------------------------------------------------\n")
+		# 	fileWrite.write("X, Y :\n")
+
+		# 	cpt = 0
+		# 	while cpt < len(X) :
+		# 		fileWrite.write(str(listPoints[cpt]) + " --> " + str((X[cpt], Y[cpt])) + "\n")
+		# 		cpt += 1
+
+		# 	fileWrite.write("----------------------------------------------------\n")
+		# 	fileWrite.write("X2, Y2 :\n")
+
+		# 	cpt = 0
+		# 	while cpt < len(X2) :
+		# 		fileWrite.write(str(listPointsDest[cpt]) + " --> " + str((X2[cpt], Y2[cpt])) + "\n")
+		# 		cpt += 1
+
+
+		# indexPoints = range(0, len(X), 10)
+		# X = [X[i] for i in indexPoints]
+		# Y = [Y[i] for i in indexPoints]
+		# V = [V[i] for i in indexPoints]
+		# U = [U[i] for i in indexPoints]
+
+		# print(str(len(X)) + "/" + str(len(Y)) + "/" + str(len(U)) + "/" + str(len(V)))
+		# print(X[::500])
+		# print(Y[::500])
+		# print(U[::500])
+		# print(V[::500])
+		# print(speed[::500])
+		# print(UN[::500])
+		# print(VN[::500])
+
+		# X = [40, 50, 60, 74.806817065583971]
+		# Y = [40, 50, 60, 43.635872846785738]
+		# U = [10, 10, 10, 10]
+		# V = [10, 10, 10, 10]
+
+		# X = [88.0]
+		# Y = [20.784609690826528]
+
+		# u = 74.806817065583971 - 88.0
+		# v = 43.635872846785738 - 20.784609690826528
+
+		# # a = u + v/2.
+		# # b = ternary.helpers.SQRT3OVER2 * v
+
+		# U = [u]
+		# V = [v]
+		# U = [74.806817065583971]
+		# V = [43.635872846785738]
+
+		# tax.get_axes().quiver(test.x, test.y, U, V)
+		# tax.get_axes().quiver(X[::100], Y[::100], U[::100], V[::100])
+		# tax.get_axes().quiver(X[::1], Y[::1], UN[::1], VN[::1], width = 0.001)
+		tax.get_axes().set_aspect(1.)
+		Q = tax.get_axes().quiver(X[::1], Y[::1], U[::1], V[::1], width = 0.001, color = 'r')
+		# tax.scatter([(49.613634131167942, 50.386365868832058, 0.0)], color = 'r', s = 25)
+		# tax.get_axes().scatter([50, 50], [0, 86], color = 'r', s = 25)
+
+		# ternary.plotting.scatter([(49.613634131167942, 50.386365868832058, 0.0)], ax=tax.get_axes(), permutation=None, color = 'r', s = 25)
+		# xs, ys = ternary.helpers.project_sequence([(49.613634131167942, 50.386365868832058, 0.0)], permutation=None)
+		# print(xs)
+		# print(ys)
+		# tax.get_axes().scatter(xs, ys, color = 'r', s = 25)
+		# tax.get_axes().scatter((76.806817065583971,), ys, color = 'g', s = 25)
+		# tax.get_axes().scatter((76.806817065583971,), (43.635872846785738,), color = 'g', s = 25)
+
+		# tax.get_axes().quiver(X[::1], Y[::1], U[::1], V[::1])
+		# tax.get_axes().streamplot(X, Y, U, V)
+		tax.plot([pA, pB, pC], color = 'black', linewidth = 2, linestyle = "--")
+		tax.plot([pA, pB, pD], color = 'black', linewidth = 2, linestyle = "--")
+		tax.boundary(linewidth=2.0)
+		tax.gridlines(color="black", multiple=10)
+
+		# ticks = [round(i / float(scale), 1) for i in range(scale + 1)]
+		# ticks = range(0, scale + 1, 20)
+		# tax.ticks(ticks=ticks, axis='rlb', linewidth=1, clockwise=True)#, offset=0.03)
+	 	# tax.ticks(axis='lbr', linewidth=1)
+		tax.ticks(axis = 'lbr', multiple = 20, linewidth = 1, clockwise = True)
+
+		# Remove default Matplotlib Axes
+		tax.clear_matplotlib_ticks()
+
+		fontsize = 25
+		fontweight = 'bold'
+		tax.left_axis_label("Solo", (0.0 - 0.09, 1.0 + 0.17, 0.5), 0.0, fontsize = fontsize, fontweight = fontweight)
+		tax.right_axis_label("Follower", (1.0 - 0.06, 0.1, 0.0), -120, fontsize = fontsize, fontweight = fontweight)
+		tax.bottom_axis_label("Turner", (-0.04, 0.1, 1.0), 120, fontsize = fontsize, fontweight = fontweight)
+
+		# plt.colorbar(Q, cax = tax.get_axes())
+
+		plt.tight_layout()
+		plt.savefig("./GraphsResults/ExpectationsVectors.svg", bbox_inches = 'tight')
+		plt.savefig("./GraphsResults/ExpectationsVectors.png", bbox_inches = 'tight')
+		# plt.show()
+
+
+		# -- Expectation All Full --
+		fig, ax = plt.subplots(ncols = 1, figsize = size)
+		ax.axis("off")
+		figure, tax = ternary.figure(ax = ax, scale = scale)
+
+		speed = [np.sqrt(U[i]**2 + V[i]**2) for i in range(0, len(U))]
+		UN = [U[i]/speed[i] if speed[i] > 0 else U[i] for i in range(0, len(U))]
+		VN = [V[i]/speed[i] if speed[i] > 0 else V[i] for i in range(0, len(V))]
+
+		# print(speed)
+		tax.get_axes().set_aspect(1.)
+		Q = tax.get_axes().quiver(X[::1], Y[::1], UN[::1], VN[::1], speed, width = 0.002, cmap = cm.jet)
+
+		tax.plot([pA, pB, pC], color = 'black', linewidth = 2, linestyle = "--")
+		tax.plot([pA, pB, pD], color = 'black', linewidth = 2, linestyle = "--")
+		tax.boundary(linewidth=2.0)
+		tax.gridlines(color="black", multiple=10)
+
+		tax.ticks(axis = 'lbr', multiple = 20, linewidth = 1, clockwise = True)
+
+		# Remove default Matplotlib Axes
+		tax.clear_matplotlib_ticks()
+
+		fontsize = 25
+		fontweight = 'bold'
+		tax.left_axis_label("Solo", (0.0 - 0.09, 1.0 + 0.17, 0.5), 0.0, fontsize = fontsize, fontweight = fontweight)
+		tax.right_axis_label("Follower", (1.0 - 0.06, 0.1, 0.0), -120, fontsize = fontsize, fontweight = fontweight)
+		tax.bottom_axis_label("Turner", (-0.04, 0.1, 1.0), 120, fontsize = fontsize, fontweight = fontweight)
+
+		# divider = make_axes_locatable(ax5)
+		# cax = divider.append_axes("right", size="5%", pad=0.05)
+
+		plt.tight_layout()
+		plt.savefig("./GraphsResults/ExpectationsVectorsNormalized.svg", bbox_inches = 'tight')
+		plt.savefig("./GraphsResults/ExpectationsVectorsNormalized.png", bbox_inches = 'tight')
+
+
+
+	listColors = ['r', 'g', 'b', 'y']
+	listStyles = ['-', '--', '-.', ':']
+	listMarkers = ['o', 's', 'D', '*']
+	listLabels = ['N=20', 'N=100', 'N=1000']
+	# listLabels = ['$N = 20$', '$N = 100$', '$N = 1000$']
+
+	if args.trajectory != None :
+		listTrajectories = list()
+		for fileTrajectory in args.trajectory :
+			if os.path.isfile(fileTrajectory) :
+				trajectory = list()
+				regexpLine = re.compile(r"^\((.+),(.+),(.+)\)$")
+				with open(fileTrajectory, 'r') as fileRead :
+					fileRead = fileRead.readlines()
+					for line in fileRead :
+						s = regexpLine.search(line.rstrip('\n'))
+
+						if s :
+							trajectory.append((int(float(s.group(1)) * 100), int(float(s.group(2)) * 100), int(float(s.group(3)) * 100)))
+
+				listTrajectories.append(trajectory)
+
+		if len(listTrajectories) > 0 :
+			# -- Expectation All Full with trajectory --
+			fig, ax = plt.subplots(ncols = 1, figsize = size)
+			ax.axis("off")
+			figure, tax = ternary.figure(ax = ax, scale = scale)
+
+			# tax.heatmap(ZexpectationAllFull, cmap = cm.jet, style="triangular", vmin = 0, vmax = 5000, colorbar = False)
+			tax.get_axes().set_aspect(1.)
+			tax.plot([pA, pB, pC], color = 'black', linewidth = 2, linestyle = "--")
+			tax.plot([pA, pB, pD], color = 'black', linewidth = 2, linestyle = "--")
+
+			cpt = 0
+			for trajectory in listTrajectories :
+				tax.plot(trajectory, linewidth = 2, color = listColors[cpt % len(listColors)], linestyle = listStyles[cpt % len(listStyles)], label = listLabels[cpt % len(listLabels)])
+
+				cpt += 1
+
+			tax.boundary(linewidth=2.0)
+			tax.gridlines(color="black", multiple=10)
+
+			# ticks = [round(i / float(scale), 1) for i in range(scale + 1)]
+			# ticks = range(0, scale + 1, 20)
+			# tax.ticks(ticks=ticks, axis='rlb', linewidth=1, clockwise=True)#, offset=0.03)
+		 	# tax.ticks(axis='lbr', linewidth=1)
+			tax.ticks(axis = 'lbr', multiple = 20, linewidth = 1, clockwise = True)
+
+			# Remove default Matplotlib Axes
+			tax.clear_matplotlib_ticks()
+
+			fontsize = 25
+			fontweight = 'bold'
+			tax.left_axis_label("Solo", (0.0 - 0.09, 1.0 + 0.17, 0.5), 0.0, fontsize = fontsize, fontweight = fontweight)
+			tax.right_axis_label("Follower", (1.0 - 0.06, 0.1, 0.0), -120, fontsize = fontsize, fontweight = fontweight)
+			tax.bottom_axis_label("Turner", (-0.04, 0.1, 1.0), 120, fontsize = fontsize, fontweight = fontweight)
+			legend = plt.legend(frameon = True)
+			frame = legend.get_frame()
+			frame.set_facecolor('0.9')
+			frame.set_edgecolor('0.9')
+
+			plt.tight_layout()
+			plt.savefig("./GraphsResults/ExpectationsTrajectory.svg", bbox_inches = 'tight')
+			plt.savefig("./GraphsResults/ExpectationsTrajectory.png", bbox_inches = 'tight')
+
+
+
+	if args.scatter != None :
+		listScatters = list()
+		for fileScatter in args.scatter :
+			if os.path.isfile(fileScatter) :
+				scatter = list()
+				regexpLine = re.compile(r"^\((.+),(.+),(.+)\)$")
+				with open(fileScatter, 'r') as fileRead :
+					fileRead = fileRead.readlines()
+					for line in fileRead :
+						s = regexpLine.search(line.rstrip('\n'))
+
+						if s :
+							scatter.append((int(float(s.group(1)) * 100), int(float(s.group(2)) * 100), int(float(s.group(3)) * 100)))
+
+				listScatters.append(scatter)
+
+		if len(listScatters) > 0 :
+			# -- Expectation All Full with trajectory --
+			fig, ax = plt.subplots(ncols = 1, figsize = size)
+			ax.axis("off")
+			figure, tax = ternary.figure(ax = ax, scale = scale)
+			tax.get_axes().set_aspect(1.)
+
+			cpt = 0
+			for scatter in listScatters :
+				tax.scatter(scatter, color = listColors[cpt % len(listColors)], marker = listMarkers[cpt % len(listMarkers)], s = 50, label = listLabels[cpt % len(listLabels)])
+
+				cpt += 1
+
+			# tax.heatmap(ZexpectationAllFull, cmap = cm.jet, style="triangular", vmin = 0, vmax = 5000, colorbar = False)
+			tax.plot([pA, pB, pC], color = 'black', linewidth = 2, linestyle = "--")
+			tax.plot([pA, pB, pD], color = 'black', linewidth = 2, linestyle = "--")
+
+			tax.boundary(linewidth=2.0)
+			tax.gridlines(color="black", multiple=10)
+
+			# ticks = [round(i / float(scale), 1) for i in range(scale + 1)]
+			# ticks = range(0, scale + 1, 20)
+			# tax.ticks(ticks=ticks, axis='rlb', linewidth=1, clockwise=True)#, offset=0.03)
+		 	# tax.ticks(axis='lbr', linewidth=1)
+			tax.ticks(axis = 'lbr', multiple = 20, linewidth = 1, clockwise = True)
+
+			# Remove default Matplotlib Axes
+			tax.clear_matplotlib_ticks()
+
+			fontsize = 25
+			fontweight = 'bold'
+			# tax.left_axis_label("Solo", fontsize = fontsize, fontweight = fontweight)
+			# tax.right_axis_label("Follower", fontsize = fontsize, fontweight = fontweight)
+			# tax.bottom_axis_label("Turner", fontsize = fontsize, fontweight = fontweight)
+			tax.left_axis_label("Solo", (0.0 - 0.09, 1.0 + 0.17, 0.5), 0.0, fontsize = fontsize, fontweight = fontweight)
+			tax.right_axis_label("Follower", (1.0 - 0.06, 0.1, 0.0), -120, fontsize = fontsize, fontweight = fontweight)
+			tax.bottom_axis_label("Turner", (-0.04, 0.1, 1.0), 120, fontsize = fontsize, fontweight = fontweight)
+			legend = plt.legend(frameon = True)
+			frame = legend.get_frame()
+			frame.set_facecolor('0.9')
+			frame.set_edgecolor('0.9')
+
+			plt.tight_layout()
+			plt.savefig("./GraphsResults/ExpectationsScatter.svg", bbox_inches = 'tight')
+			plt.savefig("./GraphsResults/ExpectationsScatter.png", bbox_inches = 'tight')
+
+
+
+	if args.timeProp != None :
+		hashTimeProp = dict()
+
+		if os.path.isfile(args.timeProp) :
+			regexpRun = re.compile(r"^Run (\d+)$")
+			regexpLine = re.compile(r"^\((.+),(.+),(.+)\)$")
+
+			curRun = None
+			histTimeProp = dict()
+			with open(args.timeProp, 'r') as fileRead :
+				fileRead = fileRead.readlines()
+				for line in fileRead :
+					s = regexpRun.search(line.rstrip('\n'))
+
+					if s :
+						if curRun != None :
+							hashTimeProp[curRun] = histTimeProp
+							histTimeProp = dict()
+
+						curRun = int(s.group(1))
+					else :
+						s = regexpLine.search(line.rstrip('\n'))
+
+						if s :
+							if curRun != None :
+
+								proportion = (int(float(s.group(1)) * 100), int(float(s.group(2)) * 100), int(float(s.group(3)) * 100))
+
+								if proportion not in histTimeProp.keys() :
+									histTimeProp[proportion] = 1
+								else :
+									histTimeProp[proportion] += 1
+
+							else :
+								print("Error ! No curRun !")
+
+			if curRun != None :
+				hashTimeProp[curRun] = histTimeProp
+
+		# for run in hashTimeProp.keys() :
+		# 	print("Run : " + str(run))
+
+		# 	# -- Expectation All Full with trajectory --
+		# 	fig, ax = plt.subplots(ncols = 1, figsize = size)
+		# 	ax.axis("off")
+		# 	figure, tax = ternary.figure(ax = ax, scale = scale)
+
+		# 	for prop in ZexpectationAllFull :
+		# 		if prop not in hashTimeProp[run] :
+		# 			hashTimeProp[run][prop] = 0
+
+		# 	tax.get_axes().set_aspect(1.)
+		# 	tax.heatmap(hashTimeProp[run], cmap = cm.jet, style="triangular", colorbar = True)#, vmin = 0, vmax = 5000)
+		# 	# tax.heatmap(test, cmap = cm.jet, style="triangular", colorbar = True)#, vmin = 0, vmax = 5000)
+
+		# 	tax.plot([pA, pB, pC], color = 'black', linewidth = 2, linestyle = "--")
+		# 	tax.plot([pA, pB, pD], color = 'black', linewidth = 2, linestyle = "--")
+
+		# 	tax.boundary(linewidth=2.0)
+		# 	tax.gridlines(color="black", multiple=10)
+
+		# 	tax.ticks(axis = 'lbr', multiple = 20, linewidth = 1, clockwise = True)
+
+		# 	# Remove default Matplotlib Axes
+		# 	tax.clear_matplotlib_ticks()
+
+		# 	plt.tight_layout()
+		# 	plt.savefig("./GraphsResults/ExpectationsTimePropRun" + str(run) + ".svg", bbox_inches = 'tight')
+		# 	plt.savefig("./GraphsResults/ExpectationsTimePropRun" + str(run) + ".png", bbox_inches = 'tight')
+
+
+		# -- Expectation All Full with trajectory --
+		fig, ax = plt.subplots(ncols = 1, figsize = size)
+		ax.axis("off")
+		figure, tax = ternary.figure(ax = ax, scale = scale)
+
+		totalTimeProp = dict()
+		for prop in ZexpectationAllFull :
+			totalTimeProp[prop] = 0
+
+			for run in hashTimeProp.keys() :
+				if prop in hashTimeProp[run] :
+					totalTimeProp[prop] += hashTimeProp[run][prop]
+
+		tax.get_axes().set_aspect(1.)
+		tax.heatmap(totalTimeProp, cmap = cm.jet, style="triangular", colorbar = False)#, vmin = 0, vmax = 5000)
+
+		tax.plot([pA, pB, pC], color = 'black', linewidth = 2, linestyle = "--")
+		tax.plot([pA, pB, pD], color = 'black', linewidth = 2, linestyle = "--")
+
+		tax.boundary(linewidth=2.0)
+		tax.gridlines(color="black", multiple=10)
+
+		tax.ticks(axis = 'lbr', multiple = 20, linewidth = 1, clockwise = True)
+
+		# Remove default Matplotlib Axes
+		tax.clear_matplotlib_ticks()
+
+		plt.tight_layout()
+		plt.savefig("./GraphsResults/ExpectationsTimeProp.svg", bbox_inches = 'tight')
+		plt.savefig("./GraphsResults/ExpectationsTimeProp.png", bbox_inches = 'tight')
 
 
 
@@ -790,6 +1189,10 @@ if __name__ == "__main__" :
 	parser = argparse.ArgumentParser()
 	# parser.add_argument('file', help = "Genome file")
 	parser.add_argument('-p', '--precision', help = "Precision", default = 0.01)
+	parser.add_argument('-t', '--trajectory', help = "Load trajectory", type = str, default = None, nargs = '+')
+	parser.add_argument('-T', '--timeProp', help = "Load time proportion", type = str, default = None)
+	parser.add_argument('-s', '--scatter', help = "Load scatter points", type = str, default = None, nargs = '+')
+	parser.add_argument('-v', '--vector', help = "Draw the vector field", default = False, action = "store_true")
 	args = parser.parse_args()
 
 	main(args)
