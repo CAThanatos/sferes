@@ -9,7 +9,7 @@ import sys
 import Tools
 from drawGraphsArticle import draw
 
-nbPopFirstGen = 10
+nbPopFirstGen = 20
 
 def copyFile(fileSource, fileDestination, evalToRemove) :
 	if evalToRemove != -1 :

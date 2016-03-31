@@ -361,6 +361,13 @@ namespace sferes
           typedef boost::archive::binary_iarchive ia_t;
           ia_t ia(ifs);
           ia >> BOOST_SERIALIZATION_NVP(_seed);
+
+// #ifdef RESEEDING
+//           time_t curTime = time(0) + ::getpid();
+//           srand(curTime);
+//           set_seed(curTime);
+// #endif
+
 	        ia >> BOOST_SERIALIZATION_NVP(_pop);
 
 #if defined(FITPROP)

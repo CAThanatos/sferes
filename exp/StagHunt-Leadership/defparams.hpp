@@ -110,6 +110,8 @@ struct Params
 		static const int total_preys = 1;
 #elif defined(PREYS2)
 		static const int total_preys = 2;
+#elif defined(PREYS3)
+		static const int total_preys = 3;
 #elif defined(PREYS6)
 		static const int total_preys = 6;
 #elif defined(PREYS8)
@@ -118,8 +120,12 @@ struct Params
 		static const int total_preys = 9;
 #elif defined(PREYS12)
 		static const int total_preys = 12;
+#elif defined(PREYS15)
+		static const int total_preys = 15;
 #elif defined(PREYS18)
 		static const int total_preys = 18;
+#elif defined(PREYS30)
+		static const int total_preys = 30;
 #elif defined(PREYS36)
 		static const int total_preys = 36;
 #elif defined(NO_PREYS)

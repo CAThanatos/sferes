@@ -153,7 +153,7 @@ namespace sferes
 					selection_pop.push_back(child_pop[i]);
 				}
 				assert(selection_pop.size() == (mu + lambda));
-				
+
 				// Evaluation of the children and the parents if need be
 #ifdef EVAL_PARENTS
 				this->_eval.eval(selection_pop, 0, selection_pop.size());

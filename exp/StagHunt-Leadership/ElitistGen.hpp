@@ -98,6 +98,13 @@ namespace sferes
 						continue;
 					}
 #endif
+
+#if defined(DECISION_MAPPING) && defined(NU_MUT_MAPP)
+					int nb_weights = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;
+					if((_size > nb_weights) && ((i == (nb_weights * 2)) || (i == (nb_weights * 2 + 1))))
+						continue
+#endif
+
 					if (randMutation < Params::evo_float::mutation_rate)
 					{
 						float value_mut = step_size * misc::gaussian_rand<float>(0, sigma * sigma);

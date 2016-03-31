@@ -245,8 +245,13 @@ namespace sferes
 					hunter1->choose_nn(ind1.data(), choice_leader);
 				}
 #elif defined(COM_NN)
+#ifdef DECISION_MAPPING
+				hunter1->choose_nn(ind1.data(), 0);
+				hunter2->choose_nn(ind2.data(), 0);
+#else
 				hunter1->choose_nn(0, ind1.data());
 				hunter2->choose_nn(0, ind2.data());
+#endif
 #else
 				hunter1->choose_nn(ind1.data(), diff_hunters);
 				hunter2->choose_nn(ind2.data(), 1 - diff_hunters);
@@ -995,11 +1000,19 @@ namespace sferes
    			for(int i = 0; i < 2; ++i)
    			{
 	   			Hunter* hunter = (Hunter*)(simu.robots()[i]);
+
+#ifdef DECISION_MAPPING
+	   			if(hunter != hunters[0])
+						hunter->change_nn_mapping(0);
+					else
+						hunter->change_nn_mapping(1);
+#else
 	   			if(hunter != hunters[0])
 	   			{
 	   				if(hunter->nn1_chosen())
 	   					hunter->change_nn(1);
 	   			}
+#endif
    			}
 #elif defined(SCREAM_PREY)
    			// If the individual got first on the prey, we alert the other one
@@ -1103,7 +1116,11 @@ namespace sferes
 
 #ifdef COM_NN
    			for(int i = 0; i < 2; ++i)
+#ifdef DECISION_MAPPING
+					((Hunter*)(simu.robots()[i]))->change_nn_mapping(0);
+#else
 	   			((Hunter*)(simu.robots()[i]))->change_nn(0);
+#endif
 #elif defined(SCREAM_PREY)
    			for(int i = 0; i < 2; ++i)
 	   			((Hunter*)(simu.robots()[i]))->set_scream(0.0f);

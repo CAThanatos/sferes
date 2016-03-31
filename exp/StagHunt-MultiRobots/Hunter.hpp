@@ -189,9 +189,27 @@ namespace sferes
  					}
 
 #ifdef COM_COMPAS
- 					inputs[current_index] = (3400.0f - _distance_hunter)/3400.0f;
- 					inputs[current_index + 1] = _angle_hunter;
- 					current_index += 2;
+#ifdef COM_NN
+ 					if(!_bool_nn1)
+ 					{
+	 					inputs[current_index] = 1.0f;
+	 					inputs[current_index + 1] = (3400.0f - _distance_hunter)/3400.0f;
+	 					inputs[current_index + 2] = _angle_hunter/M_PI;
+ 					}
+ 					else
+ 					{
+	 					inputs[current_index] = 0.0f;
+	 					inputs[current_index + 1] = 0.0f;
+	 					inputs[current_index + 2] = 0.0f;
+ 					}
+
+ 					current_index += 3;
+#else
+ 					inputs[current_index] = 1.0f;
+ 					inputs[current_index + 1] = (3400.0f - _distance_hunter)/3400.0f;
+ 					inputs[current_index + 2] = _angle_hunter/M_PI;
+ 					current_index += 3;
+#endif
 #endif
 
 					// std::cout << std::endl;

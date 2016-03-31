@@ -401,7 +401,7 @@ namespace sferes
 
 				int first_weight = 0;
 
-				if(data.size() > (nb_weights + 1))
+				if(data.size() > Params::nn::genome_size)
 				{
 #ifdef DECISION_THRESHOLD
 #ifdef CHOICE_ORDERED
@@ -480,6 +480,8 @@ namespace sferes
 				for(size_t i = first_weight; i < first_weight + nb_weights; ++i)
 					_weights[i - first_weight] = data[i];
 
+				_data = data;
+
 				return _bool_nn1?0:1;
 			}
 
@@ -515,6 +517,39 @@ namespace sferes
 					int first_weight = 0;
 					if(nn_chosen >= 1)
 						first_weight = nb_weights;
+
+					if(first_weight == 0)
+						_bool_nn1 = true;
+					else
+						_bool_nn1 = false;
+
+					for(size_t i = first_weight; i < first_weight + nb_weights; ++i)
+						_weights[i - first_weight] = _data[i];
+				}
+			}
+
+			void change_nn_mapping(float value)
+			{
+				int nb_weights = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;
+
+				if(_data.size() > Params::nn::genome_size)
+				{
+					_weights.clear();
+					_weights.resize(nb_weights);
+
+					float mean_params = (Params::parameters::min + Params::parameters::max)/2.0f;
+					int first_weight = 0;
+
+					if(value < 0.5f)
+					{
+						if(_data[nb_weights*2] > mean_params)
+							first_weight = nb_weights;
+					}
+					else
+					{
+						if(_data[nb_weights*2 + 1] > mean_params)
+							first_weight = nb_weights;
+					}
 
 					if(first_weight == 0)
 						_bool_nn1 = true;
