@@ -122,7 +122,104 @@ namespace sferes
 				}
       }
     };
+
+    struct pref_opp {
+    	int index;
+    	float value;
+    };
+
+    typedef std::vector<pref_opp> vec_pref_opp_ind_t;
+    typedef std::vector<vec_pref_opp_ind_t> vec_pref_opp_t;
+
+    bool pref_value_comp (const pref_opp& i, const pref_opp& j) { return (i.value > j.value); }
         
+    template<typename Phen>
+    struct _parallel_ev_select_partner_list
+    {
+      typedef std::vector<boost::shared_ptr<Phen> > pop_t;
+      pop_t _pop;
+      int nb_opponents;
+      int nb_eval;
+      int _size;
+      vec_pref_opp_t _vec_pref_opp;
+
+      ~_parallel_ev_select_partner_list() { }
+      _parallel_ev_select_partner_list(const pop_t& pop, int size, const vec_pref_opp_t& vec_pref_opp) : _pop(pop), _size(size), _vec_pref_opp(vec_pref_opp)
+      {
+		    nb_opponents = Params::pop::nb_opponents;
+		    nb_eval = Params::pop::nb_eval;
+      }
+      _parallel_ev_select_partner_list(const _parallel_ev_select_partner_list& ev) : _pop(ev._pop), _size(ev._size), _vec_pref_opp(ev._vec_pref_opp)
+      {
+		    nb_opponents = Params::pop::nb_opponents;
+		    nb_eval = Params::pop::nb_eval;
+      }
+      void operator() (const parallel::range_t& r) const
+      {
+				for (size_t i = r.begin(); i != r.end(); ++i)
+				{
+					assert(i < _pop.size());
+
+					vec_pref_opp_ind_t vec_pref = _vec_pref_opp[i];
+
+					for(size_t j = 0; j < nb_eval; ++j)
+					{
+#ifdef CHOOSE_BEST
+ 						std::sort(vec_pref.begin(), vec_pref.end(), pref_value_comp);
+
+						for(size_t k = 0; k < nb_opponents; ++k)
+						{
+							int opponent = vec_pref[0].index;
+							_pop[i]->fit().eval_compet(*_pop[i], *_pop[opponent]);
+						}
+#elif defined(SEVERAL_LISTS)
+						for(size_t k = 0; k < nb_opponents; ++k)
+						{
+							std::vector<pref_opp> vec_opponents(Params::pop::size_list_pref);
+							for(size_t l = 0; l < Params::pop::size_list_pref; ++l)
+							{
+								int opponent;
+								do
+								{
+									opponent = misc::rand(0, _size);
+								} while((opponent == i) || (opponent < 0) || (opponent >= _size));
+								vec_opponents[l].index = opponent;
+								vec_opponents[l].value = vec_pref[opponent].value;
+							}
+
+							// We sort this list
+							std::sort(vec_opponents.begin(), vec_opponents.end(), pref_value_comp);
+
+							int opponent = vec_opponents[0].index;
+							_pop[i]->fit().eval_compet(*_pop[i], *_pop[opponent]);
+						}
+#else
+						std::vector<pref_opp> vec_opponents(Params::pop::size_list_pref);
+						for(size_t k = 0; k < Params::pop::size_list_pref; ++k)
+						{
+							int opponent;
+							do
+							{
+								opponent = misc::rand(0, _size);
+							} while((opponent == i) || (opponent < 0) || (opponent >= _size));
+							vec_opponents[k].index = opponent;
+							vec_opponents[k].value = vec_pref[opponent].value;
+						}
+
+						// We sort this list
+						std::sort(vec_opponents.begin(), vec_opponents.end(), pref_value_comp);
+
+						for(size_t k = 0; k < nb_opponents; ++k)
+						{
+							int opponent = vec_opponents[0].index;
+							_pop[i]->fit().eval_compet(*_pop[i], *_pop[opponent]);
+						}
+#endif
+					}
+				}
+      }
+    };
+
     template<typename Phen>
     struct _parallel_ev_select_list
     {
@@ -232,13 +329,6 @@ namespace sferes
 				}
       }
     };
-
-    struct pref_opp {
-    	int index;
-    	float value;
-    };
-
-    bool pref_value_comp (const pref_opp& i, const pref_opp& j) { return (i.value > j.value); }
         
     template<typename Phen>
     struct _parallel_ev_select_partner
@@ -401,7 +491,7 @@ namespace sferes
 
 				int size_vec_opponents = vec_opponents.size();
 #endif
-		
+
 				for(int i = begin; i < end; ++i)
 				{
 					pop[i]->develop();
@@ -485,18 +575,45 @@ namespace sferes
 #endif
 				}
 
+
+#ifdef PARTNER_SELECT
+				vec_pref_opp_t vec_pref_opp;
+
+				for(size_t i = begin; i < end; ++i)
+				{
+ 					// Creation of the pref_opp list
+ 					vec_pref_opp_ind_t vec_pref_opp_ind(pop.size());
+ 					for(size_t k = 0; k < pop.size(); ++k)
+ 					{
+ 						vec_pref_opp_ind[k].index = k;
+#if defined(GBEARD) || defined(WEIGHTS_CHOICE)
+ 						vec_pref_opp_ind[k].value = pop[i]->get_pref_value(*pop[k]);
+#endif
+ 					}
+
+ 					vec_pref_opp.push_back(vec_pref_opp_ind);
+				}
+#endif
+
+
 #ifdef ALTRUISM
 				parallel::init();
 				parallel::p_for(parallel::range_t(begin, end), _parallel_ev_altruism<Phen>(pop));
 				_nb_eval += (end - begin);
 #elif defined(NOT_AGAINST_ALL)
+#ifdef LISTMATCH
 #ifdef PARTNER_SELECT
 				parallel::init();
-				parallel::p_for(parallel::range_t(begin, end), _parallel_ev_select_partner<Phen>(pop, (end - begin)));
+				parallel::p_for(parallel::range_t(begin, end), _parallel_ev_select_partner_list<Phen>(pop, (end - begin), vec_pref_opp));
 				_nb_eval += (end - begin);
-#elif defined(LISTMATCH)
+#else
 				parallel::init();
 				parallel::p_for(parallel::range_t(begin, end), _parallel_ev_select_list<Phen>(pop, (end - begin), list_matches));
+				_nb_eval += (end - begin);
+#endif
+#elif defined(PARTNER_SELECT)
+				parallel::init();
+				parallel::p_for(parallel::range_t(begin, end), _parallel_ev_select_partner<Phen>(pop, (end - begin)));
 				_nb_eval += (end - begin);
 #else
 				parallel::init();
