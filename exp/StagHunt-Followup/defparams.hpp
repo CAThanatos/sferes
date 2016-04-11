@@ -3,6 +3,10 @@
 
 #include <sferes/gen/evo_float.hpp>
 
+#ifdef COEVO
+#define NO_LISTMATCH
+#endif
+
 #ifndef NO_LISTMATCH
 #define LISTMATCH
 #endif
@@ -219,15 +223,15 @@ struct Params
 		
 		static const size_t nb_outputs = 2 + Params::nn::nb_outputs_scream;
 
-#ifdef GBEARD
+#ifdef PARTNER_SELECT
 #ifdef FIXED_CHOICE
 		static const size_t genome_size = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs + 1;
-#else
-#ifdef NETWORK_DOUBINPUTS
+#elif defined(NETWORK_DOUBINPUTS)
 		static const size_t genome_size = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs + 4;
+#elif defined(WEIGHTS_CHOICE)
+		static const size_t genome_size = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs + Params::nn::nb_hidden * Params::nn::nb_outputs + 1;
 #else
 		static const size_t genome_size = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs + 3;
-#endif
 #endif
 #else
 		static const size_t genome_size = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;
@@ -379,6 +383,8 @@ struct Params
     static const int nb_niches = 4;
 #elif defined(NICHE2)
     static const int nb_niches = 2;
+#elif defined(NICHE3)
+    static const int nb_niches = 3;
 #elif defined(NICHE8)
     static const int nb_niches = 8;
 #elif defined(NICHE10)
@@ -407,7 +413,7 @@ struct Params
 #endif
 
     // number of generations
-    static const unsigned nb_gen = 100000;
+    static const unsigned nb_gen = 2000;
     
     // how often should the result file be written
 #if defined(POP100) || defined(POP200)

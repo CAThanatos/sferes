@@ -93,6 +93,8 @@ namespace sferes
 						hunter->set_bool_leader(true);
 					else
 						hunter->set_bool_leader(false);
+
+					_num_compas = -1;
 				}
 #elif defined(NO_CHOICE_DUP)
 				int nb_weights = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_outputs * Params::nn::nb_hidden + Params::nn::nb_outputs;
@@ -189,12 +191,54 @@ namespace sferes
 
 				for (size_t i = 0; i < Params::simu::nb_steps && !stop_eval; ++i)
 				{
-#ifdef COM_COMPAS
-					for(size_t k = 0; k < vec_ind.size(); ++k)
+#if defined(COM_COMPAS)
+#ifdef COM_NN
+					if(_num_compas > -1)
 					{
-						StagHuntRobot *robLeader = (StagHuntRobot*)(simu.robots()[_num_leader]);
+						assert(_num_compas < vec_ind.size());
+
+						StagHuntRobot *robLeader = (StagHuntRobot*)(simu.robots()[_num_compas]);
 						Hunter* hunterLeader = (Hunter*)robLeader;
 
+						for(size_t k = 0; k < vec_ind.size(); ++k)
+						{
+							if(_num_compas == k)
+							{
+								hunterLeader->set_distance_hunter(0.0f);
+								hunterLeader->set_angle_hunter(0.0f);
+							}
+							else
+							{
+								StagHuntRobot *robFollower = (StagHuntRobot*)(simu.robots()[k]);
+								Hunter* hunterFollower = (Hunter*)robFollower;
+
+								float distance = robLeader->get_pos().dist_to(robFollower->get_pos().x(), robFollower->get_pos().y());
+								distance = distance - robLeader->get_radius() - robFollower->get_radius();
+								hunterFollower->set_distance_hunter(distance);
+
+								float angle = normalize_angle(atan2(robLeader->get_pos().y() - robFollower->get_pos().y(), robLeader->get_pos().x() - robFollower->get_pos().x()));
+								angle = normalize_angle(angle - robFollower->get_pos().theta());
+								hunterFollower->set_angle_hunter(angle);
+							}
+						}
+					}
+					else
+					{
+						for(size_t k = 0; k < vec_ind.size(); ++k)
+						{
+							StagHuntRobot *robot = (StagHuntRobot*)(simu.robots()[k]);
+							Hunter* hunter = (Hunter*)robot;
+
+							hunter->set_distance_hunter(0.0f);
+							hunter->set_angle_hunter(0.0f);
+						}
+					}
+#else
+					StagHuntRobot *robLeader = (StagHuntRobot*)(simu.robots()[_num_leader]);
+					Hunter* hunterLeader = (Hunter*)robLeader;
+
+					for(size_t k = 0; k < vec_ind.size(); ++k)
+					{
 						if(_num_leader == k)
 						{
 							hunterLeader->set_distance_hunter(0.0f);
@@ -202,7 +246,7 @@ namespace sferes
 						}
 						else
 						{
-							StagHuntRobot *robFollower = (StagHuntRobot*)(simu.robots()[_num_leader]);
+							StagHuntRobot *robFollower = (StagHuntRobot*)(simu.robots()[k]);
 							Hunter* hunterFollower = (Hunter*)robFollower;
 
 							float distance = robLeader->get_pos().dist_to(robFollower->get_pos().x(), robFollower->get_pos().y());
@@ -214,6 +258,7 @@ namespace sferes
 							hunterFollower->set_angle_hunter(angle);
 						}
 					}
+#endif
 #endif
 
 					// Number of steps the robots are evaluated
@@ -563,6 +608,8 @@ namespace sferes
 	   				if(hunter->nn1_chosen())
 	   					hunter->change_nn(1);
 	   			}
+	   			else
+	   				_num_compas = i;
    			}
 #endif
 
@@ -617,6 +664,7 @@ namespace sferes
 #ifdef COM_NN
    			for(int i = 0; i < vec_ind_size; ++i)
 	   			((Hunter*)(simu.robots()[i]))->change_nn(0);
+	   		_num_compas = -1;
 #endif
    		}
    	}
@@ -641,6 +689,10 @@ namespace sferes
 		size_t gen;
 
 		float nb_cooperate, nb_defect;
+
+#ifdef COM_NN
+		int _num_compas;
+#endif
 		
 		void set_res_dir(std::string res_dir)
 		{

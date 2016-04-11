@@ -100,7 +100,8 @@ namespace sferes
 					assert(_pos_mutant < _pop.size());
 
 					// _pop[_pos_mutant]->fit().eval_compet(*_pop[_pos_mutant], *_pop[i]);
-					_pop[i]->fit().eval_compet(*_pop[_pos_mutant], *_pop[i]);
+					if(_pop[i]->is_evaluated() || (i == _pos_mutant))
+						_pop[i]->fit().eval_compet(*_pop[_pos_mutant], *_pop[i]);
 				}
       }
     };
@@ -149,11 +150,12 @@ namespace sferes
 				parallel::init();
 #ifdef NOT_AGAINST_ALL
 				parallel::p_for(parallel::range_t(begin, end), _parallel_ev_select<Phen>(pop, pos_mutant, select));
-				_nb_eval += 1;
 #else
 				parallel::p_for(parallel::range_t(begin, end), _parallel_ev_mutant<Phen>(pop, pos_mutant));
-				_nb_eval += end - begin;
+				// _nb_eval += end - begin;
 #endif
+
+				_nb_eval += 1;
 
 				pop[pos_mutant]->set_nb_leader_first(pop[pos_mutant]->nb_leader_first_at());
 				pop[pos_mutant]->set_nb_preys_killed_coop(pop[pos_mutant]->nb_preys_killed_coop_at());

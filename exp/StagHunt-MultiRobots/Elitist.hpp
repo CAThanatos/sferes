@@ -153,7 +153,7 @@ namespace sferes
 					selection_pop.push_back(child_pop[i]);
 				}
 				assert(selection_pop.size() == (mu + lambda));
-				
+
 				// Evaluation of the children and the parents if need be
 #ifdef EVAL_PARENTS
 				this->_eval.eval(selection_pop, 0, selection_pop.size());
@@ -214,6 +214,23 @@ namespace sferes
 							this->_pop.end(), fit::compare());
 							
 				dbg::out(dbg::info, "ea")<<"best fitness: " << this->_pop[0]->fit().value() << std::endl;
+      }
+
+      void fill_pop()
+      {
+        std::cout << "Duplicating individuals from pop_size = " << this->_pop.size() << " to pop_size = " << mu << std::endl;
+
+        int cur_pop_size = this->_pop.size();
+        this->_pop.resize(mu);
+
+        int cpt_indiv = 0;
+        for(size_t i = cur_pop_size; i < mu; ++i)
+        {
+          this->_pop[i] = this->_pop[cpt_indiv]->clone();
+          cpt_indiv = (cpt_indiv + 1)%cur_pop_size;
+        }
+
+        assert(this->_pop.size() == mu);
       }
 
       void play_run(const std::string& fname)

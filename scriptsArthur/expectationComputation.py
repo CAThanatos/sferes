@@ -138,6 +138,15 @@ def main(args) :
 	# matplotlib.rcParams['ytick.labelsize'] = 25
 	# matplotlib.rcParams['legend.fontsize'] = 25
 
+	# matplotlib.rcParams['font.size'] = 15
+	# matplotlib.rcParams['font.weight'] = 'bold'
+	# matplotlib.rcParams['axes.labelsize'] = 25
+	# matplotlib.rcParams['axes.titlesize'] = 25
+	# matplotlib.rcParams['axes.labelweight'] = 'bold'
+	# matplotlib.rcParams['xtick.labelsize'] = 25
+	# matplotlib.rcParams['ytick.labelsize'] = 25
+	# matplotlib.rcParams['legend.fontsize'] = 25
+
 	matplotlib.rcParams['font.size'] = 15
 	matplotlib.rcParams['font.weight'] = 'bold'
 	matplotlib.rcParams['axes.labelsize'] = 25
@@ -1061,7 +1070,7 @@ def main(args) :
 
 			cpt = 0
 			for scatter in listScatters :
-				tax.scatter(scatter, color = listColors[cpt % len(listColors)], marker = listMarkers[cpt % len(listMarkers)], s = 50, label = listLabels[cpt % len(listLabels)])
+				tax.scatter(scatter, color = listColors[cpt % len(listColors)], marker = listMarkers[cpt % len(listMarkers)], s = 75, label = listLabels[cpt % len(listLabels)])
 
 				cpt += 1
 
@@ -1083,9 +1092,6 @@ def main(args) :
 
 			fontsize = 25
 			fontweight = 'bold'
-			# tax.left_axis_label("Solo", fontsize = fontsize, fontweight = fontweight)
-			# tax.right_axis_label("Follower", fontsize = fontsize, fontweight = fontweight)
-			# tax.bottom_axis_label("Turner", fontsize = fontsize, fontweight = fontweight)
 			tax.left_axis_label("Solo", (0.0 - 0.09, 1.0 + 0.17, 0.5), 0.0, fontsize = fontsize, fontweight = fontweight)
 			tax.right_axis_label("Follower", (1.0 - 0.06, 0.1, 0.0), -120, fontsize = fontsize, fontweight = fontweight)
 			tax.bottom_axis_label("Turner", (-0.04, 0.1, 1.0), 120, fontsize = fontsize, fontweight = fontweight)

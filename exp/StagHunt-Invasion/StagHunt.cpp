@@ -231,7 +231,7 @@ namespace sferes
        	
        	Hunter* h2 = (Hunter*)(simu.robots()[1]);
        	food2 += h2->get_food_gathered();
-       	
+
        	moy_hares2 += h2->nb_hares_hunted();
        	moy_sstags2 += h2->nb_small_stags_hunted();
        	moy_bstags2 += h2->nb_big_stags_hunted();

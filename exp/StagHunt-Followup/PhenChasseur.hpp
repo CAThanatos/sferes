@@ -301,6 +301,12 @@ namespace sferes
 					int nb_weights = (Params::nn::nb_inputs + 1) * Params::nn::nb_hidden + Params::nn::nb_hidden * Params::nn::nb_outputs + Params::nn::nb_outputs;
 					int cpt_weights = nb_weights;
 
+#ifdef WEIGHTS_CHOICE
+					for(size_t i = 0; i < Params::nn::nb_hidden * Params::nn::nb_outputs; ++i)
+						output += ((this->_params[Params::nn::nb_inputs + 1 + i] - min_p)/(max_p - min_p)) * this->_params[cpt_weights + i];
+
+					cpt_weights += Params::nn::nb_hidden * Params::nn::nb_outputs;
+#else
 #ifdef NETWORK_DOUBINPUTS
 					output += ((this->_params[index_gen_choice] - min_p)/(max_p - min_p))*this->_params[cpt_weights];
 					cpt_weights++;
@@ -309,6 +315,7 @@ namespace sferes
 					output += ((opponent._params[index_gen_choice] - min_p)/(max_p - min_p))*this->_params[cpt_weights];
 					cpt_weights++;
 
+#endif
 					// Bias neuron
 					output += 1.0f*this->_params[cpt_weights];
 					output = (1.0 / (exp(-output * lambda) + 1));

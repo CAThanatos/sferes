@@ -296,7 +296,7 @@ namespace sferes
 
 					// We need to set all the objective values to 0
 					pop[i]->fit().set_value(0);
-						
+
 #ifdef DIVERSITY
 					pop[i]->fit().resize_objs(2);
 #else
@@ -305,72 +305,96 @@ namespace sferes
 					for(int k = 0; k < pop[i]->fit().objs().size(); ++k)
 						pop[i]->fit().set_obj(k, 0);
 
-
 					// Creation of the matching list
 					list_matches_ind_t list_matches_ind;
-					while(vec_nb_simulations[i] < nb_simulations_max)
-					{
-						match_t vec_match(Params::simu::nb_hunters - 1);
-						for(int j = 0; j < vec_match.size(); ++j)
-						{
-							int opponent = -1;
-							int match_opp = -1;
-
-							ind_match_t ind_match(2);
-							if(size_vec_opponents == 1 && vec_opponents[0] == i)
-							{
-								do
-								{
-									opponent = misc::rand(0, int(end - begin));
-								} while((opponent == i) || (opponent < 0) || (opponent >= pop.size()));
-								
-								assert(opponent != -1);
-								ind_match[0] = opponent;
-								ind_match[1] = 0;
-							}
-							else
-							{
-								do
-								{
-									opponent = misc::rand(0, size_vec_opponents);
-									match_opp = vec_opponents[opponent];
-								} while((match_opp == i) || (match_opp < 0) || (match_opp >= pop.size()));
-								
-								assert(opponent != -1);
-								ind_match[0] = match_opp;
-								ind_match[1] = 1;
-
-								vec_nb_simulations[match_opp]++;
-
-								if(vec_nb_simulations[match_opp] >= nb_simulations_max)
-								{
-									vec_opponents[opponent] = vec_opponents[size_vec_opponents - 1];
-									size_vec_opponents--;
-								}
-							}
-
-							vec_match[j] = ind_match;
-						}
-						list_matches_ind.push_back(vec_match);
-						vec_nb_simulations[i]++;
-
-						if(vec_nb_simulations[i] >= nb_simulations_max)
-						{
-							int index = 0;
-							for(size_t j = 0; j < vec_opponents.size(); ++j)
-							{
-								if(vec_opponents[j] == i)
-								{
-									index = j;
-									break;
-								}
-							}
-							vec_opponents[index] = vec_opponents[size_vec_opponents - 1];
-							size_vec_opponents--;
-						}
-					}
 					list_matches.push_back(list_matches_ind);
 				}
+
+
+				bool all_done = false;
+				while(!all_done)
+				{
+					all_done = true;
+					for(int i = begin; i < end; ++i)
+					{
+						if(vec_nb_simulations[i] < nb_simulations_max)
+						{
+							all_done = false;
+
+							match_t vec_match(Params::simu::nb_hunters - 1);
+							for(int j = 0; j < vec_match.size(); ++j)
+							{
+								int opponent = -1;
+								int match_opp = -1;
+
+								ind_match_t ind_match(2);
+								if(size_vec_opponents == 1 && vec_opponents[0] == i)
+								{
+									do
+									{
+										opponent = misc::rand(0, int(end - begin));
+									} while((opponent == i) || (opponent < 0) || (opponent >= pop.size()));
+									
+									assert(opponent != -1);
+									ind_match[0] = opponent;
+									ind_match[1] = 0;
+								}
+								else
+								{
+									do
+									{
+										opponent = misc::rand(0, size_vec_opponents);
+										match_opp = vec_opponents[opponent];
+									} while((match_opp == i) || (match_opp < 0) || (match_opp >= pop.size()));
+									
+									assert(opponent != -1);
+									ind_match[0] = match_opp;
+									ind_match[1] = 1;
+
+									vec_nb_simulations[match_opp]++;
+
+									if(vec_nb_simulations[match_opp] >= nb_simulations_max)
+									{
+										vec_opponents[opponent] = vec_opponents[size_vec_opponents - 1];
+										size_vec_opponents--;
+									}
+								}
+
+								vec_match[j] = ind_match;
+							}
+							list_matches[i].push_back(vec_match);
+							vec_nb_simulations[i]++;
+
+							if(vec_nb_simulations[i] >= nb_simulations_max)
+							{
+								int index = 0;
+								for(size_t j = 0; j < vec_opponents.size(); ++j)
+								{
+									if(vec_opponents[j] == i)
+									{
+										index = j;
+										break;
+									}
+								}
+								vec_opponents[index] = vec_opponents[size_vec_opponents - 1];
+								size_vec_opponents--;
+							}
+						}
+					}
+				}
+
+				// for(int i = 0; i < list_matches.size(); ++i)
+				// {
+				// 	std::cout << "Indiv " << i << " : " << std::endl;
+				// 	for(int j = 0; j < list_matches[i].size(); ++j)
+				// 	{
+				// 		for(int k = 0; k < list_matches[i][j].size(); ++k)
+				// 		{
+				// 			std::cout << "(" << list_matches[i][j][k][0] << "," << list_matches[i][j][k][1] << "),";
+				// 		}
+				// 		std::cout << std::endl;
+				// 	}
+				// }
 
 				// int nb_matches = 0;
 				// for(int i = 0; i < list_matches.size(); ++i)

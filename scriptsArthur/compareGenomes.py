@@ -102,26 +102,27 @@ def main(args) :
 						if s :
 							eval = int(s.group(1))
 
-							if lastEval == None :
-								lastEval = eval
+							if (args.maximum == -1) or (eval < args.maximum) :
+								if lastEval == None :
+									lastEval = eval
 
-							if eval > lastEval :
-								if cumulEval >= args.precision :
-									cumulEval = 0
+								if eval > lastEval :
+									if cumulEval >= args.precision :
+										cumulEval = 0
 
-								firstEval = False
+									firstEval = False
 
-								cumulEval += eval - lastEval
-								lastEval = eval
+									cumulEval += eval - lastEval
+									lastEval = eval
 
-							if cumulEval >= args.precision or firstEval :
-								genotype = [float(gene) for gene in line.rstrip('\n').split(',')[1:]]
+								if cumulEval >= args.precision or firstEval :
+									genotype = [float(gene) for gene in line.rstrip('\n').split(',')[1:]]
 
-								if eval not in hashGenotypes.keys() :
-									hashGenotypes[eval] = []
-									tabEval.append(eval)
+									if eval not in hashGenotypes.keys() :
+										hashGenotypes[eval] = []
+										tabEval.append(eval)
 
-								hashGenotypes[eval].append(genotype)
+									hashGenotypes[eval].append(genotype)
 
 				hashSimilarities = {}
 				hashMeans = {}
@@ -518,6 +519,7 @@ if __name__ == "__main__" :
 	parser.add_argument('-o', '--output', help = "Output directory", default = "GraphsResults")
 	parser.add_argument('-l', '--leadership', help = "Draw best leadership", action = "store_true", default = False)
 	parser.add_argument('-b', '--beginningGen', help = "First generation from which we draw", default = False, action = 'store_true')
+	parser.add_argument('-m', '--maximum', help = "Maximum evaluation", default = -1, type = int)
 	# parser.add_argument('-g', '--generation', help = "Draw by generation", default = False, action = 'store_true')
 	args = parser.parse_args()
 

@@ -7,9 +7,9 @@ import shutil
 import sys
 
 import Tools
-from drawGraphsArticle import draw
+import drawGraphsMultiRobots
 
-nbPopFirstGen = 20
+nbPopFirstGen = 10
 
 def copyFile(fileSource, fileDestination, evalToRemove) :
 	if evalToRemove != -1 :
@@ -41,66 +41,49 @@ def copyFile(fileSource, fileDestination, evalToRemove) :
 def main(args) :
 	listTopDirectories = Tools.searchTopDirectories(args.directory)
 
+	listRefactDirFit = ['BestFit', 'AllFit', 'BestEverFit']
+	listRefactDirLeadership = ['BestLeadership', 'AllLeadership']
+	listRefactDirNN = ['BestNN', 'AllNN']
+	regexp = r"^" + re.escape(args.prefix)
 	for topDirectory in listTopDirectories :
 		if os.path.isdir(topDirectory) :
+			dicoDirFit = {name : os.path.join(topDirectory, name) for name in listRefactDirFit}
+			dicoDirLeadership = {name : os.path.join(topDirectory, name) for name in listRefactDirLeadership}
+
 			listSubDirs = [d for d in os.listdir(topDirectory) if os.path.isdir(os.path.join(topDirectory, d))]
 
 			if args.refactor :
 				numRun = 1
 
 				for subDir in listSubDirs :
-					shutil.move(os.path.join(topDirectory, subDir), os.path.join(topDirectory, 'Dir{0}'.format(numRun)))
+					if subDir not in listRefactDirFit :
+						if not re.search(regexp, subDir) :
+							newDir = os.path.join(topDirectory, 'Dir{0}'.format(numRun))
 
-					numRun += 1
+							if os.path.isdir(newDir) :
+								print("Probleme lors du refactoring : " + newDir + " deja existant !")
+								break
+							else :
+								shutil.move(os.path.join(topDirectory, subDir), os.path.join(topDirectory, 'Dir{0}'.format(numRun)))
+								numRun += 1
 
 			listSubDirs = [d for d in os.listdir(topDirectory) if os.path.isdir(os.path.join(topDirectory, d))]
 
-			bestfitDir = os.path.join(topDirectory, 'BestFit')
-			if os.path.isdir(bestfitDir) :
-				shutil.rmtree(bestfitDir)
+			for refactDir in dicoDirFit.values() :
+				if os.path.isdir(refactDir) :
+					shutil.rmtree(refactDir)
 
-			os.makedirs(bestfitDir)
+				os.makedirs(refactDir)
 
-			allfitDir = os.path.join(topDirectory, 'AllFit')
-			if os.path.isdir(allfitDir) :
-				shutil.rmtree(allfitDir)
+			if args.leadership :
+				for refactDir in dicoDirLeadership.values() :
+					if os.path.isdir(refactDir) :
+						shutil.rmtree(refactDir)
 
-			os.makedirs(allfitDir)
-
-			besteverfitDir = os.path.join(topDirectory, 'BestEverFit')
-			if os.path.isdir(besteverfitDir) :
-				shutil.rmtree(besteverfitDir)
-
-			os.makedirs(besteverfitDir)
-
-			bestdivDir = os.path.join(topDirectory, 'BestDiv')
-			alldivDir = os.path.join(topDirectory, 'AllDiv')
-			besteverdivDir = os.path.join(topDirectory, 'BestEverDiv')
-			paretoDir = os.path.join(topDirectory, 'ParetoFront')
-			if args.diversity :
-				if os.path.isdir(bestdivDir) :
-					shutil.rmtree(bestdivDir)
-
-				os.makedirs(bestdivDir)
-
-				if os.path.isdir(alldivDir) :
-					shutil.rmtree(alldivDir)
-
-				os.makedirs(alldivDir)
-
-				if os.path.isdir(besteverdivDir) :
-					shutil.rmtree(besteverdivDir)
-
-				os.makedirs(besteverdivDir)				
-
-				if os.path.isdir(paretoDir) :
-					shutil.rmtree(paretoDir)
-
-				os.makedirs(paretoDir)				
+					os.makedirs(refactDir)
 
 
 			numRun = 1
-			regexp = r"^" + re.escape(args.prefix)
 			for subDir in listSubDirs :
 				if(re.match(regexp, subDir)) :
 					m = re.match(r"^Dir(\d+)$", subDir)
@@ -113,23 +96,15 @@ def main(args) :
 
 					for curFile in listFiles :
 						if(re.match(r'^bestfit.dat$', curFile)) :
-							copyFile(os.path.join(curDir, curFile), os.path.join(bestfitDir, 'bestfit{0}.dat'.format(numRun)), int(args.evalRm))
+							copyFile(os.path.join(curDir, curFile), os.path.join(dicoDirFit['BestFit'], 'bestfit{0}.dat'.format(numRun)), int(args.evalRm))
 						elif(re.match(r'^allfitevalstat.dat$', curFile)) :
-							copyFile(os.path.join(curDir, curFile), os.path.join(allfitDir, 'allfitevalstat{0}.dat'.format(numRun)), int(args.evalRm))
+							copyFile(os.path.join(curDir, curFile), os.path.join(dicoDirFit['AllFit'], 'allfitevalstat{0}.dat'.format(numRun)), int(args.evalRm))
 
-							if not args.noDrawFit and args.diversity :
-								copyFile(os.path.join(curDir, curFile), os.path.join(paretoDir, 'allfitevalstat{0}.dat'.format(numRun)), int(args.evalRm))
-						elif(re.match(r'^besteverfit.dat$', curFile)) :
-							copyFile(os.path.join(curDir, curFile), os.path.join(besteverfitDir, 'besteverfit{0}.dat'.format(numRun)), int(args.evalRm))
-						elif(re.match(r'^bestdiv.dat$', curFile) and args.diversity == True) :
-							copyFile(os.path.join(curDir, curFile), os.path.join(bestdivDir, 'bestdiv{0}.dat'.format(numRun)), int(args.evalRm))
-						elif(re.match(r'^alldivevalstat.dat$', curFile) and args.diversity == True) :
-							copyFile(os.path.join(curDir, curFile), os.path.join(alldivDir, 'alldivevalstat{0}.dat'.format(numRun)), int(args.evalRm))
+						elif(re.match(r'^bestleadership.dat$', curFile) and args.leadership == True) :
+							copyFile(os.path.join(curDir, curFile), os.path.join(dicoDirLeadership['BestLeadership'], 'bestleadership{0}.dat'.format(numRun)), int(args.evalRm))
+						elif(re.match(r'^allleadership.dat$', curFile) and args.leadership == True) :
+							copyFile(os.path.join(curDir, curFile), os.path.join(dicoDirLeadership['AllLeadership'], 'allleadership{0}.dat'.format(numRun)), int(args.evalRm))
 
-							if not args.noDrawFit :
-								copyFile(os.path.join(curDir, curFile), os.path.join(paretoDir, 'alldivevalstat{0}.dat'.format(numRun)), int(args.evalRm))
-						elif(re.match(r'^besteverdiv.dat$', curFile) and args.diversity == True) :
-							copyFile(os.path.join(curDir, curFile), os.path.join(besteverdivDir, 'besteverdiv{0}.dat'.format(numRun)), int(args.evalRm))
 
 					numRun += 1
 
@@ -144,12 +119,13 @@ def main(args) :
 								"argDirectory" : topDirectory,
 								"argBest" : args.best,
 								"argAll" : args.all,
-								"argDiversity" : args.diversity,
+								"argNumber" : args.number,
+								"argLeadership" : args.leadership,
 								"argNoDrawFit" : args.noDrawFit,
-								"argDrawRun" : args.drawRun,
-								"argMaxGen" : int(args.maxGen),
+								"argDrawRun" : args.drawRun
 							}
-			draw(**parametres)
+
+			drawGraphsMultiRobots.draw(**parametres)
 
 
 
@@ -162,17 +138,18 @@ if __name__ == "__main__" :
 	parser.add_argument('-r', '--refactor', help = "Refactor", default=False, action="store_true")
 
 	parser.add_argument('-m', '--max', help = "Max evaluation", default='20000')
-	parser.add_argument('-M', '--maxGen', help = "Max generation", default='1000')
 	parser.add_argument('-p', '--precision', help = "Precision", default='100')
 
 	parser.add_argument('-b', '--best', help = "Best only", default=False, action="store_true")
 	parser.add_argument('-a', '--all', help = "All only", default=False, action="store_true")
-	parser.add_argument('-d', '--diversity', help = "Drawing of diversity", default=False, action="store_true")
+	parser.add_argument('-l', '--leadership', help = "Drawing of leadership behavior", default=False, action="store_true")
+	parser.add_argument('-n', '--number', help = "Number of hunters", default=3)
 	parser.add_argument('-F', '--noDrawFit', help = "No drawing of fitness", default=False, action="store_true")
 	parser.add_argument('-u', '--drawRun', help = "Drawing of each run pareto frontier", default=False, action="store_true")
 
 	parser.add_argument('-g', '--firstGen', help = "Size of population of first generation", default=10, type=int)
 	parser.add_argument('-E', '--EvalByGen', help = "Number of evaluations by generation", default=20, type=int)
+	parser.add_argument('-G', '--drawGen', help = "Drawing generations", default=False, action="store_true")
 
 	parser.add_argument('-s', '--selection', help = "Selected runs", default=None, type=int, nargs='+')
 	parser.add_argument('-e', '--exclusion', help = "Excluded runs", default=None, type=int, nargs='+')

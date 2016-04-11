@@ -274,6 +274,9 @@ namespace sferes
 					boost::shared_ptr<PhenInvasion> new_indiv = boost::shared_ptr<PhenInvasion>(new PhenInvasion());
 					for(unsigned i = 0; i < this->_gen.size(); ++i)
 						new_indiv->_gen.data(i, this->_gen.data(i));
+
+					for (unsigned i = 0; i < _params.size(); ++i)
+						new_indiv->_params[i] = new_indiv->_gen.data(i) * (max_p - min_p) + min_p;
 						
 					new_indiv->_pop_pos = this->_pop_pos;
 					new_indiv->_vec_payoffs = this->_vec_payoffs;

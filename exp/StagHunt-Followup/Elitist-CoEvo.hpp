@@ -259,6 +259,12 @@ namespace sferes
 				dbg::out(dbg::info, "ea")<<"best fitness: " << this->_pop[0]->fit().value() << std::endl;
       }
 
+      void fill_pop()
+      {
+        std::cout << "fill_pop() not implemented for this algorithm !" << std::endl;;
+        exit(1);
+      }
+
       void play_run(const std::string& fname)
       {
         std::ifstream ifs(fname.c_str());

@@ -228,7 +228,7 @@ struct Params
 		static const size_t nb_outputs_scream = 0;
 
 #ifdef COM_COMPAS
-		static const size_t nb_inputs_compas = 2;
+		static const size_t nb_inputs_compas = 3;
 #else
 		static const size_t nb_inputs_compas = 0;
 #endif
@@ -384,7 +384,7 @@ struct Params
 #ifdef POP100
     static const int dump_period = 10;
 #else
-    static const int dump_period = 100;
+    static const int dump_period = 50;
 #endif
     
     // how often should the video be done
@@ -594,6 +594,8 @@ struct Params
 
 #ifdef BSTAG2500
 #define FOOD_BIG_STAG_COOP_HIGH 2500
+#elif defined(BSTAG1500)
+#define FOOD_BIG_STAG_COOP_HIGH 1500
 #elif defined(BSTAG1000)
 #define FOOD_BIG_STAG_COOP_HIGH 1000
 #elif defined(BSTAG500)
@@ -623,7 +625,7 @@ struct Params
 
 // #define BEHAVIOUR_LOG
 
-#define BEHAVIOUR_VIDEO
+// #define BEHAVIOUR_VIDEO
 
 #ifndef COEVO
 #define GENOME_TRACES

@@ -331,6 +331,7 @@ namespace sferes
           oa_t oa(ofs);
           oa << BOOST_SERIALIZATION_NVP(_seed);
 	        oa << BOOST_SERIALIZATION_NVP(_pop);
+
 #ifdef COEVO
           oa << BOOST_SERIALIZATION_NVP(_pop_co);
 #endif
@@ -360,7 +361,22 @@ namespace sferes
           typedef boost::archive::binary_iarchive ia_t;
           ia_t ia(ifs);
           ia >> BOOST_SERIALIZATION_NVP(_seed);
+
+// #ifdef RESEEDING
+//           time_t curTime = time(0) + ::getpid();
+//           srand(curTime);
+//           set_seed(curTime);
+// #endif
+
 	        ia >> BOOST_SERIALIZATION_NVP(_pop);
+
+#if defined(FITPROP)
+          if(_pop.size() < Params::pop::size)
+            stc::exact(this)->fill_pop();
+#elif defined(ELITIST)
+          if(_pop.size() < Params::pop::mu)
+            stc::exact(this)->fill_pop();
+#endif
 
 #if defined(ELITISTINV) || defined(FINITE) || defined(INFINITE)
           stc::exact(this)->load_genotypes();
@@ -371,7 +387,7 @@ namespace sferes
 #endif
 
 #ifdef PAIRING
-          stc::exact(this)->load_niches(fname);
+          // stc::exact(this)->load_niches(fname);
 #endif
 
           // for(int i = 0; i < _pop.size(); ++i)
