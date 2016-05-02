@@ -868,7 +868,8 @@ def main(args) :
 
 		fontsize = 25
 		fontweight = 'bold'
-		tax.left_axis_label("Solo", (0.0 - 0.09, 1.0 + 0.17, 0.5), 0.0, fontsize = fontsize, fontweight = fontweight)
+		# tax.left_axis_label("Solo", (0.0 - 0.09, 1.0 + 0.17, 0.5), 0.0, fontsize = fontsize, fontweight = fontweight)
+		tax.left_axis_label("Leader", (0.0 - 0.09, 1.0 + 0.17, 0.5), 0.0, fontsize = fontsize, fontweight = fontweight)
 		tax.right_axis_label("Follower", (1.0 - 0.06, 0.1, 0.0), -120, fontsize = fontsize, fontweight = fontweight)
 		tax.bottom_axis_label("Turner", (-0.04, 0.1, 1.0), 120, fontsize = fontsize, fontweight = fontweight)
 
@@ -905,7 +906,8 @@ def main(args) :
 
 		fontsize = 25
 		fontweight = 'bold'
-		tax.left_axis_label("Solo", (0.0 - 0.09, 1.0 + 0.17, 0.5), 0.0, fontsize = fontsize, fontweight = fontweight)
+		# tax.left_axis_label("Solo", (0.0 - 0.09, 1.0 + 0.17, 0.5), 0.0, fontsize = fontsize, fontweight = fontweight)
+		tax.left_axis_label("Leader", (0.0 - 0.09, 1.0 + 0.17, 0.5), 0.0, fontsize = fontsize, fontweight = fontweight)
 		tax.right_axis_label("Follower", (1.0 - 0.06, 0.1, 0.0), -120, fontsize = fontsize, fontweight = fontweight)
 		tax.bottom_axis_label("Turner", (-0.04, 0.1, 1.0), 120, fontsize = fontsize, fontweight = fontweight)
 
@@ -1032,7 +1034,8 @@ def main(args) :
 
 			fontsize = 25
 			fontweight = 'bold'
-			tax.left_axis_label("Solo", (0.0 - 0.09, 1.0 + 0.17, 0.5), 0.0, fontsize = fontsize, fontweight = fontweight)
+			# tax.left_axis_label("Solo", (0.0 - 0.09, 1.0 + 0.17, 0.5), 0.0, fontsize = fontsize, fontweight = fontweight)
+			tax.left_axis_label("Leader", (0.0 - 0.09, 1.0 + 0.17, 0.5), 0.0, fontsize = fontsize, fontweight = fontweight)
 			tax.right_axis_label("Follower", (1.0 - 0.06, 0.1, 0.0), -120, fontsize = fontsize, fontweight = fontweight)
 			tax.bottom_axis_label("Turner", (-0.04, 0.1, 1.0), 120, fontsize = fontsize, fontweight = fontweight)
 			legend = plt.legend(frameon = True)

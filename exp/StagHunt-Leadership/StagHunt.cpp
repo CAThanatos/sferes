@@ -456,9 +456,10 @@ namespace sferes
 
 						if(this->mode() == fit::mode::view)
 						{
-							// std::string fileDump = _file_behaviour + boost::lexical_cast<std::string>(cpt_files + 1) + ".bmp";
+							std::string fileDump = _file_behaviour + boost::lexical_cast<std::string>(cpt_files + 1) + ".bmp";
        				simu.add_dead_prey(index, alone, first_robot);
-       				// cpt_files++;
+						  simu.dump_behaviour_log(fileDump.c_str());
+       				cpt_files++;
 						}
 #endif
 

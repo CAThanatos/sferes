@@ -104,6 +104,8 @@ namespace fastsim
   {
     _w = _map->get_pixel_w();
     _h = _map->get_pixel_h();
+    // _w = _map->get_pixel_w()*2;
+    // _h = _map->get_pixel_h()*2;
 
 #ifndef NO_VIDEO
     if (SDL_Init(SDL_INIT_VIDEO) == -1)
