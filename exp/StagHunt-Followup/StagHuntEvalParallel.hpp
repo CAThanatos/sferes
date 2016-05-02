@@ -167,11 +167,8 @@ namespace sferes
 #ifdef CHOOSE_BEST
  						std::sort(vec_pref.begin(), vec_pref.end(), pref_value_comp);
 
-						for(size_t k = 0; k < nb_opponents; ++k)
-						{
-							int opponent = vec_pref[0].index;
-							_pop[i]->fit().eval_compet(*_pop[i], *_pop[opponent]);
-						}
+						int opponent = vec_pref[0].index;
+						_pop[i]->fit().eval_compet(*_pop[i], *_pop[opponent]);
 #elif defined(SEVERAL_LISTS)
 						for(size_t k = 0; k < nb_opponents; ++k)
 						{

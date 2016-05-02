@@ -303,7 +303,7 @@ namespace sferes
 
 #ifdef WEIGHTS_CHOICE
 					for(size_t i = 0; i < Params::nn::nb_hidden * Params::nn::nb_outputs; ++i)
-						output += ((this->_params[Params::nn::nb_inputs + 1 + i] - min_p)/(max_p - min_p)) * this->_params[cpt_weights + i];
+						output += ((opponent._params[Params::nn::nb_inputs + 1 + i] - min_p)/(max_p - min_p)) * this->_params[cpt_weights + i];
 
 					cpt_weights += Params::nn::nb_hidden * Params::nn::nb_outputs;
 #else
