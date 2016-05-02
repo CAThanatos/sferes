@@ -49,6 +49,15 @@ def computeExpectation(genotype, tabProportions) :
 	return result
 
 
+def computeExpectationBestChoice(genotype, tabProportions) :
+	result = 0.0
+	for opponent in tabProportions.keys() :
+		if tabProportions[opponent] > 0.0 :
+			if FITNESS_ARRAY[genotype][opponent] > result :
+				result = FITNESS_ARRAY[genotype][opponent]
+
+	return result
+
 
 def main(args) :
 	sns.set()
@@ -91,6 +100,43 @@ def main(args) :
 		hashExpectations['Solo'].append(tmpArraySolo)
 		hashExpectations['Turner'].append(tmpArrayTurner)
 
+	if args.bestchoice :
+		hashExpectationsBestChoice = {}
+		hashExpectationsBestChoice['Follower'] = []
+		hashExpectationsBestChoice['Solo'] = []
+		hashExpectationsBestChoice['Turner'] = []
+		for Xproportion in Xproportions :
+			tabProportions['Follower'] = Xproportion
+
+			tmpArrayFollower = []
+			tmpArraySolo = []
+			tmpArrayTurner = []
+			for Yproportion in Yproportions : 
+				if Xproportion + Yproportion <= 1.0 :
+					tabProportions['Solo'] = Yproportion
+					tabProportions['Turner'] = 1.0 - Xproportion - Yproportion
+
+					tmpArrayFollower.append(computeExpectationBestChoice('Follower', tabProportions))
+					tmpArraySolo.append(computeExpectationBestChoice('Solo', tabProportions))
+					tmpArrayTurner.append(computeExpectationBestChoice('Turner', tabProportions))
+				else :
+					tmpArrayFollower.append(0.0)
+					tmpArraySolo.append(0.0)
+					tmpArrayTurner.append(0.0)
+
+			hashExpectationsBestChoice['Follower'].append(tmpArrayFollower)
+			hashExpectationsBestChoice['Solo'].append(tmpArraySolo)
+			hashExpectationsBestChoice['Turner'].append(tmpArrayTurner)
+
+
+	# matplotlib.rcParams['font.size'] = 15
+	# matplotlib.rcParams['font.weight'] = 'bold'
+	# matplotlib.rcParams['axes.labelsize'] = 25
+	# matplotlib.rcParams['axes.titlesize'] = 25
+	# matplotlib.rcParams['axes.labelweight'] = 'bold'
+	# matplotlib.rcParams['xtick.labelsize'] = 25
+	# matplotlib.rcParams['ytick.labelsize'] = 25
+	# matplotlib.rcParams['legend.fontsize'] = 25
 
 	# matplotlib.rcParams['font.size'] = 15
 	# matplotlib.rcParams['font.weight'] = 'bold'
@@ -136,6 +182,7 @@ def main(args) :
 
 	listPoints = list()
 	listPointsDest = list()
+	listPointsDestBestChoice = list()
 	listPointsEquilibrium = list()
 	precisionVector = 2
 
@@ -217,6 +264,25 @@ def main(args) :
 
 					if (nextPropSolo == propSolo) and (nextPropTurner == propTurner) and (nextPropFollower == propFollower) :
 						listPointsEquilibrium.append(curTuple)
+
+					if args.bestchoice :
+						fitnessFollower = hashExpectationsBestChoice['Follower'][cptX][cptY]
+						fitnessSolo = hashExpectationsBestChoice['Solo'][cptX][cptY]
+						fitnessTurner = hashExpectationsBestChoice['Turner'][cptX][cptY]
+
+						# print("(" + str(fitnessFollower) + "," + str(fitnessSolo) + "," + str(fitnessTurner) + ")")
+
+						meanFitness = propFollower*fitnessFollower + propSolo*fitnessSolo + propTurner*fitnessTurner
+
+						# print("Mean fitness : " + str(meanFitness))
+
+						nextPropFollower = propFollower * fitnessFollower / meanFitness
+						nextPropSolo = propSolo * fitnessSolo / meanFitness
+						nextPropTurner = propTurner * fitnessTurner / meanFitness
+
+						assert(abs((nextPropFollower + nextPropSolo + nextPropTurner) - 1.0) <= 1e-10)
+
+						listPointsDestBestChoice.append((nextPropFollower*100, nextPropSolo*100, nextPropTurner*100))
 
 
 			cptY += 1
@@ -769,98 +835,17 @@ def main(args) :
 		X, Y = ternary.helpers.project_sequence(listPoints)
 		X2, Y2 = ternary.helpers.project_sequence(listPointsDest)
 
-		# X2 = ternary.helpers.unzip(listPoints)[0]
-		# Y2 = ternary.helpers.unzip(listPoints)[1]
-
-		# print(X2)
-		# print(X)
-		# print(Y2)
-		# print(Y)
-
-		# U = ternary.helpers.unzip(listVectors)[0]
-		# V = ternary.helpers.unzip(listVectors)[1]
 		U = [X2[i] - X[i] for i in range(0, len(X))]
 		V = [Y2[i] - Y[i] for i in range(0, len(Y))]
 
-		# with open("debug.txt", "a") as fileWrite :
-		# 	fileWrite.write("----------------------------------------------------\n")
-		# 	fileWrite.write("X, Y :\n")
-
-		# 	cpt = 0
-		# 	while cpt < len(X) :
-		# 		fileWrite.write(str(listPoints[cpt]) + " --> " + str((X[cpt], Y[cpt])) + "\n")
-		# 		cpt += 1
-
-		# 	fileWrite.write("----------------------------------------------------\n")
-		# 	fileWrite.write("X2, Y2 :\n")
-
-		# 	cpt = 0
-		# 	while cpt < len(X2) :
-		# 		fileWrite.write(str(listPointsDest[cpt]) + " --> " + str((X2[cpt], Y2[cpt])) + "\n")
-		# 		cpt += 1
-
-
-		# indexPoints = range(0, len(X), 10)
-		# X = [X[i] for i in indexPoints]
-		# Y = [Y[i] for i in indexPoints]
-		# V = [V[i] for i in indexPoints]
-		# U = [U[i] for i in indexPoints]
-
-		# print(str(len(X)) + "/" + str(len(Y)) + "/" + str(len(U)) + "/" + str(len(V)))
-		# print(X[::500])
-		# print(Y[::500])
-		# print(U[::500])
-		# print(V[::500])
-		# print(speed[::500])
-		# print(UN[::500])
-		# print(VN[::500])
-
-		# X = [40, 50, 60, 74.806817065583971]
-		# Y = [40, 50, 60, 43.635872846785738]
-		# U = [10, 10, 10, 10]
-		# V = [10, 10, 10, 10]
-
-		# X = [88.0]
-		# Y = [20.784609690826528]
-
-		# u = 74.806817065583971 - 88.0
-		# v = 43.635872846785738 - 20.784609690826528
-
-		# # a = u + v/2.
-		# # b = ternary.helpers.SQRT3OVER2 * v
-
-		# U = [u]
-		# V = [v]
-		# U = [74.806817065583971]
-		# V = [43.635872846785738]
-
-		# tax.get_axes().quiver(test.x, test.y, U, V)
-		# tax.get_axes().quiver(X[::100], Y[::100], U[::100], V[::100])
-		# tax.get_axes().quiver(X[::1], Y[::1], UN[::1], VN[::1], width = 0.001)
 		tax.get_axes().set_aspect(1.)
 		Q = tax.get_axes().quiver(X[::1], Y[::1], U[::1], V[::1], width = 0.001, color = 'r')
-		# tax.scatter([(49.613634131167942, 50.386365868832058, 0.0)], color = 'r', s = 25)
-		# tax.get_axes().scatter([50, 50], [0, 86], color = 'r', s = 25)
 
-		# ternary.plotting.scatter([(49.613634131167942, 50.386365868832058, 0.0)], ax=tax.get_axes(), permutation=None, color = 'r', s = 25)
-		# xs, ys = ternary.helpers.project_sequence([(49.613634131167942, 50.386365868832058, 0.0)], permutation=None)
-		# print(xs)
-		# print(ys)
-		# tax.get_axes().scatter(xs, ys, color = 'r', s = 25)
-		# tax.get_axes().scatter((76.806817065583971,), ys, color = 'g', s = 25)
-		# tax.get_axes().scatter((76.806817065583971,), (43.635872846785738,), color = 'g', s = 25)
-
-		# tax.get_axes().quiver(X[::1], Y[::1], U[::1], V[::1])
-		# tax.get_axes().streamplot(X, Y, U, V)
 		tax.plot([pA, pB, pC], color = 'black', linewidth = 2, linestyle = "--")
 		tax.plot([pA, pB, pD], color = 'black', linewidth = 2, linestyle = "--")
 		tax.boundary(linewidth=2.0)
 		tax.gridlines(color="black", multiple=10)
 
-		# ticks = [round(i / float(scale), 1) for i in range(scale + 1)]
-		# ticks = range(0, scale + 1, 20)
-		# tax.ticks(ticks=ticks, axis='rlb', linewidth=1, clockwise=True)#, offset=0.03)
-	 	# tax.ticks(axis='lbr', linewidth=1)
 		tax.ticks(axis = 'lbr', multiple = 20, linewidth = 1, clockwise = True)
 
 		# Remove default Matplotlib Axes
@@ -918,6 +903,81 @@ def main(args) :
 		plt.savefig("./GraphsResults/ExpectationsVectorsNormalized.svg", bbox_inches = 'tight')
 		plt.savefig("./GraphsResults/ExpectationsVectorsNormalized.png", bbox_inches = 'tight')
 
+
+		if args.bestchoice :
+			# -- Expectation All Full --
+			fig, ax = plt.subplots(ncols = 1, figsize = size)
+			ax.axis("off")
+			figure, tax = ternary.figure(ax = ax, scale = scale)
+
+			X, Y = ternary.helpers.project_sequence(listPoints)
+			X2, Y2 = ternary.helpers.project_sequence(listPointsDestBestChoice)
+
+			U = [X2[i] - X[i] for i in range(0, len(X))]
+			V = [Y2[i] - Y[i] for i in range(0, len(Y))]
+
+			tax.get_axes().set_aspect(1.)
+			Q = tax.get_axes().quiver(X[::1], Y[::1], U[::1], V[::1], width = 0.001, color = 'r')
+
+			tax.plot([pA, pB, pC], color = 'black', linewidth = 2, linestyle = "--")
+			tax.plot([pA, pB, pD], color = 'black', linewidth = 2, linestyle = "--")
+			# tax.boundary(linewidth=2.0)
+			tax.gridlines(color="black", multiple=10)
+
+			tax.ticks(axis = 'lbr', multiple = 20, linewidth = 1, clockwise = True)
+
+			# Remove default Matplotlib Axes
+			tax.clear_matplotlib_ticks()
+
+			fontsize = 25
+			fontweight = 'bold'
+			tax.left_axis_label("Solo", (0.0 - 0.09, 1.0 + 0.17, 0.5), 0.0, fontsize = fontsize, fontweight = fontweight)
+			tax.right_axis_label("Follower", (1.0 - 0.06, 0.1, 0.0), -120, fontsize = fontsize, fontweight = fontweight)
+			tax.bottom_axis_label("Turner", (-0.04, 0.1, 1.0), 120, fontsize = fontsize, fontweight = fontweight)
+
+			# plt.colorbar(Q, cax = tax.get_axes())
+
+			plt.tight_layout()
+			plt.savefig("./GraphsResults/ExpectationsVectorsBestChoice.svg", bbox_inches = 'tight')
+			plt.savefig("./GraphsResults/ExpectationsVectorsBestChoice.png", bbox_inches = 'tight')
+			# plt.show()
+
+
+			# -- Expectation All Full --
+			fig, ax = plt.subplots(ncols = 1, figsize = size)
+			ax.axis("off")
+			figure, tax = ternary.figure(ax = ax, scale = scale)
+
+			speed = [np.sqrt(U[i]**2 + V[i]**2) for i in range(0, len(U))]
+			UN = [U[i]/speed[i] if speed[i] > 0 else U[i] for i in range(0, len(U))]
+			VN = [V[i]/speed[i] if speed[i] > 0 else V[i] for i in range(0, len(V))]
+
+			# print(speed)
+			tax.get_axes().set_aspect(1.)
+			Q = tax.get_axes().quiver(X[::1], Y[::1], UN[::1], VN[::1], speed, width = 0.002, cmap = cm.jet)
+
+			tax.plot([pA, pB, pC], color = 'black', linewidth = 2, linestyle = "--")
+			tax.plot([pA, pB, pD], color = 'black', linewidth = 2, linestyle = "--")
+			# tax.boundary(linewidth=2.0)
+			tax.gridlines(color="black", multiple=10)
+
+			tax.ticks(axis = 'lbr', multiple = 20, linewidth = 1, clockwise = True)
+
+			# Remove default Matplotlib Axes
+			tax.clear_matplotlib_ticks()
+
+			fontsize = 25
+			fontweight = 'bold'
+			tax.left_axis_label("Solo", (0.0 - 0.09, 1.0 + 0.17, 0.5), 0.0, fontsize = fontsize, fontweight = fontweight)
+			tax.right_axis_label("Follower", (1.0 - 0.06, 0.1, 0.0), -120, fontsize = fontsize, fontweight = fontweight)
+			tax.bottom_axis_label("Turner", (-0.04, 0.1, 1.0), 120, fontsize = fontsize, fontweight = fontweight)
+
+			# divider = make_axes_locatable(ax5)
+			# cax = divider.append_axes("right", size="5%", pad=0.05)
+
+			plt.tight_layout()
+			plt.savefig("./GraphsResults/ExpectationsVectorsBestChoiceNormalized.svg", bbox_inches = 'tight')
+			plt.savefig("./GraphsResults/ExpectationsVectorsBestChoiceNormalized.png", bbox_inches = 'tight')
 
 
 	listColors = ['r', 'g', 'b', 'y']
@@ -1193,6 +1253,7 @@ if __name__ == "__main__" :
 	parser.add_argument('-T', '--timeProp', help = "Load time proportion", type = str, default = None)
 	parser.add_argument('-s', '--scatter', help = "Load scatter points", type = str, default = None, nargs = '+')
 	parser.add_argument('-v', '--vector', help = "Draw the vector field", default = False, action = "store_true")
+	parser.add_argument('-b', '--bestchoice', help = "Individuals always chooses the best partner", default = False, action = "store_true")
 	args = parser.parse_args()
 
 	main(args)
