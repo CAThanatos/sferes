@@ -592,7 +592,9 @@ struct Params
 
 #define FOOD_BIG_STAG_COOP_LOW 0
 
-#ifdef BSTAG2500
+#ifdef BSTAG3000
+#define FOOD_BIG_STAG_COOP_HIGH 3000
+#elif defined(BSTAG2500)
 #define FOOD_BIG_STAG_COOP_HIGH 2500
 #elif defined(BSTAG1500)
 #define FOOD_BIG_STAG_COOP_HIGH 1500
