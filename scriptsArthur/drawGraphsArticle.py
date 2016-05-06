@@ -174,78 +174,88 @@ def drawAllFit(dossier) :
 		sns.set_context('paper')
 		palette = sns.color_palette("husl", len(hashNbBStags.keys()))
 
-		matplotlib.rcParams['font.size'] = 15
-		matplotlib.rcParams['font.weight'] = 'bold'
-		matplotlib.rcParams['axes.labelsize'] = 15
-		matplotlib.rcParams['axes.labelweight'] = 'bold'
-		matplotlib.rcParams['xtick.labelsize'] = 15
-		matplotlib.rcParams['ytick.labelsize'] = 15
-		matplotlib.rcParams['legend.fontsize'] = 15
+		rapp = 13.3333333/6.4
+		# rapp = 1.0
 
-		dpi = 96
-		size = (1280/dpi, 1024/dpi)
+		matplotlib.rcParams['font.size'] = 10*rapp
+		matplotlib.rcParams['font.weight'] = 'bold'
+		matplotlib.rcParams['axes.labelsize'] = 10*rapp
+		matplotlib.rcParams['axes.labelweight'] = 'bold'
+		matplotlib.rcParams['xtick.labelsize'] = 10*rapp
+		matplotlib.rcParams['ytick.labelsize'] = 10*rapp
+		matplotlib.rcParams['legend.fontsize'] = 10*rapp
+
+		matplotlib.rcParams['figure.dpi'] = 300
+		matplotlib.rcParams['figure.figsize'] = (13.3333333, 10.66666666)
+		# print(matplotlib.rcParams['figure.figsize'])
+
+		# dpi = 96
+		# size = (1280/dpi, 1024/dpi)
+		# dpi = 300
+		# size = (1280/dpi, 1024/dpi)
 
 		tabPlotGeneration = tabGeneration
 		tabPlotEvaluation = tabEvaluation
 
 
-		# --- MEAN RATIO BSTAGS ---
-		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+		# # --- MEAN RATIO BSTAGS ---
+		# fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 
-		cpt = 0
-		lastVals = []
-		captions = []
-		for run in hashFitness.keys() :
-			tabRatio = [np.mean(hashRatio[run][evaluation]) for evaluation in tabPlotEvaluation if evaluation in hashRatio[run].keys()]
-			axe1.plot(range(len(tabRatio)), tabRatio, color = palette[cpt])
-			lastVals.append(tabRatio[-1])
-			captions.append("Run " + str(run))
+		# cpt = 0
+		# lastVals = []
+		# captions = []
+		# for run in hashFitness.keys() :
+		# 	tabRatio = [np.mean(hashRatio[run][evaluation]) for evaluation in tabPlotEvaluation if evaluation in hashRatio[run].keys()]
+		# 	axe1.plot(range(len(tabRatio)), tabRatio, color = palette[cpt])
+		# 	lastVals.append(tabRatio[-1])
+		# 	captions.append("Run " + str(run))
 
-			cpt += 1
+		# 	cpt += 1
 
-		sortedVals = zip(*(sorted(zip(lastVals, range(len(lastVals))), key = itemgetter(0))))
-		sortedLastVals = sortedVals[0]
-		sortedIndexes = sortedVals[1]
+		# sortedVals = zip(*(sorted(zip(lastVals, range(len(lastVals))), key = itemgetter(0))))
+		# sortedLastVals = sortedVals[0]
+		# sortedIndexes = sortedVals[1]
 
-		# Create new axes on the right containing captions
-		# divider = make_axes_locatable(axe1)
-		# rax = divider.append_axes("right", size="25%", pad=0.00)
+		# # Create new axes on the right containing captions
+		# # divider = make_axes_locatable(axe1)
+		# # rax = divider.append_axes("right", size="25%", pad=0.00)
 
-		# Add captions text on axis, and lines
-		# yCaptionsCoords = np.linspace(0., 1., len(sortedIndexes))
-		# connectionLinesCoords = []
-		# for y, i in zip(yCaptionsCoords, sortedIndexes):
-		# 	cap = captions[i]
-		# 	lastVal = lastVals[i]
-		# 	color = palette[i]
-		# 	rax.text(1.10, y, cap,
-		# 			horizontalalignment='left',
-		# 			verticalalignment='center',
-		# 			transform = rax.transAxes)
+		# # Add captions text on axis, and lines
+		# # yCaptionsCoords = np.linspace(0., 1., len(sortedIndexes))
+		# # connectionLinesCoords = []
+		# # for y, i in zip(yCaptionsCoords, sortedIndexes):
+		# # 	cap = captions[i]
+		# # 	lastVal = lastVals[i]
+		# # 	color = palette[i]
+		# # 	rax.text(1.10, y, cap,
+		# # 			horizontalalignment='left',
+		# # 			verticalalignment='center',
+		# # 			transform = rax.transAxes)
 
-		# 	# Add lines
-		# 	normalizedLastVal = float(lastVal) / float(axe1.get_ylim()[1])
-		# 	normalizedY = float(y) * float(axe1.get_ylim()[1])
-		# 	rax.plot([lastVal, normalizedY], color=color)
+		# # 	# Add lines
+		# # 	normalizedLastVal = float(lastVal) / float(axe1.get_ylim()[1])
+		# # 	normalizedY = float(y) * float(axe1.get_ylim()[1])
+		# # 	rax.plot([lastVal, normalizedY], color=color)
 
 
-		# rax.set_axis_off()
-		# rax.set_ylim(0, 100)
+		# # rax.set_axis_off()
+		# # rax.set_ylim(0, 100)
 
-		# Divide the x axis by 10
-		tabEvaluationTicks = [indice for indice in range(len(tabPlotEvaluation)) if indice % (int(len(tabPlotEvaluation)/10)) == 0]
-		axe1.set_xticks(tabEvaluationTicks)
-		axe1.set_xticklabels([tabGeneration[indice] for indice in tabEvaluationTicks])
-		axe1.set_xlabel('Generation')
+		# # Divide the x axis by 10
+		# tabEvaluationTicks = [indice for indice in range(len(tabPlotEvaluation)) if indice % (int(len(tabPlotEvaluation)/10)) == 0]
+		# axe1.set_xticks(tabEvaluationTicks)
+		# axe1.set_xticklabels([tabGeneration[indice] for indice in tabEvaluationTicks])
+		# axe1.set_xlabel('Generation')
 
-		axe1.set_ylabel('Percentage of stags hunted')
-		axe1.set_ylim(-5, 105)
+		# axe1.set_ylabel('Percentage of stags hunted')
+		# axe1.set_ylim(-5, 105)
 
-		plt.savefig(dossier + "/figureRatioBStags.png", bbox_inches = 'tight')
+		# plt.savefig(dossier + "/figureRatioBStags.png", bbox_inches = 'tight')
+		# plt.savefig(dossier + "/figureRatioBStags.svg", bbox_inches = 'tight')
 
 
 		# --- MEAN RATIO BSTAGS SUCCESS ---
-		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+		fig, axe1 = plt.subplots(nrows = 1, ncols = 1)#, figsize = size)
 
 		cpt = 0
 		lastVals = []
@@ -289,8 +299,8 @@ def drawAllFit(dossier) :
 		rax.set_axis_off()
 		rax.set_ylim(0, 100)
 
-		# Divide the x axis by 10
-		tabEvaluationTicks = [indice for indice in range(len(tabPlotEvaluation)) if indice % (int(len(tabPlotEvaluation)/10)) == 0]
+		# Divide the x axis by 3
+		tabEvaluationTicks = [indice for indice in range(len(tabPlotEvaluation)) if indice % (int(len(tabPlotEvaluation)/3)) == 0]
 		axe1.set_xticks(tabEvaluationTicks)
 		axe1.set_xticklabels([tabGeneration[indice] for indice in tabEvaluationTicks])
 		axe1.set_xlabel('Generation')
@@ -299,222 +309,227 @@ def drawAllFit(dossier) :
 		# axe1.set_ylim(0, 100)
 
 		plt.savefig(dossier + "/figureRatioBStagsSuccess.png", bbox_inches = 'tight')
+		plt.savefig(dossier + "/figureRatioBStagsSuccess.svg", bbox_inches = 'tight')
 
 
-		# --- MEAN RATIO HARES ---
-		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+# 		# --- MEAN RATIO HARES ---
+# 		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 
-		palette = sns.color_palette("husl", len(hashNbBStags.keys()))
-		cpt = 0
-		lastVals = []
-		captions = []
-		for run in hashFitness.keys() :
-			tabRatio = [np.mean(hashRatioHares[run][evaluation]) for evaluation in tabPlotEvaluation if evaluation in hashRatioHares[run].keys()]
-			axe1.plot(range(len(tabRatio)), tabRatio, color = palette[cpt])
+# 		palette = sns.color_palette("husl", len(hashNbBStags.keys()))
+# 		cpt = 0
+# 		lastVals = []
+# 		captions = []
+# 		for run in hashFitness.keys() :
+# 			tabRatio = [np.mean(hashRatioHares[run][evaluation]) for evaluation in tabPlotEvaluation if evaluation in hashRatioHares[run].keys()]
+# 			axe1.plot(range(len(tabRatio)), tabRatio, color = palette[cpt])
 
-			lastVals.append(tabRatio[-1])
-			captions.append("Run " + str(run))
-			cpt += 1
+# 			lastVals.append(tabRatio[-1])
+# 			captions.append("Run " + str(run))
+# 			cpt += 1
 
-		sortedVals = zip(*(sorted(zip(lastVals, range(len(lastVals))), key = itemgetter(0))))
-		sortedLastVals = sortedVals[0]
-		sortedIndexes = sortedVals[1]
+# 		sortedVals = zip(*(sorted(zip(lastVals, range(len(lastVals))), key = itemgetter(0))))
+# 		sortedLastVals = sortedVals[0]
+# 		sortedIndexes = sortedVals[1]
 
-		# Create new axes on the right containing captions
-		divider = make_axes_locatable(axe1)
-		rax = divider.append_axes("right", size="25%", pad=0.00)
+# 		# Create new axes on the right containing captions
+# 		divider = make_axes_locatable(axe1)
+# 		rax = divider.append_axes("right", size="25%", pad=0.00)
 
-		# Add captions text on axis, and lines
-		yCaptionsCoords = np.linspace(0., 1., len(sortedIndexes))
-		connectionLinesCoords = []
-		for y, i in zip(yCaptionsCoords, sortedIndexes):
-			cap = captions[i]
-			lastVal = lastVals[i]
-			color = palette[i]
-			rax.text(1.10, y, cap,
-					horizontalalignment='left',
-					verticalalignment='center',
-					transform = rax.transAxes)
+# 		# Add captions text on axis, and lines
+# 		yCaptionsCoords = np.linspace(0., 1., len(sortedIndexes))
+# 		connectionLinesCoords = []
+# 		for y, i in zip(yCaptionsCoords, sortedIndexes):
+# 			cap = captions[i]
+# 			lastVal = lastVals[i]
+# 			color = palette[i]
+# 			rax.text(1.10, y, cap,
+# 					horizontalalignment='left',
+# 					verticalalignment='center',
+# 					transform = rax.transAxes)
 
-			# Add lines
-			normalizedLastVal = float(lastVal) / float(axe1.get_ylim()[1])
-			normalizedY = float(y) * float(axe1.get_ylim()[1])
-			rax.plot([lastVal, normalizedY], color=color)
-
-
-		rax.set_axis_off()
-		rax.set_ylim(0, 100)
+# 			# Add lines
+# 			normalizedLastVal = float(lastVal) / float(axe1.get_ylim()[1])
+# 			normalizedY = float(y) * float(axe1.get_ylim()[1])
+# 			rax.plot([lastVal, normalizedY], color=color)
 
 
-		# Divide the x axis by 10
-		tabEvaluationTicks = [indice for indice in range(len(tabPlotEvaluation)) if indice % (int(len(tabPlotEvaluation)/10)) == 0]
-		axe1.set_xticks(tabEvaluationTicks)
-		axe1.set_xticklabels([tabGeneration[indice] for indice in tabEvaluationTicks])
-		axe1.set_xlabel('Generation')
-
-		axe1.set_ylabel('Percentage of hares hunted')
-		axe1.set_ylim(0, 100)
-
-		plt.savefig(dossier + "/figureRatioHares.png", bbox_inches = 'tight')
+# 		rax.set_axis_off()
+# 		rax.set_ylim(0, 100)
 
 
-		# --- MEAN RATIO HARES SUCCESS ---
-		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+# 		# Divide the x axis by 10
+# 		tabEvaluationTicks = [indice for indice in range(len(tabPlotEvaluation)) if indice % (int(len(tabPlotEvaluation)/10)) == 0]
+# 		axe1.set_xticks(tabEvaluationTicks)
+# 		axe1.set_xticklabels([tabGeneration[indice] for indice in tabEvaluationTicks])
+# 		axe1.set_xlabel('Generation')
 
-		palette = sns.color_palette("husl", len(hashNbBStags.keys()))
-		cpt = 0
-		lastVals = []
-		captions = []
-		for run in hashFitness.keys() :
-			tabRatio = [np.mean(hashRatioHaresSuccess[run][evaluation]) for evaluation in tabPlotEvaluation if evaluation in hashRatioHaresSuccess[run].keys()]
-			axe1.plot(range(len(tabRatio)), tabRatio, color = palette[cpt])
+# 		axe1.set_ylabel('Percentage of hares hunted')
+# 		axe1.set_ylim(0, 100)
 
-			lastVals.append(tabRatio[-1])
-			captions.append("Run " + str(run))
-			cpt += 1
-
-		sortedVals = zip(*(sorted(zip(lastVals, range(len(lastVals))), key = itemgetter(0))))
-		sortedLastVals = sortedVals[0]
-		sortedIndexes = sortedVals[1]
-
-		# Create new axes on the right containing captions
-		divider = make_axes_locatable(axe1)
-		rax = divider.append_axes("right", size="25%", pad=0.00)
-
-		# Add captions text on axis, and lines
-		yCaptionsCoords = np.linspace(0., 1., len(sortedIndexes))
-		connectionLinesCoords = []
-		for y, i in zip(yCaptionsCoords, sortedIndexes):
-			cap = captions[i]
-			lastVal = lastVals[i]
-			color = palette[i]
-			rax.text(1.10, y, cap,
-					horizontalalignment='left',
-					verticalalignment='center',
-					transform = rax.transAxes)
-
-			# Add lines
-			normalizedLastVal = float(lastVal) / float(axe1.get_ylim()[1])
-			normalizedY = float(y) * float(axe1.get_ylim()[1])
-			rax.plot([lastVal, normalizedY], color=color)
+# 		plt.savefig(dossier + "/figureRatioHares.png", bbox_inches = 'tight')
+# 		plt.savefig(dossier + "/figureRatioHares.svg", bbox_inches = 'tight')
 
 
-		rax.set_axis_off()
-		rax.set_ylim(0, 100)
+# 		# --- MEAN RATIO HARES SUCCESS ---
+# 		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+
+# 		palette = sns.color_palette("husl", len(hashNbBStags.keys()))
+# 		cpt = 0
+# 		lastVals = []
+# 		captions = []
+# 		for run in hashFitness.keys() :
+# 			tabRatio = [np.mean(hashRatioHaresSuccess[run][evaluation]) for evaluation in tabPlotEvaluation if evaluation in hashRatioHaresSuccess[run].keys()]
+# 			axe1.plot(range(len(tabRatio)), tabRatio, color = palette[cpt])
+
+# 			lastVals.append(tabRatio[-1])
+# 			captions.append("Run " + str(run))
+# 			cpt += 1
+
+# 		sortedVals = zip(*(sorted(zip(lastVals, range(len(lastVals))), key = itemgetter(0))))
+# 		sortedLastVals = sortedVals[0]
+# 		sortedIndexes = sortedVals[1]
+
+# 		# Create new axes on the right containing captions
+# 		divider = make_axes_locatable(axe1)
+# 		rax = divider.append_axes("right", size="25%", pad=0.00)
+
+# 		# Add captions text on axis, and lines
+# 		yCaptionsCoords = np.linspace(0., 1., len(sortedIndexes))
+# 		connectionLinesCoords = []
+# 		for y, i in zip(yCaptionsCoords, sortedIndexes):
+# 			cap = captions[i]
+# 			lastVal = lastVals[i]
+# 			color = palette[i]
+# 			rax.text(1.10, y, cap,
+# 					horizontalalignment='left',
+# 					verticalalignment='center',
+# 					transform = rax.transAxes)
+
+# 			# Add lines
+# 			normalizedLastVal = float(lastVal) / float(axe1.get_ylim()[1])
+# 			normalizedY = float(y) * float(axe1.get_ylim()[1])
+# 			rax.plot([lastVal, normalizedY], color=color)
 
 
-		# Divide the x axis by 10
-		tabEvaluationTicks = [indice for indice in range(len(tabPlotEvaluation)) if indice % (int(len(tabPlotEvaluation)/10)) == 0]
-		axe1.set_xticks(tabEvaluationTicks)
-		axe1.set_xticklabels([tabGeneration[indice] for indice in tabEvaluationTicks])
-		axe1.set_xlabel('Generation')
-
-		axe1.set_ylabel('Percentage of hares hunted')
-		axe1.set_ylim(0, 100)
-
-		plt.savefig(dossier + "/figureRatioHaresSuccess.png", bbox_inches = 'tight')
+# 		rax.set_axis_off()
+# 		rax.set_ylim(0, 100)
 
 
-		# --- NUMBER OF PREYS HUNTED ---
-		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+# 		# Divide the x axis by 10
+# 		tabEvaluationTicks = [indice for indice in range(len(tabPlotEvaluation)) if indice % (int(len(tabPlotEvaluation)/10)) == 0]
+# 		axe1.set_xticks(tabEvaluationTicks)
+# 		axe1.set_xticklabels([tabGeneration[indice] for indice in tabEvaluationTicks])
+# 		axe1.set_xlabel('Generation')
 
-		palette = sns.color_palette("husl", len(hashNbBStags.keys()))
-		firstGraphStags = None
-		firstGraphHares = None
-		cpt = 0
-		for run in hashNbBStags.keys() :
-			tabNbBStags = [np.mean(hashNbBStags[run][evaluation]) for evaluation in tabPlotEvaluation if evaluation in hashNbBStags[run].keys()]
-			tabNbHares = [np.mean(hashNbHares[run][evaluation]) for evaluation in tabPlotEvaluation if evaluation in hashNbHares[run].keys()]
+# 		axe1.set_ylabel('Percentage of hares hunted')
+# 		axe1.set_ylim(0, 100)
 
-			tmp1, = axe1.plot(range(len(tabNbBStags)), tabNbBStags, color = palette[cpt])
-			tmp2, = axe1.plot(range(len(tabNbHares)), tabNbHares, color = palette[cpt], linestyle = "--")
-
-			if firstGraphStags == None :
-				firstGraphStags = tmp1
-
-			if firstGraphHares == None :
-				firstGraphHares = tmp2
-
-			cpt += 1
-
-		# Divide the x axis by 10
-		tabEvaluationTicks = [indice for indice in range(len(tabPlotEvaluation)) if indice % (int(len(tabPlotEvaluation)/10)) == 0]
-		axe1.set_xticks(tabEvaluationTicks)
-		axe1.set_xticklabels([tabGeneration[indice] for indice in tabEvaluationTicks])
-		axe1.set_xlabel('Generation')
-
-		axe1.set_ylabel('Number of preys hunted')
-
-		plt.legend([firstGraphStags, firstGraphHares], ['Stags', 'Hares'], bbox_to_anchor=(0., 0., 1., .102), frameon = True)
-
-		plt.savefig(dossier + "/figureNbPreys.png", bbox_inches = 'tight')
+# 		plt.savefig(dossier + "/figureRatioHaresSuccess.png", bbox_inches = 'tight')
+# 		plt.savefig(dossier + "/figureRatioHaresSuccess.svg", bbox_inches = 'tight')
 
 
-		# --- BARS NUMBER OF PREYS ---
-		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+# 		# --- NUMBER OF PREYS HUNTED ---
+# 		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 
-		width = 0.5
-		tabPlotRun = [run for run in sorted(hashNbBStags.keys())]
-		tabNbHares = [np.mean(hashNbHares[run][tabPlotEvaluation[-1] if tabPlotEvaluation[-1] in hashNbHares[run].keys() else sorted(hashNbHares[run].keys())[-1]]) for run in tabPlotRun]
-		tabNbHaresStd = [np.std(hashNbHares[run][tabPlotEvaluation[-1] if tabPlotEvaluation[-1] in hashNbHares[run].keys() else sorted(hashNbHares[run].keys())[-1]]) for run in tabPlotRun]
-		tabNbBStags = [np.mean(hashNbBStags[run][tabPlotEvaluation[-1] if tabPlotEvaluation[-1] in hashNbBStags[run].keys() else sorted(hashNbBStags[run].keys())[-1]]) for run in tabPlotRun]
-		tabNbBStagsStd = [np.std(hashNbBStags[run][tabPlotEvaluation[-1] if tabPlotEvaluation[-1] in hashNbBStags[run].keys() else sorted(hashNbBStags[run].keys())[-1]]) for run in tabPlotRun]
+# 		palette = sns.color_palette("husl", len(hashNbBStags.keys()))
+# 		firstGraphStags = None
+# 		firstGraphHares = None
+# 		cpt = 0
+# 		for run in hashNbBStags.keys() :
+# 			tabNbBStags = [np.mean(hashNbBStags[run][evaluation]) for evaluation in tabPlotEvaluation if evaluation in hashNbBStags[run].keys()]
+# 			tabNbHares = [np.mean(hashNbHares[run][evaluation]) for evaluation in tabPlotEvaluation if evaluation in hashNbHares[run].keys()]
 
-		barNbHares = axe1.bar(range(len(tabNbHares)), tabNbHares, width = width, color = 'lime', alpha = 0.5, yerr = tabNbHaresStd, ecolor = 'black')
-		barNbBStags = axe1.bar(range(len(tabNbBStags)), tabNbBStags, bottom = tabNbHares, width = width, color = 'magenta', alpha = 0.5, yerr = tabNbBStagsStd, ecolor = 'black')
+# 			tmp1, = axe1.plot(range(len(tabNbBStags)), tabNbBStags, color = palette[cpt])
+# 			tmp2, = axe1.plot(range(len(tabNbHares)), tabNbHares, color = palette[cpt], linestyle = "--")
 
-		axe1.set_xticks(np.add(np.arange(len(tabPlotRun)), width/2))
-		axe1.set_xticklabels(tabPlotRun)
-		# axe1.set_xticklabels(np.add(np.arange(len(tabPlotRun)), 1))
-		axe1.set_xlim(0, len(tabNbBStags))
-#		axe1.set_xticklabels(tabPlotRun)
-		axe1.set_xlabel('Run')
+# 			if firstGraphStags == None :
+# 				firstGraphStags = tmp1
 
-		axe1.set_ylabel('Number of preys hunted')
-		axe1.set_ylim(0)
+# 			if firstGraphHares == None :
+# 				firstGraphHares = tmp2
 
-		plt.legend([barNbHares, barNbBStags], ['Hares', 'Stags'], frameon = True)
+# 			cpt += 1
 
-		plt.savefig(dossier + "/figureBarsNbPreys.png", bbox_inches = 'tight')
+# 		# Divide the x axis by 10
+# 		tabEvaluationTicks = [indice for indice in range(len(tabPlotEvaluation)) if indice % (int(len(tabPlotEvaluation)/10)) == 0]
+# 		axe1.set_xticks(tabEvaluationTicks)
+# 		axe1.set_xticklabels([tabGeneration[indice] for indice in tabEvaluationTicks])
+# 		axe1.set_xlabel('Generation')
+
+# 		axe1.set_ylabel('Number of preys hunted')
+
+# 		plt.legend([firstGraphStags, firstGraphHares], ['Stags', 'Hares'], bbox_to_anchor=(0., 0., 1., .102), frameon = True)
+
+# 		plt.savefig(dossier + "/figureNbPreys.png", bbox_inches = 'tight')
+# 		plt.savefig(dossier + "/figureNbPreys.svg", bbox_inches = 'tight')
 
 
-		# --- NUMBER OF PREYS HUNTED SUCCESS ---
-		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+# 		# --- BARS NUMBER OF PREYS ---
+# 		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 
-		palette = sns.color_palette("husl", len(hashNbBStagsDuo.keys()))
-		firstGraphStags = None
-		firstGraphHares = None
-		cpt = 0
-		for run in hashNbBStagsDuo.keys() :
-			tabNbBStags = [np.mean(hashNbBStagsDuo[run][evaluation]) for evaluation in tabPlotEvaluation if evaluation in hashNbBStagsDuo[run].keys()]
-			tabNbHares = [np.mean(hashNbHares[run][evaluation]) for evaluation in tabPlotEvaluation if evaluation in hashNbHares[run].keys()]
+# 		width = 0.5
+# 		tabPlotRun = [run for run in sorted(hashNbBStags.keys())]
+# 		tabNbHares = [np.mean(hashNbHares[run][tabPlotEvaluation[-1] if tabPlotEvaluation[-1] in hashNbHares[run].keys() else sorted(hashNbHares[run].keys())[-1]]) for run in tabPlotRun]
+# 		tabNbHaresStd = [np.std(hashNbHares[run][tabPlotEvaluation[-1] if tabPlotEvaluation[-1] in hashNbHares[run].keys() else sorted(hashNbHares[run].keys())[-1]]) for run in tabPlotRun]
+# 		tabNbBStags = [np.mean(hashNbBStags[run][tabPlotEvaluation[-1] if tabPlotEvaluation[-1] in hashNbBStags[run].keys() else sorted(hashNbBStags[run].keys())[-1]]) for run in tabPlotRun]
+# 		tabNbBStagsStd = [np.std(hashNbBStags[run][tabPlotEvaluation[-1] if tabPlotEvaluation[-1] in hashNbBStags[run].keys() else sorted(hashNbBStags[run].keys())[-1]]) for run in tabPlotRun]
 
-			tmp1, = axe1.plot(range(len(tabNbBStags)), tabNbBStags, color = palette[cpt])
-			tmp2, = axe1.plot(range(len(tabNbHares)), tabNbHares, color = palette[cpt], linestyle = "--")
+# 		barNbHares = axe1.bar(range(len(tabNbHares)), tabNbHares, width = width, color = 'lime', alpha = 0.5, yerr = tabNbHaresStd, ecolor = 'black')
+# 		barNbBStags = axe1.bar(range(len(tabNbBStags)), tabNbBStags, bottom = tabNbHares, width = width, color = 'magenta', alpha = 0.5, yerr = tabNbBStagsStd, ecolor = 'black')
 
-			if firstGraphStags == None :
-				firstGraphStags = tmp1
+# 		axe1.set_xticks(np.add(np.arange(len(tabPlotRun)), width/2))
+# 		axe1.set_xticklabels(tabPlotRun)
+# 		# axe1.set_xticklabels(np.add(np.arange(len(tabPlotRun)), 1))
+# 		axe1.set_xlim(0, len(tabNbBStags))
+# #		axe1.set_xticklabels(tabPlotRun)
+# 		axe1.set_xlabel('Run')
 
-			if firstGraphHares == None :
-				firstGraphHares = tmp2
+# 		axe1.set_ylabel('Number of preys hunted')
+# 		axe1.set_ylim(0)
 
-			cpt += 1
+# 		plt.legend([barNbHares, barNbBStags], ['Hares', 'Stags'], frameon = True)
 
-		# Divide the x axis by 10
-		tabEvaluationTicks = [indice for indice in range(len(tabPlotEvaluation)) if indice % (int(len(tabPlotEvaluation)/10)) == 0]
-		axe1.set_xticks(tabEvaluationTicks)
-		axe1.set_xticklabels([tabGeneration[indice] for indice in tabEvaluationTicks])
-		axe1.set_xlabel('Generation')
+# 		plt.savefig(dossier + "/figureBarsNbPreys.png", bbox_inches = 'tight')
+# 		plt.savefig(dossier + "/figureBarsNbPreys.svg", bbox_inches = 'tight')
 
-		axe1.set_ylabel('Number of preys hunted')
 
-		plt.legend([firstGraphStags, firstGraphHares], ['Stags', 'Hares'], bbox_to_anchor=(0., 0., 1., .102), frameon = True)
+# 		# --- NUMBER OF PREYS HUNTED SUCCESS ---
+# 		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 
-		plt.savefig(dossier + "/figureNbPreysSuccess.png", bbox_inches = 'tight')
+# 		palette = sns.color_palette("husl", len(hashNbBStagsDuo.keys()))
+# 		firstGraphStags = None
+# 		firstGraphHares = None
+# 		cpt = 0
+# 		for run in hashNbBStagsDuo.keys() :
+# 			tabNbBStags = [np.mean(hashNbBStagsDuo[run][evaluation]) for evaluation in tabPlotEvaluation if evaluation in hashNbBStagsDuo[run].keys()]
+# 			tabNbHares = [np.mean(hashNbHares[run][evaluation]) for evaluation in tabPlotEvaluation if evaluation in hashNbHares[run].keys()]
 
+# 			tmp1, = axe1.plot(range(len(tabNbBStags)), tabNbBStags, color = palette[cpt])
+# 			tmp2, = axe1.plot(range(len(tabNbHares)), tabNbHares, color = palette[cpt], linestyle = "--")
+
+# 			if firstGraphStags == None :
+# 				firstGraphStags = tmp1
+
+# 			if firstGraphHares == None :
+# 				firstGraphHares = tmp2
+
+# 			cpt += 1
+
+# 		# Divide the x axis by 10
+# 		tabEvaluationTicks = [indice for indice in range(len(tabPlotEvaluation)) if indice % (int(len(tabPlotEvaluation)/10)) == 0]
+# 		axe1.set_xticks(tabEvaluationTicks)
+# 		axe1.set_xticklabels([tabGeneration[indice] for indice in tabEvaluationTicks])
+# 		axe1.set_xlabel('Generation')
+
+# 		axe1.set_ylabel('Number of preys hunted')
+
+# 		plt.legend([firstGraphStags, firstGraphHares], ['Stags', 'Hares'], bbox_to_anchor=(0., 0., 1., .102), frameon = True)
+
+# 		plt.savefig(dossier + "/figureNbPreysSuccess.png", bbox_inches = 'tight')
+# 		plt.savefig(dossier + "/figureNbPreysSuccess.svg", bbox_inches = 'tight')
 
 		# --- BARS NUMBER OF PREYS COOP ---
-		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+		fig, axe1 = plt.subplots(nrows = 1, ncols = 1)#, figsize = size)
 
 		width = 0.5
 		tabPlotRun = [run for run in sorted(hashNbBStags.keys())]
@@ -539,72 +554,76 @@ def drawAllFit(dossier) :
 		axe1.set_ylabel('Number of preys hunted')
 		axe1.set_ylim(0)
 
-		plt.legend([barNbHares, barNbBStagsDuo, barNbBStagsSolo], ['Hares', 'Stags coop.', 'Stags solo'], frameon = True)
+		# plt.legend([barNbHares, barNbBStagsDuo, barNbBStagsSolo], ['Hares', 'Stags coop.', 'Stags solo'], frameon = True, bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
+  #        ncol=3, mode="expand", borderaxespad=0.)
 
 		plt.savefig(dossier + "/figureBarsNbPreysSuccess.png", bbox_inches = 'tight')
+		plt.savefig(dossier + "/figureBarsNbPreysSuccess.svg", bbox_inches = 'tight')
 
 
-		# --- COOPERATION ON BSTAGS ---
-		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+# 		# --- COOPERATION ON BSTAGS ---
+# 		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 
-		palette = sns.color_palette("husl", len(hashNbBStags.keys()))
-		firstGraphTotal = None
-		firstGraphCoop = None
-		cpt = 0
-		for run in hashNbBStags.keys() :
-			tabNbBStags = [np.mean(hashNbBStags[run][evaluation]) for evaluation in tabPlotEvaluation if evaluation in hashNbBStags[run].keys()]
-			tabNbBStagsDuo = [np.mean(hashNbBStagsDuo[run][evaluation]) for evaluation in tabPlotEvaluation if evaluation in hashNbBStagsDuo[run].keys()]
+# 		palette = sns.color_palette("husl", len(hashNbBStags.keys()))
+# 		firstGraphTotal = None
+# 		firstGraphCoop = None
+# 		cpt = 0
+# 		for run in hashNbBStags.keys() :
+# 			tabNbBStags = [np.mean(hashNbBStags[run][evaluation]) for evaluation in tabPlotEvaluation if evaluation in hashNbBStags[run].keys()]
+# 			tabNbBStagsDuo = [np.mean(hashNbBStagsDuo[run][evaluation]) for evaluation in tabPlotEvaluation if evaluation in hashNbBStagsDuo[run].keys()]
 
-			tmp1, = axe1.plot(range(len(tabNbBStags)), tabNbBStags, color = palette[cpt])
-			tmp2, = axe1.plot(range(len(tabNbBStagsDuo)), tabNbBStagsDuo, color = palette[cpt], linestyle = "--")
+# 			tmp1, = axe1.plot(range(len(tabNbBStags)), tabNbBStags, color = palette[cpt])
+# 			tmp2, = axe1.plot(range(len(tabNbBStagsDuo)), tabNbBStagsDuo, color = palette[cpt], linestyle = "--")
 
-			if firstGraphTotal == None :
-				firstGraphTotal = tmp1
+# 			if firstGraphTotal == None :
+# 				firstGraphTotal = tmp1
 
-			if firstGraphCoop == None :
-				firstGraphCoop = tmp2
+# 			if firstGraphCoop == None :
+# 				firstGraphCoop = tmp2
 
-			cpt += 1
+# 			cpt += 1
 
-		# Divide the x axis by 10
-		tabEvaluationTicks = [indice for indice in range(len(tabPlotEvaluation)) if indice % (int(len(tabPlotEvaluation)/10)) == 0]
-		axe1.set_xticks(tabEvaluationTicks)
-		axe1.set_xticklabels([tabGeneration[indice] for indice in tabEvaluationTicks])
-		axe1.set_xlabel('Generation')
+# 		# Divide the x axis by 10
+# 		tabEvaluationTicks = [indice for indice in range(len(tabPlotEvaluation)) if indice % (int(len(tabPlotEvaluation)/10)) == 0]
+# 		axe1.set_xticks(tabEvaluationTicks)
+# 		axe1.set_xticklabels([tabGeneration[indice] for indice in tabEvaluationTicks])
+# 		axe1.set_xlabel('Generation')
 
-		axe1.set_ylabel('Number of preys hunted')
+# 		axe1.set_ylabel('Number of preys hunted')
 
-		plt.legend([firstGraphTotal, firstGraphCoop], ['Solo', 'Coop.'], bbox_to_anchor=(0., 0., 1., .102), frameon = True)
+# 		plt.legend([firstGraphTotal, firstGraphCoop], ['Solo', 'Coop.'], bbox_to_anchor=(0., 0., 1., .102), frameon = True)
 
-		plt.savefig(dossier + "/figureBStagsCoop.png", bbox_inches = 'tight')
+# 		plt.savefig(dossier + "/figureBStagsCoop.png", bbox_inches = 'tight')
+# 		plt.savefig(dossier + "/figureBStagsCoop.svg", bbox_inches = 'tight')
 
 
-		# --- BARS COOP BSTAGS ---
-		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
+# 		# --- BARS COOP BSTAGS ---
+# 		fig, axe1 = plt.subplots(nrows = 1, ncols = 1, figsize = size)
 
-		width = 0.5
-		tabPlotRun = [run for run in sorted(hashNbBStagsSolo.keys())]
-		tabNbBStagsSolo = [np.mean(hashNbBStagsSolo[run][tabPlotEvaluation[-1] if tabPlotEvaluation[-1] in hashNbBStagsSolo[run].keys() else sorted(hashNbBStagsSolo[run].keys())[-1]]) for run in tabPlotRun]
-		tabNbBStagsSoloStd = [np.std(hashNbBStagsSolo[run][tabPlotEvaluation[-1] if tabPlotEvaluation[-1] in hashNbBStagsSolo[run].keys() else sorted(hashNbBStagsSolo[run].keys())[-1]]) for run in tabPlotRun]
-		tabNbBStagsDuo = [np.mean(hashNbBStagsDuo[run][tabPlotEvaluation[-1] if tabPlotEvaluation[-1] in hashNbBStagsDuo[run].keys() else sorted(hashNbBStagsDuo[run].keys())[-1]]) for run in tabPlotRun]
-		tabNbBStagsDuoStd = [np.std(hashNbBStagsDuo[run][tabPlotEvaluation[-1] if tabPlotEvaluation[-1] in hashNbBStagsDuo[run].keys() else sorted(hashNbBStagsDuo[run].keys())[-1]]) for run in tabPlotRun]
+# 		width = 0.5
+# 		tabPlotRun = [run for run in sorted(hashNbBStagsSolo.keys())]
+# 		tabNbBStagsSolo = [np.mean(hashNbBStagsSolo[run][tabPlotEvaluation[-1] if tabPlotEvaluation[-1] in hashNbBStagsSolo[run].keys() else sorted(hashNbBStagsSolo[run].keys())[-1]]) for run in tabPlotRun]
+# 		tabNbBStagsSoloStd = [np.std(hashNbBStagsSolo[run][tabPlotEvaluation[-1] if tabPlotEvaluation[-1] in hashNbBStagsSolo[run].keys() else sorted(hashNbBStagsSolo[run].keys())[-1]]) for run in tabPlotRun]
+# 		tabNbBStagsDuo = [np.mean(hashNbBStagsDuo[run][tabPlotEvaluation[-1] if tabPlotEvaluation[-1] in hashNbBStagsDuo[run].keys() else sorted(hashNbBStagsDuo[run].keys())[-1]]) for run in tabPlotRun]
+# 		tabNbBStagsDuoStd = [np.std(hashNbBStagsDuo[run][tabPlotEvaluation[-1] if tabPlotEvaluation[-1] in hashNbBStagsDuo[run].keys() else sorted(hashNbBStagsDuo[run].keys())[-1]]) for run in tabPlotRun]
 
-		barNbBStagsSolo = axe1.bar(range(len(tabNbBStagsSolo)), tabNbBStagsSolo, width = width, color = 'magenta', alpha = 0.5, yerr = tabNbBStagsSoloStd, ecolor = 'black')
-		barNbBStagsDuo = axe1.bar(range(len(tabNbBStagsDuo)), tabNbBStagsDuo, bottom = tabNbBStagsSolo, width = width, color = 'purple', alpha = 0.5, yerr = tabNbBStagsDuoStd, ecolor = 'black')
+# 		barNbBStagsSolo = axe1.bar(range(len(tabNbBStagsSolo)), tabNbBStagsSolo, width = width, color = 'magenta', alpha = 0.5, yerr = tabNbBStagsSoloStd, ecolor = 'black')
+# 		barNbBStagsDuo = axe1.bar(range(len(tabNbBStagsDuo)), tabNbBStagsDuo, bottom = tabNbBStagsSolo, width = width, color = 'purple', alpha = 0.5, yerr = tabNbBStagsDuoStd, ecolor = 'black')
 
-		axe1.set_xticks(np.add(np.arange(len(tabPlotRun)), width/2))
-		axe1.set_xticklabels(tabPlotRun)
-		# axe1.set_xticklabels(np.add(np.arange(len(tabPlotRun)), 1))
-		axe1.set_xlim(0, len(tabNbBStagsSolo))
-#		axe1.set_xticklabels(tabPlotRun)
-		axe1.set_xlabel('Run')
+# 		axe1.set_xticks(np.add(np.arange(len(tabPlotRun)), width/2))
+# 		axe1.set_xticklabels(tabPlotRun)
+# 		# axe1.set_xticklabels(np.add(np.arange(len(tabPlotRun)), 1))
+# 		axe1.set_xlim(0, len(tabNbBStagsSolo))
+# #		axe1.set_xticklabels(tabPlotRun)
+# 		axe1.set_xlabel('Run')
 
-		axe1.set_ylabel('Number of preys hunted')
-		axe1.set_ylim(0)
+# 		axe1.set_ylabel('Number of preys hunted')
+# 		axe1.set_ylim(0)
 
-		plt.legend([barNbBStagsSolo, barNbBStagsDuo], ['Solo', 'Coop.'], frameon = True)
+# 		plt.legend([barNbBStagsSolo, barNbBStagsDuo], ['Solo', 'Coop.'], frameon = True)
 
-		plt.savefig(dossier + "/figureBarsBStagsCoop.png", bbox_inches = 'tight')
+# 		plt.savefig(dossier + "/figureBarsBStagsCoop.png", bbox_inches = 'tight')
+# 		plt.savefig(dossier + "/figureBarsBStagsCoop.svg", bbox_inches = 'tight')
 
 
 def drawBestFit(dossier) :

@@ -1630,16 +1630,26 @@ def drawBestLeadership(dossier) :
 			# axe1.add_line(lines.Line2D([0, lastEval], [-0.5, -0.5], color="red"))
 
 			# Divide the x axis by 10
+			tabEvaluationTicks = [indice for indice in range(len(tabPlotEvaluation)) if indice % (int(len(tabPlotEvaluation)/3)) == 0]
+
+			# print(tabEvaluationTicks)
+			# tabTicks = tabPlotEvaluation
+			# tabTicks[tabEvaluationTicks[1]] = 30000
+			# tabTicks[tabEvaluationTicks[2]] = 60000
+			# tabTicks[tabEvaluationTicks[3]] = 90000
+			# axe1.set_xticks(tabEvaluationTicks)
+			# axe1.set_xticklabels([tabTicks[indice] for indice in tabEvaluationTicks])
 			tabEvaluationTicks = [indice for indice in range(len(tabPlotEvaluation)) if indice % (int(len(tabPlotEvaluation)/10)) == 0]
 
 			axe1.set_xticks(tabEvaluationTicks)
 			axe1.set_xticklabels([tabPlotEvaluation[indice] for indice in tabEvaluationTicks])
 			axe1.set_xlabel('Evaluation')
+			axe1.set_xlim(tabEvaluationTicks[0], tabEvaluationTicks[-1])
 
 			axe1.set_ylabel("Proportion of leadership")
 			axe1.set_ylim(-0.1, 1.1)
 
-			axe1.set_title('Best proportion')
+			# axe1.set_title('Best proportion')
 
 			plt.savefig(dossier + "/proportionRun" + str(run) + ".png", bbox_inches = 'tight')
 			plt.close()

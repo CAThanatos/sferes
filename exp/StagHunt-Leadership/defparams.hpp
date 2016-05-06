@@ -100,11 +100,16 @@ struct Params
 #else
 		SFERES_STRING(map_name, SFERES_ROOT "/exp/StagHunt-Leadership/map800x800.pbm");
 		static const float real_w = 2400.0f;
+		// static const float real_w = 4800.0f;
 #endif
 		
 		static const float hunter_radius = 20.0f;
 		
 		static const float hare_radius = 20.0f;
+		
+		// static const float hunter_radius = 40.0f;
+		
+		// static const float hare_radius = 40.0f;
 
 #ifdef PREYS1
 		static const int total_preys = 1;
@@ -640,9 +645,9 @@ struct Params
 
 //#define PRED_CONF
 
-// #define BEHAVIOUR_LOG
+#define BEHAVIOUR_LOG
 
-#define BEHAVIOUR_VIDEO
+// #define BEHAVIOUR_VIDEO
 
 #ifndef COEVO
 #define GENOME_TRACES
