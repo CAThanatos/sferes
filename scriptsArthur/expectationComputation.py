@@ -1245,7 +1245,7 @@ def main(args) :
 if __name__ == "__main__" :
 	parser = argparse.ArgumentParser()
 	# parser.add_argument('file', help = "Genome file")
-	parser.add_argument('-p', '--precision', help = "Precision", default = 0.01)
+	parser.add_argument('-p', '--precision', help = "Precision", default = 0.01, type = float)
 	parser.add_argument('-t', '--trajectory', help = "Load trajectory", type = str, default = None, nargs = '+')
 	parser.add_argument('-T', '--timeProp', help = "Load time proportion", type = str, default = None)
 	parser.add_argument('-s', '--scatter', help = "Load scatter points", type = str, default = None, nargs = '+')
