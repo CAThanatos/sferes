@@ -36,12 +36,13 @@ def build(bld):
 													 							# "SETTING15 COEVO BSTAG250",
 													 							# "SETTING15 COEVO PREYS1 BSTAG250",
 
-													 							"SETTING15 NO_PREYS SOLO BSTAG250 BSTAG_SOLO250",
-													 							"SETTING15 PREYS1 SOLO BSTAG250 BSTAG_SOLO250",
-													 							"SETTING15 PREYS1 BSTAG250 BSTAG_SOLO250"
-													 							"CONTROL1 NO_PREYS SOLO BSTAG250",
-													 							"CONTROL1 PREYS2 SOLO BSTAG250",
-													 							"CONTROL1 PREYS2 BSTAG250",
+													 							# "SETTING15 NO_PREYS SOLO BSTAG250 BSTAG_SOLO250",
+													 							# "SETTING15 PREYS1 SOLO BSTAG250 BSTAG_SOLO250",
+													 							"SETTING15 PREYS1 BSTAG250 BSTAG_SOLO250",
+													 							# "SETTING15 COEVO PREYS1 BSTAG250 BSTAG_SOLO250",
+													 							# "CONTROL1 NO_PREYS SOLO BSTAG250",
+													 							# "CONTROL1 PREYS2 SOLO BSTAG250",
+													 							# "CONTROL1 PREYS2 BSTAG250",
 													 							# "SETTING15 PREYS1 SOLO BSTAG250 BSTAG_SOLO250",
 																			])
 

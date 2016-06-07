@@ -210,6 +210,21 @@ namespace sferes
 				dbg::out(dbg::info, "ea")<<"best fitness: " << this->_pop[0]->fit().value() << std::endl;
       }
 
+      void fill_pop()
+      {
+        std::cout << "Duplicating individuals from pop_size = " << this->_pop.size() << " to pop_size = " << mu << std::endl;
+
+        int cur_pop_size = this->_pop.size();
+        this->_pop.resize(mu);
+
+        int cpt_indiv = 0;
+        for(size_t i = cur_pop_size; i < mu; ++i)
+        {
+          this->_pop[i] = this->_pop[cpt_indiv]->clone();
+          cpt_indiv = (cpt_indiv + 1)%cur_pop_size;
+        }
+			}
+
       void play_run(const std::string& fname)
       {
         std::ifstream ifs(fname.c_str());

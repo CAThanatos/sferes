@@ -205,9 +205,19 @@ namespace sferes
 
  					current_index += 3;
 #else
- 					inputs[current_index] = 1.0f;
- 					inputs[current_index + 1] = (3400.0f - _distance_hunter)/3400.0f;
- 					inputs[current_index + 2] = _angle_hunter/M_PI;
+ 					if(!_bool_leader)
+ 					{
+	 					inputs[current_index] = 1.0f;
+	 					inputs[current_index + 1] = (3400.0f - _distance_hunter)/3400.0f;
+	 					inputs[current_index + 2] = _angle_hunter/M_PI;
+ 					}
+ 					else
+ 					{
+	 					inputs[current_index] = 0.0f;
+	 					inputs[current_index + 1] = 1.0f;
+	 					inputs[current_index + 2] = 0.0f;
+ 					}
+
  					current_index += 3;
 #endif
 #endif

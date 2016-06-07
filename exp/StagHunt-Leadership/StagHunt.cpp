@@ -458,7 +458,7 @@ namespace sferes
 						{
 							std::string fileDump = _file_behaviour + boost::lexical_cast<std::string>(cpt_files + 1) + ".bmp";
        				simu.add_dead_prey(index, alone, first_robot);
-						  simu.dump_behaviour_log(fileDump.c_str());
+						  // simu.dump_behaviour_log(fileDump.c_str());
        				cpt_files++;
 						}
 #endif
@@ -1004,9 +1004,9 @@ namespace sferes
 
 #ifdef DECISION_MAPPING
 	   			if(hunter != hunters[0])
-						hunter->change_nn_mapping(0);
-					else
 						hunter->change_nn_mapping(1);
+					else
+						hunter->change_nn_mapping(0);
 #else
 	   			if(hunter != hunters[0])
 	   			{

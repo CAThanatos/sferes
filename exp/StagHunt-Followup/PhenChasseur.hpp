@@ -95,6 +95,11 @@ namespace sferes
 
 					this->fit().fitness_at = 0;
 
+#ifdef LEADERSHIP_INFO
+					_nb_get_first = 0;
+					_nb_get_first_at = 0;
+#endif
+
 #ifdef DIVERSITY
 					_vector_diversity_init = false;
 					_vector_diversity.clear();
@@ -198,6 +203,13 @@ namespace sferes
 		    float nb_leader_first_at() const { return _nb_leader_first_at; }
 		    void add_nb_leader_first(float nb_leader_first) { _nb_leader_first_at.fetch_and_store(_nb_leader_first_at + nb_leader_first); }
 
+#ifdef LEADERSHIP_INFO
+		    float nb_get_first() const { return _nb_get_first; }
+		    void set_nb_get_first(float nb_get_first) { _nb_get_first = nb_get_first; }
+		    
+		    float nb_get_first_at() const { return _nb_get_first_at; }
+		    void add_nb_get_first(float nb_get_first) { _nb_get_first_at.fetch_and_store(_nb_get_first_at + nb_get_first); }
+#endif
 
 		    float nb_preys_killed_coop() const { return _nb_preys_killed_coop; }
 		    void set_nb_preys_killed_coop(float nb_preys_killed_coop) { _nb_preys_killed_coop = nb_preys_killed_coop; }
@@ -391,6 +403,11 @@ namespace sferes
 
 		    std::vector<tbb::atomic<float> > _vec_sm_at;
 		    std::vector<float> _vec_sm;
+#endif
+
+#ifdef LEADERSHIP_INFO
+		    float _nb_get_first;
+		    tbb::atomic<float> _nb_get_first_at;
 #endif
 		    
 		    float _fit_mov;

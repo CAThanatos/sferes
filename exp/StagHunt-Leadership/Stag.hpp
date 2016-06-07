@@ -40,6 +40,7 @@ namespace sferes
 				  	_fur_color = fur_color;
 				  	_huntable_alone = true;		
 						this->set_display_color(SMALL_STAG_COLOR/100);
+						// this->set_display_color(SMALL_STAG_COLOR/100);
 					}
 					else if(_fur_color >= 50)
 					{

@@ -23,7 +23,7 @@ namespace sferes
       typedef fastsim::Map map_t;
 
       using namespace fastsim;	
-      
+
       //this->set_mode(fit::mode::eval);
       // this->set_mode(fit::mode::view);
 
@@ -156,19 +156,9 @@ namespace sferes
 						hunter->set_bool_leader(false);
 
 						if(vec_ind[max_ind]->data().size() == nb_weights)
-						{
-							if((vec_ind[k]->data().size() == nb_weights) || (misc::rand<float>() < 0.5f))
 								hunter->choose_nn(0, vec_ind[k]->data());
-							else
-								hunter->choose_nn(1, vec_ind[k]->data());
-						}
 						else
-						{
-							if((vec_ind[k]->data().size() == nb_weights) && (misc::rand<float>() < 0.5f))
-								hunter->choose_nn(0, vec_ind[k]->data());
-							else
 								hunter->choose_nn(1, vec_ind[k]->data());
-						}
 					}
 				}
 #endif

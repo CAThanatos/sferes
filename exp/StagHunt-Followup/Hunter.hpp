@@ -31,6 +31,10 @@ namespace sferes
 				_bool_leader = false;
 				_bool_nn1 = false;
 
+#if LEADERSHIP_INFO
+				_nb_get_first = 0;
+#endif
+
 #ifdef SCREAM
 				_scream_value = 0.0f;
 #endif
@@ -394,6 +398,11 @@ namespace sferes
 					_nb_big_stags_hunted_solo++; 
 			}
 
+#ifdef LEADERSHIP_INFO
+			void add_get_first() { _nb_get_first++; }
+			int nb_get_first() { return _nb_get_first; }
+#endif
+
 			int nb_hares_hunted() { return _nb_hares_hunted; }
 	    int nb_hares_hunted_solo() { return _nb_hares_hunted_solo; }
 			int nb_small_stags_hunted() { return _nb_small_stags_hunted; }
@@ -442,6 +451,10 @@ namespace sferes
 			int _nb_big_stags_hunted;
 			int _nb_big_stags_hunted_solo;
 			bool _deactivated;
+
+#ifdef LEADERSHIP_INFO
+			int _nb_get_first;
+#endif
 
 			float _distance_hunter;
 			float _angle_hunter;	

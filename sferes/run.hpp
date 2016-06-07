@@ -123,6 +123,7 @@ namespace sferes
 	  {
 	    int stat = 0;
 	    int n = 0;
+
 	    if (vm.count("stat"))
 	      stat = vm["stat"].as<int>();
 	    if (vm.count("number"))

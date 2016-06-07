@@ -191,6 +191,8 @@ struct Params
 		
 #ifdef TRACE_ONLY
 		static const int nb_trials = 20;
+#elif defined(TRIALS10)
+		static const int nb_trials = 10;
 #else
 		static const int nb_trials = 5;
 #endif

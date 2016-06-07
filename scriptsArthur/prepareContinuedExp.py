@@ -85,7 +85,7 @@ for dir in listDirs :
 						fileGenMax = fileGen
 
 				# The file is copied to the output directory
-				dirOut = os.path.join(lastGenPopDir, os.path.join(dir, subDir))
+				dirOut = os.path.abspath(os.path.join(lastGenPopDir, os.path.join(dir, subDir)))
 				os.makedirs(dirOut)
 				shutil.copy(os.path.join(curDir, fileGenMax), dirOut)
 

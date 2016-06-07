@@ -104,6 +104,7 @@ namespace sferes
       template<typename T>
       void operator() (T & x) const
       {
+        std::cout << "MAAAAAAAAAAIS" << std::endl;
         std::string version;
         _archive >> boost::serialization::make_nvp("svn_version", version);
         if (version != std::string(SVN_VERSION))

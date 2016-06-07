@@ -243,7 +243,7 @@ namespace sferes
 	
 						std::vector<float> action = robot->step_action();
 	
-						std::cout << "==> " << action[0] << "/" << action[1] << std::endl;
+						// std::cout << "==> " << action[0] << "/" << action[1] << std::endl;
 
 						// We compute the movement of the robot
 						if(action[0] >= 0 || action[1] >= 0)

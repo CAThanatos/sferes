@@ -66,6 +66,10 @@ namespace sferes
 
 			float nb_ind1_leader_first = 0;
 
+#ifdef LEADERSHIP_INFO
+			float moy_get_first1 = 0.0f, moy_get_first2 = 0.0f;
+#endif
+
 #ifdef DIVERSITY
 			std::vector<float> vec_sm;
 #endif
@@ -261,6 +265,18 @@ namespace sferes
 	      else
 	      	nb_ind1_leader_first += _nb_preys_killed_coop_trial - _nb_leader_first_trial;
 
+#ifdef LEADERSHIP_INFO
+	      total_preys1 = h1->nb_hares_hunted() + h1->nb_small_stags_hunted() + h1->nb_big_stags_hunted();
+
+	      if(total_preys1 > 0)
+		      moy_get_first1 += (float)h1->nb_get_first()/(float)total_preys1;
+
+	      total_preys2 = h2->nb_hares_hunted() + h2->nb_small_stags_hunted() + h2->nb_big_stags_hunted();
+
+	      if(total_preys2 > 0)
+		      moy_get_first2 += (float)h2->nb_get_first()/(float)total_preys2;
+#endif
+
 #ifdef DIVERSITY
 	      for (size_t l = 0; l < vec_sm_trial.size(); ++l)
 	      	vec_sm.push_back(vec_sm_trial[l]);
@@ -319,6 +335,11 @@ namespace sferes
 			_nb_preys_killed_coop /= Params::simu::nb_trials;
 			proportion_leader /= Params::simu::nb_trials;
 			nb_ind1_leader_first /= Params::simu::nb_trials;
+
+#ifdef LEADERSHIP_INFO
+			moy_get_first1 /= Params::simu::nb_trials;
+			moy_get_first2 /= Params::simu::nb_trials;
+#endif
 		
 #ifdef NOT_AGAINST_ALL	
 			int nb_encounters = Params::pop::nb_opponents*Params::pop::nb_eval;
@@ -350,6 +371,11 @@ namespace sferes
      	
      	food2 /= nb_encounters;
      	food1 /= nb_encounters;
+
+#ifdef LEADERSHIP_INFO
+			moy_get_first1 /= nb_encounters;
+			moy_get_first2 /= nb_encounters;
+#endif
      	
 #ifdef KEEP_BEST_EVAL
 			if(food1 > ind1.fit().fitness_at)
@@ -373,6 +399,10 @@ namespace sferes
 
 			_nb_ind1_leader_first = nb_ind1_leader_first;
 
+#ifdef LEADERSHIP_INFO
+			ind1.add_nb_get_first(moy_get_first1);
+#endif
+
 			// std::cout << "----------" << std::endl;
    //   	std::cout << "Food 1 : " << food1 << std::endl;
    //   	std::cout << "Food 2 : " << food2 << std::endl;
@@ -394,6 +424,10 @@ namespace sferes
 				ind2.add_nb_ind1_leader_first(nb_ind1_leader_first);
 
 				ind2.fit().add_fitness(food2);
+
+#ifdef LEADERSHIP_INFO
+				ind2.add_nb_get_first(moy_get_first2);
+#endif
 			}
 #endif
 
@@ -620,6 +654,13 @@ namespace sferes
    					hunters[i]->eat_small_stag(alone);
    				else
    					hunters[i]->eat_big_stag(alone);
+
+#ifdef LEADERSHIP_INFO
+   				// If the leader got there first and I'm the leader or if the other got there first and I'm not the leader
+   				// THEN we know I got first on the prey
+   				if(((prey->get_leader_first() == 1) && (hunters[i]->is_leader())) || ((prey->get_leader_first() == 0) && !(hunters[i]->is_leader())))
+   					hunters[i]->add_get_first();
+#endif
    			}
    		}
    	}

@@ -102,7 +102,7 @@ namespace sferes
 				_best->develop();
 				_best->show(os);
 				_best->fit().set_mode(fit::mode::view);
-        
+  
         std::vector<boost::shared_ptr<Phen> > vec_ind;
         std::vector<bool> vec_eval;
         for(size_t i = 0; i < Params::simu::nb_hunters; ++i)
