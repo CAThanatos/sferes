@@ -240,7 +240,6 @@ namespace sferes
 						assert(num < simu.robots().size());
 	
 						StagHuntRobot* robot = (StagHuntRobot*)(simu.robots()[num]);
-	
 						std::vector<float> action = robot->step_action();
 	
 						// std::cout << "==> " << action[0] << "/" << action[1] << std::endl;
@@ -252,6 +251,7 @@ namespace sferes
 							float v2 = 4.0*(action[1] * 2.0-1.0);
 							
 							// v1 and v2 are between -4 and 4
+							// std::cout << v1 << "/" << v2 << std::endl;
 							simu.move_robot(v1, v2, num);
 
 							// speed_trial += ((v1 + v2) + 8.0)/16.0f;
@@ -360,6 +360,8 @@ namespace sferes
 							}
 						}
 					}
+
+					// usleep(500000);
 				}
 
 				// clock_t fin = clock();
@@ -582,7 +584,12 @@ namespace sferes
 			
 #ifdef POS_CLOSE
 			pos_init.push_back(Posture(width/2 - 40, 80, M_PI/2));
+
+#ifdef FIXED_PARTNER
+			pos_init.push_back(Posture(width/2, height/4, M_PI/2));
+#else
 			pos_init.push_back(Posture(width/2 + 40, 80, M_PI/2));
+#endif
 #else
 			pos_init.push_back(Posture(width/2, 80, M_PI/2));
 			pos_init.push_back(Posture(width/2, height - 80, -M_PI/2));
@@ -618,7 +625,7 @@ namespace sferes
 				else
 					r = new Hunter(Params::simu::hunter_radius, pos, HUNTER_COLOR, nn2);
 
-#ifdef SOLO
+#if defined(SOLO) || defined(FIXED_PARTNER)
 				if(i > 0)
 					r->set_deactivated(true);
 #endif

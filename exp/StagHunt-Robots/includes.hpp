@@ -2,6 +2,7 @@
 
 #include "defparams.hpp"
 #include <iostream>
+#include <unistd.h>
 #include <math.h>
 #include <ctime>
 #include <fstream>
