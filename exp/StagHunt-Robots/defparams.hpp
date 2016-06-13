@@ -15,6 +15,8 @@
 #define MLP_PERSO
 #endif
 
+#define LISTMATCH
+
 #define NO_BOOLEAN
 #define POS_CLOSE
 
