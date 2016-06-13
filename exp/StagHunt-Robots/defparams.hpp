@@ -15,6 +15,8 @@
 #define MLP_PERSO
 #endif
 
+#define LISTMATCH
+
 #define NO_BOOLEAN
 #define POS_CLOSE
 
@@ -156,7 +158,7 @@ struct Params
 		
 		static const int nb_levels = 2;
 
-		static const float nb_steps = 500;
+		static const float nb_steps = 20000;
 		
 #ifdef TRACE_ONLY
 		static const int nb_trials = 20;

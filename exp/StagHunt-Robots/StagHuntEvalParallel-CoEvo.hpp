@@ -49,6 +49,11 @@ namespace sferes
 {
   namespace eval
   {
+  	typedef std::vector<int> ind_match_t;
+  	typedef std::vector<ind_match_t> match_t;
+  	typedef std::vector<match_t> list_matches_ind_t;
+  	typedef std::vector<list_matches_ind_t> list_matches_t;
+
     template<typename Phen>
     struct _parallel_ev_coevo
     {
@@ -196,6 +201,48 @@ namespace sferes
       }
     };
 
+    template<typename Phen>
+    struct _parallel_ev_select_list_coevo
+    {
+      typedef std::vector<boost::shared_ptr<Phen> > pop_t;
+      pop_t _pop;
+      int nb_opponents;
+      int nb_eval;
+      int _size;
+      list_matches_t _list_matches;
+
+      ~_parallel_ev_select_list_coevo() { }
+      _parallel_ev_select_list_coevo(const pop_t& pop, int size, const list_matches_t& list_matches) : _pop(pop), _size(size), _list_matches(list_matches)
+      {
+		    nb_opponents = Params::pop::nb_opponents;
+		    nb_eval = Params::pop::nb_eval;
+      }
+      _parallel_ev_select_list_coevo(const _parallel_ev_select_list_coevo& ev) : _pop(ev._pop), _size(ev._size), _list_matches(ev._list_matches)
+      {
+		    nb_opponents = Params::pop::nb_opponents;
+		    nb_eval = Params::pop::nb_eval;
+      }
+      void operator() (const parallel::range_t& r) const
+      {
+				for (size_t i = r.begin(); i != r.end(); ++i)
+				{
+					assert(i < _pop.size());
+					assert(i < _list_matches.size());
+
+					for(size_t j = 0; j < _list_matches[i].size(); ++j)
+					{
+						std::vector<boost::shared_ptr<Phen> > vec_ind;
+						std::vector<bool> vec_eval;
+
+						vec_ind.push_back(_pop[i]);
+						vec_eval.push_back(true);
+
+						_pop[i]->fit().eval_compet(*_pop[i], *_pop[_list_matches[i][j][0][0]], (_list_matches[i][j][0][1] == 0) ? false : true);
+					}
+				}
+      }
+    };
+
 #ifdef NOVELTY
 		float dist(std::vector<float> v1, std::vector<float> v2)
 		{
@@ -245,6 +292,12 @@ namespace sferes
 				int duration = time(NULL);
 #endif
 		
+#ifdef LISTMATCH
+				list_matches_t list_matches;
+				int nb_simulations_max = Params::pop::nb_opponents*Params::pop::nb_eval;
+				std::vector<int> vec_nb_simulations(end - begin, 0);
+#endif
+		
 				for(int i = begin; i < end; ++i)
 				{
 					pop[i]->develop();
@@ -259,6 +312,92 @@ namespace sferes
 #endif
 					for(int k = 0; k < pop[i]->fit().objs().size(); ++k)
 						pop[i]->fit().set_obj(k, 0);
+
+#ifdef LISTMATCH
+					std::vector<int> vec_opponents;
+					if(i < pop.size()/2)
+					{
+						for(int j = pop.size()/2; j < end; ++j)
+							if(vec_nb_simulations[j] < nb_simulations_max)
+								vec_opponents.push_back(j);
+					}
+					else
+					{
+						for(int j = 0; j < pop.size()/2; ++j)
+							if(vec_nb_simulations[j] < nb_simulations_max)
+								vec_opponents.push_back(j);
+					}
+
+					int size_vec_opponents = vec_opponents.size();
+
+					// Creation of the matching list
+					list_matches_ind_t list_matches_ind;
+					while(vec_nb_simulations[i] < nb_simulations_max)
+					{
+						match_t vec_match(1);
+						for(int j = 0; j < vec_match.size(); ++j)
+						{
+							int opponent = -1;
+							int match_opp = -1;
+
+							ind_match_t ind_match(2);
+							if(size_vec_opponents == 0)
+							{
+								do
+								{
+									if(i < pop.size()/2)
+										opponent = misc::rand(pop.size()/2, end);
+									else
+										opponent = misc::rand(0, (int)(pop.size()/2) + 1);
+								} while((opponent == i) || (opponent < 0) || (opponent >= pop.size()));
+								
+								assert(opponent != -1);
+								ind_match[0] = opponent;
+								ind_match[1] = 0;
+							}
+							else
+							{
+								do
+								{
+									opponent = misc::rand(0, size_vec_opponents);
+									match_opp = vec_opponents[opponent];
+								} while((match_opp == i) || (match_opp < 0) || (match_opp >= pop.size()));
+								
+								assert(opponent != -1);
+								ind_match[0] = match_opp;
+								ind_match[1] = 1;
+
+								vec_nb_simulations[match_opp]++;
+
+								if(vec_nb_simulations[match_opp] >= nb_simulations_max)
+								{
+									vec_opponents[opponent] = vec_opponents[size_vec_opponents - 1];
+									size_vec_opponents--;
+								}
+							}
+
+							vec_match[j] = ind_match;
+						}
+						list_matches_ind.push_back(vec_match);
+						vec_nb_simulations[i]++;
+
+						if(vec_nb_simulations[i] >= nb_simulations_max)
+						{
+							int index = 0;
+							for(size_t j = 0; j < vec_opponents.size(); ++j)
+							{
+								if(vec_opponents[j] == i)
+								{
+									index = j;
+									break;
+								}
+							}
+							vec_opponents[index] = vec_opponents[size_vec_opponents - 1];
+							size_vec_opponents--;
+						}
+					}
+					list_matches.push_back(list_matches_ind);
+#endif
 				}
 
 #ifdef ALTRUISM
@@ -266,9 +405,15 @@ namespace sferes
 				parallel::p_for(parallel::range_t(begin, end), _parallel_ev_altruism_coevo<Phen>(pop));
 				_nb_eval += (end - begin);
 #elif defined(NOT_AGAINST_ALL)
+#ifdef LISTMATCH
+				parallel::init();
+				parallel::p_for(parallel::range_t(begin, end), _parallel_ev_select_list_coevo<Phen>(pop, (end - begin), list_matches));
+				_nb_eval += (end - begin);
+#else
 				parallel::init();
 				parallel::p_for(parallel::range_t(begin, end), _parallel_ev_select_coevo<Phen>(pop, (end - begin)));
 				_nb_eval += (end - begin);
+#endif
 #else
 				for(size_t i = begin; i != end; ++i)
 				{
